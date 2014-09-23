@@ -1,10 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.0'
+    }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'signing'
 apply plugin: 'maven'
 apply plugin: 'jacoco'
+apply plugin: 'axion-release'
+
+scmVersion {
+    tag {
+        prefix = 'axion-release-plugin'
+    }
+}
 
 group = 'pl.allegro.tech.build'
-version = '0.9.0'
+version = scmVersion.version
 
 repositories {
     mavenCentral()
@@ -38,13 +54,18 @@ task groovydocJar(type: Jar) {
     from groovydoc
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
 task sourceJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
 artifacts {
-    archives groovydocJar, sourceJar
+    archives javadocJar, groovydocJar, sourceJar
 }
 
 signing {
