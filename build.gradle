@@ -1,0 +1,100 @@
+apply plugin: 'groovy'
+apply plugin: 'signing'
+apply plugin: 'maven'
+apply plugin: 'jacoco'
+
+group = 'pl.allegro.tech.build'
+version = '0.9.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile group: 'org.ajoberstar', name: 'grgit', version: '0.2.3'
+    compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.7.2'
+
+    testCompile(group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testCompile(group: 'cglib', name: 'cglib-nodep', version: '3.1')
+}
+
+test {
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
+
+task groovydocJar(type: Jar) {
+    classifier = 'groovydoc'
+    from groovydoc
+}
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives groovydocJar, sourceJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            def username = project.ext.has('nexusUser') ? project.ext.nexusUser : ''
+            def password = project.ext.has('nexusPassword') ? project.ext.nexusPassword : ''
+
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                authentication(userName: username, password: password)
+            }
+
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                authentication(userName: username, password: password)
+            }
+
+            pom.project {
+                name 'axion-release-plugin'
+
+                packaging 'jar'
+
+                description 'Gradle release and version management plugin.'
+                url 'https://github.com/allegro/axion-release-plugin'
+                inceptionYear '2014'
+
+                scm {
+                    connection 'scm:git:git@github.com:allegro/axion-release-plugin.git'
+                    developerConnection 'scm:git:git@github.com:allegro/axion-release-plugin.git'
+                    url 'https://github.com/allegro/axion-release-plugin'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        name 'Adam Dubiel'
+                    }
+                }
+            }
+        }
+    }
+}

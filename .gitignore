@@ -1,0 +1,11 @@
+/build/
+
+.gradle/
+
+.nb-gradle/
+.nb-gradle-properties
+
+.idea
+*.iml
+
+sonar-project.properties
