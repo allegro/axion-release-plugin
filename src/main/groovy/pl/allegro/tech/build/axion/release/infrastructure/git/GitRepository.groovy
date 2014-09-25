@@ -36,7 +36,7 @@ class GitRepository implements ScmRepository {
         if (options.attachRemote) {
             this.attachRemote(options.remote, options.remoteUrl)
         }
-        if(options.fetchTags) {
+        if (options.fetchTags) {
             this.fetchTags()
         }
     }
@@ -82,19 +82,25 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
-        repository.add(patterns: ['*'])
-        repository.commit(message: message)
-    }
-
-    @Override
     void attachRemote(String remoteName, String remoteUrl) {
         Config config = repository.repository.jgit.repository.config
 
         RemoteConfig remote = new RemoteConfig(config, remoteName)
-        remote.addURI(new URIish(remoteUrl))
+        // clear other push specs
+        List<URIish> pushUris = new ArrayList<>(remote.pushURIs)
+        for (URIish uri : pushUris) {
+            remote.removePushURI(uri)
+        }
+        remote.addPushURI(new URIish(remoteUrl))
         remote.update(config)
+
         config.save()
+    }
+
+    @Override
+    void commit(String message) {
+        repository.add(patterns: ['*'])
+        repository.commit(message: message)
     }
 
     @Override
