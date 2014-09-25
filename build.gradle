@@ -15,7 +15,7 @@ apply plugin: 'axion-release'
 
 scmVersion {
     tag {
-        prefix = 'axion-release-plugin'
+        prefix = 'axion-release'
     }
 }
 
