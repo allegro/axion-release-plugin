@@ -37,7 +37,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.0'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.2'
     }
 }
 
@@ -149,10 +149,12 @@ remote repository.
 scmVersion {
     remote = 'myRemote' // 'origin' by default
 
+    sanitizeVersion = true // should created version be sanitized, true by defaule
+
     tag {
         prefix = 'tag-prefix' // prefix to be used, 'release' by default
         versionSeparator = '-' // separator between prefix and version number, '-' by default
-        serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name fro mraw version
+        serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name from raw version
         deserialize = { tag, position -> /* ... */ } // reads raw version from tag
         initialVersion = { tag, position -> /* ... */ } // returns initial version if none found, 0.1.0 by default
     }
@@ -176,6 +178,32 @@ In `versionCreator` and `branchVersionCreators` closure arguments, `position` co
 * `latestTag` - the name of the latest tag.
 * `branch` - the name of the current branch.
 * `onTag` - true, if current commit is tagged.
+
+#### Version creators
+
+To create version creator that will attach branch name to version only for feature branches use:
+
+```
+branchVersionCreators = [
+    'feature/.*': {version, position -> "$version-$position.branch" 
+]
+```
+
+#### Version sanitization
+
+By default all versions are sanitized i.e. all characters that do not match `[A-Za-z0-9._-]` group are replaced with `-`. For example:
+
+```
+versionCreator = {version, position -> "$version-$position.branch"}
+```
+
+```
+$ git branch
+feature/some_feature
+
+$ ./gradlew cV
+release-0.1.0-feature-some_feature-SNAPSHOT
+```
 
 ## Publishing released version
 
