@@ -45,4 +45,37 @@ class VersionServiceTest extends Specification {
         then:
         version.version.toString() == '1.0.1-SNAPSHOT'
     }
+
+    def "should sanitize version if flag is set to true"() {
+        given:
+        versionConfig.versionCreator = {v, t -> return v + '-feature/hello'}
+
+        resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf("1.0.1"),
+                new ScmPosition('master', 'release-1.0.0', false)
+        )
+
+        when:
+        String version = service.currentDecoratedVersion(versionConfig, readOptions)
+
+        then:
+        version == '1.0.1-feature-hello-SNAPSHOT'
+    }
+
+    def "should not sanitize version if flag is set to false"() {
+        given:
+        versionConfig.sanitizeVersion = false
+        versionConfig.versionCreator = {v, t -> return v + '-feature/hello'}
+
+        resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf("1.0.1"),
+                new ScmPosition('master', 'release-1.0.0', false)
+        )
+
+        when:
+        String version = service.currentDecoratedVersion(versionConfig, readOptions)
+
+        then:
+        version == '1.0.1-feature/hello-SNAPSHOT'
+    }
 }

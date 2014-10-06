@@ -24,6 +24,8 @@ class VersionConfig {
 
     ChecksConfig checks = new ChecksConfig()
 
+    boolean sanitizeVersion = true
+
     VersionService versionService
 
     private String resolvedVersion = null

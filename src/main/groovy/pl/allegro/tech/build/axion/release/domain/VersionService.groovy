@@ -14,10 +14,13 @@ class VersionService {
 
     private final VersionResolver versionResolver
 
+    private final VersionSanitizer sanitizer
+
     VersionService(VersionResolver versionResolver) {
         this.repository = repository
         this.versionResolver = versionResolver
         this.versionDecorator = new VersionDecorator()
+        this.sanitizer = new VersionSanitizer()
     }
 
     VersionWithPosition currentVersion(VersionConfig versionConfig, VersionReadOptions options) {
@@ -37,7 +40,11 @@ class VersionService {
         VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options)
         String version = versionDecorator.createVersion(versionConfig, positionedVersion)
 
-        if(!positionedVersion.position.onTag) {
+        if (versionConfig.sanitizeVersion) {
+            version = sanitizer.sanitize(version)
+        }
+
+        if (!positionedVersion.position.onTag) {
             version = version + '-' + SNAPSHOT
         }
 

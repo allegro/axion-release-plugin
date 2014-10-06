@@ -34,7 +34,8 @@ class SshConnector extends JschConfigSessionFactory {
 
     private JSch createJSch() {
         JSch jsch = new JSch()
-        jsch.addIdentity('key', identity.privateKey.bytes, null, identity.passPhrase.bytes)
+        byte[] passPhrase = identity.passPhrase != null ? identity.passPhrase.bytes : null
+        jsch.addIdentity('key', identity.privateKey.bytes, null, passPhrase)
 
         return jsch
     }

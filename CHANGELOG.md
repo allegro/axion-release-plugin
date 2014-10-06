@@ -1,6 +1,8 @@
 axion-release-plugin changelog
 ====
 
+* **0.9.1** (25.09.2014)
+    * fixed bug with bamboo CI >= 5.6 (#3)
 * **0.9.0** (23.09.2014)
     * refactored API to be more verbose
     * refactored all configuration options

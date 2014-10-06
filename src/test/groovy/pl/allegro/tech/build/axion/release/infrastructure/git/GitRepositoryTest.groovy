@@ -2,6 +2,8 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
 import org.eclipse.jgit.lib.Config
+import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
@@ -122,7 +124,9 @@ class GitRepositoryTest extends Specification {
         then:
         Config config = rawRepository.repository.jgit.repository.config
         config.getSubsections('remote').contains('testRemote')
-        config.getString('remote', 'testRemote', 'url') == 'whatever'
+
+        RemoteConfig remote = new RemoteConfig(config, 'testRemote')
+        remote.pushURIs == [new URIish('whatever')]
     }
 
     def "should provide current branch name in position"() {
