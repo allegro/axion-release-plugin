@@ -37,7 +37,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.2'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.3'
     }
 }
 
@@ -159,7 +159,8 @@ scmVersion {
         initialVersion = { tag, position -> /* ... */ } // returns initial version if none found, 0.1.0 by default
     }
 
-    versionCreator = { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
+    versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
+    versionCreator 'versionWithBrach' // use one of predefined version creators
 
     branchVersionCreators = [
         'feature/.*': { version, position -> /* ... */ },
@@ -187,6 +188,28 @@ To create version creator that will attach branch name to version only for featu
 branchVersionCreators = [
     'feature/.*': {version, position -> "$version-$position.branch" 
 ]
+```
+
+#### Predefined version creators
+
+For convenience predefined version creators were created. They are registered under unique name (type) and aim to reduce
+bloat in `build.gradle` for commonly used cases. Currently there are two predefined version creators:
+
+* **default** returns version:
+
+```
+{version, position -> version}
+```
+
+* **versionWithBranch** appends branch name to version when not on master:
+
+```
+{version, position ->
+    if(position.branch != 'master') {
+        return version + '-' + position.branch
+    }
+    return version
+}
 ```
 
 #### Version sanitization
