@@ -18,7 +18,7 @@ class VersionConfig {
 
     TagNameSerializationRules tag = new TagNameSerializationRules()
 
-    Closure versionCreator = defaultVersionCreator()
+    Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
 
     Map<String, Closure> branchVersionCreators
 
@@ -49,6 +49,14 @@ class VersionConfig {
 
     void checks(Closure c) {
         project.configure(checks, c)
+    }
+
+    void versionCreator(String type) {
+        this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
+    }
+
+    void versionCreator(Closure c) {
+        this.versionCreator = c
     }
 
     String getVersion() {
