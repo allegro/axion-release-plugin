@@ -5,7 +5,7 @@ axion-release-plugin
 
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with 
-[maven-release-plugin](maven.apache.org/maven-release/maven-release-plugin/) which
+[maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
 did all the dirty work. Gradle has no such tool and probably doesn't need it anyway. Evolution of software craft came
 to the point, when we start thinking about SCM as ultimate source of truth about project version. No longer version
 hardcoded in **pom.xml** or **build.gradle**.
