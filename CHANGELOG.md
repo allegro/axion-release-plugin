@@ -1,6 +1,11 @@
 axion-release-plugin changelog
 ====
 
+* **0.9.3** (16.10.2014)
+    * added predefined version creators
+* **0.9.2** (06.10.2014)
+    * optional version sanitization to protect against any strange chars in artifact names
+    * private key password is not obligatory anymore
 * **0.9.1** (25.09.2014)
     * fixed bug with bamboo CI >= 5.6 (#3)
 * **0.9.0** (23.09.2014)

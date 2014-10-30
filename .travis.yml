@@ -1,0 +1,7 @@
+language: java
+
+install: ./gradlew assemble -x signArchives
+script: ./gradlew check
+
+jdk:
+  - openjdk7

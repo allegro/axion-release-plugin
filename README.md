@@ -3,9 +3,10 @@ axion-release-plugin
 
 *gradle release and version management plugin*
 
+[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with 
-[maven-release-plugin](maven.apache.org/maven-release/maven-release-plugin/) which
+[maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
 did all the dirty work. Gradle has no such tool and probably doesn't need it anyway. Evolution of software craft came
 to the point, when we start thinking about SCM as ultimate source of truth about project version. No longer version
 hardcoded in **pom.xml** or **build.gradle**.
@@ -37,7 +38,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.0'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.3'
     }
 }
 
@@ -149,15 +150,18 @@ remote repository.
 scmVersion {
     remote = 'myRemote' // 'origin' by default
 
+    sanitizeVersion = true // should created version be sanitized, true by defaule
+
     tag {
         prefix = 'tag-prefix' // prefix to be used, 'release' by default
         versionSeparator = '-' // separator between prefix and version number, '-' by default
-        serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name fro mraw version
+        serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name from raw version
         deserialize = { tag, position -> /* ... */ } // reads raw version from tag
         initialVersion = { tag, position -> /* ... */ } // returns initial version if none found, 0.1.0 by default
     }
 
-    versionCreator = { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
+    versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
+    versionCreator 'versionWithBrach' // use one of predefined version creators
 
     branchVersionCreators = [
         'feature/.*': { version, position -> /* ... */ },
@@ -176,6 +180,54 @@ In `versionCreator` and `branchVersionCreators` closure arguments, `position` co
 * `latestTag` - the name of the latest tag.
 * `branch` - the name of the current branch.
 * `onTag` - true, if current commit is tagged.
+
+#### Version creators
+
+To create version creator that will attach branch name to version only for feature branches use:
+
+```
+branchVersionCreators = [
+    'feature/.*': {version, position -> "$version-$position.branch" 
+]
+```
+
+#### Predefined version creators
+
+For convenience predefined version creators were created. They are registered under unique name (type) and aim to reduce
+bloat in `build.gradle` for commonly used cases. Currently there are two predefined version creators:
+
+* **default** returns version:
+
+```
+{version, position -> version}
+```
+
+* **versionWithBranch** appends branch name to version when not on master:
+
+```
+{version, position ->
+    if(position.branch != 'master') {
+        return version + '-' + position.branch
+    }
+    return version
+}
+```
+
+#### Version sanitization
+
+By default all versions are sanitized i.e. all characters that do not match `[A-Za-z0-9._-]` group are replaced with `-`. For example:
+
+```
+versionCreator = {version, position -> "$version-$position.branch"}
+```
+
+```
+$ git branch
+feature/some_feature
+
+$ ./gradlew cV
+release-0.1.0-feature-some_feature-SNAPSHOT
+```
 
 ## Publishing released version
 
