@@ -3,6 +3,7 @@ axion-release-plugin
 
 *gradle release and version management plugin*
 
+[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with 
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
