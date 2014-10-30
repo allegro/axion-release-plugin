@@ -34,7 +34,8 @@ class ComponentFactory {
             repository = repositoryFactory.createRepository(versionConfig.repository,
                     project.rootProject.file('./'),
                     identity,
-                    initializationOptions)
+                    initializationOptions,
+                    project.logger)
         }
         return repository
     }

@@ -7,9 +7,9 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 class DryRepository implements ScmRepository {
     
-    private final ScmRepository delegateRepository;
+    private final ScmRepository delegateRepository
     
-    private final Logger logger;
+    private final Logger logger
 
     DryRepository(ScmRepository delegateRepository, Logger logger) {
         this.delegateRepository = delegateRepository

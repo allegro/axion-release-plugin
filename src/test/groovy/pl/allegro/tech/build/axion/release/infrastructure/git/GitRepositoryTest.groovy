@@ -25,7 +25,18 @@ class GitRepositoryTest extends Specification {
         rawRepository.add(patterns: ['*'])
         rawRepository.commit(message: 'InitialCommit')
 
-        repository = new GitRepository(projectDir, null)
+        repository = new GitRepository(projectDir, null, project.logger)
+    }
+
+    def "should not fail when initializing in unexisitng repository"() {
+        given:
+        Project gitlessProject = ProjectBuilder.builder().build()
+
+        when:
+        new GitRepository(gitlessProject.file('./'), null, gitlessProject.logger)
+
+        then:
+        notThrown(Exception)
     }
 
     def "should create new tag on current commit"() {
@@ -63,6 +74,22 @@ class GitRepositoryTest extends Specification {
         then:
         position.latestTag == 'release-1'
         position.onTag == false
+    }
+
+    def "should return default position when no commit in repository"() {
+        given:
+        Project commitlessProject = ProjectBuilder.builder().build()
+        File projectDir = commitlessProject.file('./')
+
+        Grgit.init(dir: projectDir)
+        GitRepository commitlessRepository = new GitRepository(projectDir, null, commitlessProject.logger)
+
+        when:
+        ScmPosition position = commitlessRepository.currentPosition('release')
+
+        then:
+        position.branch == 'master'
+        position.tagless()
     }
 
     def "should indicate that position is on tag when latest commit is tagged"() {
