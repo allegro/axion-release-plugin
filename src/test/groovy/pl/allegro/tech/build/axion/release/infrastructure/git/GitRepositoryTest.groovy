@@ -6,6 +6,7 @@ import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
@@ -15,18 +16,24 @@ class GitRepositoryTest extends Specification {
 
     Grgit rawRepository
 
+    Grgit remoteRawRepository
+
     GitRepository repository
 
     void setup() {
+        File remoteProjectDir = ProjectBuilder.builder().build().file('./')
+        remoteRawRepository = Grgit.init(dir: remoteProjectDir)
+        remoteRawRepository.add(patterns: ['*'])
+        remoteRawRepository.commit(message: 'InitialCommit')
+
         project = ProjectBuilder.builder().build()
-        File projectDir = project.file('./')
+        File projectDir = project.file('./repo')
 
-        rawRepository = Grgit.init(dir: projectDir)
-        rawRepository.add(patterns: ['*'])
-        rawRepository.commit(message: 'InitialCommit')
+        rawRepository = Grgit.clone(dir: projectDir, uri: "file://$remoteProjectDir.canonicalPath")
 
-        repository = new GitRepository(projectDir, null, project.logger)
+        repository = new GitRepository(projectDir, ScmIdentity.defaultIdentity(), project.logger)
     }
+
 
     def "should not fail when initializing in unexisitng repository"() {
         given:
@@ -57,7 +64,7 @@ class GitRepositoryTest extends Specification {
 
     def "should signal there are uncommited changes"() {
         when:
-        project.file('uncommited').createNewFile()
+        project.file('repo/uncommited').createNewFile()
 
         then:
         repository.checkUncommitedChanges() == true
@@ -166,5 +173,37 @@ class GitRepositoryTest extends Specification {
 
         then:
         position.branch == 'some-branch'
+    }
+
+    def "should push changes and tag to remote"() {
+        given:
+        repository.tag('release-push')
+        repository.commit('commit after release-push')
+
+        when:
+        repository.push('origin')
+
+        then:
+        remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
+        remoteRawRepository.tag.list()*.fullName == ['refs/tags/release-push']
+    }
+
+    def "should push changes to remote with custom name"() {
+        given:
+        File customRemoteProjectDir = ProjectBuilder.builder().build().file('./')
+        Grgit customRemoteRawRepository = Grgit.init(dir: customRemoteProjectDir)
+
+        repository.tag('release-custom')
+        repository.commit('commit after release-custom')
+        repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
+
+        when:
+        repository.push('customRemote')
+
+        then:
+        customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']
+        customRemoteRawRepository.tag.list()*.fullName == ['refs/tags/release-custom']
+        remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
+        remoteRawRepository.tag.list()*.fullName == []
     }
 }

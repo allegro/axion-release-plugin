@@ -77,12 +77,13 @@ class GitRepository implements ScmRepository {
     void push(String remoteName) {
         ensureRepositoryExists()
 
-        pushCommand().call()
-        pushCommand().setPushTags().call()
+        pushCommand(remoteName).call()
+        pushCommand(remoteName).setPushTags().call()
     }
 
-    private PushCommand pushCommand() {
+    private PushCommand pushCommand(String remoteName) {
         PushCommand push = repository.repository.jgit.push()
+        push.remote = remoteName
         setTransportOptions(push)
 
         return push
