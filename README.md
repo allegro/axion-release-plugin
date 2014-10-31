@@ -51,7 +51,7 @@ scmVersion {
     }
 }
 
-// make our version is available to all
+// make our version available to all
 project.version = scmVersion.version
 ```
 
