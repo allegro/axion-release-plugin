@@ -51,7 +51,7 @@ scmVersion {
     }
 }
 
-// make our version is available to all
+// make our version available to all - necessarily after scmVersion configuration closure when tag prefix is defined
 project.version = scmVersion.version
 ```
 
