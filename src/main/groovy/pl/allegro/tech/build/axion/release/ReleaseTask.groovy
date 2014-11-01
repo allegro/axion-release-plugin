@@ -4,6 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
+import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.VersionWithPosition
@@ -19,7 +20,7 @@ class ReleaseTask extends DefaultTask {
 
     private final ScmRepository repository
 
-    public ReleaseTask() {
+    ReleaseTask() {
         this.versionConfig = project.extensions.getByType(VersionConfig)
         this.repository = createRepository(project, versionConfig)
     }
@@ -31,6 +32,7 @@ class ReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
+        LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(versionConfig, project)
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
@@ -40,8 +42,14 @@ class ReleaseTask extends DefaultTask {
 
             project.logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
-            project.logger.quiet("Pushing all to remote: ${versionConfig.remote}")
-            repository.push(versionConfig.remote)
+
+            if(!localOnlyResolver.localOnly(repository.remoteAttached(versionConfig.remote))) {
+                project.logger.quiet("Pushing all to remote: ${versionConfig.remote}")
+                repository.push(versionConfig.remote)
+            }
+            else {
+                project.logger.quiet("Changes made to local repository only")
+            }
         }
         else {
             project.logger.quiet("Working on released version ${versionConfig.version}, nothing to do here.")

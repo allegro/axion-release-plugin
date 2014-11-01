@@ -175,6 +175,13 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
+    boolean remoteAttached(String remoteName) {
+        Config config = repository.repository.jgit.repository.config
+
+        return config.getSubsections('remote').any { it == remoteName }
+    }
+
+    @Override
     boolean checkUncommitedChanges() {
         ensureRepositoryExists()
 

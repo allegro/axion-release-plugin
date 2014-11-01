@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.ChecksResolver
+import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
@@ -23,6 +24,7 @@ class VerifyReleaseTask extends DefaultTask {
         VersionConfig config = project.extensions.getByType(VersionConfig)
         boolean dryRun = project.hasProperty(ReleaseTask.DRY_RUN_FLAG)
         ChecksResolver resolver = new ChecksResolver(config.checks, project)
+        LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(config, project)
 
         if(resolver.checkUncommitedChanges()) {
             boolean uncommitedChanges = repository.checkUncommitedChanges()
@@ -35,7 +37,8 @@ class VerifyReleaseTask extends DefaultTask {
             project.logger.quiet('Skipping uncommited changes check')
         }
 
-        if(resolver.checkAheadOfRemote()) {
+        boolean remoteAttached = repository.remoteAttached(config.remote)
+        if(resolver.checkAheadOfRemote() && !localOnlyResolver.localOnly(remoteAttached)) {
             boolean aheadOfRemote = repository.checkAheadOfRemote()
             project.logger.quiet("Checking if branch is ahead of remote.. ${aheadOfRemote ? 'FAILED' : ''}")
             if (aheadOfRemote && !dryRun) {
@@ -43,7 +46,7 @@ class VerifyReleaseTask extends DefaultTask {
             }
         }
         else {
-            project.logger.quiet('Skipping ahead of remote check')
+            project.logger.quiet("Skipping ahead of remote check")
         }
     }
 }

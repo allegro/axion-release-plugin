@@ -104,6 +104,16 @@ To force version, set `release.forceVersion` project property, for example to st
 Plugin recognizes if you are on tag or not and adds additional "-SNAPSHOT" suffix when necessary.
 This property is ignored if it has empty value.
 
+#### Local build
+
+If you don't want release plugin to connect to remote, use `release.localOnly` flag:
+
+```
+./gradlew release -Prelease.localOnly
+```
+
+This implies, that plugin won't try to verify if current branch is ahead of remote nor it will push tag to remote.
+
 #### Dry run
 
 To check how release would behave without actually releasing anything, use `release.dryRun` option:
@@ -151,8 +161,9 @@ remote repository.
 ```groovy
 scmVersion {
     remote = 'myRemote' // 'origin' by default
+    localOnly = false // never connect to remote (e.g. don't push tags), false by default
 
-    sanitizeVersion = true // should created version be sanitized, true by defaule
+    sanitizeVersion = true // should created version be sanitized, true by default
 
     tag {
         prefix = 'tag-prefix' // prefix to be used, 'release' by default

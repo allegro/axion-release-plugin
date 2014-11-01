@@ -16,6 +16,8 @@ interface ScmRepository {
 
     ScmPosition currentPosition(String tagPrefix)
 
+    boolean remoteAttached(String remoteName);
+
     boolean checkUncommitedChanges()
 
     boolean checkAheadOfRemote()
