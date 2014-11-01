@@ -51,9 +51,11 @@ scmVersion {
     }
 }
 
-// make our version is available to all
+// make our version available to all
 project.version = scmVersion.version
 ```
+
+**Warning** Order of definitions in `build.gradle` file does matter! First you apply plugin, then comes `scmVersion { }` closure if configuration is needed and only then you can use `scmVersion.version` to extract current version.
 
 ## Tasks
 
