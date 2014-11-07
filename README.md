@@ -59,7 +59,17 @@ project.version = scmVersion.version
 
 ### Multi-project builds
 
-For multi project builds the plugin has to be applied only on the root project.
+For multi project builds the plugin has to be applied only on the root project, but version has to be set also in submodules.
+
+```groovy
+buildscript { ... }
+
+apply plugin: 'axion-release'
+
+allprojects {
+    project.version = scmVersion.version
+}
+```
 
 ## Tasks
 
