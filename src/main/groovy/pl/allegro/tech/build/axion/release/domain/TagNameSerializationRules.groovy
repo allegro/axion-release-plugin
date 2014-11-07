@@ -12,23 +12,11 @@ class TagNameSerializationRules {
 
     String versionSeparator = DEFAULT_VERSION_SEPARATOR
 
-    Closure serialize = defaultSerializer()
+    Closure serialize = TagNameSerializer.DEFAULT.serializer
 
-    Closure deserialize = defaultDeserializer()
+    Closure deserialize = TagNameSerializer.DEFAULT.deserializer
 
     Closure initialVersion = defaultInitialVersion()
-
-    private static Closure defaultSerializer() {
-        return { TagNameSerializationRules rules, String version ->
-            return rules.prefix + rules.versionSeparator + version
-        }
-    }
-
-    private static Closure defaultDeserializer() {
-        return { TagNameSerializationRules rules, ScmPosition position ->
-            return position.latestTag.substring(rules.prefix.length() + rules.versionSeparator.length())
-        }
-    }
 
     private static Closure defaultInitialVersion() {
         return { TagNameSerializationRules rules, ScmPosition position ->

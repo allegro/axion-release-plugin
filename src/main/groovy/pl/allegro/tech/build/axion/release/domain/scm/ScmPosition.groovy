@@ -18,6 +18,10 @@ class ScmPosition {
         return new ScmPosition('master', null, false)
     }
 
+    static ScmPosition onTag(String tagName) {
+        return new ScmPosition('master', tagName, true)
+    }
+
     boolean tagless() {
         return latestTag == null
     }
