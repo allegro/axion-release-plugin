@@ -5,7 +5,7 @@ axion-release-plugin
 
 [![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
 
-Releasing versions in Gradle is very different from releasing in Maven. Maven came with 
+Releasing versions in Gradle is very different from releasing in Maven. Maven came with
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
 did all the dirty work. Gradle has no such tool and probably doesn't need it anyway. Evolution of software craft came
 to the point, when we start thinking about SCM as ultimate source of truth about project version. No longer version
@@ -38,7 +38,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.3'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.4'
     }
 }
 
@@ -183,7 +183,7 @@ scmVersion {
     branchVersionCreators = [
         'feature/.*': { version, position -> /* ... */ },
         'bugfix/.*': { version, position -> /* ... */ }
-    ] // map [regexp: closure] of version creators per branch, first match wins but no order is guaranteed (depends on created map instance) 
+    ] // map [regexp: closure] of version creators per branch, first match wins but no order is guaranteed (depends on created map instance)
 
     checks {
         uncommitedChanges = false // permanently disable uncommited changes check
@@ -193,7 +193,7 @@ scmVersion {
 ```
 
 In `versionCreator` and `branchVersionCreators` closure arguments, `position` contains the following attributes:
- 
+
 * `latestTag` - the name of the latest tag.
 * `branch` - the name of the current branch.
 * `onTag` - true, if current commit is tagged.
@@ -204,7 +204,7 @@ To create version creator that will attach branch name to version only for featu
 
 ```
 branchVersionCreators = [
-    'feature/.*': {version, position -> "$version-$position.branch" 
+    'feature/.*': {version, position -> "$version-$position.branch"
 ]
 ```
 
@@ -246,6 +246,26 @@ $ ./gradlew cV
 release-0.1.0-feature-some_feature-SNAPSHOT
 ```
 
+### Tag name serializer
+
+Tag name serializer interprets tag name and extracts version from it.
+Tag name deserializer creates version based on rules and current version.
+
+Default serializer extracts version from tag by removing prefix and version separator
+from tag name. If prefix is empty, no version separator is used, e.g.:
+
+```
+tag: release-0.1.0, prefix: release, versionSeparator: - => version: 0.1.0
+tag: 0.1.0, prefix: <empty>, versionSeparator: - => version: 0.1.0
+```
+
+Deserializer reverts this operation:
+
+```
+version: 0.1.0, prefix: release, versionSeparator: - => version: release-0.1.0
+version: 0.1.0, prefix: <empty>, versionSeparator: - => tag: 0.1.0
+```
+
 ## Publishing released version
 
 Publishing release version is simple with **axion-release-plugin**. Since release does not increase version unless
@@ -257,9 +277,8 @@ you commit something, you can publish release version any time by calling gradle
 ```
 
 Why not make it work in single Gradle run? **maven-publish** plugin reads **project.version** in configuration phase.
-Any change made by tasks running prior to publishing won't be recognized. 
+Any change made by tasks running prior to publishing won't be recognized.
 
 ## License
 
 **axion-release-plugin** is published under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
-
