@@ -57,6 +57,10 @@ project.version = scmVersion.version
 
 **Warning** Order of definitions in `build.gradle` file does matter! First you apply plugin, then comes `scmVersion { }` closure if configuration is needed and only then you can use `scmVersion.version` to extract current version.
 
+### Multi-project builds
+
+For multi project builds the plugin has to be applied only on the root project.
+
 ## Tasks
 
 * `currentVersion` - prints current version as seen by plugin.
