@@ -7,9 +7,9 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 class DryRepository implements ScmRepository {
     
-    private final ScmRepository delegateRepository;
+    private final ScmRepository delegateRepository
     
-    private final Logger logger;
+    private final Logger logger
 
     DryRepository(ScmRepository delegateRepository, Logger logger) {
         this.delegateRepository = delegateRepository
@@ -55,6 +55,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    boolean remoteAttached(String remoteName) {
+        return true
+    }
+
+    @Override
     boolean checkUncommitedChanges() {
         boolean uncommitedChanges = delegateRepository.checkUncommitedChanges()
         log("uncommited changes: $uncommitedChanges")
@@ -67,6 +72,7 @@ class DryRepository implements ScmRepository {
         log("ahead of remote: $aheadOfRemote")
         return aheadOfRemote
     }
+
 
     private void log(String msg) {
         logger.quiet("DRY-RUN: $msg")

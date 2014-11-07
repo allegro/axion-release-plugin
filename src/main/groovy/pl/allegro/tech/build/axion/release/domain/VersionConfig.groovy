@@ -16,6 +16,8 @@ class VersionConfig {
 
     String remote = 'origin'
 
+    boolean localOnly = false
+
     TagNameSerializationRules tag = new TagNameSerializationRules()
 
     Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator

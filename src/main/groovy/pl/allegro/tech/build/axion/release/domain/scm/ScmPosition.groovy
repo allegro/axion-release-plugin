@@ -14,10 +14,17 @@ class ScmPosition {
         this.onTag = onTag
     }
 
+    static ScmPosition defaultPosition() {
+        return new ScmPosition('master', null, false)
+    }
+
+    static ScmPosition onTag(String tagName) {
+        return new ScmPosition('master', tagName, true)
+    }
+
     boolean tagless() {
         return latestTag == null
     }
-
 
     @Override
     public String toString() {
