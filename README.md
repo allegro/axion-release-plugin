@@ -39,7 +39,6 @@ buildscript {
     }
     dependencies {
         classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.5'
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.4'
     }
 }
 
@@ -219,7 +218,7 @@ To create version creator that will attach branch name to version only for featu
 
 ```
 branchVersionCreators = [
-    'feature/.*': {version, position -> "$version-$position.branch"
+    'feature/.*': {version, position -> "$version-$position.branch"}
 ]
 ```
 
