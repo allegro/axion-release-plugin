@@ -52,6 +52,7 @@ task wrapper(type: Wrapper) {
 }
 
 plugindev {
+    pluginId 'pl.allegro.tech.build.axion-release'
     pluginImplementationClass 'pl.allegro.tech.build.axion.release.ReleasePlugin'
     pluginDescription 'Release and version management plugin.'
     pluginLicenses 'Apache-2.0'
