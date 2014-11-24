@@ -1,6 +1,6 @@
 language: java
 
-install: ./gradlew assemble -x signArchives
+install: ./gradlew assemble
 script: ./gradlew check
 
 jdk:
