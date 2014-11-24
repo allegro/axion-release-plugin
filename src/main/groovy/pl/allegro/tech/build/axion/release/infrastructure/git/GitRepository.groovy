@@ -199,4 +199,11 @@ class GitRepository implements ScmRepository {
     void checkoutBranch(String branchName) {
         repository.repository.jgit.checkout().setName(branchName).setCreateBranch(true).call()
     }
+
+    @Override
+    List<String> lastLogMessages(int messageCount) {
+        ensureRepositoryExists()
+
+        return repository.log(maxCommits: messageCount)*.fullMessage
+    }
 }

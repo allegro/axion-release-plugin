@@ -18,8 +18,7 @@ class ReleasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        VersionConfig config = project.extensions.create(VERSION_EXTENSION, VersionConfig, project)
-        config.versionService = ComponentFactory.versionService(project, config)
+        VersionConfig config = ComponentFactory.versionConfig(project, VERSION_EXTENSION)
 
         Task verifyReleaseTask = project.tasks.create(VERIFY_RELEASE_TASK, VerifyReleaseTask)
         verifyReleaseTask.group = 'Release'

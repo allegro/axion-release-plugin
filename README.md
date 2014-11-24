@@ -8,7 +8,7 @@ axion-release-plugin
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with 
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
 did all the dirty work. Gradle has no such tool and probably doesn't need it anyway. Evolution of software craft came
-to the point, when we start thinking about SCM as ultimate source of truth about project version. No longer version
+to the point, when we start thinking about SCM as ultimate source of truth about project version. Version should not be
 hardcoded in **pom.xml** or **build.gradle**.
 
 **axion-release-plugin** embraces this philosophy. Instead of reading project version from buildfile, it is derived
@@ -38,7 +38,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.3'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.5'
     }
 }
 
@@ -55,7 +55,8 @@ scmVersion {
 project.version = scmVersion.version
 ```
 
-**Warning** Order of definitions in `build.gradle` file does matter! First you apply plugin, then comes `scmVersion { }` closure if configuration is needed and only then you can use `scmVersion.version` to extract current version.
+**Warning** Order of definitions in `build.gradle` file does matter! First you apply plugin, then comes `scmVersion { }`
+closure if configuration is needed and only then you can use `scmVersion.version` to extract current version.
 
 ### Multi-project builds
 
@@ -180,6 +181,9 @@ scmVersion {
     versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
     versionCreator 'versionWithBrach' // use one of predefined version creators
 
+    createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
+    releaseCommitMessage { version, position -> /* ... */ } // custom commit message if commits are created
+
     branchVersionCreators = [
         'feature/.*': { version, position -> /* ... */ },
         'bugfix/.*': { version, position -> /* ... */ }
@@ -245,6 +249,21 @@ feature/some_feature
 $ ./gradlew cV
 release-0.1.0-feature-some_feature-SNAPSHOT
 ```
+
+#### Create commit on release
+
+By default **axion-release-plugin** operates on tags only and does not mess with commit history. However, in some cases it
+might be useful to create additional commit to mark release. Use `createReleaseCommit` option to change this behavior.
+
+Default commit message is created using closure:
+
+```groovy
+{ version, position ->
+    "release version: $version"
+}
+```
+
+It can be changed by overriding `releaseCommitMessage` property with own closure.
 
 ## Publishing released version
 

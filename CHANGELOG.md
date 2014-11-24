@@ -1,6 +1,7 @@
 axion-release-plugin changelog
 ====
 
+
 * **0.9.3** (16.10.2014)
     * added predefined version creators
 * **0.9.2** (06.10.2014)
