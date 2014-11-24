@@ -1,7 +1,12 @@
 axion-release-plugin changelog
 ====
 
-
+* **0.9.5** (TBD)
+    * added option to create empty commit to mark release (#18)
+* **0.9.4** (07.11.2014)
+    * added option to run whole process locally, without interaction with remote (#8, #9)
+    * default tag name serializers/deserializers are smarter (#13)
+    * fixed bug #10, pushes always went to origin instead of defined remote
 * **0.9.3** (16.10.2014)
     * added predefined version creators
 * **0.9.2** (06.10.2014)
