@@ -276,6 +276,9 @@ Default commit message is created using closure:
 
 It can be changed by overriding `releaseCommitMessage` property with own closure.
 
+**Warning** don't use it as a way to commit files along with release - release commit does not run
+`git add .` so nothing will be added to tracked changes set.
+
 #### Tag name serializer
 
 Tag name serializer interprets tag name and extracts version from it.
