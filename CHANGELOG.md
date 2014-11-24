@@ -1,6 +1,9 @@
 axion-release-plugin changelog
 ====
 
+* **0.9.5** (TBD)
+    * added option to create empty commit to mark release (#18)
+    * compatibility with newer Semver 0.8.0 (#19)
 * **0.9.4** (07.11.2014)
     * added option to run whole process locally, without interaction with remote (#8, #9)
     * default tag name serializers/deserializers are smarter (#13)

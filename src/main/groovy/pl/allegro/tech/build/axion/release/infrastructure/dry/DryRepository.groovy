@@ -73,6 +73,10 @@ class DryRepository implements ScmRepository {
         return aheadOfRemote
     }
 
+    @Override
+    List<String> lastLogMessages(int messageCount) {
+        return delegateRepository.lastLogMessages(messageCount)
+    }
 
     private void log(String msg) {
         logger.quiet("DRY-RUN: $msg")

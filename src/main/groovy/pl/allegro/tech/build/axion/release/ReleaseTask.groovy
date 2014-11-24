@@ -5,6 +5,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
+import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.VersionWithPosition
@@ -18,11 +19,15 @@ class ReleaseTask extends DefaultTask {
 
     private final VersionConfig versionConfig
 
-    private final ScmRepository repository
+    private final Releaser releaser
 
     ReleaseTask() {
         this.versionConfig = project.extensions.getByType(VersionConfig)
-        this.repository = createRepository(project, versionConfig)
+        this.releaser = new Releaser(
+                createRepository(project, versionConfig),
+                new LocalOnlyResolver(versionConfig, project),
+                logger
+        )
     }
 
     private ScmRepository createRepository(Project project, VersionConfig versionConfig) {
@@ -32,27 +37,6 @@ class ReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
-        LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(versionConfig, project)
-        VersionWithPosition positionedVersion = versionConfig.getRawVersion()
-        Version version = positionedVersion.version
-
-        if (version.preReleaseVersion == VersionService.SNAPSHOT) {
-            version = version.setPreReleaseVersion(null)
-            String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
-
-            project.logger.quiet("Creating tag: $tagName")
-            repository.tag(tagName)
-
-            if(!localOnlyResolver.localOnly(repository.remoteAttached(versionConfig.remote))) {
-                project.logger.quiet("Pushing all to remote: ${versionConfig.remote}")
-                repository.push(versionConfig.remote)
-            }
-            else {
-                project.logger.quiet("Changes made to local repository only")
-            }
-        }
-        else {
-            project.logger.quiet("Working on released version ${versionConfig.version}, nothing to do here.")
-        }
+        releaser.release(versionConfig)
     }
 }

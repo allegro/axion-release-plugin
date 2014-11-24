@@ -22,4 +22,5 @@ interface ScmRepository {
 
     boolean checkAheadOfRemote()
 
+    List<String> lastLogMessages(int messageCount)
 }

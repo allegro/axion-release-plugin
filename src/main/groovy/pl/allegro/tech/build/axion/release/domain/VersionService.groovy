@@ -8,8 +8,6 @@ class VersionService {
 
     static final String SNAPSHOT = "SNAPSHOT"
 
-    private final ScmRepository repository
-
     private final VersionDecorator versionDecorator
 
     private final VersionResolver versionResolver
@@ -17,7 +15,6 @@ class VersionService {
     private final VersionSanitizer sanitizer
 
     VersionService(VersionResolver versionResolver) {
-        this.repository = repository
         this.versionResolver = versionResolver
         this.versionDecorator = new VersionDecorator()
         this.sanitizer = new VersionSanitizer()

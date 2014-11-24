@@ -28,17 +28,15 @@ class VersionConfig {
 
     boolean sanitizeVersion = true
 
+    boolean createReleaseCommit = false
+
+    Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
+
     VersionService versionService
 
     private String resolvedVersion = null
 
     private VersionWithPosition rawVersion = null
-
-    private static Closure defaultVersionCreator() {
-        return { String versionFromTag, ScmPosition position ->
-            return versionFromTag.toString()
-        }
-    }
 
     @Inject
     VersionConfig(Project project) {
@@ -55,6 +53,14 @@ class VersionConfig {
 
     void versionCreator(String type) {
         this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
+    }
+
+    void releaseCommitMessage(Closure c) {
+        releaseCommitMessage = c
+    }
+
+    void createReleaseCommit(boolean createReleaseCommit) {
+        this.createReleaseCommit = createReleaseCommit
     }
 
     void versionCreator(Closure c) {

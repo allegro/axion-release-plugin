@@ -22,6 +22,13 @@ class ComponentFactory {
 
     private static ScmRepository repository
 
+    static VersionConfig versionConfig(Project project, String extensionName) {
+        VersionConfig config = project.extensions.create(extensionName, VersionConfig, project)
+        config.versionService = ComponentFactory.versionService(project, config)
+
+        return config
+    }
+
     static VersionService versionService(Project project, VersionConfig versionConfig) {
         ScmRepository repository = scmRepository(project, versionConfig)
         return new VersionService(new VersionResolver(repository))
