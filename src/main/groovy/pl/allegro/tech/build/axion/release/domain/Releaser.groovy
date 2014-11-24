@@ -23,7 +23,10 @@ class Releaser {
         Version version = positionedVersion.version
 
         if (version.preReleaseVersion == VersionService.SNAPSHOT) {
-            version = Version.forIntegers(version.getMajorVersion(), version.getMinorVersion(), version.getPatchVersion());
+            version = new Version.Builder()
+                    .setNormalVersion(version.normalVersion)
+                    .setBuildMetadata(version.buildMetadata)
+                    .build()
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
             if(versionConfig.createReleaseCommit) {
