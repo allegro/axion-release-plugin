@@ -35,6 +35,12 @@ other means of authorization is on our TODO list.
 Apply plugin **gradle 2.1+** style:
 
 ```groovy
+buildscript {
+    repositories {
+        mavenCentral() // for plugin dependencies
+    }
+}
+
 plugins {
     id 'pl.allegro.tech.build.axion-gradle', version: '0.9.9'
 }
@@ -46,6 +52,7 @@ If using gradle < 2.1:
 buildscript {
     repositories {
         jcentral()
+        mavenCentral()
     }
     dependencies {
         classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.9'
