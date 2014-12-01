@@ -36,7 +36,7 @@ Apply plugin **gradle 2.1+** style:
 
 ```groovy
 plugins {
-    id 'pl.allegro.tech.build.axion-gradle', version: '1.0.0'
+    id 'pl.allegro.tech.build.axion-gradle', version: '0.9.9'
 }
 ```
 
@@ -48,7 +48,7 @@ buildscript {
         jcentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.0.0'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.9'
     }
 }
 
