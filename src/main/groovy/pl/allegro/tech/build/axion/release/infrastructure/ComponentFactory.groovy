@@ -39,7 +39,7 @@ class ComponentFactory {
             ScmIdentity identity = identityResolver.resolve(project)
             ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(versionConfig.remote, project)
             repository = repositoryFactory.createRepository(versionConfig.repository,
-                    project.rootProject.file('./'),
+                    versionConfig.repositoryDir,
                     identity,
                     initializationOptions,
                     project.logger)

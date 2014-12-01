@@ -189,6 +189,8 @@ remote repository.
 
 ```groovy
 scmVersion {
+    repositoryDir = project.rootProject.file('./') // where is repository root? by default rootProject dir
+
     remote = 'myRemote' // 'origin' by default
     localOnly = false // never connect to remote (e.g. don't push tags), false by default
 
