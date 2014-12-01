@@ -11,6 +11,7 @@ scmVersion {
         prefix = 'axion-release'
     }
 
+    versionCreator 'versionWithBranch'
     createReleaseCommit true
 }
 
