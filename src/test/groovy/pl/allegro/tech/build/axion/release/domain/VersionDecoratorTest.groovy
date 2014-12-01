@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
@@ -8,7 +9,11 @@ class VersionDecoratorTest extends Specification {
 
     VersionDecorator decorator = new VersionDecorator()
 
-    VersionConfig versionConfig = new VersionConfig(null)
+    VersionConfig versionConfig
+
+    def setup() {
+        versionConfig = new VersionConfig(ProjectBuilder.builder().build())
+    }
 
     def "should use default creator when working with forced version"() {
         given:

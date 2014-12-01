@@ -32,19 +32,32 @@ will be easily integrated with maven-publish and signing. It also needs to be Co
 In order for release plugin to work, you need to access you repository using ssh keys, not http authorization! Support for
 other means of authorization is on our TODO list.
 
+Apply plugin **gradle 2.1+** style:
+
+```groovy
+plugins {
+    id 'pl.allegro.tech.build.axion-gradle', version: '0.9.9'
+}
+```
+
+If using gradle < 2.1:
+
 ```groovy
 buildscript {
     repositories {
-        mavenCentral()
+        jcentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.5'
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.4'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.9'
     }
 }
 
-apply plugin: 'axion-release'
+apply plugin: 'pl.allegro.tech.build.axion-release'
+```
 
+Basic configuration:
+
+```groovy
 // configure version
 scmVersion {
     tag {
@@ -64,9 +77,9 @@ closure if configuration is needed and only then you can use `scmVersion.version
 For multi project builds the plugin has to be applied only on the root project, but version has to be set also in submodules.
 
 ```groovy
-buildscript { ... }
-
-apply plugin: 'axion-release'
+plugins {
+    id 'pl.allegro.tech.build.axion-gradle', version: '1.0.0'
+}
 
 allprojects {
     project.version = scmVersion.version
@@ -176,6 +189,8 @@ remote repository.
 
 ```groovy
 scmVersion {
+    repositoryDir = project.rootProject.file('./') // where is repository root? by default rootProject dir
+
     remote = 'myRemote' // 'origin' by default
     localOnly = false // never connect to remote (e.g. don't push tags), false by default
 
@@ -219,7 +234,7 @@ To create version creator that will attach branch name to version only for featu
 
 ```
 branchVersionCreators = [
-    'feature/.*': {version, position -> "$version-$position.branch"
+    'feature/.*': {version, position -> "$version-$position.branch"}
 ]
 ```
 

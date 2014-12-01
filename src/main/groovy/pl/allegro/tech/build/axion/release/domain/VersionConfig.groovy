@@ -14,6 +14,8 @@ class VersionConfig {
 
     String repository = 'git'
 
+    File repositoryDir
+
     String remote = 'origin'
 
     boolean localOnly = false
@@ -41,6 +43,7 @@ class VersionConfig {
     @Inject
     VersionConfig(Project project) {
         this.project = project
+        this.repositoryDir = project.rootProject.file('./')
     }
 
     void tag(Closure c) {

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import spock.lang.Specification
@@ -8,9 +9,12 @@ class VersionResolverTest extends Specification {
 
     ScmRepository repository = Stub(ScmRepository)
 
+    VersionConfig versionConfig
+
     VersionResolver resolver
 
     def setup() {
+        versionConfig = new VersionConfig(ProjectBuilder.builder().build())
         resolver = new VersionResolver(repository)
     }
 
@@ -19,7 +23,7 @@ class VersionResolverTest extends Specification {
         repository.currentPosition('release') >> new ScmPosition('master', 'release-1.0.0', true)
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(new VersionConfig(null), VersionReadOptionsFactory.empty())
+        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
 
         then:
         version.version.toString() == '1.0.0'
@@ -30,7 +34,7 @@ class VersionResolverTest extends Specification {
         repository.currentPosition('release') >> new ScmPosition('master', 'release-1.0.0', false)
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(new VersionConfig(null), VersionReadOptionsFactory.empty())
+        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
 
         then:
         version.version.toString() == '1.0.1'
@@ -41,7 +45,7 @@ class VersionResolverTest extends Specification {
         repository.currentPosition('release') >> new ScmPosition('master', 'release-1.0.0', true)
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(new VersionConfig(null), VersionReadOptionsFactory.withForcedVersion('2.0.0'))
+        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.withForcedVersion('2.0.0'))
 
         then:
         version.version.toString() == '2.0.0'
@@ -51,7 +55,6 @@ class VersionResolverTest extends Specification {
         given:
         repository.currentPosition('release') >> new ScmPosition('master', null, false)
 
-        VersionConfig versionConfig = new VersionConfig(null)
         versionConfig.tag.initialVersion = {r, p -> '0.0.1'}
 
         when:
@@ -66,7 +69,7 @@ class VersionResolverTest extends Specification {
         repository.currentPosition('release') >> new ScmPosition('master', null, false)
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(new VersionConfig(null), VersionReadOptionsFactory.empty())
+        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
 
         then:
         version.version.toString() == '0.1.0'

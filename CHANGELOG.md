@@ -1,6 +1,10 @@
 axion-release-plugin changelog
 ====
 
+* **0.9.9** (01.12.2014)
+    * added option to choose Git repository root
+* **0.9.8** (24.11.2014)
+    * publication in gradle plugin portal
 * **0.9.5** (24.11.2014)
     * added option to create empty commit to mark release (#18)
     * compatibility with newer Semver 0.8.0 (#19)
