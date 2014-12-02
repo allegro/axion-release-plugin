@@ -51,7 +51,7 @@ If using gradle < 2.1:
 ```groovy
 buildscript {
     repositories {
-        jcentral()
+        jcenter()
         mavenCentral()
     }
     dependencies {
