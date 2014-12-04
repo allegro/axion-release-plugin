@@ -12,15 +12,10 @@ import javax.inject.Inject
 
 class VerifyReleaseTask extends DefaultTask {
 
-    private final ScmRepository repository
-
-    @Inject
-    public VerifyReleaseTask() {
-        this.repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig))
-    }
-
     @TaskAction
     void prepare() {
+        ScmRepository repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig))
+
         VersionConfig config = project.extensions.getByType(VersionConfig)
         boolean dryRun = project.hasProperty(ReleaseTask.DRY_RUN_FLAG)
         ChecksResolver resolver = new ChecksResolver(config.checks, project)

@@ -1,12 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import com.github.zafarkhaja.semver.Version
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
 
 import javax.inject.Inject
-import java.util.regex.Pattern
 
 class VersionConfig {
 
@@ -43,7 +40,7 @@ class VersionConfig {
     @Inject
     VersionConfig(Project project) {
         this.project = project
-        this.repositoryDir = project.rootProject.file('./')
+        this.repositoryDir = project.rootDir
     }
 
     void tag(Closure c) {
@@ -72,6 +69,7 @@ class VersionConfig {
 
     String getVersion() {
         if (resolvedVersion == null) {
+            ensureVersionServiceExists()
             resolvedVersion = versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project))
         }
         return resolvedVersion
@@ -79,8 +77,13 @@ class VersionConfig {
 
     VersionWithPosition getRawVersion() {
         if(rawVersion == null) {
+            ensureVersionServiceExists()
             rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project))
         }
         return rawVersion
+    }
+
+    private void ensureVersionServiceExists() {
+        this.versionService = ComponentFactory.versionService(project, this)
     }
 }

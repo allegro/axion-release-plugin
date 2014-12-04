@@ -2,14 +2,9 @@ package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
-import pl.allegro.tech.build.axion.release.domain.VersionReadOptions
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentityResolver
-import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryFactory
+import pl.allegro.tech.build.axion.release.domain.scm.*
 
 /**
  * Poor mans solution to Gradle DI problems (can't use DI to anything else than inner Gradle services).
@@ -23,13 +18,11 @@ class ComponentFactory {
     private static ScmRepository repository
 
     static VersionConfig versionConfig(Project project, String extensionName) {
-        VersionConfig config = project.extensions.create(extensionName, VersionConfig, project)
-        config.versionService = ComponentFactory.versionService(project, config)
-
-        return config
+        return project.extensions.create(extensionName, VersionConfig, project)
     }
 
     static VersionService versionService(Project project, VersionConfig versionConfig) {
+        project.logger.warn("$versionConfig.repositoryDir")
         ScmRepository repository = scmRepository(project, versionConfig)
         return new VersionService(new VersionResolver(repository))
     }
@@ -44,6 +37,7 @@ class ComponentFactory {
                     initializationOptions,
                     project.logger)
         }
+
         return repository
     }
 }

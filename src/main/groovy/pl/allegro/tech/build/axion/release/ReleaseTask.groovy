@@ -19,24 +19,22 @@ class ReleaseTask extends DefaultTask {
 
     private final VersionConfig versionConfig
 
-    private final Releaser releaser
-
     ReleaseTask() {
         this.versionConfig = project.extensions.getByType(VersionConfig)
-        this.releaser = new Releaser(
-                createRepository(project, versionConfig),
-                new LocalOnlyResolver(versionConfig, project),
-                logger
-        )
     }
 
     private ScmRepository createRepository(Project project, VersionConfig versionConfig) {
         ScmRepository scm = ComponentFactory.scmRepository(project, versionConfig)
-        return project.hasProperty(DRY_RUN_FLAG)? new DryRepository(scm, project.logger) : scm
+        return project.hasProperty(DRY_RUN_FLAG) ? new DryRepository(scm, project.logger) : scm
     }
 
     @TaskAction
     void release() {
+        Releaser releaser = new Releaser(
+                createRepository(project, versionConfig),
+                new LocalOnlyResolver(versionConfig, project),
+                logger
+        )
         releaser.release(versionConfig)
     }
 }
