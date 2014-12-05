@@ -212,7 +212,7 @@ scmVersion {
     }
 
     versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
-    versionCreator 'versionWithBrach' // use one of predefined version creators
+    versionCreator 'versionWithBranch' // use one of predefined version creators
 
     createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
     releaseCommitMessage { version, position -> /* ... */ } // custom commit message if commits are created
