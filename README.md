@@ -42,7 +42,7 @@ buildscript {
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-gradle', version: '0.9.9'
+    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
 }
 ```
 
