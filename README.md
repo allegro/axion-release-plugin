@@ -85,7 +85,7 @@ For multi project builds the plugin has to be applied only on the root project, 
 
 ```groovy
 plugins {
-    id 'pl.allegro.tech.build.axion-gradle', version: '1.0.0'
+    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
 }
 
 allprojects {
