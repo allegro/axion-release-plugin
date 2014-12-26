@@ -2,7 +2,12 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
-import org.eclipse.jgit.api.*
+import org.ajoberstar.grgit.Status
+import org.eclipse.jgit.api.FetchCommand
+import org.eclipse.jgit.api.LogCommand
+import org.eclipse.jgit.api.PushCommand
+import org.eclipse.jgit.api.TransportCommand
+import org.eclipse.jgit.api.TransportConfigCallback
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Config
@@ -11,7 +16,10 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.transport.*
+import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.SshTransport
+import org.eclipse.jgit.transport.Transport
+import org.eclipse.jgit.transport.URIish
 import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
@@ -212,6 +220,10 @@ class GitRepository implements ScmRepository {
 
     void checkoutBranch(String branchName) {
         repository.checkout(branch: branchName, createBranch: true)
+    }
+
+    Status listChanges() {
+        return repository.status()
     }
 
     @Override

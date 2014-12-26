@@ -1,11 +1,13 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.Project
+import org.gradle.logging.StyledTextOutput
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitChangesPrinter
 
 /**
  * Poor mans solution to Gradle DI problems (can't use DI to anything else than inner Gradle services).
@@ -39,5 +41,9 @@ class ComponentFactory {
         }
 
         return repository
+    }
+
+    static ScmChangesPrinter scmChangesPrinter(ScmRepository repository, StyledTextOutput output) {
+        return new GitChangesPrinter(repository, output)
     }
 }

@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm
 
+import org.ajoberstar.grgit.Status
+
 interface ScmRepository {
 
     void initialize(ScmInitializationOptions initializationOptions)
