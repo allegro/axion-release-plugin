@@ -5,9 +5,9 @@ import org.gradle.testfixtures.ProjectBuilder
 
 class LocalOnlyResolverTest {
 
-    private final VersionConfig config = new VersionConfig()
-
     private final Project project = ProjectBuilder.builder().build()
+
+    private final VersionConfig config = new VersionConfig(project)
 
     private final LocalOnlyResolver resolver = new LocalOnlyResolver(config, project)
 
@@ -16,7 +16,7 @@ class LocalOnlyResolverTest {
         project.setProperty('release.localOnly')
 
         expect:
-        resolver.localOnly(true) == true
+        resolver.localOnly(true)
     }
 
     def "should resolve to localOnly when config has localOnly flag set"() {
@@ -24,12 +24,12 @@ class LocalOnlyResolverTest {
         config.localOnly = true
 
         expect:
-        resolver.localOnly(true) == true
+        resolver.localOnly(true)
     }
 
     def "should decide if local only based on remote presence if no flags present"() {
         expect:
-        resolver.localOnly(false) == true
-        resolver.localOnly(true) == false
+        resolver.localOnly(false)
+        !resolver.localOnly(true)
     }
 }

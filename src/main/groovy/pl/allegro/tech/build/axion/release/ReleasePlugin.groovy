@@ -8,13 +8,15 @@ import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
 
 class ReleasePlugin implements Plugin<Project> {
 
-    static final String VERSION_EXTENSION = 'scmVersion'
+    public static final String VERSION_EXTENSION = 'scmVersion'
 
-    static final String VERIFY_RELEASE_TASK = 'verifyRelease'
+    public static final String VERIFY_RELEASE_TASK = 'verifyRelease'
 
-    static final String RELEASE_TASK = 'release'
+    public static final String RELEASE_TASK = 'release'
 
-    static final String CURRENT_VERSION_TASK = 'currentVersion'
+    public static final String CURRENT_VERSION_TASK = 'currentVersion'
+
+    public static final String DRY_RUN_FLAG = 'release.dryRun'
 
     @Override
     void apply(Project project) {
