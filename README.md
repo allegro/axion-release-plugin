@@ -35,8 +35,14 @@ other means of authorization is on our TODO list.
 Apply plugin **gradle 2.1+** style:
 
 ```groovy
+buildscript {
+    repositories {
+        mavenCentral() // for plugin dependencies
+    }
+}
+
 plugins {
-    id 'pl.allegro.tech.build.axion-gradle', version: '0.9.9'
+    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
 }
 ```
 
@@ -45,7 +51,8 @@ If using gradle < 2.1:
 ```groovy
 buildscript {
     repositories {
-        jcentral()
+        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.9'
@@ -78,7 +85,7 @@ For multi project builds the plugin has to be applied only on the root project, 
 
 ```groovy
 plugins {
-    id 'pl.allegro.tech.build.axion-gradle', version: '1.0.0'
+    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
 }
 
 allprojects {
@@ -205,7 +212,7 @@ scmVersion {
     }
 
     versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
-    versionCreator 'versionWithBrach' // use one of predefined version creators
+    versionCreator 'versionWithBranch' // use one of predefined version creators
 
     createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
     releaseCommitMessage { version, position -> /* ... */ } // custom commit message if commits are created
