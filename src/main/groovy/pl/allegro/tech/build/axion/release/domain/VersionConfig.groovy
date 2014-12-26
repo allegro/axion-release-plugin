@@ -10,13 +10,11 @@ class VersionConfig {
 
     private final Project project
 
-    String repository = 'git'
-
-    File repositoryDir
-
-    String remote = 'origin'
-
     boolean localOnly = false
+
+    boolean dryRun
+
+    RepositoryConfig repository = new RepositoryConfig()
 
     TagNameSerializationRules tag = new TagNameSerializationRules()
 
@@ -38,13 +36,15 @@ class VersionConfig {
 
     private VersionWithPosition rawVersion = null
 
-    boolean dryRun
-
     @Inject
     VersionConfig(Project project) {
         this.project = project
-        this.repositoryDir = project.rootDir
+        this.repository.directory = project.rootDir
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
+    }
+
+    void repository(Closure c) {
+        project.configure(repository, c)
     }
 
     void tag(Closure c) {

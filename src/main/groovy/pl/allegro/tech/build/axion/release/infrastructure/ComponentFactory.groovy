@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.Project
+import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
@@ -22,17 +23,16 @@ class ComponentFactory {
     }
 
     static VersionService versionService(Project project, VersionConfig versionConfig) {
-        project.logger.warn("$versionConfig.repositoryDir")
-        ScmRepository repository = scmRepository(project, versionConfig)
+        ScmRepository repository = scmRepository(project, versionConfig.repository)
         return new VersionService(new VersionResolver(repository))
     }
 
-    static ScmRepository scmRepository(Project project, VersionConfig versionConfig) {
+    static ScmRepository scmRepository(Project project, RepositoryConfig config) {
         if (repository == null) {
             ScmIdentity identity = identityResolver.resolve(project)
-            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(versionConfig.remote, project)
-            repository = repositoryFactory.createRepository(versionConfig.repository,
-                    versionConfig.repositoryDir,
+            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(config.remote, project)
+            repository = repositoryFactory.createRepository(
+                    config,
                     identity,
                     initializationOptions,
                     project.logger)

@@ -201,9 +201,13 @@ remote repository.
 
 ```groovy
 scmVersion {
-    repositoryDir = project.rootProject.file('./') // where is repository root? by default rootProject dir
 
-    remote = 'myRemote' // 'origin' by default
+    repository {
+        type = 'git' // type of repository, only git supported
+        directory = project.rootProject.file('./') // where is repository root? by default rootProject dir
+        remote = 'myRemote' // 'origin' by default
+    }
+
     localOnly = false // never connect to remote (e.g. don't push tags), false by default
 
     sanitizeVersion = true // should created version be sanitized, true by default

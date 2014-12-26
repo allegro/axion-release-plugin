@@ -12,7 +12,7 @@ class VerifyReleaseTask extends DefaultTask {
 
     @TaskAction
     void prepare() {
-        ScmRepository repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig))
+        ScmRepository repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig).repository)
 
         VersionConfig config = project.extensions.getByType(VersionConfig)
         boolean dryRun = config.dryRun
@@ -30,7 +30,7 @@ class VerifyReleaseTask extends DefaultTask {
             project.logger.quiet('Skipping uncommited changes check')
         }
 
-        boolean remoteAttached = repository.remoteAttached(config.remote)
+        boolean remoteAttached = repository.remoteAttached(config.repository.remote)
         if(resolver.checkAheadOfRemote() && !localOnlyResolver.localOnly(remoteAttached)) {
             boolean aheadOfRemote = repository.checkAheadOfRemote()
             project.logger.quiet("Checking if branch is ahead of remote.. ${aheadOfRemote ? 'FAILED' : ''}")

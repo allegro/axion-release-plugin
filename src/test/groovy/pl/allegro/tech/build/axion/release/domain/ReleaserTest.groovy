@@ -23,7 +23,7 @@ class ReleaserTest extends Specification {
         Grgit.init(dir: project.rootDir)
 
         config = ComponentFactory.versionConfig(project, 'scmVersion')
-        repository = ComponentFactory.scmRepository(project, config)
+        repository = ComponentFactory.scmRepository(project, config.repository)
 
         repository.commit('initial commit')
 

@@ -37,9 +37,9 @@ class Releaser {
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            if(!localOnlyResolver.localOnly(repository.remoteAttached(versionConfig.remote))) {
-                logger.quiet("Pushing all to remote: ${versionConfig.remote}")
-                repository.push(versionConfig.remote)
+            if(!localOnlyResolver.localOnly(repository.remoteAttached(versionConfig.repository.remote))) {
+                logger.quiet("Pushing all to remote: ${versionConfig.repository.remote}")
+                repository.push(versionConfig.repository.remote)
             }
             else {
                 logger.quiet("Changes made to local repository only")

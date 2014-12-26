@@ -19,7 +19,7 @@ class ReleaseTask extends DefaultTask {
     }
 
     private ScmRepository createRepository(Project project, VersionConfig versionConfig) {
-        ScmRepository scm = ComponentFactory.scmRepository(project, versionConfig)
+        ScmRepository scm = ComponentFactory.scmRepository(project, versionConfig.repository)
         return versionConfig.dryRun ? new DryRepository(scm, project.logger) : scm
     }
 
