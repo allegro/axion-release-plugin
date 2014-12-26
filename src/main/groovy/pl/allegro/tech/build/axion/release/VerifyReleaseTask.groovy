@@ -8,8 +8,6 @@ import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
 
-import javax.inject.Inject
-
 class VerifyReleaseTask extends DefaultTask {
 
     @TaskAction
@@ -17,7 +15,7 @@ class VerifyReleaseTask extends DefaultTask {
         ScmRepository repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig))
 
         VersionConfig config = project.extensions.getByType(VersionConfig)
-        boolean dryRun = project.hasProperty(ReleaseTask.DRY_RUN_FLAG)
+        boolean dryRun = config.dryRun
         ChecksResolver resolver = new ChecksResolver(config.checks, project)
         LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(config, project)
 

@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
+import pl.allegro.tech.build.axion.release.ReleasePlugin
 
 import javax.inject.Inject
 
@@ -37,10 +38,13 @@ class VersionConfig {
 
     private VersionWithPosition rawVersion = null
 
+    boolean dryRun
+
     @Inject
     VersionConfig(Project project) {
         this.project = project
         this.repositoryDir = project.rootDir
+        this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
     }
 
     void tag(Closure c) {
