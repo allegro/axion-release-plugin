@@ -75,15 +75,31 @@ class GitRepository implements ScmRepository {
 
     @Override
     void push(String remoteName) {
-        ensureRepositoryExists()
-
-        pushCommand(remoteName).call()
-        pushCommand(remoteName).setPushTags().call()
+        push(remoteName, false)
     }
 
-    private PushCommand pushCommand(String remoteName) {
+    void push(String remoteName, boolean all) {
+        ensureRepositoryExists()
+        identity.useDefault ? callPush(remoteName, all) : callLowLevelPush(remoteName, all)
+    }
+
+    private void callPush(String remoteName, boolean all) {
+        repository.push(remote: remoteName, tags: true, all: all)
+    }
+
+    private void callLowLevelPush(String remoteName, boolean all) {
+        pushCommand(remoteName, all).call()
+        pushCommand(remoteName, all).setPushTags().call()
+    }
+
+    private PushCommand pushCommand(String remoteName, boolean all) {
         PushCommand push = repository.repository.jgit.push()
         push.remote = remoteName
+
+        if(all) {
+            push.setPushAll()
+        }
+
         setTransportOptions(push)
 
         return push
@@ -93,10 +109,8 @@ class GitRepository implements ScmRepository {
         command.transportConfigCallback = new TransportConfigCallback() {
             @Override
             void configure(Transport transport) {
-                if (!identity.useDefault) {
-                    SshTransport sshTransport = (SshTransport) transport
-                    sshTransport.setSshSessionFactory(new SshConnector(identity))
-                }
+                SshTransport sshTransport = (SshTransport) transport
+                sshTransport.setSshSessionFactory(new SshConnector(identity))
             }
         }
     }
@@ -197,13 +211,12 @@ class GitRepository implements ScmRepository {
     }
 
     void checkoutBranch(String branchName) {
-        repository.repository.jgit.checkout().setName(branchName).setCreateBranch(true).call()
+        repository.checkout(branch: branchName, createBranch: true)
     }
 
     @Override
     List<String> lastLogMessages(int messageCount) {
         ensureRepositoryExists()
-
         return repository.log(maxCommits: messageCount)*.fullMessage
     }
 }

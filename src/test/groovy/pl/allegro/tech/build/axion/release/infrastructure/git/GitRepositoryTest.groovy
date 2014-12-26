@@ -181,7 +181,7 @@ class GitRepositoryTest extends Specification {
         repository.commit('commit after release-push')
 
         when:
-        repository.push('origin')
+        repository.push('origin', true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -198,7 +198,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push('customRemote')
+        repository.push('customRemote', true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']
