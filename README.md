@@ -29,9 +29,6 @@ will be easily integrated with maven-publish and signing. It also needs to be Co
 
 ## Usage
 
-In order for release plugin to work, you need to access you repository using ssh keys, not http authorization! Support for
-other means of authorization is on our TODO list.
-
 Apply plugin **gradle 2.1+** style:
 
 ```groovy
@@ -42,7 +39,7 @@ buildscript {
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
+    id 'pl.allegro.tech.build.axion-release' version '1.0.0'
 }
 ```
 
@@ -55,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '0.9.9'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.0.0'
     }
 }
 
@@ -85,7 +82,7 @@ For multi project builds the plugin has to be applied only on the root project, 
 
 ```groovy
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '0.9.9'
+    id 'pl.allegro.tech.build.axion-release' version '...'
 }
 
 allprojects {
@@ -126,6 +123,14 @@ published project-0.1.1 release version
 ```
 
 ## Options
+
+### Authorization
+
+Almost all authorization mechanisms are provided by [grgit](https://github.com/ajoberstar/grgit),
+see [authorization docs](http://ajoberstar.org/grgit/docs/groovydoc/org/ajoberstar/grgit/auth/AuthConfig.html) for more info.
+
+If you want to use custom key file to authorize, see *Using custom SSH key* section below.
+
 
 ### Command line
 
