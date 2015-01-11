@@ -12,9 +12,9 @@ class ScmRepositoryFactory {
 
     private static final String GIT = 'git'
 
-    ScmRepository create(Project project, RepositoryConfig config, boolean dryRun) {
+    ScmRepository create(Project project, RepositoryConfig config) {
         if(config.type != GIT) {
-            throw new IllegalArgumentException("Unsupported repository type $type")
+            throw new IllegalArgumentException("Unsupported repository type $config.type")
         }
 
         ScmRepository repository

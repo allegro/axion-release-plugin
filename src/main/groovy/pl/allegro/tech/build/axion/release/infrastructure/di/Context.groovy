@@ -40,7 +40,7 @@ class Context {
     }
 
     private void initialize() {
-        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config.repository, config.dryRun)
+        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config.repository)
         instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository)))
     }
 
