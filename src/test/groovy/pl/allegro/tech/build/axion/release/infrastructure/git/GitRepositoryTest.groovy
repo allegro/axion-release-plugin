@@ -7,12 +7,16 @@ import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 import spock.lang.Specification
 
 class GitRepositoryTest extends Specification {
 
     Project project
+
+    ScmInitializationOptions initializationOptions
 
     Grgit rawRepository
 
@@ -31,19 +35,20 @@ class GitRepositoryTest extends Specification {
 
         rawRepository = Grgit.clone(dir: projectDir, uri: "file://$remoteProjectDir.canonicalPath")
 
-        repository = new GitRepository(projectDir, ScmIdentity.defaultIdentity(), project.logger)
+        initializationOptions = ScmInitializationOptions.fromProject(project, 'origin')
+        repository = new GitRepository(projectDir, initializationOptions)
     }
 
 
-    def "should not fail when initializing in unexisitng repository"() {
+    def "should throw unavailable exception when initializing in unexisitng repository"() {
         given:
         Project gitlessProject = ProjectBuilder.builder().build()
 
         when:
-        new GitRepository(gitlessProject.file('./'), null, gitlessProject.logger)
+        new GitRepository(gitlessProject.file('./'), initializationOptions)
 
         then:
-        notThrown(Exception)
+        thrown(ScmRepositoryUnavailableException)
     }
 
     def "should create new tag on current commit"() {
@@ -67,7 +72,7 @@ class GitRepositoryTest extends Specification {
         project.file('repo/uncommited').createNewFile()
 
         then:
-        repository.checkUncommitedChanges() == true
+        repository.checkUncommitedChanges()
     }
 
     def "should point to last tag in current position in simple case"() {
@@ -80,7 +85,7 @@ class GitRepositoryTest extends Specification {
 
         then:
         position.latestTag == 'release-1'
-        position.onTag == false
+        !position.onTag
     }
 
     def "should return default position when no commit in repository"() {
@@ -89,7 +94,7 @@ class GitRepositoryTest extends Specification {
         File projectDir = commitlessProject.file('./')
 
         Grgit.init(dir: projectDir)
-        GitRepository commitlessRepository = new GitRepository(projectDir, null, commitlessProject.logger)
+        GitRepository commitlessRepository = new GitRepository(projectDir, initializationOptions)
 
         when:
         ScmPosition position = commitlessRepository.currentPosition('release')
@@ -108,7 +113,7 @@ class GitRepositoryTest extends Specification {
 
         then:
         position.latestTag == 'release-1'
-        position.onTag == true
+        position.onTag
     }
 
     def "should track back to older tag when commit was made after checking out older version"() {
@@ -181,7 +186,7 @@ class GitRepositoryTest extends Specification {
         repository.commit('commit after release-push')
 
         when:
-        repository.push('origin', true)
+        repository.push(ScmIdentity.defaultIdentity(), 'origin', true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -198,7 +203,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push('customRemote', true)
+        repository.push(ScmIdentity.defaultIdentity(), 'customRemote', true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']

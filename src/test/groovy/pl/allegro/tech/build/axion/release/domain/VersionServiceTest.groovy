@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
@@ -16,7 +17,9 @@ class VersionServiceTest extends Specification {
     VersionReadOptions readOptions = VersionReadOptionsFactory.empty()
 
     def setup() {
-        versionConfig = new VersionConfig(ProjectBuilder.builder().build())
+        Project project = ProjectBuilder.builder().build()
+        versionConfig = project.extensions.create('versionService', VersionConfig, project)
+
         service = new VersionService(resolver)
     }
 

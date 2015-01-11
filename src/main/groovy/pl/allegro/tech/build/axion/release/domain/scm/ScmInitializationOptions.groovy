@@ -23,7 +23,7 @@ class ScmInitializationOptions {
         this.remoteUrl = remoteUrl
     }
 
-    static ScmInitializationOptions fromProject(String remote, Project project) {
+    static ScmInitializationOptions fromProject(Project project, String remote) {
         return new ScmInitializationOptions(
                 remote,
                 project.hasProperty(FETCH_TAGS_PROPERTY),

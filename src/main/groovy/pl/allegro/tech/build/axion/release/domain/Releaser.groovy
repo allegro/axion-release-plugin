@@ -2,17 +2,17 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.logging.Logger
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class Releaser {
 
-    private final ScmRepository repository
+    private final ScmService repository
 
     private final LocalOnlyResolver localOnlyResolver
 
     private final Logger logger
 
-    Releaser(ScmRepository repository, LocalOnlyResolver localOnlyResolver, Logger logger) {
+    Releaser(ScmService repository, LocalOnlyResolver localOnlyResolver, Logger logger) {
         this.repository = repository
         this.localOnlyResolver = localOnlyResolver
         this.logger = logger
@@ -37,9 +37,8 @@ class Releaser {
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            if(!localOnlyResolver.localOnly(repository.remoteAttached(versionConfig.repository.remote))) {
-                logger.quiet("Pushing all to remote: ${versionConfig.repository.remote}")
-                repository.push(versionConfig.repository.remote)
+            if(!localOnlyResolver.localOnly(repository.remoteAttached())) {
+                repository.push()
             }
             else {
                 logger.quiet("Changes made to local repository only")

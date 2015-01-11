@@ -3,15 +3,15 @@ package pl.allegro.tech.build.axion.release.domain
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
+import pl.allegro.tech.build.axion.release.domain.scm.ScmService
+import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import spock.lang.Specification
 
 class ReleaserTest extends Specification {
 
     Project project
 
-    ScmRepository repository
+    ScmService repository
 
     Releaser releaser
 
@@ -19,15 +19,15 @@ class ReleaserTest extends Specification {
 
     def setup() {
         project = ProjectBuilder.builder().build()
+        config = project.extensions.create('scmVersion', VersionConfig, project)
 
         Grgit.init(dir: project.rootDir)
 
-        config = ComponentFactory.versionConfig(project, 'scmVersion')
-        repository = ComponentFactory.scmRepository(project, config.repository)
-
+        Context context = Context.instance(project)
+        repository = context.scmService()
         repository.commit('initial commit')
 
-        releaser = new Releaser(repository, new LocalOnlyResolver(config, project), project.logger)
+        releaser = new Releaser(repository, context.localOnlyResolver(), project.logger)
     }
 
     def "should release new version when not on tag"() {

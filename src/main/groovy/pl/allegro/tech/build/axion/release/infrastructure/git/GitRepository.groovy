@@ -3,11 +3,8 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
-import org.eclipse.jgit.api.FetchCommand
-import org.eclipse.jgit.api.LogCommand
-import org.eclipse.jgit.api.PushCommand
-import org.eclipse.jgit.api.TransportCommand
-import org.eclipse.jgit.api.TransportConfigCallback
+import org.ajoberstar.grgit.operation.FetchOp
+import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Config
@@ -18,13 +15,14 @@ import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.SshTransport
+import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.transport.Transport
 import org.eclipse.jgit.transport.URIish
-import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 
 class GitRepository implements ScmRepository {
 
@@ -32,22 +30,14 @@ class GitRepository implements ScmRepository {
 
     private final Grgit repository
 
-    private final ScmIdentity identity
-
-    GitRepository(File repositoryDir, ScmIdentity identity, Logger logger) {
+    GitRepository(File repositoryDir, ScmInitializationOptions options) {
         try {
             repository = Grgit.open(repositoryDir)
         }
         catch(RepositoryNotFoundException exception) {
-            logger.warn("No repository found at $repositoryDir.canonicalPath , continuing with defaults.")
-            repository = null
+            throw new ScmRepositoryUnavailableException(exception)
         }
 
-        this.identity = identity
-    }
-
-    @Override
-    void initialize(ScmInitializationOptions options) {
         if (options.attachRemote) {
             this.attachRemote(options.remote, options.remoteUrl)
         }
@@ -56,51 +46,49 @@ class GitRepository implements ScmRepository {
         }
     }
 
-    private void ensureRepositoryExists() {
-        if(repository == null) {
-            throw new IllegalStateException("Trying to execute command in an uninitialized repository.")
-        }
+    @Override
+    void fetchTags(ScmIdentity identity, String remoteName) {
+        identity.useDefault ? callFetch(remoteName) : callLowLevelFetch(identity, remoteName);
     }
 
-    @Override
-    void fetchTags() {
-        ensureRepositoryExists()
+    private void callFetch(String remoteName) {
+        repository.fetch(remote: remoteName, tagMode: FetchOp.TagMode.ALL, refSpecs: [Transport.REFSPEC_TAGS])
+    }
 
+    private void callLowLevelFetch(ScmIdentity identity, String remoteName) {
         FetchCommand fetch = repository.repository.jgit.fetch()
+        fetch.remote = remoteName
         fetch.tagOpt = TagOpt.FETCH_TAGS
         fetch.refSpecs = [Transport.REFSPEC_TAGS]
-        setTransportOptions(fetch)
+        setTransportOptions(identity, fetch)
 
         fetch.call()
     }
 
     @Override
     void tag(String tagName) {
-        ensureRepositoryExists()
-
         repository.tag.add(name: tagName)
     }
 
     @Override
-    void push(String remoteName) {
-        push(remoteName, false)
+    void push(ScmIdentity identity, String remoteName) {
+        push(identity, remoteName, false)
     }
 
-    void push(String remoteName, boolean all) {
-        ensureRepositoryExists()
-        identity.useDefault ? callPush(remoteName, all) : callLowLevelPush(remoteName, all)
+    void push(ScmIdentity identity, String remoteName, boolean all) {
+        identity.useDefault ? callPush(remoteName, all) : callLowLevelPush(identity, remoteName, all)
     }
 
     private void callPush(String remoteName, boolean all) {
         repository.push(remote: remoteName, tags: true, all: all)
     }
 
-    private void callLowLevelPush(String remoteName, boolean all) {
-        pushCommand(remoteName, all).call()
-        pushCommand(remoteName, all).setPushTags().call()
+    private void callLowLevelPush(ScmIdentity identity, String remoteName, boolean all) {
+        pushCommand(identity, remoteName, all).call()
+        pushCommand(identity, remoteName, all).setPushTags().call()
     }
 
-    private PushCommand pushCommand(String remoteName, boolean all) {
+    private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
         PushCommand push = repository.repository.jgit.push()
         push.remote = remoteName
 
@@ -108,12 +96,12 @@ class GitRepository implements ScmRepository {
             push.setPushAll()
         }
 
-        setTransportOptions(push)
+        setTransportOptions(identity, push)
 
         return push
     }
 
-    private void setTransportOptions(TransportCommand command) {
+    private void setTransportOptions(ScmIdentity identity, TransportCommand command) {
         command.transportConfigCallback = new TransportConfigCallback() {
             @Override
             void configure(Transport transport) {
@@ -125,8 +113,6 @@ class GitRepository implements ScmRepository {
 
     @Override
     void attachRemote(String remoteName, String remoteUrl) {
-        ensureRepositoryExists()
-
         Config config = repository.repository.jgit.repository.config
 
         RemoteConfig remote = new RemoteConfig(config, remoteName)
@@ -144,15 +130,13 @@ class GitRepository implements ScmRepository {
 
     @Override
     void commit(String message) {
-        ensureRepositoryExists()
-
         repository.add(patterns: ['*'])
         repository.commit(message: message)
     }
 
     @Override
     ScmPosition currentPosition(String tagPrefix) {
-        if(repository == null || !hasCommits()) {
+        if(!hasCommits()) {
             return ScmPosition.defaultPosition()
         }
 
@@ -205,15 +189,11 @@ class GitRepository implements ScmRepository {
 
     @Override
     boolean checkUncommitedChanges() {
-        ensureRepositoryExists()
-
         return !repository.status().isClean()
     }
 
     @Override
     boolean checkAheadOfRemote() {
-        ensureRepositoryExists()
-
         BranchStatus status = repository.branch.status(branch: repository.branch.current.fullName)
         return status.aheadCount != 0 || status.behindCount != 0
     }
@@ -228,7 +208,6 @@ class GitRepository implements ScmRepository {
 
     @Override
     List<String> lastLogMessages(int messageCount) {
-        ensureRepositoryExists()
         return repository.log(maxCommits: messageCount)*.fullMessage
     }
 }
