@@ -19,15 +19,15 @@ class VerifyReleaseTask extends DefaultTask {
         ChecksResolver resolver = new ChecksResolver(config.checks, project)
         LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(config, project)
 
-        if(resolver.checkUncommitedChanges()) {
-            boolean uncommitedChanges = repository.checkUncommitedChanges()
-            project.logger.quiet("Looking for uncommited changes.. ${uncommitedChanges ? 'FAILED' : ''}")
-            if (uncommitedChanges && !dryRun) {
-                throw new IllegalStateException("There are uncommited files in your repository - can't release.")
+        if(resolver.checkUncommittedChanges()) {
+            boolean uncommittedChanges = repository.checkUncommittedChanges()
+            project.logger.quiet("Looking for uncommitted changes.. ${uncommittedChanges ? 'FAILED' : ''}")
+            if (uncommittedChanges && !dryRun) {
+                throw new IllegalStateException("There are uncommitted files in your repository - can't release.")
             }
         }
         else {
-            project.logger.quiet('Skipping uncommited changes check')
+            project.logger.quiet('Skipping uncommitted changes check')
         }
 
         boolean remoteAttached = repository.remoteAttached(config.repository.remote)

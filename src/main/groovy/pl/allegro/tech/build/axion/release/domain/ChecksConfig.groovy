@@ -4,6 +4,6 @@ class ChecksConfig {
 
     boolean aheadOfRemote = true
 
-    boolean uncommitedChanges = true
+    boolean uncommittedChanges = true
 
 }

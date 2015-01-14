@@ -18,7 +18,7 @@ interface ScmRepository {
 
     boolean remoteAttached(String remoteName);
 
-    boolean checkUncommitedChanges()
+    boolean checkUncommittedChanges()
 
     boolean checkAheadOfRemote()
 

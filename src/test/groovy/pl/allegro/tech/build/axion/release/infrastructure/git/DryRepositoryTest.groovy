@@ -49,12 +49,12 @@ class DryRepositoryTest extends Specification {
         currentPosition == expectedPosition
     }
 
-    def "should check uncommited changes on real scm"() {
+    def "should check uncommitted changes on real scm"() {
         given:
-        scm.checkUncommitedChanges() >> true
+        scm.checkUncommittedChanges() >> true
 
         expect:
-        dryRepository.checkUncommitedChanges()
+        dryRepository.checkUncommittedChanges()
     }
 
     def "should check ahead of remote on real scm"() {

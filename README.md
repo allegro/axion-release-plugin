@@ -93,7 +93,7 @@ allprojects {
 ## Tasks
 
 * `currentVersion` - prints current version as seen by plugin.
-* `verifyRelease` - check some basic stuff before release, i.e. if there are no uncommited files and if branch is not ahead of origin
+* `verifyRelease` - check some basic stuff before release, i.e. if there are no uncommitted files and if branch is not ahead of origin
 * `release` - create tag with current version and push it to remote
 
 ## Example
@@ -167,11 +167,11 @@ This will output actions it would take during release, but won't persist changes
 
 #### Disabling checks
 
-By default plugin checks if there are no uncommited changes and if local branch is ahead of remote before release. These
+By default plugin checks if there are no uncommitted changes and if local branch is ahead of remote before release. These
 checks can be disabled from command line using:
 
     * `release.disableChecks` - disable all checks
-    * `release.disableUncommitedCheck` - disable uncommited changes check
+    * `release.disableUncommittedCheck` - disable uncommitted changes check
     * `release.disableRemoteCheck` - disable ahead of remote check
 
 ```
@@ -232,7 +232,7 @@ scmVersion {
     ] // map [regexp: closure] of version creators per branch, first match wins but no order is guaranteed (depends on created map instance)
 
     checks {
-        uncommitedChanges = false // permanently disable uncommited changes check
+        uncommittedChanges = false // permanently disable uncommitted changes check
         aheadOfRemote = false // permanently disable ahead of remote check
     }
 }
