@@ -2,13 +2,11 @@ package pl.allegro.tech.build.axion.release.domain.scm
 
 interface ScmRepository {
 
-    void initialize(ScmInitializationOptions initializationOptions)
-
-    void fetchTags()
+    void fetchTags(ScmIdentity identity, String remoteName)
 
     void tag(String tagName)
 
-    void push(String remoteName)
+    void push(ScmIdentity identity, String remoteName)
 
     void commit(String message)
 

@@ -3,7 +3,8 @@ plugins {
     id 'groovy'
     id 'jacoco'
     id 'nu.studer.plugindev' version '1.0.3'
-    id 'pl.allegro.tech.build.axion-release' version '0.9.8'
+    id 'pl.allegro.tech.build.axion-release' version '1.0.0'
+    id 'maven'
 }
 
 scmVersion {

@@ -1,7 +1,7 @@
-package pl.allegro.tech.build.axion.release.infrastructure.dry
+package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.logging.Logger
-import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
@@ -17,14 +17,9 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    void initialize(ScmInitializationOptions options) {
-        delegateRepository.initialize(options)
-    }
-
-    @Override
-    void fetchTags() {
+    void fetchTags(ScmIdentity identity, String remoteName) {
         log('fetching tags from remote')
-        delegateRepository.fetchTags()
+        delegateRepository.fetchTags(identity, remoteName)
     }
 
     @Override
@@ -33,7 +28,7 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    void push(String remoteName) {
+    void push(ScmIdentity identity, String remoteName) {
         log("pushing to remote: $remoteName")
     }
 

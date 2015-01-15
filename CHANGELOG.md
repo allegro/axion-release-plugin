@@ -1,6 +1,13 @@
 axion-release-plugin changelog
 ====
 
+* **1.0.1** (15.01.2015)
+    * support for setting custom key file/password in runtime
+    * printing uncommitted changes on check failure
+* **1.0.0** (12.12.2014)
+    * support for different means of authorization
+
+
 * **0.9.9** (01.12.2014)
     * added option to choose Git repository root
 * **0.9.8** (24.11.2014)

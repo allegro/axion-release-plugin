@@ -1,14 +1,16 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.gradle.api.logging.Logger
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.infrastructure.dry.DryRepository
+import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
 import spock.lang.Specification
 
 class DryRepositoryTest extends Specification {
 
     ScmRepository scm = Mock()
+
     Logger logger = Mock()
 
     DryRepository dryRepository = new DryRepository(scm, logger)
@@ -23,10 +25,10 @@ class DryRepositoryTest extends Specification {
 
     def "should not push anything to scm"() {
         when:
-        dryRepository.push("dry_remote_name")
+        dryRepository.push(ScmIdentity.defaultIdentity(), "dry_remote_name")
 
         then:
-        0 * scm.push(_)
+        0 * scm.push(_, _)
     }
 
     def "should not commit anything to scm"() {

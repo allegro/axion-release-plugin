@@ -5,40 +5,45 @@ import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.ChecksResolver
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
+import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
 class VerifyReleaseTask extends DefaultTask {
 
     @TaskAction
     void prepare() {
-        ScmRepository repository = ComponentFactory.scmRepository(project, project.extensions.getByType(VersionConfig).repository)
+        Context context = Context.instance(project)
 
-        VersionConfig config = project.extensions.getByType(VersionConfig)
+        ScmRepository repository = context.repository()
+        ScmChangesPrinter changesPrinter = context.changesPrinter(services)
+        VersionConfig config = context.config()
+
         boolean dryRun = config.dryRun
-        ChecksResolver resolver = new ChecksResolver(config.checks, project)
-        LocalOnlyResolver localOnlyResolver = new LocalOnlyResolver(config, project)
+        ChecksResolver resolver = context.checksResolver()
+        LocalOnlyResolver localOnlyResolver = context.localOnlyResolver()
 
-        if(resolver.checkUncommittedChanges()) {
+        if (resolver.checkUncommittedChanges()) {
             boolean uncommittedChanges = repository.checkUncommittedChanges()
             project.logger.quiet("Looking for uncommitted changes.. ${uncommittedChanges ? 'FAILED' : ''}")
             if (uncommittedChanges && !dryRun) {
-                throw new IllegalStateException("There are uncommitted files in your repository - can't release.")
+                changesPrinter.printChanges()
+
+                throw new IllegalStateException("There are uncommitted files in your repository - can't release. " +
+                        "See above for list of all changes.")
             }
-        }
-        else {
+        } else {
             project.logger.quiet('Skipping uncommitted changes check')
         }
 
         boolean remoteAttached = repository.remoteAttached(config.repository.remote)
-        if(resolver.checkAheadOfRemote() && !localOnlyResolver.localOnly(remoteAttached)) {
+        if (resolver.checkAheadOfRemote() && !localOnlyResolver.localOnly(remoteAttached)) {
             boolean aheadOfRemote = repository.checkAheadOfRemote()
             project.logger.quiet("Checking if branch is ahead of remote.. ${aheadOfRemote ? 'FAILED' : ''}")
             if (aheadOfRemote && !dryRun) {
                 throw new IllegalStateException("Current branch is ahead of remote counterpart - can't release.")
             }
-        }
-        else {
+        } else {
             project.logger.quiet("Skipping ahead of remote check")
         }
     }

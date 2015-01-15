@@ -4,7 +4,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
-import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
 
 class ReleasePlugin implements Plugin<Project> {
 
@@ -20,7 +19,7 @@ class ReleasePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        VersionConfig config = ComponentFactory.versionConfig(project, VERSION_EXTENSION)
+        project.extensions.create(VERSION_EXTENSION, VersionConfig, project)
 
         Task verifyReleaseTask = project.tasks.create(VERIFY_RELEASE_TASK, VerifyReleaseTask)
         verifyReleaseTask.group = 'Release'

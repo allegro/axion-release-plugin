@@ -39,7 +39,7 @@ buildscript {
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.0.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.0.1'
 }
 ```
 
@@ -52,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.0.0'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.0.1'
     }
 }
 
@@ -197,6 +197,9 @@ remote repository.
 ./gradlew release -Prelease.customKeyFile="./keys/secret_key_rsa" -Prelease.customKeyPassword=password
 ```
 
+If you don't want to pass these information via command line, you cen set it in Gradle runtime by changing
+`scmVersion.repository.customKey` and `scmVersion.repository.customKeyPassword` properties.
+
 ### Plugin
 
 ```groovy
@@ -206,6 +209,9 @@ scmVersion {
         type = 'git' // type of repository, only git supported
         directory = project.rootProject.file('./') // where is repository root? by default rootProject dir
         remote = 'myRemote' // 'origin' by default
+
+        customKey = 'AAasaDDSSD...' or project.file('myKey') // custom key - String or File
+        customKeyPassword = 'secret' // custom key password
     }
 
     localOnly = false // never connect to remote (e.g. don't push tags), false by default

@@ -1,8 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
-import pl.allegro.tech.build.axion.release.infrastructure.ComponentFactory
 import pl.allegro.tech.build.axion.release.ReleasePlugin
+import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
 import javax.inject.Inject
 
@@ -14,7 +14,7 @@ class VersionConfig {
 
     boolean dryRun
 
-    RepositoryConfig repository = new RepositoryConfig()
+    RepositoryConfig repository
 
     TagNameSerializationRules tag = new TagNameSerializationRules()
 
@@ -39,7 +39,8 @@ class VersionConfig {
     @Inject
     VersionConfig(Project project) {
         this.project = project
-        this.repository.directory = project.rootDir
+
+        this.repository = RepositoryConfigFactory.create(project)
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
     }
 
@@ -80,7 +81,7 @@ class VersionConfig {
     }
 
     VersionWithPosition getRawVersion() {
-        if(rawVersion == null) {
+        if (rawVersion == null) {
             ensureVersionServiceExists()
             rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project))
         }
@@ -88,6 +89,6 @@ class VersionConfig {
     }
 
     private void ensureVersionServiceExists() {
-        this.versionService = ComponentFactory.versionService(project, this)
+        this.versionService = Context.instance(project).versionService()
     }
 }

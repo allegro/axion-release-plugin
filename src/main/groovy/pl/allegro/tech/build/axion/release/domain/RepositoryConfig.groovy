@@ -8,4 +8,7 @@ class RepositoryConfig {
 
     String remote = 'origin'
 
+    def customKey
+
+    String customKeyPassword
 }
