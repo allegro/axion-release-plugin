@@ -55,8 +55,8 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    boolean checkUncommitedChanges() {
-        log('check ucommited changes')
+    boolean checkUncommittedChanges() {
+        log('check uncommitted changes')
         return false
     }
 

@@ -67,12 +67,12 @@ class GitRepositoryTest extends Specification {
         rawRepository.log(maxCommits: 1)*.fullMessage == ['release commit']
     }
 
-    def "should signal there are uncommited changes"() {
+    def "should signal there are uncommitted changes"() {
         when:
-        project.file('repo/uncommited').createNewFile()
+        project.file('repo/uncommitted').createNewFile()
 
         then:
-        repository.checkUncommitedChanges()
+        repository.checkUncommittedChanges()
     }
 
     def "should point to last tag in current position in simple case"() {
