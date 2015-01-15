@@ -26,7 +26,7 @@ class GradleAwareScmService implements ScmService {
     @Override
     void push() {
         project.logger.quiet("Pushing all to remote: ${config.remote}")
-        ScmIdentity identity = new ScmIdentityResolver().resolve(project)
+        ScmIdentity identity = ScmIdentityResolver.resolve(config)
         repository.push(identity, config.remote)
     }
 

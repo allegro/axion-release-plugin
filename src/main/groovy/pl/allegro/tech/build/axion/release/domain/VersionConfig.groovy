@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
-import org.gradle.internal.service.ServiceRegistry
 import pl.allegro.tech.build.axion.release.ReleasePlugin
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
@@ -15,7 +14,7 @@ class VersionConfig {
 
     boolean dryRun
 
-    RepositoryConfig repository = new RepositoryConfig()
+    RepositoryConfig repository
 
     TagNameSerializationRules tag = new TagNameSerializationRules()
 
@@ -41,7 +40,7 @@ class VersionConfig {
     VersionConfig(Project project) {
         this.project = project
 
-        this.repository.directory = project.rootDir
+        this.repository = RepositoryConfigFactory.create(project)
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
     }
 

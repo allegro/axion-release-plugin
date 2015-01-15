@@ -9,7 +9,7 @@ class ReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
-        Context context = Context.instance(project, services)
+        Context context = Context.instance(project)
 
         Releaser releaser = new Releaser(
                 context.scmService(),

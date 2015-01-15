@@ -13,10 +13,10 @@ class VerifyReleaseTask extends DefaultTask {
 
     @TaskAction
     void prepare() {
-        Context context = Context.instance(project, services)
+        Context context = Context.instance(project)
 
         ScmRepository repository = context.repository()
-        ScmChangesPrinter changesPrinter = context.changesPrinter()
+        ScmChangesPrinter changesPrinter = context.changesPrinter(services)
         VersionConfig config = context.config()
 
         boolean dryRun = config.dryRun
