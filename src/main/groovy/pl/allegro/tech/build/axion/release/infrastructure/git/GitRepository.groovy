@@ -196,7 +196,7 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    boolean checkUncommitedChanges() {
+    boolean checkUncommittedChanges() {
         ensureRepositoryExists()
 
         return !repository.status().isClean()

@@ -4,7 +4,10 @@ import org.gradle.api.Project
 
 class ChecksResolver {
 
+    @Deprecated
     private static final String DISABLE_UNCOMMITED_CHANGES_CHECK = "release.disableUncommitedCheck"
+
+    private static final String DISABLE_UNCOMMITTED_CHANGES_CHECK = "release.disableUncommittedCheck"
 
     private static final String DISABLE_AHEAD_OF_REMOTE_CHECK = "release.disableRemoteCheck"
 
@@ -19,14 +22,18 @@ class ChecksResolver {
         this.project = project
     }
 
-    boolean checkUncommitedChanges() {
+    boolean checkUncommittedChanges() {
         if(project.hasProperty(DISABLE_CHECKS)) {
             return false
         }
+        if(project.hasProperty(DISABLE_UNCOMMITTED_CHANGES_CHECK)) {
+            return false
+        }
+        // Old check for backwards compatibility
         if(project.hasProperty(DISABLE_UNCOMMITED_CHANGES_CHECK)) {
             return false
         }
-        return config.uncommitedChanges
+        return config.uncommittedChanges
     }
 
     boolean checkAheadOfRemote() {

@@ -13,12 +13,12 @@ class ChecksResolverTest extends Specification {
     def "should return default value from config when no project properties are present"() {
         given:
         config.aheadOfRemote = true
-        config.uncommitedChanges = true
+        config.uncommittedChanges = true
 
         ChecksResolver resolver = new ChecksResolver(config, project)
 
         expect:
-        resolver.checkUncommitedChanges()
+        resolver.checkUncommittedChanges()
         resolver.checkAheadOfRemote()
     }
 
@@ -26,24 +26,36 @@ class ChecksResolverTest extends Specification {
         given:
         project.extensions.extraProperties.set('release.disableChecks', true)
         config.aheadOfRemote = true
-        config.uncommitedChanges = true
+        config.uncommittedChanges = true
 
         ChecksResolver resolver = new ChecksResolver(config, project)
 
         expect:
-        !resolver.checkUncommitedChanges()
+        !resolver.checkUncommittedChanges()
         !resolver.checkAheadOfRemote()
     }
 
-    def "should skip uncommited changes check if it was disabled using project property"() {
+    def "should skip uncommitted changes check if it was disabled using project property"() {
         given:
-        project.extensions.extraProperties.set('release.disableUncommitedCheck', true)
-        config.uncommitedChanges = true
+        project.extensions.extraProperties.set('release.disableUncommittedCheck', true)
+        config.uncommittedChanges = true
 
         ChecksResolver resolver = new ChecksResolver(config, project)
 
         expect:
-        !resolver.checkUncommitedChanges()
+        !resolver.checkUncommittedChanges()
+    }
+
+    // Old check. Tests backwards compatibility with deprecated property
+    def "should skip uncommited changes check if it was disabled using project property"() {
+        given:
+        project.extensions.extraProperties.set('release.disableUncommitedCheck', true)
+        config.uncommittedChanges = true
+
+        ChecksResolver resolver = new ChecksResolver(config, project)
+
+        expect:
+        !resolver.checkUncommittedChanges()
     }
 
     def "should skip ahead of remote check if it was disabled using project property"() {

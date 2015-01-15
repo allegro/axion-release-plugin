@@ -60,10 +60,10 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    boolean checkUncommitedChanges() {
-        boolean uncommitedChanges = delegateRepository.checkUncommitedChanges()
-        log("uncommited changes: $uncommitedChanges")
-        return uncommitedChanges
+    boolean checkUncommittedChanges() {
+        boolean uncommittedChanges = delegateRepository.checkUncommittedChanges()
+        log("uncommitted changes: $uncommittedChanges")
+        return uncommittedChanges
     }
 
     @Override
