@@ -45,7 +45,7 @@ class DryRepositoryTest extends Specification {
         scm.currentPosition(_) >> expectedPosition
 
         when:
-        ScmPosition currentPosition = dryRepository.currentPosition("dry_prefix")
+        ScmPosition currentPosition = dryRepository.currentPosition(~/^release.*/)
 
         then:
         currentPosition == expectedPosition

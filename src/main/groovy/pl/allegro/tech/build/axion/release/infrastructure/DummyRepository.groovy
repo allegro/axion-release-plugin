@@ -5,6 +5,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
+import java.util.regex.Pattern
+
 class DummyRepository implements ScmRepository {
 
     private final Logger logger
@@ -43,7 +45,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String tagPrefix) {
+    ScmPosition currentPosition(Pattern tagPattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return ScmPosition.defaultPosition()
     }

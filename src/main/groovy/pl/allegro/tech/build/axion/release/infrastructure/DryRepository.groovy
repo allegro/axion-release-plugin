@@ -5,6 +5,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
+import java.util.regex.Pattern
+
 class DryRepository implements ScmRepository {
     
     private final ScmRepository delegateRepository
@@ -43,8 +45,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String tagPrefix) {
-        ScmPosition position = delegateRepository.currentPosition(tagPrefix)
+    ScmPosition currentPosition(Pattern tagPattern) {
+        ScmPosition position = delegateRepository.currentPosition(tagPattern)
         log("scm position: $position")
         return position
     }

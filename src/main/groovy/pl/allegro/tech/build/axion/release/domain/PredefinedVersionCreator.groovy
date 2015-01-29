@@ -25,10 +25,10 @@ enum PredefinedVersionCreator {
     }
 
     static Closure versionCreatorFor(String type) {
-        PredefinedVersionCreator creator = PredefinedVersionCreator.values().find { it.type == type }
+        PredefinedVersionCreator creator = values().find { it.type == type }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version creator with $type type. " +
-                    "You can choose from: ${PredefinedVersionCreator.values().collect { it.type }}");
+                    "You can choose from: ${values().collect { it.type }}");
         }
         return creator.versionCreator
     }

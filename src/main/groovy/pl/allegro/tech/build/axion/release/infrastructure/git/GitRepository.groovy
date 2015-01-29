@@ -24,6 +24,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 
+import java.util.regex.Pattern
+
 class GitRepository implements ScmRepository {
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
@@ -135,13 +137,13 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String tagPrefix) {
+    ScmPosition currentPosition(Pattern pattern) {
         if(!hasCommits()) {
             return ScmPosition.defaultPosition()
         }
 
         Map tags = repository.tag.list()
-                .grep({ it.fullName.substring(GIT_TAG_PREFIX.length()).startsWith(tagPrefix) })
+                .grep({ it.fullName.substring(GIT_TAG_PREFIX.length()) ==~ pattern })
                 .inject([:], { map, entry -> map[entry.commit.id] = entry.fullName.substring(GIT_TAG_PREFIX.length()); return map; })
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
