@@ -86,4 +86,15 @@ class VersionResolverTest extends Specification {
         then:
         version.version.toString() == '2.0.0'
     }
+    
+    def "should not increment patch version when being on position after next version tag"() {
+        given:
+        repository.currentPosition(_) >> new ScmPosition('master', 'release-2.0.0-alpha', false)
+
+        when:
+        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
+
+        then:
+        version.version.toString() == '2.0.0'
+    }
 }

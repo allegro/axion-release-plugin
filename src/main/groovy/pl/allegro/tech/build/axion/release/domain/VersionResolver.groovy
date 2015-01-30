@@ -19,9 +19,9 @@ class VersionResolver {
 
         Pattern pattern = Pattern.compile("^${versionConfig.tag.prefix}.*(|${versionConfig.nextVersion.suffix})\$")
         ScmPosition position = repository.currentPosition(pattern)
-        boolean nextVersionTag = nextVersionTag(position, versionConfig.nextVersion)
+        boolean afterNextVersionTag = afterNextVersionTag(position, versionConfig.nextVersion)
         
-        if(nextVersionTag) {
+        if(afterNextVersionTag) {
             position = ScmPosition.notOnTag(position)
         }
         
@@ -31,8 +31,8 @@ class VersionResolver {
             if (position.tagless()) {
                 version = Version.valueOf(initialVersion(versionConfig, position))
             } else {
-                version = Version.valueOf(readVersionFromPosition(position, versionConfig, nextVersionTag))
-                if (!position.onTag && !nextVersionTag) {
+                version = Version.valueOf(readVersionFromPosition(position, versionConfig, afterNextVersionTag))
+                if (!position.onTag && !afterNextVersionTag) {
                     version = version.incrementPatchVersion()
                 }
             }
@@ -53,7 +53,7 @@ class VersionResolver {
         return config.tag.deserialize(config.tag, position, tagWithoutNextVersion)
     }
     
-    private boolean nextVersionTag(ScmPosition position, NextVersionConfig config) {
-        return position.onTag && position.latestTag.endsWith(config.suffix)
+    private boolean afterNextVersionTag(ScmPosition position, NextVersionConfig config) {
+        return position.latestTag?.endsWith(config.suffix)
     }
 }
