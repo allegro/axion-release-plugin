@@ -35,8 +35,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
-        log("commiting message: $message")
+    void commit(List patterns, String message) {
+        log("commiting files matching $patterns with message: $message")
     }
 
     @Override

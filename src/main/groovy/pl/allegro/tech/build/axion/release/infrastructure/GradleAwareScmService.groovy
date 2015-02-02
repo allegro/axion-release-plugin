@@ -31,8 +31,8 @@ class GradleAwareScmService implements ScmService {
     }
 
     @Override
-    void commit(String message) {
-        repository.commit(message)
+    void commit(List patterns, String message) {
+        repository.commit(patterns, message)
     }
 
     @Override

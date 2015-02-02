@@ -35,7 +35,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
+    void commit(List patterns, String message) {
         log('commit')
     }
 

@@ -131,8 +131,8 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
-        repository.add(patterns: ['*'])
+    void commit(List patterns, String message) {
+        repository.add(patterns: patterns)
         repository.commit(message: message)
     }
 
