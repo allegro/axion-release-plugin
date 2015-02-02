@@ -30,6 +30,8 @@ class VersionConfig {
 
     Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
 
+    NextVersionConfig nextVersion = new NextVersionConfig()
+    
     VersionService versionService
 
     private String resolvedVersion = null
@@ -54,6 +56,10 @@ class VersionConfig {
 
     void checks(Closure c) {
         project.configure(checks, c)
+    }
+
+    void nextVersion(Closure c) {
+        project.configure(nextVersion, c)
     }
 
     void versionCreator(String type) {

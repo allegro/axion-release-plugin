@@ -23,6 +23,6 @@ class VersionReadOptions {
     }
 
     static VersionReadOptions defaultOptions() {
-        return new VersionReadOptions(false, false, null, false, null)
+        return new VersionReadOptions(false, null)
     }
 }

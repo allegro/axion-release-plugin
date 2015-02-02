@@ -4,7 +4,6 @@ plugins {
     id 'jacoco'
     id 'nu.studer.plugindev' version '1.0.3'
     id 'pl.allegro.tech.build.axion-release' version '1.0.0'
-    id 'maven'
 }
 
 scmVersion {

@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm
 
+import java.util.regex.Pattern
+
 interface ScmRepository {
 
     void fetchTags(ScmIdentity identity, String remoteName)
@@ -12,7 +14,7 @@ interface ScmRepository {
 
     void attachRemote(String remoteName, String url)
 
-    ScmPosition currentPosition(String tagPrefix)
+    ScmPosition currentPosition(Pattern tagPattern)
 
     boolean remoteAttached(String remoteName);
 

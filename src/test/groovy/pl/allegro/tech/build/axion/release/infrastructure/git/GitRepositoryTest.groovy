@@ -81,7 +81,7 @@ class GitRepositoryTest extends Specification {
         repository.commit("commit after release")
 
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.latestTag == 'release-1'
@@ -97,7 +97,7 @@ class GitRepositoryTest extends Specification {
         GitRepository commitlessRepository = new GitRepository(projectDir, initializationOptions)
 
         when:
-        ScmPosition position = commitlessRepository.currentPosition('release')
+        ScmPosition position = commitlessRepository.currentPosition(~/^release.*/)
 
         then:
         position.branch == 'master'
@@ -109,7 +109,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('release-1')
 
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.latestTag == 'release-1'
@@ -127,7 +127,7 @@ class GitRepositoryTest extends Specification {
         repository.commit("bugfix after release-1")
 
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.latestTag == 'release-1'
@@ -135,7 +135,7 @@ class GitRepositoryTest extends Specification {
 
     def "should return tagless position with branch name when no tag in repository"() {
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.branch == 'master'
@@ -150,7 +150,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('otherTag')
 
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.latestTag == 'release-1'
@@ -174,7 +174,7 @@ class GitRepositoryTest extends Specification {
         repository.commit("first commit")
 
         when:
-        ScmPosition position = repository.currentPosition('release')
+        ScmPosition position = repository.currentPosition(~/^release.*/)
 
         then:
         position.branch == 'some-branch'

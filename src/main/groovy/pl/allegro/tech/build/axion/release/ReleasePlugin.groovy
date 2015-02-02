@@ -13,6 +13,8 @@ class ReleasePlugin implements Plugin<Project> {
 
     public static final String RELEASE_TASK = 'release'
 
+    public static final String MARK_NEXT_VERSION_TASK = 'markNextVersionTask'
+
     public static final String CURRENT_VERSION_TASK = 'currentVersion'
 
     public static final String DRY_RUN_FLAG = 'release.dryRun'
@@ -28,8 +30,11 @@ class ReleasePlugin implements Plugin<Project> {
         Task releaseTask = project.tasks.create(RELEASE_TASK, ReleaseTask)
         releaseTask.group = 'Release'
         releaseTask.description = 'Performs release - creates tag and pushes it to remote.'
-
         releaseTask.dependsOn(VERIFY_RELEASE_TASK)
+
+        Task nextVersionTask = project.tasks.create(MARK_NEXT_VERSION_TASK, MarkNextVersionTask)
+        nextVersionTask.group = 'Release'
+        nextVersionTask.description = 'Creates next version marker tag and pushes it to remote.'
 
         Task currentVersionTask = project.tasks.create(CURRENT_VERSION_TASK, OutputCurrentVersionTask)
         currentVersionTask.group = 'Help'

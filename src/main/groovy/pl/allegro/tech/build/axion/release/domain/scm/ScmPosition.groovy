@@ -21,6 +21,10 @@ class ScmPosition {
     static ScmPosition onTag(String tagName) {
         return new ScmPosition('master', tagName, true)
     }
+    
+    static ScmPosition notOnTag(ScmPosition position) {
+        return new ScmPosition(position.branch, position.latestTag, false)
+    }
 
     boolean tagless() {
         return latestTag == null

@@ -8,11 +8,11 @@ enum TagNameSerializer {
             { TagNameSerializationRules rules, String version ->
                 return rules.prefix ? rules.prefix + rules.versionSeparator + version : version
             },
-            { TagNameSerializationRules rules, ScmPosition position ->
+            { TagNameSerializationRules rules, ScmPosition position, String tagName ->
                 if (rules.prefix.isEmpty()) {
-                    return position.latestTag
+                    return tagName
                 }
-                return position.latestTag.substring(rules.prefix.length() + rules.versionSeparator.length())
+                return tagName.substring(rules.prefix.length() + rules.versionSeparator.length())
             }
     )
 

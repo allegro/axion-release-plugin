@@ -120,6 +120,11 @@ project-0.1.0 project-0.1.1
 
 # ./graldew publish
 published project-0.1.1 release version
+
+# ./gradlew markNextVersion -Prelease.nextVersion=1.0.0
+
+# ./gradlew currentVersion
+1.0.0-SNAPSHOT
 ```
 
 ## Options
@@ -133,6 +138,29 @@ If you want to use custom key file to authorize, see *Using custom SSH key* sect
 
 
 ### Command line
+
+#### Mark next version
+
+To start using new version without releasing, you can create next version marker tag:
+
+```
+./gradlew markNextVersion -Prelease.nextVersion=1.0.0
+```
+
+This will change version numbering, but plugin will treat current version as *SNAPSHOT*.
+Marking next version means creating suffixed tag in repository. You can change the way it is created in `nextVersion` config section.
+
+Usage scenario:
+
+```
+./gradlew currentVersion
+0.1.0-SNAPSHOT
+./gradlew markNextVersion -Prelease.nextVersion=1.0.0
+./gradlew currentVersion
+1.0.0-SNAPSHOT
+git tag
+release-1.0.0-alpha
+```
 
 #### Force version
 
@@ -223,7 +251,14 @@ scmVersion {
         versionSeparator = '-' // separator between prefix and version number, '-' by default
         serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name from raw version
         deserialize = { tag, position -> /* ... */ } // reads raw version from tag
-        initialVersion = { tag, position -> /* ... */ } // returns initial version if none found, 0.1.0 by default
+        initialVersion = { tag, position, tagName -> /* ... */ } // returns initial version if none found, 0.1.0 by default
+    }
+    
+    nextVersion {
+        suffix = 'alpha' // tag suffix
+        separator = '-' // separator between version and suffix
+        serializer = { nextVersionConfig, version -> /* ... */ } // append suffix to version tag
+        deserializer = { nextVersionConfig, position -> /* ... */ } // strip suffix off version tag
     }
 
     versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
@@ -246,9 +281,9 @@ scmVersion {
 
 In `versionCreator` and `branchVersionCreators` closure arguments, `position` contains the following attributes:
 
-* `latestTag` - the name of the latest tag.
-* `branch` - the name of the current branch.
-* `onTag` - true, if current commit is tagged.
+* `latestTag` - the name of the latest tag
+* `branch` - the name of the current branch
+* `onTag` - true, if current commit is tagged with release version tag
 
 #### Version creators
 
