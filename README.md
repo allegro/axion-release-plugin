@@ -39,7 +39,7 @@ buildscript {
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.0.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.1.0'
 }
 ```
 
@@ -52,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.0.1'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.1.0'
     }
 }
 
@@ -153,12 +153,15 @@ Marking next version means creating suffixed tag in repository. You can change t
 Usage scenario:
 
 ```
-./gradlew currentVersion
+# ./gradlew currentVersion
 0.1.0-SNAPSHOT
-./gradlew markNextVersion -Prelease.nextVersion=1.0.0
-./gradlew currentVersion
+
+# ./gradlew markNextVersion -Prelease.nextVersion=1.0.0
+
+# ./gradlew currentVersion
 1.0.0-SNAPSHOT
-git tag
+
+# git tag
 release-1.0.0-alpha
 ```
 

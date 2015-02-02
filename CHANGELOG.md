@@ -1,6 +1,8 @@
 axion-release-plugin changelog
 ====
 
+* **1.1.0** (02.02.2015)
+    * next version markers - ability to declare working on next major version
 * **1.0.1** (15.01.2015)
     * support for setting custom key file/password in runtime
     * printing uncommitted changes on check failure
