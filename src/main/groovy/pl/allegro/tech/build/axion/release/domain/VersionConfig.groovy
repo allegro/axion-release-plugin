@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.ReleasePlugin
+import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
 import javax.inject.Inject
@@ -31,6 +32,8 @@ class VersionConfig {
     Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
 
     NextVersionConfig nextVersion = new NextVersionConfig()
+
+    HooksConfig hooks = new HooksConfig()
     
     VersionService versionService
 

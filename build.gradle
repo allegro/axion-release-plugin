@@ -14,12 +14,12 @@ scmVersion {
     versionCreator 'versionWithBranch'
     createReleaseCommit true
     
-    hooks {
-        pre 'fileUpdate', [file: './docs/config.py', pattern: {c -> /^version=.*/}, replacement: {c -> "version=$c.currentVersion"}]
-        pre 'fileUpdate', [file: 'README.md', pattern: {c -> /^version:.*/}, replacement: {c -> "version: $c.currentVersion"}]
-        pre 'releaseCommit', {c -> "Releasing version $c.currentVersion"}
-        pre 'commit'
-    }
+//    hooks {
+//        pre 'fileUpdate', [file: './docs/config.py', pattern: {c -> /^version=.*/}, replacement: {c -> "version=$c.currentVersion"}]
+//        pre 'fileUpdate', [file: 'README.md', pattern: {c -> /^version:.*/}, replacement: {c -> "version: $c.currentVersion"}]
+//        pre 'releaseCommit', {c -> "Releasing version $c.currentVersion"}
+//        pre 'commit'
+//    }
 }
 
 group = 'pl.allegro.tech.build'

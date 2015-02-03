@@ -2,18 +2,22 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.logging.Logger
+import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class Releaser {
 
     private final ScmService repository
 
+    private final ReleaseHooksRunner hooksRunner
+    
     private final LocalOnlyResolver localOnlyResolver
 
     private final Logger logger
 
-    Releaser(ScmService repository, LocalOnlyResolver localOnlyResolver, Logger logger) {
+    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, LocalOnlyResolver localOnlyResolver, Logger logger) {
         this.repository = repository
+        this.hooksRunner = hooksRunner
         this.localOnlyResolver = localOnlyResolver
         this.logger = logger
     }
@@ -34,6 +38,8 @@ class Releaser {
                 repository.commit(versionConfig.releaseCommitMessage(version.toString(), positionedVersion.position))
             }
 
+            hooksRunner.runPreReleaseHooks(positionedVersion, version)
+            
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
@@ -43,6 +49,8 @@ class Releaser {
             else {
                 logger.quiet("Changes made to local repository only")
             }
+            
+            hooksRunner.runPostReleaseHooks(positionedVersion, version)
         }
         else {
             logger.quiet("Working on released version ${versionConfig.version}, nothing to do here.")
