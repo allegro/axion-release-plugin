@@ -15,6 +15,7 @@ class VersionResolver {
     }
 
     VersionWithPosition resolveVersion(VersionConfig versionConfig, VersionReadOptions options) {
+        Version lastReleaseVersion
         Version version
 
         Pattern pattern = Pattern.compile("^${versionConfig.tag.prefix}.*(|${versionConfig.nextVersion.suffix})\$")

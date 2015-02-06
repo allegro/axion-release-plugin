@@ -2,6 +2,9 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 class FileUpdateHook implements ReleaseHook {
 
     private final Map arguments
@@ -16,8 +19,8 @@ class FileUpdateHook implements ReleaseHook {
 
         String text = file.text
         String replacedText = text.replaceAll(
-                arguments.pattern(hookContext.position, hookContext.previousVersion),
-                arguments.replacement(hookContext.position, hookContext.currentVersion)
+                arguments.pattern(hookContext.previousVersion, hookContext.position),
+                arguments.replacement(hookContext.currentVersion, hookContext.position)
         )
 
         file.write(replacedText)

@@ -26,7 +26,7 @@ class ReleaserTest extends Specification {
 
         Context context = Context.instance(project)
         repository = context.scmService()
-        repository.commit('initial commit')
+        repository.commit(['*'], 'initial commit')
 
         releaser = new Releaser(repository, new ReleaseHooksRunner(repository, config.hooks), context.localOnlyResolver(), project.logger)
     }

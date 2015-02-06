@@ -35,7 +35,7 @@ class Releaser {
 
             if(versionConfig.createReleaseCommit) {
                 logger.quiet("Creating release commit")
-                repository.commit(versionConfig.releaseCommitMessage(version.toString(), positionedVersion.position))
+                versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
             }
 
             hooksRunner.runPreReleaseHooks(positionedVersion, version)

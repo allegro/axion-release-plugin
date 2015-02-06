@@ -65,6 +65,10 @@ class VersionConfig {
         project.configure(nextVersion, c)
     }
 
+    void hooks(Closure c) {
+        project.configure(hooks, c)
+    }
+
     void versionCreator(String type) {
         this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
     }

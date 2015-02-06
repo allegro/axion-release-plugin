@@ -8,6 +8,7 @@ import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
+import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
@@ -59,7 +60,7 @@ class Context {
     public ScmService scmService() {
         return new GradleAwareScmService(project, config.repository, repository())
     }
-
+    
     public LocalOnlyResolver localOnlyResolver() {
         return new LocalOnlyResolver(config, project)
     }

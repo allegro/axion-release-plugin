@@ -10,8 +10,16 @@ class HooksConfig {
         preReleaseHooks.add(PredefinedReleaseHook.DEFAULT.factory.create(c))
     }
 
+    void pre(String type) {
+        postReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create())
+    }
+    
     void pre(String type, Map arguments) {
         preReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(arguments))
+    }
+
+    void pre(String type, Closure customAction) {
+        preReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(customAction))
     }
 
     void post(Closure c) {
