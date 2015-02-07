@@ -18,7 +18,7 @@ class VersionServiceTest extends Specification {
 
     def setup() {
         Project project = ProjectBuilder.builder().build()
-        versionConfig = project.extensions.create('versionService', VersionConfig, project)
+        versionConfig = project.extensions.create('versionConfig', VersionConfig, project)
 
         service = new VersionService(resolver)
     }
@@ -26,7 +26,8 @@ class VersionServiceTest extends Specification {
     def "should return resolver version when on tag"() {
         given:
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
-                Version.valueOf("1.0.0"),
+                Version.valueOf('1.0.0'),
+                Version.valueOf('1.0.0'),
                 new ScmPosition('master', 'release-1.0.0', true)
         )
 
@@ -40,6 +41,7 @@ class VersionServiceTest extends Specification {
     def "should return snapshot version with increased patch when not on tag"() {
         given:
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf("1.0.1"),
                 Version.valueOf("1.0.1"),
                 new ScmPosition('master', 'release-1.0.0', false)
         )
@@ -57,6 +59,7 @@ class VersionServiceTest extends Specification {
 
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
                 Version.valueOf("1.0.1"),
+                Version.valueOf("1.0.1"),
                 new ScmPosition('master', 'release-1.0.0', false)
         )
 
@@ -73,6 +76,7 @@ class VersionServiceTest extends Specification {
         versionConfig.versionCreator = {v, t -> return v + '-feature/hello'}
 
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf("1.0.1"),
                 Version.valueOf("1.0.1"),
                 new ScmPosition('master', 'release-1.0.0', false)
         )

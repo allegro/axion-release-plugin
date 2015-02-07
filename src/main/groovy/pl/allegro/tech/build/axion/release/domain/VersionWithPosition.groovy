@@ -7,17 +7,17 @@ class VersionWithPosition {
 
     final Version version
 
-    final Version lastReleasedVersion
+    final Version previousVersion
     
     final ScmPosition position
 
-    VersionWithPosition(Version version, Version lastReleasedVersion, ScmPosition position) {
+    VersionWithPosition(Version version, Version previousVersion, ScmPosition position) {
         this.version = version
-        this.lastReleasedVersion = lastReleasedVersion
+        this.previousVersion = previousVersion
         this.position = position
     }
 
-    static VersionWithPosition withoutPosition(Version version, Version lastReleasedVersion) {
+    static VersionWithPosition withoutPosition(Version version) {
         return new VersionWithPosition(version, null, null)
     }
 

@@ -1,100 +1,70 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import spock.lang.Specification
 
-class VersionResolverTest extends Specification {
-
-    ScmRepository repository = Stub(ScmRepository)
-
-    VersionConfig versionConfig
-
+class VersionResolverTest extends RepositoryBasedTest {
+    
     VersionResolver resolver
-
+    
+    ScmRepository repository
+    
+    VersionReadOptions options = VersionReadOptions.defaultOptions()
+    
     def setup() {
-        versionConfig = new VersionConfig(ProjectBuilder.builder().build())
-        resolver = new VersionResolver(repository)
-    }
+        repository = context.repository()
+        repository.commit(['*'], 'initial commit')
 
-    def "should return current version read from tag"() {
-        given:
-        // ~/^release.*(|alpha)$/
-        repository.currentPosition(_) >> new ScmPosition('master', 'release-1.0.0', true)
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
-
-        then:
-        version.version.toString() == '1.0.0'
-    }
-
-    def "should return current version with patch version increased when not on tag"() {
-        given:
-        repository.currentPosition(_) >> new ScmPosition('master', 'release-1.0.0', false)
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
-
-        then:
-        version.version.toString() == '1.0.1'
-    }
-
-    def "should return forced version when forcing is on"() {
-        given:
-        repository.currentPosition(_) >> new ScmPosition('master', 'release-1.0.0', true)
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.withForcedVersion('2.0.0'))
-
-        then:
-        version.version.toString() == '2.0.0'
-    }
-
-    def "should return custom initial version when no tag exists"() {
-        given:
-        repository.currentPosition(_) >> new ScmPosition('master', null, false)
-
-        versionConfig.tag.initialVersion = { r, p -> '0.0.1' }
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
-
-        then:
-        version.version.toString() == '0.0.1'
-    }
-
-    def "should return default initial version when no tag exists and initial version not explicitly defined"() {
-        given:
-        repository.currentPosition(_) >> new ScmPosition('master', null, false)
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
-
-        then:
-        version.version.toString() == '0.1.0'
-    }
-
-    def "should deserialize nextVersion before deserializing version when on nextVersion tag"() {
-        given:
-        repository.currentPosition(_) >> new ScmPosition('master', 'release-2.0.0-alpha', true)
-
-        when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
-
-        then:
-        version.version.toString() == '2.0.0'
+        resolver = new VersionResolver(repository, context.versionFactory())
     }
     
-    def "should not increment patch version when being on position after next version tag"() {
+    def "should return default previous and current version when no tag in repository"() {
+        when:
+        VersionWithPosition version = resolver.resolveVersion(config, options)
+        
+        then:
+        version.previousVersion.toString() == '0.1.0'
+        version.version.toString() == '0.1.0'
+        version.position.tagless()
+    }
+    
+    def "should return same previous and current version when on release tag"() {
         given:
-        repository.currentPosition(_) >> new ScmPosition('master', 'release-2.0.0-alpha', false)
+        repository.tag('release-1.1.0')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(versionConfig, VersionReadOptionsFactory.empty())
+        VersionWithPosition version = resolver.resolveVersion(config, options)
 
         then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '1.1.0'
+    }
+    
+    def "should return unmodified previous and incremented current version when not on tag"() {
+        given:
+        repository.tag('release-1.1.0')
+        repository.commit(['*'], 'some commit')
+
+        when:
+        VersionWithPosition version = resolver.resolveVersion(config, options)
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '1.1.1'
+    }
+    
+    def "should return previous version from last release tag and current from alpha when on alpha tag"() {
+        given:
+        repository.tag('release-1.1.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-2.0.0-alpha')
+
+        when:
+        VersionWithPosition version = resolver.resolveVersion(config, options)
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '2.0.0'
+        !version.position.onTag
     }
 }

@@ -26,7 +26,7 @@ class NextVersionMarkerTest extends Specification {
 
         Context context = Context.instance(project)
         ScmService scmService = context.scmService()
-        scmService.commit('initial commit')
+        scmService.commit(['*'], 'initial commit')
         repository = context.repository()
         versionService = context.versionService()
 
@@ -38,7 +38,7 @@ class NextVersionMarkerTest extends Specification {
         nextVersionMarker.markNextVersion(config, '2.0.0')
         
         then:
-        versionService.currentVersion(config, VersionReadOptions.defaultOptions()).version.toString() == '2.0.0-SNAPSHOT'
         repository.currentPosition(~/.*/).latestTag == 'release-2.0.0-alpha'
+        versionService.currentVersion(config, VersionReadOptions.defaultOptions()).version.toString() == '2.0.0-SNAPSHOT'
     }
 }

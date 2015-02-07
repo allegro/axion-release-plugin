@@ -4,57 +4,48 @@ import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
-import java.util.regex.Pattern
-
 class VersionResolver {
-
+    
     private final ScmRepository repository
 
-    VersionResolver(ScmRepository repository) {
+    private final VersionFactory versionFactory
+    
+    VersionResolver(ScmRepository repository, VersionFactory versionFactory) {
         this.repository = repository
-    }
-
-    VersionWithPosition resolveVersion(VersionConfig versionConfig, VersionReadOptions options) {
-        Version lastReleaseVersion
-        Version version
-
-        Pattern pattern = Pattern.compile("^${versionConfig.tag.prefix}.*(|${versionConfig.nextVersion.suffix})\$")
-        ScmPosition position = repository.currentPosition(pattern)
-        boolean afterNextVersionTag = afterNextVersionTag(position, versionConfig.nextVersion)
-        
-        if(afterNextVersionTag) {
-            position = ScmPosition.notOnTag(position)
-        }
-        
-        if (options.forcedVersion) {
-            version = Version.valueOf(options.forcedVersion)
-        } else {
-            if (position.tagless()) {
-                version = Version.valueOf(initialVersion(versionConfig, position))
-            } else {
-                version = Version.valueOf(readVersionFromPosition(position, versionConfig, afterNextVersionTag))
-                if (!position.onTag && !afterNextVersionTag) {
-                    version = version.incrementPatchVersion()
-                }
-            }
-        }
-
-        return new VersionWithPosition(version, position)
-    }
-
-    private String initialVersion(VersionConfig serializationConfig, ScmPosition currentPosition) {
-        return serializationConfig.tag.initialVersion(serializationConfig.tag, currentPosition)
-    }
-
-    private String readVersionFromPosition(ScmPosition position, VersionConfig config, nextVersionTag) {
-        String tagWithoutNextVersion = position.latestTag
-        if(nextVersionTag) {
-            tagWithoutNextVersion = config.nextVersion.deserializer(config.nextVersion, position)
-        }
-        return config.tag.deserialize(config.tag, position, tagWithoutNextVersion)
+        this.versionFactory = versionFactory
     }
     
-    private boolean afterNextVersionTag(ScmPosition position, NextVersionConfig config) {
-        return position.latestTag?.endsWith(config.suffix)
+    VersionWithPosition resolveVersion(VersionConfig versionConfig, VersionReadOptions readOptions) {
+        Map positions = readPositions(versionConfig)
+
+        Version currentVersion = versionFactory.create(positions.currentPosition, versionConfig, readOptions)        
+        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, readOptions)
+
+        ScmPosition position = positions.currentPosition.position
+        if(positions.currentPosition.nextVersionTag) {
+            position = position.asNotOnTagPosition()
+        }
+        
+        return new VersionWithPosition(currentVersion, previousVersion, position)
     }
+
+
+    private Map readPositions(VersionConfig config) {
+        ScmPosition currentPosition = repository.currentPosition(~/^${config.tag.prefix}.*(|${config.nextVersion.suffix})$/)
+        ScmPositionContext currentPositionContext = new ScmPositionContext(currentPosition, config.nextVersion)
+
+        ScmPosition lastReleasePosition
+        if(currentPositionContext.nextVersionTag) {
+            lastReleasePosition = repository.currentPosition(~/^${config.tag.prefix}.*/, ~/.*${config.nextVersion.suffix}$/).asOnTagPosition()
+        }
+        else {
+            lastReleasePosition = currentPosition.asOnTagPosition()
+        }
+        
+        return [
+                currentPosition: currentPositionContext,
+                lastReleasePosition: new ScmPositionContext(lastReleasePosition, config.nextVersion)
+        ]
+    }
+    
 }

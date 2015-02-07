@@ -28,7 +28,9 @@ class ReleaserTest extends Specification {
         repository = context.scmService()
         repository.commit(['*'], 'initial commit')
 
-        releaser = new Releaser(repository, new ReleaseHooksRunner(repository, config.hooks), context.localOnlyResolver(), project.logger)
+        releaser = new Releaser(repository, new ReleaseHooksRunner(project.logger, repository, config.hooks),
+                context.localOnlyResolver(),
+                project.logger)
     }
 
     def "should release new version when not on tag"() {

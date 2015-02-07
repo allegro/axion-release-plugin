@@ -17,7 +17,7 @@ class ReleaseTask extends DefaultTask {
         
         Releaser releaser = new Releaser(
                 scmService,
-                new ReleaseHooksRunner(scmService, context.config().hooks),
+                new ReleaseHooksRunner(project.logger, scmService, context.config().hooks),
                 context.localOnlyResolver(),
                 logger
         )

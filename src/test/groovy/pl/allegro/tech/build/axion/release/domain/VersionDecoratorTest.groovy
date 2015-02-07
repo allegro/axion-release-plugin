@@ -35,6 +35,7 @@ class VersionDecoratorTest extends Specification {
         given:
         VersionWithPosition rawVersion = new VersionWithPosition(
                 Version.valueOf('0.1.0'),
+                Version.valueOf('0.1.0'),
                 new ScmPosition('master', 'release-0.1.0', false)
         )
         versionConfig.with {
@@ -53,6 +54,7 @@ class VersionDecoratorTest extends Specification {
     def "should use branch creator when pattern matches branch"() {
         given:
         VersionWithPosition rawVersion = new VersionWithPosition(
+                Version.valueOf('0.1.0'),
                 Version.valueOf('0.1.0'),
                 new ScmPosition('someBranch', 'release-0.1.0', false)
         )

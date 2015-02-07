@@ -45,6 +45,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
+        return currentPosition(tagPattern)
+    }
+    
+    @Override
     ScmPosition currentPosition(Pattern tagPattern) {
         ScmPosition position = delegateRepository.currentPosition(tagPattern)
         log("scm position: $position")

@@ -49,6 +49,11 @@ class DummyRepository implements ScmRepository {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return ScmPosition.defaultPosition()
     }
+    
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
+        return currentPosition(tagPattern)
+    }
 
     @Override
     boolean remoteAttached(String remoteName) {

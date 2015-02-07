@@ -1,10 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
+import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class HookContext {
+    
+    final Logger logger
     
     private final ScmService scmService
     
@@ -16,7 +19,9 @@ class HookContext {
     
     final List<String> patternsToCommit = []
     
-    HookContext(ScmService scmService, ScmPosition position, Version previousVersion, Version currentVersion) {
+    HookContext(Logger logger, ScmService scmService, 
+                ScmPosition position, Version previousVersion, Version currentVersion) {
+        this.logger = logger
         this.scmService = scmService
         this.position = position
         this.previousVersion = previousVersion.toString()

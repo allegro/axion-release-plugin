@@ -7,6 +7,13 @@ final class FileLoader {
         return readableFile.getText('UTF-8')
     }
     
+    static String readIfFile(def potentialFile) {
+        if(potentialFile instanceof File) {
+            return readFrom(potentialFile)
+        }
+        return potentialFile
+    }
+    
     static File asFile(def file) {
         if (file instanceof File) {
             return file

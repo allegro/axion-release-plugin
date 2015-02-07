@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
+import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
@@ -15,7 +16,7 @@ class HookContextBuilder {
     String currentVersion = '2.0.0'
     
     HookContext build() {
-        return new HookContext(scmService, position,
+        return new HookContext({} as Logger, scmService, position,
                 new Version.Builder().setNormalVersion(previousVersion).build(),
                 new Version.Builder().setNormalVersion(currentVersion).build())
     }

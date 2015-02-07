@@ -138,12 +138,17 @@ class GitRepository implements ScmRepository {
 
     @Override
     ScmPosition currentPosition(Pattern pattern) {
+        return currentPosition(pattern, Pattern.compile('$a^'))
+    }
+    
+    @Override
+    ScmPosition currentPosition(Pattern pattern, Pattern inversePattern) {
         if(!hasCommits()) {
             return ScmPosition.defaultPosition()
         }
 
         Map tags = repository.tag.list()
-                .grep({ it.fullName.substring(GIT_TAG_PREFIX.length()) ==~ pattern })
+                .grep({ def tag = it.fullName.substring(GIT_TAG_PREFIX.length()); tag ==~ pattern && !(tag ==~ inversePattern) })
                 .inject([:], { map, entry -> map[entry.commit.id] = entry.fullName.substring(GIT_TAG_PREFIX.length()); return map; })
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)

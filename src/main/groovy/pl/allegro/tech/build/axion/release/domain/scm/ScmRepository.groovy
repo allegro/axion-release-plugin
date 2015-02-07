@@ -15,6 +15,8 @@ interface ScmRepository {
     void attachRemote(String remoteName, String url)
 
     ScmPosition currentPosition(Pattern tagPattern)
+    
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern)
 
     boolean remoteAttached(String remoteName);
 

@@ -2,9 +2,6 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
 class FileUpdateHook implements ReleaseHook {
 
     private final Map arguments
@@ -15,13 +12,22 @@ class FileUpdateHook implements ReleaseHook {
 
     @Override
     void act(HookContext hookContext) {
-        File file = FileLoader.asFile(arguments.file)
+        if(!arguments.files) {
+            arguments.files = [arguments.file]
+        }
+        arguments.files.each { updateInFile(hookContext, it) }
+    }
+    
+    private void updateInFile(HookContext hookContext, def potentialFile) {
+        File file = FileLoader.asFile(potentialFile)
 
         String text = file.text
-        String replacedText = text.replaceAll(
-                arguments.pattern(hookContext.previousVersion, hookContext.position),
-                arguments.replacement(hookContext.currentVersion, hookContext.position)
-        )
+
+        String pattern = arguments.pattern(hookContext.previousVersion, hookContext.position)
+        String replacement = arguments.replacement(hookContext.currentVersion, hookContext.position)
+
+        hookContext.logger.info("Replacing pattern \"$pattern\" with \"$replacement\" in $file.path")
+        String replacedText = text.replaceAll(pattern, replacement)
 
         file.write(replacedText)
         hookContext.addCommitPattern(file.canonicalPath)
