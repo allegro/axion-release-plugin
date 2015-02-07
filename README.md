@@ -39,7 +39,7 @@ buildscript {
 }
 
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.1.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.2.0'
 }
 ```
 
@@ -52,7 +52,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.1.0'
+        classpath group: 'pl.allegro.tech.build', name: 'axion-release-plugin', version: '1.2.0'
     }
 }
 
@@ -92,7 +92,8 @@ allprojects {
 
 ## Tasks
 
-* `currentVersion` - prints current version as seen by plugin.
+* `currentVersion` - prints current version as seen by plugin
+* `markNextVersion` - creates next version marker to change displayed SNAPSHOT version
 * `verifyRelease` - check some basic stuff before release, i.e. if there are no uncommitted files and if branch is not ahead of origin
 * `release` - create tag with current version and push it to remote
 
@@ -135,7 +136,6 @@ Almost all authorization mechanisms are provided by [grgit](https://github.com/a
 see [authorization docs](http://ajoberstar.org/grgit/docs/groovydoc/org/ajoberstar/grgit/auth/AuthConfig.html) for more info.
 
 If you want to use custom key file to authorize, see *Using custom SSH key* section below.
-
 
 ### Command line
 
@@ -264,6 +264,11 @@ scmVersion {
         deserializer = { nextVersionConfig, position -> /* ... */ } // strip suffix off version tag
     }
 
+    // configure pre and post release hooks, see below for detailed documentation
+    hooks {
+        pre 'fileUpdate' [file: 'README.md', pattern: {v,p -> /.../}, replacement: {v,p -> /.../}]
+    }
+
     versionCreator { version, position -> /* ... */ } // creates version visible for Gradle from raw version and current position in scm
     versionCreator 'versionWithBranch' // use one of predefined version creators
 
@@ -353,6 +358,35 @@ It can be changed by overriding `releaseCommitMessage` property with own closure
 
 **Warning** don't use it as a way to commit files along with release - release commit does not run
 `git add .` so nothing will be added to tracked changes set.
+
+**Warning** hooks introduced in 1.2.0 are now preferred mechanism of creating commit on release. This flag is kept
+for compatibility reasons, and leads to adding `commit` hook. Flag should be perceived as deprecated.
+
+#### Hooks
+
+With `axion-release` you can add custom actions that should be run right before the release (or right after it).
+By default it ships with two predefined hooks: `fileUpdate` and `commit`. Of course there is no reason not to pass
+custom closure that will be called. Example of configuration to update version in README.md and commit changes
+afterwards:
+
+```
+hooks {
+    pre 'fileUpdate' [file: 'README.md', pattern: {v, p -> /(?m)(version.) $v/}, replacement: {v, p -> "\$1 $v"}]
+    pre 'commit'
+}
+```
+
+**Warning** Use either `commit` hook or `createReleaseCommit` flag, never both as it would lead to creating two
+commits (unless you really want to have two commits of course).
+
+If you need to call some custom action, just pass closure as `pre` (or `post`) parameter. Closure will have access
+to `HookContext` object:
+
+```
+hooks {
+    pre {context -> // do something}
+}
+```
 
 #### Tag name serializer
 
