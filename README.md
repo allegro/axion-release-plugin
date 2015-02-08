@@ -252,9 +252,9 @@ scmVersion {
     tag {
         prefix = 'tag-prefix' // prefix to be used, 'release' by default
         versionSeparator = '-' // separator between prefix and version number, '-' by default
-        serialize = { tag, version -> rules.prefix + rules.versionSeparator + version } // creates tag name from raw version
-        deserialize = { tag, position -> /* ... */ } // reads raw version from tag
-        initialVersion = { tag, position, tagName -> /* ... */ } // returns initial version if none found, 0.1.0 by default
+        serialize = { rules, version -> rules.prefix + rules.versionSeparator + version } // creates tag name from raw version
+        deserialize = { rules, position, tagName -> /* ... */ } // reads raw version from tag
+        initialVersion = { rules, position -> /* ... */ } // returns initial version if none found, 0.1.0 by default
     }
     
     nextVersion {
