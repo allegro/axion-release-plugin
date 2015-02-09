@@ -16,6 +16,22 @@ from nearest tag in SCM (or set to default if nothing was tagged). If current co
 a release version. If there were any commits after last tag, project is in SNAPSHOT version. This very simple and
 intuitive philosophy makes it a lot easier to manage project versions along SCM tag versions.
 
+## Basic usage
+
+```
+plugins {
+    id 'pl.allegro.tech.build.axion-release' version '1.2.0'
+}
+
+scmVersion {
+    tag {
+        prefix = 'my-project-name'
+    }
+}
+
+project.version = scmVersion.version
+```
+
 ## Documentation
 
 Documentation is available at [axion-release read the docs](https://readthedocs.org/docs/axion-release-plugin/en/latest).
