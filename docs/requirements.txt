@@ -1,1 +1,1 @@
-phinx_bootstrap_theme
+sphinx_bootstrap_theme
