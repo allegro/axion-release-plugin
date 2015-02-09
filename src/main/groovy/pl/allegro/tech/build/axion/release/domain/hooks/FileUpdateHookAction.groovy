@@ -2,11 +2,13 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
-class FileUpdateHook implements ReleaseHook {
+import java.util.regex.Pattern
+
+class FileUpdateHookAction implements ReleaseHookAction {
 
     private final Map arguments
 
-    FileUpdateHook(Map arguments) {
+    FileUpdateHookAction(Map arguments) {
         this.arguments = arguments
     }
 
@@ -27,7 +29,7 @@ class FileUpdateHook implements ReleaseHook {
         String replacement = arguments.replacement(hookContext.currentVersion, hookContext.position)
 
         hookContext.logger.info("Replacing pattern \"$pattern\" with \"$replacement\" in $file.path")
-        String replacedText = text.replaceAll(pattern, replacement)
+        String replacedText = text.replaceAll(Pattern.compile(pattern, Pattern.MULTILINE), replacement)
 
         file.write(replacedText)
         hookContext.addCommitPattern(file.canonicalPath)
@@ -36,8 +38,8 @@ class FileUpdateHook implements ReleaseHook {
     static final class Factory extends DefaultReleaseHookFactory {
         
         @Override
-        ReleaseHook create(Map arguments) {
-            return new FileUpdateHook(arguments)
+        ReleaseHookAction create(Map arguments) {
+            return new FileUpdateHookAction(arguments)
         }
     }
 

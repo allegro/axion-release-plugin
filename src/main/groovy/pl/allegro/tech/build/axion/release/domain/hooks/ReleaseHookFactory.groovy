@@ -2,9 +2,9 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 interface ReleaseHookFactory {
     
-    ReleaseHook create()
+    ReleaseHookAction create()
     
-    ReleaseHook create(Map arguments)
+    ReleaseHookAction create(Map arguments)
     
-    ReleaseHook create(Closure customAction)
+    ReleaseHookAction create(Closure customAction)
 }

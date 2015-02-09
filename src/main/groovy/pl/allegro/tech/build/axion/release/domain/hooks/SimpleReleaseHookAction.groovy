@@ -1,10 +1,10 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
-class SimpleReleaseHook implements ReleaseHook {
+class SimpleReleaseHookAction implements ReleaseHookAction {
 
     private final Closure customAction
 
-    SimpleReleaseHook(Closure customAction) {
+    SimpleReleaseHookAction(Closure customAction) {
         this.customAction = customAction
     }
 
@@ -16,8 +16,8 @@ class SimpleReleaseHook implements ReleaseHook {
     static final class Factory extends DefaultReleaseHookFactory {
 
         @Override
-        ReleaseHook create(Closure customAction) {
-            return new SimpleReleaseHook(customAction)
+        ReleaseHookAction create(Closure customAction) {
+            return new SimpleReleaseHookAction(customAction)
         }
     }
 }

@@ -1,14 +1,14 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
-class CommitHook implements ReleaseHook {
+class CommitHookAction implements ReleaseHookAction {
     
     private Closure customAction
 
-    CommitHook(Closure customAction) {
+    CommitHookAction(Closure customAction) {
         this.customAction = customAction
     }
 
-    CommitHook() {
+    CommitHookAction() {
         this({v, p -> "Release version: $v"})
     }
     
@@ -21,13 +21,13 @@ class CommitHook implements ReleaseHook {
     static final class Factory extends DefaultReleaseHookFactory {
 
         @Override
-        ReleaseHook create() {
-            return new CommitHook()
+        ReleaseHookAction create() {
+            return new CommitHookAction()
         }
 
         @Override
-        ReleaseHook create(Closure customAction) {
-            return new CommitHook(customAction)
+        ReleaseHookAction create(Closure customAction) {
+            return new CommitHookAction(customAction)
         }
     }
 }

@@ -1,7 +1,7 @@
 Release hooks
 =============
 
-``axion-release-plugin`` supports registering custom operations to be hooked either before (*pre*) or after (*post*)
+``axion-release-plugin`` supports registering custom actions to be hooked either before (*pre*) or after (*post*)
 the release::
 
     scmVersion {
@@ -11,13 +11,13 @@ the release::
         }
     }
 
-Implementing hooks for common tasks would be a waste, this is why ``axion-release`` comes bundled with two predefined
-hooks. If you come up with some useful implementation, don't hesitate to create pull request!
+Implementing action for common tasks would be a waste, this is why ``axion-release`` comes bundled with two predefined
+actions. If you come up with some useful implementation, don't hesitate to create pull request!
 
 fileUpdate
 ----------
 
-This hook can update given file (or files) by evaluating regex pattern and replacing all matches with given replacement.
+This action can update given file (or files) by evaluating regex pattern and replacing all matches with given replacement.
 Most common scenario is to update version in README::
 
     scmVersion {
@@ -26,7 +26,7 @@ Most common scenario is to update version in README::
         }
     }
 
-Syntax of hook is simple: first comes name, then map of arguments. Supported arguments:
+Syntax of action is simple: first comes name, then map of arguments. Supported arguments:
 
 * file - path to file in form of string or ``File`` instance to update
 * files - array of files, takes precedence over single file definition if not empty
@@ -60,10 +60,10 @@ current version and SCM position as arguments::
         }
     }
 
-Custom hook
------------
+Custom action
+-------------
 
-Of course nothing can stop you from implementing own hook. It can be any closure that accepts ``HookContext`` object::
+Of course nothing can stop you from implementing own action. It can be any closure that accepts ``HookContext`` object::
 
     scmVersion {
         hook {

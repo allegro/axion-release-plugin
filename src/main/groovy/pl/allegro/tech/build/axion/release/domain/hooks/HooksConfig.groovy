@@ -2,35 +2,35 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 class HooksConfig {
     
-    List<ReleaseHook> preReleaseHooks = []
+    List<ReleaseHookAction> preReleaseHooks = []
     
-    List<ReleaseHook> postReleaseHooks = []
+    List<ReleaseHookAction> postReleaseHooks = []
     
     void pre(Closure c) {
-        preReleaseHooks.add(PredefinedReleaseHook.DEFAULT.factory.create(c))
+        preReleaseHooks.add(PredefinedReleaseHookAction.DEFAULT.factory.create(c))
     }
 
     void pre(String type) {
-        postReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create())
+        postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create())
     }
     
     void pre(String type, Map arguments) {
-        preReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(arguments))
+        preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(arguments))
     }
 
     void pre(String type, Closure customAction) {
-        preReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(customAction))
+        preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(customAction))
     }
 
     void post(Closure c) {
-        postReleaseHooks.add(PredefinedReleaseHook.DEFAULT.factory.create(c))
+        postReleaseHooks.add(PredefinedReleaseHookAction.DEFAULT.factory.create(c))
     }
 
     void post(String type, Map arguments) {
-        postReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(arguments))
+        postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(arguments))
     }
     
     void post(String type, Closure c) {
-        postReleaseHooks.add(PredefinedReleaseHook.factoryFor(type).create(c))
+        postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(c))
     }
 }

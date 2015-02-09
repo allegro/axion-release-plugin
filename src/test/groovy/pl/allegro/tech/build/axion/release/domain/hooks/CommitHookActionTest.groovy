@@ -9,7 +9,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import spock.lang.Specification
 
-class CommitHookTest extends Specification {
+class CommitHookActionTest extends Specification {
     
     ScmRepository repository
     
@@ -28,7 +28,7 @@ class CommitHookTest extends Specification {
     
     def "should commit files matching patterns with given message"() {
         given:
-        CommitHook hook = new CommitHook({v, p -> "test of version $v"})
+        CommitHookAction hook = new CommitHookAction({v, p -> "test of version $v"})
         HookContext context = new HookContextBuilder(scmService: scmService, previousVersion: '1.0.0', currentVersion: '2.0.0').build()
         context.addCommitPattern('*')
         

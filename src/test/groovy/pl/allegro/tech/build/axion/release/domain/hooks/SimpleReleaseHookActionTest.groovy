@@ -2,12 +2,12 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import spock.lang.Specification
 
-class SimpleReleaseHookTest extends Specification {
+class SimpleReleaseHookActionTest extends Specification {
     
     def "should run specified closure"() {
         given:
         boolean hookRun = false
-        SimpleReleaseHook hook = new SimpleReleaseHook({ hookRun = true })
+        SimpleReleaseHookAction hook = new SimpleReleaseHookAction({ hookRun = true })
         
         when:
         hook.act(null)
