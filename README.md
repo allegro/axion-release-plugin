@@ -31,19 +31,6 @@ There are a few plugins that try to do the same - question is do we need another
 What I needed was plugin that exposes version taken from nearest tag (like **build-version-plugin**) which at the same time
 will be easily integrated with maven-publish and signing. It also needs to be Continuous Integration-aware.
 
-## Publishing released version
-
-Publishing release version is simple with **axion-release-plugin**. Since release does not increase version unless
-you commit something, you can publish release version any time by calling gradle once again:
-
-```
-./gradlew release
-./gradlew publish
-```
-
-Why not make it work in single Gradle run? **maven-publish** plugin reads **project.version** in configuration phase.
-Any change made by tasks running prior to publishing won't be recognized.
-
 ## License
 
 **axion-release-plugin** is published under [Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0).
