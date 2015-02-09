@@ -41,7 +41,7 @@ Ahead of remote check
 ---------------------
 
 This check tries to verify if all local commits have been pushed to remote. In order to do so, it need full information
-about remote and HEAD commit, which might be lacking in CI environment (for more on CI build read :doc:`ci_servers.rst`).
+about remote and HEAD commit, which might be lacking in CI environment (for more on CI build read :doc:`ci_servers`).
 
 You can disable this check using either ``scmVersion.checks.aheadOfRemote`` property or via
 ``release.disableRemoteCheck`` command line option::

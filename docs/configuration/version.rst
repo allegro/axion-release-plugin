@@ -70,7 +70,7 @@ You can implement own deserializer by setting closure that would accept deserial
         }
     }
 
-``config`` object is instance of ``TagNameSerializationRules``class. Useful properties are:
+``config`` object is instance of ``TagNameSerializationRules`` class. Useful properties are:
 
 * ``prefix``: tag prefix
 * ``separator``: separator between prefix and version

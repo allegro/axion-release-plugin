@@ -11,7 +11,7 @@ Applying plugin
 Gradle 2.1+
 ^^^^^^^^^^^
 
-::
+.. parsed-literal::
 
     buildscript {
         repositories {
@@ -28,7 +28,7 @@ Maven Central needs to be imported in buildscript, as there are some dependencie
 Maven Central
 ^^^^^^^^^^^^^
 
-::
+.. parsed-literal::
 
     buildscript {
         repositories {
@@ -65,7 +65,9 @@ Single module project
 Multi-module project
 ^^^^^^^^^^^^^^^^^^^^
 
-For multi project builds the plugin has to be applied only on the root project, but version has to be set also in submodules::
+For multi project builds the plugin has to be applied only on the root project, but version has to be set also in submodules
+
+.. parsed-literal::
 
     plugins {
         id 'pl.allegro.tech.build.axion-release' version '|version|'
