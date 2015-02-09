@@ -14,11 +14,6 @@ class CommitHook implements ReleaseHook {
     
     @Override
     void act(HookContext hookContext) {
-        if(hookContext.patternsToCommit.isEmpty()) {
-            // there has to be some pattern, and build.gradle should always exist.. better than * i think
-            hookContext.patternsToCommit.add('build.gradle')
-        }
-        
         String message = customAction(hookContext.currentVersion, hookContext.position)
         hookContext.commit(hookContext.patternsToCommit, message)
     }

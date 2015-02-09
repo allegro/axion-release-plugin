@@ -132,7 +132,9 @@ class GitRepository implements ScmRepository {
 
     @Override
     void commit(List patterns, String message) {
-        repository.add(patterns: patterns)
+        if(!patterns.isEmpty()) {
+            repository.add(patterns: patterns)
+        }
         repository.commit(message: message)
     }
 
