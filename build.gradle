@@ -64,13 +64,11 @@ bintray {
     key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : ''
     pkg {
         repo = 'maven'
-        gpg {
-            sign = true
-            passphrase = project.property('gpgPassphrase')
-        }
-        mavenCentralSync {
-            sync = true
-            close = '1'
+        version {
+            gpg {
+                sign = true
+                passphrase = project.ext.has('gpgPassphrase') ? project.ext.gpgPassphrase : ''
+            }
         }
     }
 }
