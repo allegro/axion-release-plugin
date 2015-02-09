@@ -19,8 +19,8 @@ Configuration
     configuration/dry_run
     configuration/repository
     configuration/hooks
+    configuration/publishing
     configuration/ci_servers
-
 
 Examples
 --------
@@ -62,3 +62,12 @@ Basic workflow with ``axion-release``::
     # ./gradlew currentVersion
     1.0.0-SNAPSHOT
 
+Changelog
+=========
+
+.. toctree::
+    :hidden:
+    
+    changelog.rst
+
+Project changelog: :doc:`changelog`.
