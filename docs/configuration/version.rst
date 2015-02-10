@@ -47,6 +47,8 @@ tree from commit ``C`` upwards, first discovered tag will be ``T1`` and so repor
 ``T1`` tag, even though tag ``T2`` has higher version number. It all comes down to what is the history of current commit,
 not what has happened in repository in general.
 
+.. _version-parsing:
+
 Parsing
 -------
 
@@ -117,6 +119,8 @@ version::
 
 Input objects have same structure as deserialization closure inputs.
 
+.. _version-decorating:
+
 Decorating
 ----------
 
@@ -138,7 +142,8 @@ You can also set decorators per branches that match specific regular expression:
         ]
     }
 
-Per-branch version creators must be closures, there is no support for predefined creators.
+Per-branch version creators must be closures, there is no support for predefined creators. First match wins, but the order
+depends on collection type used (default for ``[:]`` is LinkedHashMap).
 
 versionWithBranch
 ^^^^^^^^^^^^^^^^^
@@ -163,6 +168,8 @@ Custom version creators can be implemented by creating closure::
     
 * version - string version resolved by previous steps
 * position - object described above in *Serialization* section
+
+.. _version-sanitization:
 
 Sanitization
 ------------

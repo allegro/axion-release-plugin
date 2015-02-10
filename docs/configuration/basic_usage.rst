@@ -76,3 +76,16 @@ For multi project builds the plugin has to be applied only on the root project, 
     allprojects {
         project.version = scmVersion.version
     }
+
+Releasing
+---------
+
+::
+
+    # ./gradlew currentVersion
+    0.1.0-SNAPSHOT
+
+    # ./gradlew release
+    
+    # ./gradlew cV
+    0.1.0

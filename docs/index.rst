@@ -5,13 +5,22 @@ Gradle release and version management plugin documentation.
 See `Github project <http://github.com/allegro/axion-release-plugin>`_ to see the source code and motivation for creating
 this plugin.
 
+General
+-------
+
+.. toctree::
+    :titlesonly:
+    
+    configuration/basic_usage
+    configuration/overview
+    configuration/tasks
+
 Configuration
 -------------
 
 .. toctree::
     :titlesonly:
-
-    configuration/basic_usage
+    
     configuration/authorization
     configuration/version
     configuration/next_version
