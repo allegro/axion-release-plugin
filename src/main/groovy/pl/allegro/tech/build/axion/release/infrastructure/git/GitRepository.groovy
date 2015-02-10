@@ -13,16 +13,8 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.transport.RemoteConfig
-import org.eclipse.jgit.transport.SshTransport
-import org.eclipse.jgit.transport.TagOpt
-import org.eclipse.jgit.transport.Transport
-import org.eclipse.jgit.transport.URIish
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import org.eclipse.jgit.transport.*
+import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
@@ -30,10 +22,13 @@ class GitRepository implements ScmRepository {
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
+    private final File repositoryDir
+    
     private final Grgit repository
 
     GitRepository(File repositoryDir, ScmInitializationOptions options) {
         try {
+            this.repositoryDir = repositoryDir
             repository = Grgit.open(repositoryDir)
         }
         catch(RepositoryNotFoundException exception) {
@@ -82,6 +77,7 @@ class GitRepository implements ScmRepository {
     }
 
     private void callPush(String remoteName, boolean all) {
+        repository.push(remote: remoteName, all: all)
         repository.push(remote: remoteName, tags: true, all: all)
     }
 
@@ -133,7 +129,7 @@ class GitRepository implements ScmRepository {
     @Override
     void commit(List patterns, String message) {
         if(!patterns.isEmpty()) {
-            repository.add(patterns: patterns)
+            repository.add(patterns: patterns.collect { it.replaceFirst(repositoryDir.canonicalPath + '/', '') })
         }
         repository.commit(message: message)
     }

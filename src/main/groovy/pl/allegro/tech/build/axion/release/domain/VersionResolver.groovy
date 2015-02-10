@@ -19,7 +19,7 @@ class VersionResolver {
         Map positions = readPositions(versionConfig)
 
         Version currentVersion = versionFactory.create(positions.currentPosition, versionConfig, readOptions)        
-        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, readOptions)
+        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, VersionReadOptions.defaultOptions())
 
         ScmPosition position = positions.currentPosition.position
         if(positions.currentPosition.nextVersionTag) {

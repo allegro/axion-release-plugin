@@ -22,7 +22,7 @@ Most common scenario is to update version in README::
 
     scmVersion {
         hooks {
-            pre 'fileUpdate' [file: 'README.md', pattern: {v, p -> /version: $v/}, replacement: {v, p -> "version: $v"}]
+            pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /version: $v/}, replacement: {v, p -> "version: $v"}]
         }
     }
 
@@ -46,7 +46,7 @@ Remember, that **fileUpdate** does it for you!::
 
     scmVersion {
         hooks {
-            pre 'fileUpdate' [...]
+            pre 'fileUpdate', [...]
             pre 'commit'
         }
     }
@@ -56,7 +56,7 @@ current version and SCM position as arguments::
  
     scmVersion {
        hooks {
-            pre 'commit' {v, p -> "This is my great new commit message for version $v"}
+            pre 'commit', {v, p -> "This is my great new commit message for version $v"}
         }
     }
 

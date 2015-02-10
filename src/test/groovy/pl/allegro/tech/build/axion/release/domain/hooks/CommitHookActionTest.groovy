@@ -23,6 +23,8 @@ class CommitHookActionTest extends Specification {
         Context context = Context.instance(project)
         
         repository = context.repository()
+        repository.commit(['*'], 'initial commit')
+        
         scmService = context.scmService()
     }
     

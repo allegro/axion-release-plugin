@@ -17,6 +17,7 @@ class FileUpdateHookActionTest extends Specification {
         
         then:
         tmp.text == "Hello\nthis is axion-release test\nversion: 2.0.0"
+        context.patternsToCommit == [tmp.canonicalPath]
     }
     
     def "should update all listed files"() {

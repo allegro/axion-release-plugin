@@ -28,7 +28,7 @@ This replacement pattern will update any ``version* x.x.x`` occurrences in READM
         versionCreator 'versionWithBranch'
         
         hooks {
-            pre 'fileUpdate' [file: 'README.md', pattern: {v,p -> /(version.) $v/}, replacement: {v, p -> "\$1 $v"}]
+            pre 'fileUpdate', [file: 'README.md', pattern: {v,p -> /(version.) $v/}, replacement: {v, p -> "\$1 $v"}]
             pre 'commit'
         }
     }

@@ -67,4 +67,17 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.version.toString() == '2.0.0'
         !version.position.onTag
     }
+    
+    def "should return previous version from last release and current from forced version when forcing version"() {
+        given:
+        repository.tag('release-1.1.0')
+        repository.commit(['*'], 'some commit')
+
+        when:
+        VersionWithPosition version = resolver.resolveVersion(config, new VersionReadOptions(true, '2.0.0'))
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '2.0.0'
+    }
 }

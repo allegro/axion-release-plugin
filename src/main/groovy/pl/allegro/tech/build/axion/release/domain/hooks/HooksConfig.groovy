@@ -11,7 +11,7 @@ class HooksConfig {
     }
 
     void pre(String type) {
-        postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create())
+        preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create())
     }
     
     void pre(String type, Map arguments) {
