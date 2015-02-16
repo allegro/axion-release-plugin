@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import spock.lang.Specification
@@ -14,7 +15,7 @@ class ReleaserTest extends Specification {
     ScmService repository
 
     Releaser releaser
-
+    
     VersionConfig config
 
     def setup() {
@@ -25,9 +26,11 @@ class ReleaserTest extends Specification {
 
         Context context = Context.instance(project)
         repository = context.scmService()
-        repository.commit('initial commit')
+        repository.commit(['*'], 'initial commit')
 
-        releaser = new Releaser(repository, context.localOnlyResolver(), project.logger)
+        releaser = new Releaser(repository, new ReleaseHooksRunner(project.logger, repository, config.hooks),
+                context.localOnlyResolver(),
+                project.logger)
     }
 
     def "should release new version when not on tag"() {

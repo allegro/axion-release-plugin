@@ -33,7 +33,7 @@ class DryRepositoryTest extends Specification {
 
     def "should not commit anything to scm"() {
         when:
-        dryRepository.commit("yo")
+        dryRepository.commit(['*'], "yo")
 
         then:
         0 * scm.commit(_)

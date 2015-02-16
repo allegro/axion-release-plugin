@@ -22,14 +22,18 @@ class ScmPosition {
         return new ScmPosition('master', tagName, true)
     }
     
-    static ScmPosition notOnTag(ScmPosition position) {
-        return new ScmPosition(position.branch, position.latestTag, false)
-    }
-
     boolean tagless() {
         return latestTag == null
     }
 
+    ScmPosition asOnTagPosition() {
+        return new ScmPosition(branch, latestTag, latestTag != null)
+    }
+
+    ScmPosition asNotOnTagPosition() {
+        return new ScmPosition(branch, latestTag, false)
+    }
+    
     @Override
     public String toString() {
         return "ScmPosition[branch = $branch, latestTag = $latestTag, onTag = $onTag]"

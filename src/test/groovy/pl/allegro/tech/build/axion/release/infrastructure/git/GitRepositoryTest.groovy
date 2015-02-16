@@ -61,7 +61,7 @@ class GitRepositoryTest extends Specification {
 
     def "should create commit with given message"() {
         when:
-        repository.commit('release commit')
+        repository.commit(['*'], 'release commit')
 
         then:
         rawRepository.log(maxCommits: 1)*.fullMessage == ['release commit']
@@ -78,7 +78,7 @@ class GitRepositoryTest extends Specification {
     def "should point to last tag in current position in simple case"() {
         given:
         repository.tag('release-1')
-        repository.commit("commit after release")
+        repository.commit(['*'], "commit after release")
 
         when:
         ScmPosition position = repository.currentPosition(~/^release.*/)
@@ -119,12 +119,12 @@ class GitRepositoryTest extends Specification {
     def "should track back to older tag when commit was made after checking out older version"() {
         given:
         repository.tag('release-1')
-        repository.commit("commit after release-1")
+        repository.commit(['*'], "commit after release-1")
         repository.tag('release-2')
-        repository.commit("commit after release-2")
+        repository.commit(['*'], "commit after release-2")
 
         rawRepository.checkout(branch: 'release-1')
-        repository.commit("bugfix after release-1")
+        repository.commit(['*'], "bugfix after release-1")
 
         when:
         ScmPosition position = repository.currentPosition(~/^release.*/)
@@ -146,7 +146,7 @@ class GitRepositoryTest extends Specification {
     def "should return only tags that match with prefix"() {
         given:
         repository.tag('release-1')
-        repository.commit("commit after release-1")
+        repository.commit(['*'], "commit after release-1")
         repository.tag('otherTag')
 
         when:
@@ -171,7 +171,7 @@ class GitRepositoryTest extends Specification {
     def "should provide current branch name in position"() {
         given:
         repository.checkoutBranch('some-branch')
-        repository.commit("first commit")
+        repository.commit(['*'], "first commit")
 
         when:
         ScmPosition position = repository.currentPosition(~/^release.*/)
@@ -183,7 +183,7 @@ class GitRepositoryTest extends Specification {
     def "should push changes and tag to remote"() {
         given:
         repository.tag('release-push')
-        repository.commit('commit after release-push')
+        repository.commit(['*'], 'commit after release-push')
 
         when:
         repository.push(ScmIdentity.defaultIdentity(), 'origin', true)
@@ -199,7 +199,7 @@ class GitRepositoryTest extends Specification {
         Grgit customRemoteRawRepository = Grgit.init(dir: customRemoteProjectDir)
 
         repository.tag('release-custom')
-        repository.commit('commit after release-custom')
+        repository.commit(['*'], 'commit after release-custom')
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:

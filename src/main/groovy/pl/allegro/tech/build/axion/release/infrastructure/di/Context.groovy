@@ -6,6 +6,7 @@ import org.gradle.logging.StyledTextOutputFactory
 import pl.allegro.tech.build.axion.release.domain.ChecksResolver
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.VersionFactory
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
@@ -38,10 +39,15 @@ class Context {
         }
         return context
     }
+    
+    static Context ephemeralInstance(Project project) {
+        return new Context(project)
+    }
 
     private void initialize() {
+        instances[VersionFactory] = new VersionFactory()
         instances[ScmRepository] = new ScmRepositoryFactory().create(project, config.repository)
-        instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository)))
+        instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository), get(VersionFactory)))
     }
 
     private <T> T get(Class<T> clazz) {
@@ -59,7 +65,11 @@ class Context {
     public ScmService scmService() {
         return new GradleAwareScmService(project, config.repository, repository())
     }
-
+    
+    public VersionFactory versionFactory() {
+        return get(VersionFactory)
+    }
+    
     public LocalOnlyResolver localOnlyResolver() {
         return new LocalOnlyResolver(config, project)
     }

@@ -10,11 +10,13 @@ interface ScmRepository {
 
     void push(ScmIdentity identity, String remoteName)
 
-    void commit(String message)
+    void commit(List patterns, String message)
 
     void attachRemote(String remoteName, String url)
 
     ScmPosition currentPosition(Pattern tagPattern)
+    
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern)
 
     boolean remoteAttached(String remoteName);
 

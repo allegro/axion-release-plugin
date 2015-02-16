@@ -35,8 +35,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
-        log("commiting message: $message")
+    void commit(List patterns, String message) {
+        log("commiting files matching $patterns with message: $message")
     }
 
     @Override
@@ -44,6 +44,11 @@ class DryRepository implements ScmRepository {
         log("attaching remote: $remoteName")
     }
 
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
+        return currentPosition(tagPattern)
+    }
+    
     @Override
     ScmPosition currentPosition(Pattern tagPattern) {
         ScmPosition position = delegateRepository.currentPosition(tagPattern)

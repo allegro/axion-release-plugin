@@ -35,7 +35,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    void commit(String message) {
+    void commit(List patterns, String message) {
         log('commit')
     }
 
@@ -48,6 +48,11 @@ class DummyRepository implements ScmRepository {
     ScmPosition currentPosition(Pattern tagPattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return ScmPosition.defaultPosition()
+    }
+    
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
+        return currentPosition(tagPattern)
     }
 
     @Override

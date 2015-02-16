@@ -6,7 +6,7 @@ interface ScmService {
 
     void tag(String tagName)
 
-    void commit(String message)
+    void commit(List patterns, String message)
 
     boolean remoteAttached()
 

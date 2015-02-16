@@ -3,7 +3,7 @@ plugins {
     id 'groovy'
     id 'jacoco'
     id 'nu.studer.plugindev' version '1.0.3'
-    id 'pl.allegro.tech.build.axion-release' version '1.0.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.1.0'
 }
 
 scmVersion {
@@ -62,6 +62,14 @@ plugindev {
 bintray {
     user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
     key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : ''
-    pkg.repo = 'maven'
+    pkg {
+        repo = 'maven'
+        version {
+            gpg {
+                sign = true
+                passphrase = project.ext.has('gpgPassphrase') ? project.ext.gpgPassphrase : ''
+            }
+        }
+    }
 }
 
