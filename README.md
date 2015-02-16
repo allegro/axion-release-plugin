@@ -3,7 +3,10 @@ axion-release-plugin
 
 *gradle release and version management plugin*
 
-[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin) [![JCenter](https://api.bintray.com/packages/allegro/maven/axion-release-plugin/images/download.svg) ](https://bintray.com/allegro/maven/axion-release-plugin/_latestVersion)
+[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
+[![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ] (https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin)
+[![JCenter](https://api.bintray.com/packages/allegro/maven/axion-release-plugin/images/download.svg) ](https://bintray.com/allegro/maven/axion-release-plugin/_latestVersion)
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
