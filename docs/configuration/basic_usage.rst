@@ -73,9 +73,24 @@ For multi project builds the plugin has to be applied only on the root project, 
         id 'pl.allegro.tech.build.axion-release' version '|version|'
     }
 
+    scmVersion {
+        // ...
+    }
+
     allprojects {
         project.version = scmVersion.version
     }
+
+Multi-module with multiple versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Sometimes it might be desirable to release each module (or just some modules) of multi-module project separately.
+If so, please make sure that:
+
+* tag prefixes for each module do not overlap, i.e. ``!tagA.startsWith(tagB)`` for each permutation of all tag prefixes
+* keep in mind, that ``scmVersion`` must be initialized before ``scmVersion.version`` is accessed, so do not put
+    ``project.version = scmVersion.version`` in ``allprojects`` clause
+* apply plugin on each module that should be released on it's own
 
 Releasing
 ---------
