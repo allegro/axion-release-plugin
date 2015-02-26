@@ -19,70 +19,51 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 class Context {
 
-    private static Context context = null
-
     private final Map instances = [:]
 
-    private final VersionConfig config
-
-    private final Project project
-
-    private Context(Project project) {
-        this.project = project
-        config = project.extensions.getByType(VersionConfig)
-        initialize()
+    public Context(Project project) {
+        initialize(project)
     }
 
-    static Context instance(Project project) {
-        if (context == null) {
-            context = new Context(project)
-        }
-        return context
-    }
-    
-    static Context ephemeralInstance(Project project) {
-        return new Context(project)
-    }
-
-    private void initialize() {
+    private void initialize(Project project) {
         instances[VersionFactory] = new VersionFactory()
-        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config.repository)
+        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config(project).repository)
         instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository), get(VersionFactory)))
     }
 
     private <T> T get(Class<T> clazz) {
         return (T) instances[clazz]
     }
-
-    public VersionConfig config() {
-        return config
+    
+    VersionConfig config(Project project) {
+        return project.extensions.getByType(VersionConfig)
     }
 
-    public ScmRepository repository() {
-        return config.dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
+    ScmRepository repository(Project project) {
+        return config(project).dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
     }
 
-    public ScmService scmService() {
-        return new GradleAwareScmService(project, config.repository, repository())
+    ScmService scmService(Project project) {
+        return new GradleAwareScmService(project, config(project).repository, repository(project))
     }
     
-    public VersionFactory versionFactory() {
+    VersionFactory versionFactory() {
         return get(VersionFactory)
     }
     
-    public LocalOnlyResolver localOnlyResolver() {
-        return new LocalOnlyResolver(config, project)
+    LocalOnlyResolver localOnlyResolver(Project project) {
+        return new LocalOnlyResolver(config(project), project)
     }
 
-    public ChecksResolver checksResolver() {
-        return new ChecksResolver(config.checks, project)
+    ChecksResolver checksResolver(Project project) {
+        return new ChecksResolver(config(project).checks, project)
     }
 
-    public VersionService versionService() {
+    VersionService versionService() {
         return get(VersionService)
     }
 
-    public ScmChangesPrinter changesPrinter(ServiceRegistry services) {
+    ScmChangesPrinter changesPrinter(ServiceRegistry services) {
         return new GitChangesPrinter(
                 get(ScmRepository) as GitRepository,
                 services.get(StyledTextOutputFactory).create(ScmChangesPrinter)

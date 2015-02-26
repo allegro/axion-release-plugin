@@ -1,35 +1,18 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import org.ajoberstar.grgit.Grgit
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
-import pl.allegro.tech.build.axion.release.infrastructure.di.Context
-import spock.lang.Specification
 
-class ReleaserTest extends Specification {
-
-    Project project
-
-    ScmService repository
+class ReleaserTest extends RepositoryBasedTest {
 
     Releaser releaser
     
-    VersionConfig config
-
     def setup() {
-        project = ProjectBuilder.builder().build()
-        config = project.extensions.create('scmVersion', VersionConfig, project)
-
-        Grgit.init(dir: project.rootDir)
-
-        Context context = Context.instance(project)
-        repository = context.scmService()
-        repository.commit(['*'], 'initial commit')
-
-        releaser = new Releaser(repository, new ReleaseHooksRunner(project.logger, repository, config.hooks),
-                context.localOnlyResolver(),
+        ScmService scmService = context.scmService(project)
+        
+        releaser = new Releaser(scmService, new ReleaseHooksRunner(project.logger, scmService, config.hooks),
+                context.localOnlyResolver(project),
                 project.logger)
     }
 

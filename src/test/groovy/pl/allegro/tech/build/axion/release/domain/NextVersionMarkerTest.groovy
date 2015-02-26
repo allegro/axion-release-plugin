@@ -1,36 +1,18 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import org.ajoberstar.grgit.Grgit
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.ScmService
-import pl.allegro.tech.build.axion.release.infrastructure.di.Context
-import spock.lang.Specification
+import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 
-class NextVersionMarkerTest extends Specification {
-    
-    VersionConfig config
+class NextVersionMarkerTest extends RepositoryBasedTest {
     
     VersionService versionService
 
-    ScmRepository repository
-    
     NextVersionMarker nextVersionMarker
     
     def setup() {
-        Project project = ProjectBuilder.builder().build()
-        config = project.extensions.create('scmVersion', VersionConfig, project)
-
-        Grgit.init(dir: project.rootDir)
-
-        Context context = Context.instance(project)
-        ScmService scmService = context.scmService()
-        scmService.commit(['*'], 'initial commit')
-        repository = context.repository()
+        repository = context.repository(project)
         versionService = context.versionService()
 
-        nextVersionMarker = new NextVersionMarker(scmService, context.localOnlyResolver(), project.logger)
+        nextVersionMarker = new NextVersionMarker(context.scmService(project), context.localOnlyResolver(project), project.logger)
     }
     
     def "should create next version tag with given version"() {

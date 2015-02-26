@@ -11,16 +11,16 @@ class ReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
-        Context context = Context.instance(project)
+        Context context = new Context(project)
 
-        ScmService scmService = context.scmService()
+        ScmService scmService = context.scmService(project)
         
         Releaser releaser = new Releaser(
                 scmService,
-                new ReleaseHooksRunner(project.logger, scmService, context.config().hooks),
-                context.localOnlyResolver(),
+                new ReleaseHooksRunner(project.logger, scmService, context.config(project).hooks),
+                context.localOnlyResolver(project),
                 logger
         )
-        releaser.release(context.config())
+        releaser.release(context.config(project))
     }
 }

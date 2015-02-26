@@ -12,7 +12,7 @@ class VersionResolverTest extends RepositoryBasedTest {
     VersionReadOptions options = VersionReadOptions.defaultOptions()
     
     def setup() {
-        repository = context.repository()
+        repository = context.repository(project)
         repository.commit(['*'], 'initial commit')
 
         resolver = new VersionResolver(repository, context.versionFactory())
