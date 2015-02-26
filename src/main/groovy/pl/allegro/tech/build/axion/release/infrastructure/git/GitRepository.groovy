@@ -129,7 +129,8 @@ class GitRepository implements ScmRepository {
     @Override
     void commit(List patterns, String message) {
         if(!patterns.isEmpty()) {
-            repository.add(patterns: patterns.collect { it.replaceFirst(repositoryDir.canonicalPath + '/', '') })
+            String canonicalPath = Pattern.quote(repositoryDir.canonicalPath + File.separatorChar)
+            repository.add(patterns: patterns.collect { it.replaceFirst(canonicalPath, '') })
         }
         repository.commit(message: message)
     }
