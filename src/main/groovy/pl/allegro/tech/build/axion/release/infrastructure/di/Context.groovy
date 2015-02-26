@@ -5,10 +5,12 @@ import org.gradle.internal.service.ServiceRegistry
 import org.gradle.logging.StyledTextOutputFactory
 import pl.allegro.tech.build.axion.release.domain.ChecksResolver
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
+import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionFactory
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
+import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
@@ -21,13 +23,16 @@ class Context {
 
     private final Map instances = [:]
 
+    private final Project project
+    
     public Context(Project project) {
+        this.project = project
         initialize(project)
     }
 
     private void initialize(Project project) {
         instances[VersionFactory] = new VersionFactory()
-        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config(project).repository)
+        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config().repository)
         instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository), get(VersionFactory)))
     }
 
@@ -35,34 +40,43 @@ class Context {
         return (T) instances[clazz]
     }
     
-    VersionConfig config(Project project) {
+    VersionConfig config() {
         return project.extensions.getByType(VersionConfig)
     }
 
-    ScmRepository repository(Project project) {
-        return config(project).dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
+    ScmRepository repository() {
+        return config().dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
     }
 
-    ScmService scmService(Project project) {
-        return new GradleAwareScmService(project, config(project).repository, repository(project))
+    ScmService scmService() {
+        return new GradleAwareScmService(project, config().repository, repository())
     }
     
     VersionFactory versionFactory() {
         return get(VersionFactory)
     }
     
-    LocalOnlyResolver localOnlyResolver(Project project) {
-        return new LocalOnlyResolver(config(project), project)
+    LocalOnlyResolver localOnlyResolver() {
+        return new LocalOnlyResolver(config(), project)
     }
 
-    ChecksResolver checksResolver(Project project) {
-        return new ChecksResolver(config(project).checks, project)
+    ChecksResolver checksResolver() {
+        return new ChecksResolver(config().checks, project)
     }
 
     VersionService versionService() {
         return get(VersionService)
     }
 
+    Releaser releaser() {
+        return new Releaser(
+                scmService(),
+                new ReleaseHooksRunner(project.logger, scmService(), config().hooks),
+                localOnlyResolver(),
+                project.logger
+        )
+    }
+    
     ScmChangesPrinter changesPrinter(ServiceRegistry services) {
         return new GitChangesPrinter(
                 get(ScmRepository) as GitRepository,

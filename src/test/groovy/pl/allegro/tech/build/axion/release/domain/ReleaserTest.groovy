@@ -9,10 +9,10 @@ class ReleaserTest extends RepositoryBasedTest {
     Releaser releaser
     
     def setup() {
-        ScmService scmService = context.scmService(project)
+        ScmService scmService = context.scmService()
         
         releaser = new Releaser(scmService, new ReleaseHooksRunner(project.logger, scmService, config.hooks),
-                context.localOnlyResolver(project),
+                context.localOnlyResolver(),
                 project.logger)
     }
 

@@ -5,14 +5,14 @@ import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
-class ReleaseTask extends DefaultTask {
+class CreateReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
         Context context = new Context(project)
-        Releaser releaser = context.releaser()
         
+        Releaser releaser = context.releaser()
         releaser.release(context.config())
-        releaser.pushRelease()
     }
+    
 }

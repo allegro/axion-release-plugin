@@ -26,7 +26,7 @@ class Releaser {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
-        if (version.preReleaseVersion == VersionService.SNAPSHOT) {
+        if (notOnTagAlready(version)) {
             version = new Version.Builder()
                     .setNormalVersion(version.normalVersion)
                     .setBuildMetadata(version.buildMetadata)
@@ -43,18 +43,30 @@ class Releaser {
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            if(!localOnlyResolver.localOnly(repository.remoteAttached())) {
-                repository.push()
-            }
-            else {
-                logger.quiet("Changes made to local repository only")
-            }
-            
             hooksRunner.runPostReleaseHooks(positionedVersion, version)
         }
         else {
-            logger.quiet("Working on released version ${versionConfig.version}, nothing to do here.")
+            logger.quiet("Working on released version ${versionConfig.version}, nothing to release.")
+        }
+    }
+    
+    void pushRelease() {
+        VersionWithPosition positionedVersion = versionConfig.getRawVersion()
+        Version version = positionedVersion.version
+
+        if(notOnTagAlready(version)) {
+            if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
+                repository.push()
+            } else {
+                logger.quiet("Changes made to local repository only")
+            }
+        }
+        else {
+            logger.quiet("Working on released version, nothing to push.")
         }
     }
 
+    private boolean notOnTagAlready(Version version) {
+        return version.preReleaseVersion == VersionService.SNAPSHOT
+    }
 }

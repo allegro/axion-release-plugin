@@ -25,7 +25,7 @@ class RepositoryBasedTest extends Specification {
         Grgit.init(dir: project.rootDir)
         context = new Context(project)
 
-        repository = context.repository(project)
+        repository = context.repository()
         repository.commit(['*'], 'initial commit')
     }
     

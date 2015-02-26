@@ -1,20 +1,14 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 class VersionResolverTest extends RepositoryBasedTest {
     
     VersionResolver resolver
     
-    ScmRepository repository
-    
     VersionReadOptions options = VersionReadOptions.defaultOptions()
     
     def setup() {
-        repository = context.repository(project)
-        repository.commit(['*'], 'initial commit')
-
         resolver = new VersionResolver(repository, context.versionFactory())
     }
     

@@ -8,7 +8,7 @@ class CommitHookActionTest extends RepositoryBasedTest {
     ScmService scmService
     
     def setup() {
-        scmService = context.scmService(project)
+        scmService = context.scmService()
     }
     
     def "should commit files matching patterns with given message"() {

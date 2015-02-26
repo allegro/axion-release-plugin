@@ -15,13 +15,13 @@ class VerifyReleaseTask extends DefaultTask {
     void prepare() {
         Context context = new Context(project)
 
-        ScmRepository repository = context.repository(project)
+        ScmRepository repository = context.repository()
         ScmChangesPrinter changesPrinter = context.changesPrinter(services)
-        VersionConfig config = context.config(project)
+        VersionConfig config = context.config()
 
         boolean dryRun = config.dryRun
-        ChecksResolver resolver = context.checksResolver(project)
-        LocalOnlyResolver localOnlyResolver = context.localOnlyResolver(project)
+        ChecksResolver resolver = context.checksResolver()
+        LocalOnlyResolver localOnlyResolver = context.localOnlyResolver()
 
         if (resolver.checkUncommittedChanges()) {
             boolean uncommittedChanges = repository.checkUncommittedChanges()

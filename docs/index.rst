@@ -23,6 +23,7 @@ Configuration
     
     configuration/authorization
     configuration/version
+    configuration/force_version
     configuration/next_version
     configuration/checks
     configuration/dry_run
