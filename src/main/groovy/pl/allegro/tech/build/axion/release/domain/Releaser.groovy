@@ -50,7 +50,7 @@ class Releaser {
         }
     }
     
-    void pushRelease() {
+    void pushRelease(VersionConfig versionConfig) {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
