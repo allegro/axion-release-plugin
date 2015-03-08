@@ -12,7 +12,7 @@ scmVersion {
     }
     
     hooks {
-        pre 'fileUpdate', [files: ['README.md', 'docs/conf.py'], pattern: {v, p -> /'$v'/ }, replacement: {v, p -> "$v"}]
+        pre 'fileUpdate', [files: ['README.md', 'docs/conf.py'], pattern: {v, p -> /'$v'/ }, replacement: {v, p -> "'$v'"}]
         pre 'commit'
     }
 
