@@ -23,7 +23,7 @@ intuitive philosophy makes it a lot easier to manage project versions along SCM 
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.2.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.2.1'
 }
 
 scmVersion {
