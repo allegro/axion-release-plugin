@@ -15,7 +15,7 @@ class VersionReadOptionsTest extends Specification {
         VersionReadOptions options = VersionReadOptions.fromProject(project)
 
         then:
-        options.forceVersion == false
+        !options.forceVersion
     }
 
     def "should return forceVersion false when project has 'release.forceVersion' property with empty value"() {
@@ -27,7 +27,7 @@ class VersionReadOptionsTest extends Specification {
         VersionReadOptions options = VersionReadOptions.fromProject(project)
 
         then:
-        options.forceVersion == false
+        !options.forceVersion
     }
 
     def "should return forceVersion true when project has 'release.forceVersion' property with non-empty value"() {
@@ -39,7 +39,7 @@ class VersionReadOptionsTest extends Specification {
         VersionReadOptions options = VersionReadOptions.fromProject(project)
 
         then:
-        options.forceVersion == true
+        options.forceVersion
         options.forcedVersion == 'version'
     }
 

@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* **1.2.1** (08.03.2015)
+    * create separate tasks for tag creation and pushing
+    * possibility to use different configuration across multiple modules
 * **1.2.0** (09.02.2015)
     * hooks - add custom actions before/after release
     * new documentation in RTD

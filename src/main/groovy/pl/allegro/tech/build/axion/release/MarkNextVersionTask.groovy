@@ -16,7 +16,7 @@ class MarkNextVersionTask extends DefaultTask {
             return
         }
 
-        Context context = Context.instance(project)
+        Context context = new Context(project)
 
         NextVersionMarker marker = new NextVersionMarker(
                 context.scmService(),

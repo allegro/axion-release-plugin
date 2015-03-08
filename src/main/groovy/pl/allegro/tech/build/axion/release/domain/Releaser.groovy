@@ -10,7 +10,7 @@ class Releaser {
     private final ScmService repository
 
     private final ReleaseHooksRunner hooksRunner
-    
+
     private final LocalOnlyResolver localOnlyResolver
 
     private final Logger logger
@@ -26,35 +26,39 @@ class Releaser {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
-        if (version.preReleaseVersion == VersionService.SNAPSHOT) {
+        if (notOnTagAlready(version)) {
             version = new Version.Builder()
                     .setNormalVersion(version.normalVersion)
                     .setBuildMetadata(version.buildMetadata)
                     .build()
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
-            if(versionConfig.createReleaseCommit) {
+            if (versionConfig.createReleaseCommit) {
                 logger.quiet("Creating release commit")
                 versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
             }
 
             hooksRunner.runPreReleaseHooks(positionedVersion, version)
-            
+
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            if(!localOnlyResolver.localOnly(repository.remoteAttached())) {
-                repository.push()
-            }
-            else {
-                logger.quiet("Changes made to local repository only")
-            }
-            
             hooksRunner.runPostReleaseHooks(positionedVersion, version)
-        }
-        else {
-            logger.quiet("Working on released version ${versionConfig.version}, nothing to do here.")
+        } else {
+            logger.quiet("Working on released version ${versionConfig.version}, nothing to release.")
         }
     }
 
+    void pushRelease(VersionConfig versionConfig) {
+        if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
+            repository.push()
+        } else {
+            logger.quiet("Changes made to local repository only")
+        }
+
+    }
+
+    private boolean notOnTagAlready(Version version) {
+        return version.preReleaseVersion == VersionService.SNAPSHOT
+    }
 }

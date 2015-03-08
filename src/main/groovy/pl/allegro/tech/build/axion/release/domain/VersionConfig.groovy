@@ -102,6 +102,8 @@ class VersionConfig {
     }
 
     private void ensureVersionServiceExists() {
-        this.versionService = Context.instance(project).versionService()
+        if (versionService == null) {
+            this.versionService = new Context(project).versionService()
+        }
     }
 }
