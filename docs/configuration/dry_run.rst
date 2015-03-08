@@ -10,7 +10,7 @@ Dry run
 In dry-run mode, no changes are made to repository. ``axion-release`` still interacts with repository to read things,
 but all write operations are mocked and printed out to indicated what *would* happen. To use dry run mode::
 
-    #./gradlew release -Prelease.druRun
+    #./gradlew release -Prelease.dryRun
     :verifyRelease
     DRY-RUN: uncommitted changes: true
     Looking for uncommitted changes.. FAILED
