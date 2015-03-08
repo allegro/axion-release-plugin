@@ -10,7 +10,7 @@ class Releaser {
     private final ScmService repository
 
     private final ReleaseHooksRunner hooksRunner
-    
+
     private final LocalOnlyResolver localOnlyResolver
 
     private final Logger logger
@@ -33,37 +33,29 @@ class Releaser {
                     .build()
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
-            if(versionConfig.createReleaseCommit) {
+            if (versionConfig.createReleaseCommit) {
                 logger.quiet("Creating release commit")
                 versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
             }
 
             hooksRunner.runPreReleaseHooks(positionedVersion, version)
-            
+
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
             hooksRunner.runPostReleaseHooks(positionedVersion, version)
-        }
-        else {
+        } else {
             logger.quiet("Working on released version ${versionConfig.version}, nothing to release.")
         }
     }
-    
-    void pushRelease(VersionConfig versionConfig) {
-        VersionWithPosition positionedVersion = versionConfig.getRawVersion()
-        Version version = positionedVersion.version
 
-        if(notOnTagAlready(version)) {
-            if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
-                repository.push()
-            } else {
-                logger.quiet("Changes made to local repository only")
-            }
+    void pushRelease(VersionConfig versionConfig) {
+        if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
+            repository.push()
+        } else {
+            logger.quiet("Changes made to local repository only")
         }
-        else {
-            logger.quiet("Working on released version, nothing to push.")
-        }
+
     }
 
     private boolean notOnTagAlready(Version version) {

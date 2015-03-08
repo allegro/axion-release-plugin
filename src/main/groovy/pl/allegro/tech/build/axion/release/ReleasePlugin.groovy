@@ -41,7 +41,7 @@ class ReleasePlugin implements Plugin<Project> {
         createReleaseTask.description = 'Performs first stage of release - creates tag.'
         createReleaseTask.dependsOn(VERIFY_RELEASE_TASK)
 
-        Task pushReleaseTask = project.tasks.create(PUSH_RELEASE_TASK, CreateReleaseTask)
+        Task pushReleaseTask = project.tasks.create(PUSH_RELEASE_TASK, PushReleaseTask)
         pushReleaseTask.group = 'Release'
         pushReleaseTask.description = 'Performs second stage of release - pushes tag to remote.'
 
