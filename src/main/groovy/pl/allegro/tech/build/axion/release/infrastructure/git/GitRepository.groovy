@@ -26,10 +26,10 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
-    GitRepository(File repositoryDir, ScmInitializationOptions options) {
+    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options) {
         try {
             this.repositoryDir = repositoryDir
-            repository = Grgit.open(repositoryDir)
+            repository = Grgit.open(dir: repositoryDir)
         }
         catch(RepositoryNotFoundException exception) {
             throw new ScmRepositoryUnavailableException(exception)
@@ -39,7 +39,7 @@ class GitRepository implements ScmRepository {
             this.attachRemote(options.remote, options.remoteUrl)
         }
         if (options.fetchTags) {
-            this.fetchTags()
+            this.fetchTags(identity, options.remote)
         }
     }
 

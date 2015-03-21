@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* **1.2.2** (21.03.2015)
+    * use newer GrGit (and JGit) version with some bugfixes
+    * start using Coveralls
 * **1.2.1** (08.03.2015)
     * create separate tasks for tag creation and pushing
     * possibility to use different configuration across multiple modules
