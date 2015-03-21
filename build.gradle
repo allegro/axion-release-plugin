@@ -4,6 +4,7 @@ plugins {
     id 'jacoco'
     id 'nu.studer.plugindev' version '1.0.3'
     id 'pl.allegro.tech.build.axion-release' version '1.2.0'
+    id 'com.github.kt3k.coveralls' version '2.3.1'
 }
 
 scmVersion {
@@ -30,8 +31,8 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile group: 'org.ajoberstar', name: 'grgit', version: '0.4.0'
-    compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.8.0'
+    compile group: 'org.ajoberstar', name: 'grgit', version: '1.1.0'
+    compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
     testCompile(group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
@@ -45,8 +46,15 @@ test {
     }
 }
 
+jacocoTestReport {
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2'
+    gradleVersion = '2.3'
 }
 
 plugindev {
@@ -76,4 +84,3 @@ bintray {
         }
     }
 }
-

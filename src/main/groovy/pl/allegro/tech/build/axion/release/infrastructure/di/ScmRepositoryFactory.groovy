@@ -2,6 +2,8 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentityResolver
 import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
@@ -20,7 +22,8 @@ class ScmRepositoryFactory {
         ScmRepository repository
         try {
             ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote)
-            repository = new GitRepository(config.directory, initializationOptions)
+            ScmIdentity identity = ScmIdentityResolver.resolve(config)
+            repository = new GitRepository(config.directory, identity, initializationOptions)
         }
         catch(ScmRepositoryUnavailableException exception) {
             project.logger.warn("Failed top open repository, trying to work without it", exception)
