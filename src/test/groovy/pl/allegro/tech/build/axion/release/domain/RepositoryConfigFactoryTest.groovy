@@ -27,6 +27,8 @@ class RepositoryConfigFactoryTest extends Specification {
         then:
         !config.customKeyPassword
         !config.customKey
+        !config.customUsername
+        config.customPassword == ''
     }
 
     def "should set authorization options when custom key and password provided"() {
@@ -79,6 +81,20 @@ class RepositoryConfigFactoryTest extends Specification {
 
         then:
         config.customKey == 'key'
+    }
+    
+    def "should set username and password when provided via 'release.customUsername' and 'release.customPassword'"() {
+        given:
+        Project project = ProjectBuilder.builder().build()
+        project.extensions.extraProperties.set('release.customUsername', 'username')
+        project.extensions.extraProperties.set('release.customPassword', 'password')
+
+        when:
+        RepositoryConfig config = RepositoryConfigFactory.create(project)
+
+        then:
+        config.customUsername == 'username'
+        config.customPassword == 'password'
     }
 
 }

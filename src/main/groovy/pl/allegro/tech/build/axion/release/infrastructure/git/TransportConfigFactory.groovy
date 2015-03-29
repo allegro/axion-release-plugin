@@ -1,0 +1,37 @@
+package pl.allegro.tech.build.axion.release.infrastructure.git
+
+import org.eclipse.jgit.api.TransportConfigCallback
+import org.eclipse.jgit.transport.SshTransport
+import org.eclipse.jgit.transport.Transport
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+
+class TransportConfigFactory {
+
+    TransportConfigCallback create(ScmIdentity identity) {
+        if (identity.privateKeyBased) {
+            return createForSsh(identity)
+        } else if (identity.usernameBased) {
+            return createForUsername(identity)
+        }
+        throw new IllegalArgumentException("Transport callback can be created only for private key or username based identity")
+    }
+
+    private TransportConfigCallback createForSsh(ScmIdentity identity) {
+        return new TransportConfigCallback() {
+            @Override
+            void configure(Transport transport) {
+                SshTransport sshTransport = (SshTransport) transport
+                sshTransport.setSshSessionFactory(new SshConnector(identity))
+            }
+        }
+    }
+
+    private TransportConfigCallback createForUsername(ScmIdentity identity) {
+        return new TransportConfigCallback() {
+            @Override
+            void configure(Transport transport) {
+                transport.setCredentialsProvider(new SimpleCredentialsProvider(identity.username, identity.password))
+            }
+        }
+    }
+}

@@ -10,6 +10,10 @@ class RepositoryConfigFactory {
     private static final String CUSTOM_KEY_FILE_PROPERTY = 'release.customKeyFile'
 
     private static final String CUSTOM_KEY_PASSWORD_PROPERTY = 'release.customKeyPassword'
+    
+    private static final String USERNAME_PROPERTY = 'release.customUsername'
+    
+    private static final String PASSWORD_PROPERTY = 'release.customPassword'
 
 
     static RepositoryConfig create(Project project) {
@@ -25,6 +29,14 @@ class RepositoryConfigFactory {
         } else if (project.hasProperty(CUSTOM_KEY_FILE_PROPERTY)) {
             config.customKey = FileLoader.readFrom(project.property(CUSTOM_KEY_FILE_PROPERTY))
         }
+        
+        if(project.hasProperty(USERNAME_PROPERTY)) {
+            config.customUsername = project.property(USERNAME_PROPERTY)
+        }
+        if(project.hasProperty(PASSWORD_PROPERTY)) {
+            config.customPassword = project.property(PASSWORD_PROPERTY)
+        }
+        
         return config
     }
 }

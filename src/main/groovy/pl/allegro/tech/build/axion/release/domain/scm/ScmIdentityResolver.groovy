@@ -8,7 +8,9 @@ class ScmIdentityResolver {
     static ScmIdentity resolve(RepositoryConfig config) {
         ScmIdentity identity
         if (config.customKey) {
-            identity = ScmIdentity.customIdentity(FileLoader.readIfFile(config.customKey), config.customKeyPassword)
+            identity = ScmIdentity.keyIdentity(FileLoader.readIfFile(config.customKey), config.customKeyPassword)
+        } else if (config.customUsername) {
+            identity = ScmIdentity.usernameIdentity(config.customUsername, config.customPassword)
         } else {
             identity = ScmIdentity.defaultIdentity()
         }

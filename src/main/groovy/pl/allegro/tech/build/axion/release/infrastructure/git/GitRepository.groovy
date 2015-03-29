@@ -22,6 +22,8 @@ class GitRepository implements ScmRepository {
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
+    private final TransportConfigFactory transportConfigFactory = new TransportConfigFactory()
+    
     private final File repositoryDir
     
     private final Grgit repository
@@ -100,13 +102,7 @@ class GitRepository implements ScmRepository {
     }
 
     private void setTransportOptions(ScmIdentity identity, TransportCommand command) {
-        command.transportConfigCallback = new TransportConfigCallback() {
-            @Override
-            void configure(Transport transport) {
-                SshTransport sshTransport = (SshTransport) transport
-                sshTransport.setSshSessionFactory(new SshConnector(identity))
-            }
-        }
+        command.transportConfigCallback = transportConfigFactory.create(identity)
     }
 
     @Override
