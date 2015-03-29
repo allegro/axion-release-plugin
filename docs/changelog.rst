@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* **1.2.3** (29.03.2015)
+    * support for Basic Auth username and password (GitHub tokens!)
 * **1.2.2** (21.03.2015)
     * use newer GrGit (and JGit) version with some bugfixes
     * start using Coveralls
