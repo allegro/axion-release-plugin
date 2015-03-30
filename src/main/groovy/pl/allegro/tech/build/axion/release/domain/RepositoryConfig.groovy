@@ -11,4 +11,8 @@ class RepositoryConfig {
     def customKey
 
     String customKeyPassword
+    
+    String customUsername
+    
+    String customPassword = ''
 }

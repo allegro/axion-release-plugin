@@ -8,6 +8,8 @@ All interactive authorization mechanisms are provided by `grgit <https://github.
 see `authorization docs <http://ajoberstar.org/grgit/docs/groovydoc/org/ajoberstar/grgit/auth/AuthConfig.html>`_
 for more information.
 
+Interactive mode is default option, switched off by using any special properties described below.
+
 SSH Key/password
 ----------------
 
@@ -50,4 +52,28 @@ dynamically using custom Gradle tasks right before release. To change credential
     
     task release {
         dependsOn loadKeyPassword
+    }
+
+
+HTTP Basic Auth/GitHub tokens
+-----------------------------
+
+Same as with SSH keys, ``axion-release-plugin``gives option to set basic auth data when connecting to repository via
+HTTP. This is especially useful when using `GitHub OAuth tokens <https://help.github.com/articles/git-automation-with-oauth-tokens/>`_.
+
+Command line
+^^^^^^^^^^^^
+
+Use ``release.customUsername`` and ``release.customPassword`` properties to set username and password that will be provided
+when using Basic Auth. If password is not set, it defaults to empty string.
+
+Dynamic
+^^^^^^^
+
+Username and password can be provided in runtime, just before push is made via ``scmVersion.repository.customUsername``
+and ``scmVersion.repository.customPassword`` properties::
+
+
+    task loadGitHubToken << {
+        scmVersion.repository.customUsername = loadGitHubTokenFromSomewhere()
     }
