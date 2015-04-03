@@ -154,7 +154,7 @@ versionWithBranch
         versionCreator 'versionWithBranch'
     }
 
-This version creator appends branch name to version unless you are on *master*::
+This version creator appends branch name to version unless you are on *master* or *detached HEAD*::
 
     decorate(version: '0.1.0', branch: 'master') == 0.1.0
     decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
