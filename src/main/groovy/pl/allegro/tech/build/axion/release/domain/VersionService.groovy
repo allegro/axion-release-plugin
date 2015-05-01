@@ -20,11 +20,7 @@ class VersionService {
         VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options)
 
         if (!positionedVersion.position.onTag) {
-            positionedVersion = new VersionWithPosition(
-                    positionedVersion.version.setPreReleaseVersion(SNAPSHOT),
-                    positionedVersion.previousVersion,
-                    positionedVersion.position
-            )
+            positionedVersion.setSnapshotVersion(true)
         }
 
         return positionedVersion

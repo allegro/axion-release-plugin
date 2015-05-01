@@ -21,6 +21,6 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         
         then:
         repository.currentPosition(~/.*/).latestTag == 'release-2.0.0-alpha'
-        versionService.currentVersion(config, VersionReadOptions.defaultOptions()).version.toString() == '2.0.0-SNAPSHOT'
+        versionService.currentDecoratedVersion(config, VersionReadOptions.defaultOptions()) == '2.0.0-SNAPSHOT'
     }
 }

@@ -36,6 +36,7 @@ class VersionServiceTest extends Specification {
 
         then:
         version.version.toString() == '1.0.0'
+        version.isSnapshotVersion == false
     }
 
     def "should return snapshot version with increased patch when not on tag"() {
@@ -50,7 +51,8 @@ class VersionServiceTest extends Specification {
         VersionWithPosition version = service.currentVersion(versionConfig, readOptions)
 
         then:
-        version.version.toString() == '1.0.1-SNAPSHOT'
+        version.version.toString() == '1.0.1'
+        version.isSnapshotVersion == true
     }
 
     def "should sanitize version if flag is set to true"() {
