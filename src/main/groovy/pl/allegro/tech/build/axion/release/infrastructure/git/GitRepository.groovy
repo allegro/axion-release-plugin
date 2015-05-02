@@ -66,7 +66,11 @@ class GitRepository implements ScmRepository {
 
     @Override
     void tag(String tagName) {
-        repository.tag.add(name: tagName)
+        String headId = repository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        boolean isOnExistingTag = repository.tag.list().any({it.name == tagName && it.commit.id == headId})
+        if (!isOnExistingTag) {
+            repository.tag.add(name: tagName)
+        }
     }
 
     @Override
