@@ -73,7 +73,7 @@ class Context {
                 scmService(),
                 new ReleaseHooksRunner(project.logger, scmService(), config().hooks),
                 localOnlyResolver(),
-                project.logger
+                project
         )
     }
     
