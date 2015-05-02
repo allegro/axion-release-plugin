@@ -55,6 +55,6 @@ class Releaser {
     }
 
     private boolean notOnTagAlready(VersionWithPosition positionedVersion) {
-        return positionedVersion.isSnapshotVersion
+        return positionedVersion.snapshotVersion
     }
 }

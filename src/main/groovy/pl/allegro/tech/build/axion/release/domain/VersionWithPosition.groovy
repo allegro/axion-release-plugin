@@ -11,7 +11,7 @@ class VersionWithPosition {
     
     final ScmPosition position
 
-    boolean isSnapshotVersion = false
+    boolean snapshotVersion = false
 
     VersionWithPosition(Version version, Version previousVersion, ScmPosition position) {
         this.version = version
@@ -27,7 +27,7 @@ class VersionWithPosition {
         return position == null
     }
 
-    void setSnapshotVersion(boolean isSnapshotVersion) {
-        this.isSnapshotVersion = isSnapshotVersion
+    void asSnapshotVersion() {
+        this.snapshotVersion = true
     }
 }
