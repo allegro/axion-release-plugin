@@ -26,11 +26,7 @@ class Releaser {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
-        if (notOnTagAlready(version)) {
-            version = new Version.Builder()
-                    .setNormalVersion(version.normalVersion)
-                    .setBuildMetadata(version.buildMetadata)
-                    .build()
+        if (notOnTagAlready(positionedVersion)) {
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
             if (versionConfig.createReleaseCommit) {
@@ -58,7 +54,7 @@ class Releaser {
 
     }
 
-    private boolean notOnTagAlready(Version version) {
-        return version.preReleaseVersion == VersionService.SNAPSHOT
+    private boolean notOnTagAlready(VersionWithPosition positionedVersion) {
+        return positionedVersion.snapshotVersion
     }
 }

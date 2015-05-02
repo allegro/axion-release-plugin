@@ -38,6 +38,41 @@ class ReleaserTest extends RepositoryBasedTest {
         config.getVersion() == '1.0.0'
     }
 
+    def "should release with forced pre-released versions"() {
+        given:
+        project.extensions.extraProperties.set('release.forceVersion', '3.0.0-rc4')
+        config.createReleaseCommit = false
+
+        when:
+        releaser.release(config)
+
+        then:
+        config.getVersion() == '3.0.0-rc4'
+    }
+
+    def "should not release version when on pre-released version tag"() {
+        given:
+        repository.tag('release-3.0.0-rc4')
+
+        when:
+        releaser.release(config)
+
+        then:
+        config.getVersion() == '3.0.0-rc4'
+    }
+
+    def "should increment pre-released version correctly"() {
+        given:
+        repository.tag('release-3.0.0-rc4')
+        repository.commit(['*'], 'make is snapshot')
+
+        when:
+        releaser.release(config)
+
+        then:
+        config.getVersion() == '3.0.1'
+    }
+
     def "should create release commit if configured"() {
         given:
         project.extensions.extraProperties.set('release.forceVersion', '3.0.0')
@@ -50,4 +85,5 @@ class ReleaserTest extends RepositoryBasedTest {
         config.getVersion() == '3.0.0'
         repository.lastLogMessages(1) == ['release version: 3.0.0']
     }
+
 }
