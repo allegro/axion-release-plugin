@@ -23,7 +23,7 @@ class VersionFactoryTest extends Specification {
         )
         
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.0.0'
@@ -37,7 +37,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.0.1'
@@ -51,7 +51,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.withForcedVersion('2.0.0'))
+        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0'))
 
         then:
         version.toString() == '2.0.0'
@@ -66,7 +66,7 @@ class VersionFactoryTest extends Specification {
         versionConfig.tag.initialVersion = { r, p -> '0.0.1' }
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '0.0.1'
@@ -80,7 +80,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '0.1.0'
@@ -94,7 +94,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '2.0.0'
@@ -108,7 +108,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '2.0.0'

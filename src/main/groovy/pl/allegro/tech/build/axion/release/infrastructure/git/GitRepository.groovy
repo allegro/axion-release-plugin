@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
+import groovy.util.logging.Slf4j
 import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
@@ -18,6 +19,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
+@Slf4j
 class GitRepository implements ScmRepository {
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
@@ -70,6 +72,8 @@ class GitRepository implements ScmRepository {
         boolean isOnExistingTag = repository.tag.list().any({it.name == tagName && it.commit.id == headId})
         if (!isOnExistingTag) {
             repository.tag.add(name: tagName)
+        } else {
+            log.debug("The head commit $headId already has the tag $tagName.")
         }
     }
 

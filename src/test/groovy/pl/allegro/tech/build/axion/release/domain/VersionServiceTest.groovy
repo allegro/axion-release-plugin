@@ -14,7 +14,7 @@ class VersionServiceTest extends Specification {
 
     VersionConfig versionConfig
 
-    VersionReadOptions readOptions = VersionReadOptionsFactory.empty()
+    VersionReadOptions readOptions = VersionReadOptions.defaultOptions()
 
     def setup() {
         Project project = ProjectBuilder.builder().build()
