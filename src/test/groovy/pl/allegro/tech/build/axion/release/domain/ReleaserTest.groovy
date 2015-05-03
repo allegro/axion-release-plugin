@@ -13,7 +13,7 @@ class ReleaserTest extends RepositoryBasedTest {
         
         releaser = new Releaser(scmService, new ReleaseHooksRunner(project.logger, scmService, config.hooks),
                 context.localOnlyResolver(),
-                project.logger)
+                project)
     }
 
     def "should release new version when not on tag"() {
@@ -86,4 +86,17 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.lastLogMessages(1) == ['release version: 3.0.0']
     }
 
+    def "should create release commit when on tag but forced"() {
+        given:
+        repository.tag('release-3.1.0')
+        project.extensions.extraProperties.set('release.forceVersion', '3.2.0')
+        config.createReleaseCommit = true
+
+        when:
+        releaser.release(config)
+
+        then:
+        config.getVersion() == '3.2.0'
+        repository.lastLogMessages(1) == ['release version: 3.2.0']
+    }
 }

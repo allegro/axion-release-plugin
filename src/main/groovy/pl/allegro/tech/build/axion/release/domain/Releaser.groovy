@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
@@ -15,18 +16,21 @@ class Releaser {
 
     private final Logger logger
 
-    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, LocalOnlyResolver localOnlyResolver, Logger logger) {
+    private Project project
+
+    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, LocalOnlyResolver localOnlyResolver, Project project) {
         this.repository = repository
         this.hooksRunner = hooksRunner
         this.localOnlyResolver = localOnlyResolver
-        this.logger = logger
+        this.project = project
+        this.logger = project.logger
     }
 
     void release(VersionConfig versionConfig) {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
-        if (notOnTagAlready(positionedVersion)) {
+        if (notOnTagAlready(positionedVersion) || VersionReadOptions.fromProject(project).forceVersion) {
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
             if (versionConfig.createReleaseCommit) {
