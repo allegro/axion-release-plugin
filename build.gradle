@@ -1,11 +1,20 @@
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/'  }
+    }
+    dependencies {
+        classpath group: 'com.gradle.publish', name: 'plugin-publish-plugin', version: '0.9.0'
+    }
+}
 
 plugins {
     id 'groovy'
     id 'jacoco'
-    id 'nu.studer.plugindev' version '1.0.3'
-    id 'pl.allegro.tech.build.axion-release' version '1.2.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.2.3'
     id 'com.github.kt3k.coveralls' version '2.3.1'
 }
+
+apply plugin: 'com.gradle.plugin-publish'
 
 scmVersion {
     tag {
@@ -34,7 +43,7 @@ dependencies {
     compile group: 'org.ajoberstar', name: 'grgit', version: '1.1.0'
     compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile(group: 'org.spockframework', name: 'spock-core', version: '0.7-groovy-2.0') {
+    testCompile(group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.3') {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
@@ -57,30 +66,21 @@ task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
 
-plugindev {
-    pluginId 'pl.allegro.tech.build.axion-release'
-    pluginImplementationClass 'pl.allegro.tech.build.axion.release.ReleasePlugin'
-    pluginDescription 'Release and version management plugin.'
-    pluginLicenses 'Apache-2.0'
-    pluginTags 'release', 'version'
-    authorId 'adamdubiel'
-    authorName 'Adam Dubiel'
-    authorEmail 'adam@nospam.com'
-    projectUrl 'https://github.com/allegro/axion-release-plugin'
-    projectInceptionYear '2014'
-    done()
-}
+pluginBundle {
+    website = 'https://github.com/allegro/axion-release-plugin'
+    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+    description = 'Release and version management plugin.'
+    tags = ['release', 'version']
 
-bintray {
-    user = project.ext.has('bintrayUser') ? project.ext.bintrayUser : ''
-    key = project.ext.has('bintrayApiKey') ? project.ext.bintrayApiKey : ''
-    pkg {
-        repo = 'maven'
-        version {
-            gpg {
-                sign = true
-                passphrase = project.ext.has('gpgPassphrase') ? project.ext.gpgPassphrase : ''
-            }
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
         }
+    }
+
+    mavenCoordinates {
+        groupId = 'pl.allegro.tech.build'
+        artifactId = 'axion-release-plugin'
     }
 }
