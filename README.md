@@ -18,7 +18,8 @@ hardcoded in **pom.xml** or **build.gradle**.
 **axion-release-plugin** embraces this philosophy. Instead of reading project version from buildfile, it is derived
 from nearest tag in SCM (or set to default if nothing was tagged). If current commit is tagged commit, project has
 a release version. If there were any commits after last tag, project is in SNAPSHOT version. This very simple and
-intuitive philosophy makes it a lot easier to manage project versions along SCM tag versions.
+intuitive philosophy, alongside with [Semantic Versioning](http://semver.org/) rules, makes it a lot easier to manage
+project versions along SCM tag versions.
 
 ## Basic usage
 
