@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* **1.2.4** (03.05.2015)
+    * support for pre-release versions (i.e. 2.0.0-rc2) - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
 * **1.2.3** (29.03.2015)
     * support for Basic Auth username and password (GitHub tokens!)
 * **1.2.2** (21.03.2015)
