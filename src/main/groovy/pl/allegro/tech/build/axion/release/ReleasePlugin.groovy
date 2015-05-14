@@ -12,7 +12,9 @@ class ReleasePlugin implements Plugin<Project> {
     public static final String VERIFY_RELEASE_TASK = 'verifyRelease'
 
     public static final String RELEASE_TASK = 'release'
-    
+
+    public static final String CONDITIONAL_RELEASE_TASK = 'conditionalRelease'
+
     public static final String CREATE_RELEASE_TASK = 'createRelease'
     
     public static final String PUSH_RELEASE_TASK = 'pushRelease'
@@ -35,6 +37,11 @@ class ReleasePlugin implements Plugin<Project> {
         releaseTask.group = 'Release'
         releaseTask.description = 'Performs release - creates tag and pushes it to remote.'
         releaseTask.dependsOn(VERIFY_RELEASE_TASK)
+
+        Task conditionalReleaseTask = project.tasks.create(CONDITIONAL_RELEASE_TASK, ConditionalReleaseTask)
+        conditionalReleaseTask.group = 'Release'
+        conditionalReleaseTask.description = 'Performs conditional release - if the branch is "releaseBranch", creates a tag and pushes it to remote.'
+        conditionalReleaseTask.dependsOn(VERIFY_RELEASE_TASK)
 
         Task createReleaseTask = project.tasks.create(CREATE_RELEASE_TASK, CreateReleaseTask)
         createReleaseTask.group = 'Release'
