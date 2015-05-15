@@ -5,6 +5,7 @@ Tasks
 
 * *verifyRelease*
 * *release*
+* *conditionalRelease*
 * *createRelease*
 * *pushRelease*
 * *currentVersion*
@@ -23,6 +24,12 @@ of running *createRelease* and *pushRelease* in a single run. The crucial differ
 *release* task guarantees release & push operations will be called in single task run without other tasks interrupting.
 In case of calling *createRelease* and *pushRelease* via *dependsOn*, it is up to Gradle to create task execution
 graph, meaning there is no guarantee of these tasks running exactly one after another.
+
+conditionalRelease
+------------------
+
+Works exactly like the *release* task, but makes an addition comparison between the current scm branch to the configured
+release branch pattern before releasing. This can be useful in automatic continuous integration environments like Bamboo.
 
 createRelease
 -------------
