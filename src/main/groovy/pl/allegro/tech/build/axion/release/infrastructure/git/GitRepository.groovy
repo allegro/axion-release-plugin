@@ -28,6 +28,8 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
+    private final boolean pushTagsOnly
+
     GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options) {
         try {
             this.repositoryDir = repositoryDir
@@ -43,6 +45,8 @@ class GitRepository implements ScmRepository {
         if (options.fetchTags) {
             this.fetchTags(identity, options.remote)
         }
+
+        this.pushTagsOnly = options.pushTagsOnly
     }
 
     @Override
@@ -83,12 +87,16 @@ class GitRepository implements ScmRepository {
     }
 
     private void callPush(String remoteName, boolean all) {
-        repository.push(remote: remoteName, all: all)
+        if(pushTagsOnly == false) {
+            repository.push(remote: remoteName, all: all)
+        }
         repository.push(remote: remoteName, tags: true, all: all)
     }
 
     private void callLowLevelPush(ScmIdentity identity, String remoteName, boolean all) {
-        pushCommand(identity, remoteName, all).call()
+        if(pushTagsOnly == false) {
+            pushCommand(identity, remoteName, all).call()
+        }
         pushCommand(identity, remoteName, all).setPushTags().call()
     }
 

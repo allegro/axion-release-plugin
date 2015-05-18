@@ -21,7 +21,7 @@ class ScmRepositoryFactory {
 
         ScmRepository repository
         try {
-            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote)
+            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote, config.pushTagsOnly)
             ScmIdentity identity = ScmIdentityResolver.resolve(config)
             repository = new GitRepository(config.directory, identity, initializationOptions)
         }
