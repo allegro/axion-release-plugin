@@ -87,14 +87,14 @@ class GitRepository implements ScmRepository {
     }
 
     private void callPush(String remoteName, boolean all) {
-        if(pushTagsOnly == false) {
+        if(!pushTagsOnly) {
             repository.push(remote: remoteName, all: all)
         }
         repository.push(remote: remoteName, tags: true, all: all)
     }
 
     private void callLowLevelPush(ScmIdentity identity, String remoteName, boolean all) {
-        if(pushTagsOnly == false) {
+        if(!pushTagsOnly) {
             pushCommand(identity, remoteName, all).call()
         }
         pushCommand(identity, remoteName, all).setPushTags().call()
