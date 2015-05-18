@@ -42,7 +42,6 @@ class GitRepositoryTest extends Specification {
         repository = new GitRepository(projectDir, identity, initializationOptions)
     }
 
-
     def "should throw unavailable exception when initializing in unexisitng repository"() {
         given:
         Project gitlessProject = ProjectBuilder.builder().build()
@@ -217,6 +216,22 @@ class GitRepositoryTest extends Specification {
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
+        remoteRawRepository.tag.list()*.fullName == ['refs/tags/release-push']
+    }
+
+    def "should not push commits if the pushTagsOnly flag is set to true"() {
+        given:
+        initializationOptions = ScmInitializationOptions.fromProject(project, 'origin', true)
+        repository = new GitRepository(project.file('./repo'), identity, initializationOptions)
+
+        repository.tag('release-push')
+        repository.commit(['*'], 'commit after release-push')
+
+        when:
+        repository.push(ScmIdentity.defaultIdentity(), 'origin')
+
+        then:
+        remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
         remoteRawRepository.tag.list()*.fullName == ['refs/tags/release-push']
     }
 
