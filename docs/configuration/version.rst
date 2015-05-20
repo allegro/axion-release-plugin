@@ -119,6 +119,35 @@ version::
 
 Input objects have same structure as deserialization closure inputs.
 
+.. _version-incrementing:
+
+Incrementing
+------------
+
+Incrementing phase does incrementing the version in accordance with *version incrementer* rule. By default version patch
+(least significant) number is incremented. There are predefined rules:
+
+- *incrementPatch* - increment patch number
+- *incrementMinor* - increment minor (middle) number
+- *incrementMinorIfNotOnRelease* - increment patch number if on release branch. Increment minor otherwise
+- *incrementPrerelease* - increment pre-release suffix if possible (-rc1 to -rc2). Increment patch otherwise
+
+You can set one of predefined rules via ``scmVersion.versionIncrementingRule`` method::
+
+    scmVersion {
+        versionIncrementingRule 'incrementPatch'
+    }
+
+Alternatively you can specify a custom rule by setting a closure that would accept a version, position and configuration
+and return a version object::
+
+    scmVersion {
+        versionIncrementingRule {version, position, versionConfig -> ...}
+    }
+
+If incrementMinorIfNotOnRelease rule is activated then the property ``releaseBranchPattern`` is used to match the release
+branch. By default it's set to 'release/.+'.
+
 .. _version-decorating:
 
 Decorating

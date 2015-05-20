@@ -41,7 +41,11 @@ All ``axion-release-plugin`` configuration options:
         // :ref:`version-decorating`
         versionCreator { version, position -> ... } // creates version visible for Gradle from raw version and current position in scm
         versionCreator 'versionWithBranch' // use one of predefined version creators
-    
+
+        // :ref:`version-incrementing`
+        versionIncrementingRule {version, position, versionConfig -> ...} // closure that increments a version from raw version and current position in scm
+        versionIncrementingRule 'incrementPatch' // use one of predefined version incrementing rules
+
         // :doc:`hooks`
         createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
         releaseCommitMessage { version, position -> ... } // custom commit message if commits are created
