@@ -2,7 +2,6 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
-import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentityResolver
 import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
