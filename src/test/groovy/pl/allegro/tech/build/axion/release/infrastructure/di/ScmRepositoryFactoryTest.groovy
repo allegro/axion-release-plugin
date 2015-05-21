@@ -37,6 +37,26 @@ class ScmRepositoryFactoryTest extends Specification {
         factory.create(gitlessProject, config) instanceof DummyRepository
     }
 
+    def "should set repository pushTagsOnly flag based on repository configuration and presence of property flag" () {
+        given:
+        config.pushTagsOnly = configSetting
+
+        if(useCommandLineFlag) {
+            project.extensions.extraProperties.set('repository.pushTagsOnly', null)
+        }
+
+        when:
+        GitRepository repository = factory.create(project, config)
+
+        then:
+        repository.pushTagsOnly == expected
+
+        where:
+        configSetting << [false, true, false]
+        useCommandLineFlag << [false, false, true]
+        expected << [false, true, true]
+    }
+
     def "should throw exception when trying to construct unknown type of repository"() {
         given:
         config.type = 'unknown'
