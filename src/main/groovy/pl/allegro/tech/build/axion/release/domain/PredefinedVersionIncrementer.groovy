@@ -4,6 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 import java.util.regex.Matcher
+import static String.format
 
 enum PredefinedVersionIncrementer {
 
@@ -26,10 +27,12 @@ enum PredefinedVersionIncrementer {
     INCREMENT_PRERELEASE('incrementPrerelease', { Version version, ScmPosition position, VersionConfig config ->
         // version.incrementPreReleaseVersion() does increment -rc1 into -rc1.1, so incrementing manually
         if (version.preReleaseVersion) {
-            Matcher matcher = version.preReleaseVersion =~ /^(.*)(\d+)$/
+            Matcher matcher = version.preReleaseVersion =~ /^(.*?)(\d+)$/
             if (matcher.matches()) {
                 long nextNumber = Long.parseLong(matcher.group(2)) + 1
-                String nextPreReleaseVersion = matcher.group(1) + nextNumber
+                String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
+                String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
+
                 return new Version.Builder()
                         .setNormalVersion(version.normalVersion)
                         .setPreReleaseVersion(nextPreReleaseVersion)

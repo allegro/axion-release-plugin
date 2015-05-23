@@ -15,6 +15,10 @@ class VersionFactoryTest extends Specification {
 
     VersionFactory factory = new VersionFactory()
 
+    def setup() {
+        versionConfig.versionIncrementer = PredefinedVersionIncrementer.INCREMENT_PATCH_VERSION.versionIncrementer
+    }
+
     def "should return current version read from position"() {
         given:
         ScmPositionContext context = new ScmPositionContext(
@@ -29,20 +33,6 @@ class VersionFactoryTest extends Specification {
         version.toString() == '1.0.0'
     }
 
-    def "patch version increased when not on tag and default incrementer"() {
-        given:
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-1.0.0', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.0.1'
-    }
-
     def "patch version increased when not on tag and incrementPatchVersion incrementer"() {
         given:
         versionConfig.versionIncrementer = PredefinedVersionIncrementer.INCREMENT_PATCH_VERSION.versionIncrementer
@@ -52,7 +42,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.0.1'
@@ -67,7 +57,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.1.0'
@@ -82,7 +72,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.1.0'
@@ -97,7 +87,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.0.3'
@@ -113,7 +103,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.1.1'
@@ -123,15 +113,30 @@ class VersionFactoryTest extends Specification {
         given:
         versionConfig.versionIncrementer = PredefinedVersionIncrementer.INCREMENT_PRERELEASE.versionIncrementer
         ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-2.0.0-rc1', false),
+                new ScmPosition('master', 'release-2.0.0-rc19', false),
                 versionConfig.nextVersion
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
-        version.toString() == '2.0.0-rc2'
+        version.toString() == '2.0.0-rc20'
+    }
+
+    def "prerelease version increased when not on tag and incrementPrerelease incrementer. Honor leading zeros"() {
+        given:
+        versionConfig.versionIncrementer = PredefinedVersionIncrementer.INCREMENT_PRERELEASE.versionIncrementer
+        ScmPositionContext context = new ScmPositionContext(
+                new ScmPosition('master', 'release-2.0.0-b05', false),
+                versionConfig.nextVersion
+        )
+
+        when:
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+
+        then:
+        version.toString() == '2.0.0-b06'
     }
 
     def "patch version increased when not on tag and incrementPrerelease incrementer and prerelease version without trailing digits"() {
@@ -143,7 +148,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptionsFactory.empty())
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '2.0.1'
