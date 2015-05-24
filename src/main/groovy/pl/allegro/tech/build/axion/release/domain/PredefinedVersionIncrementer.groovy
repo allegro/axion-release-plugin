@@ -8,11 +8,11 @@ import static String.format
 
 enum PredefinedVersionIncrementer {
 
-    INCREMENT_PATCH_VERSION('incrementPatchVersion', { Version version, ScmPosition position, VersionConfig config ->
+    INCREMENT_PATCH_VERSION('incrementPatch', { Version version, ScmPosition position, VersionConfig config ->
         return version.incrementPatchVersion()
     }),
 
-    INCREMENT_MINOR_VERSION('incrementMinorVersion', { Version version, ScmPosition position, VersionConfig config ->
+    INCREMENT_MINOR_VERSION('incrementMinor', { Version version, ScmPosition position, VersionConfig config ->
         return version.incrementMinorVersion()
     }),
 
