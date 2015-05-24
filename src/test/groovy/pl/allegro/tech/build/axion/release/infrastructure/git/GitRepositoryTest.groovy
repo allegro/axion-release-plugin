@@ -39,7 +39,7 @@ class GitRepositoryTest extends Specification {
         rawRepository = Grgit.clone(dir: projectDir, uri: "file://$remoteProjectDir.canonicalPath")
 
         initializationOptions = ScmInitializationOptions.fromProject(project, 'origin')
-        repository = new GitRepository(projectDir, identity, initializationOptions)
+        repository = new GitRepository(projectDir, identity, initializationOptions, project.logger)
     }
 
 
@@ -48,7 +48,7 @@ class GitRepositoryTest extends Specification {
         Project gitlessProject = ProjectBuilder.builder().build()
 
         when:
-        new GitRepository(gitlessProject.file('./'), identity, initializationOptions)
+        new GitRepository(gitlessProject.file('./'), identity, initializationOptions, project.logger)
 
         then:
         thrown(ScmRepositoryUnavailableException)
@@ -121,7 +121,7 @@ class GitRepositoryTest extends Specification {
         File projectDir = commitlessProject.file('./')
 
         Grgit.init(dir: projectDir)
-        GitRepository commitlessRepository = new GitRepository(projectDir, identity, initializationOptions)
+        GitRepository commitlessRepository = new GitRepository(projectDir, identity, initializationOptions, project.logger)
 
         when:
         ScmPosition position = commitlessRepository.currentPosition(~/^release.*/)

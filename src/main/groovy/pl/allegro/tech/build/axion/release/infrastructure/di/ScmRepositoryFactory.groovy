@@ -23,7 +23,7 @@ class ScmRepositoryFactory {
         try {
             ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote)
             ScmIdentity identity = ScmIdentityResolver.resolve(config)
-            repository = new GitRepository(config.directory, identity, initializationOptions)
+            repository = new GitRepository(config.directory, identity, initializationOptions, project.logger)
         }
         catch(ScmRepositoryUnavailableException exception) {
             project.logger.warn("Failed top open repository, trying to work without it", exception)

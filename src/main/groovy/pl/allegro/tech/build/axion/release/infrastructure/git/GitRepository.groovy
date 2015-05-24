@@ -15,12 +15,14 @@ import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.*
+import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
-@Slf4j
 class GitRepository implements ScmRepository {
+
+    private final Logger log;
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
@@ -30,7 +32,8 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
-    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options) {
+    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options, Logger logger) {
+        this.log = logger;
         try {
             this.repositoryDir = repositoryDir
             repository = Grgit.open(dir: repositoryDir)
