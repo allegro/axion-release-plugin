@@ -49,7 +49,7 @@ class Releaser {
         }
     }
 
-    void pushRelease(VersionConfig versionConfig) {
+    void pushRelease() {
         if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
             repository.push()
         } else {

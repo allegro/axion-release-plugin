@@ -10,19 +10,17 @@ class VersionReadOptions {
 
     final String forcedVersion
 
-    VersionReadOptions(boolean forceVersion, String forcedVersion) {
-        this.forceVersion = forceVersion
+    VersionReadOptions(String forcedVersion) {
+        this.forceVersion = forcedVersion != null
         this.forcedVersion = forcedVersion
     }
 
     static VersionReadOptions fromProject(Project project) {
         String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
-        boolean forceVersion = forceVersionValue != null && !forceVersionValue.trim().isEmpty()
-
-        return new VersionReadOptions(forceVersion, forceVersionValue)
+        return new VersionReadOptions(forceVersionValue?.trim() ? forceVersionValue.trim() : null)
     }
 
     static VersionReadOptions defaultOptions() {
-        return new VersionReadOptions(false, null)
+        return new VersionReadOptions(null)
     }
 }

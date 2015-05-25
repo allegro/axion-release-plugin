@@ -43,4 +43,17 @@ class VersionReadOptionsTest extends Specification {
         options.forcedVersion == 'version'
     }
 
+    def "should return trimmed forcedVersion when project has 'release.forceVersion' property with leading or trailing spaces"() {
+        given:
+        Project project = builder().build()
+        project.extensions.extraProperties.set('release.forceVersion', ' version ')
+
+        when:
+        VersionReadOptions options = VersionReadOptions.fromProject(project)
+
+        then:
+        options.forceVersion
+        options.forcedVersion == 'version'
+    }
+
 }

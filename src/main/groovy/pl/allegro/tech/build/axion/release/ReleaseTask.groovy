@@ -13,6 +13,6 @@ class ReleaseTask extends DefaultTask {
         Releaser releaser = context.releaser()
         
         releaser.release(context.config())
-        releaser.pushRelease(context.config())
+        releaser.pushRelease()
     }
 }
