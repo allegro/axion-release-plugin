@@ -15,4 +15,6 @@ class RepositoryConfig {
     String customUsername
     
     String customPassword = ''
+
+    boolean pushTagsOnly = false
 }

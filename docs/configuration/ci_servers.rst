@@ -15,13 +15,15 @@ TBD
 Jenkins
 -------
 
-Jenkins and ``axion-release`` cooperate nicely. All you need to do is make sure to disable all checks when running
-release plan::
+Jenkins and ``axion-release`` cooperate nicely. However, because Jenkins will check out git repositories in a
+'detached head' state, two flags should be set when running the release task::
 
 
-    ./gradlew release -Prelease.disableChecks
+    ./gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly
 
-Because of the way Jenkins clones repository, ``axion-release`` is not able to verify if current commit is ahead of remote.
+Disabling checks is necessary because ``axion-release`` is not able to verify if current commit is ahead of remote.
+Setting pushTagsOnly ensures that git will not throw an error by attempting to push commits while not working
+on a branch.
 
 Bamboo
 ------

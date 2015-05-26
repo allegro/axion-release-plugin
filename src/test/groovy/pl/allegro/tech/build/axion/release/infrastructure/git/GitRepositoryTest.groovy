@@ -42,7 +42,6 @@ class GitRepositoryTest extends Specification {
         repository = new GitRepository(projectDir, identity, initializationOptions, project.logger)
     }
 
-
     def "should throw unavailable exception when initializing in unexisitng repository"() {
         given:
         Project gitlessProject = ProjectBuilder.builder().build()
@@ -218,6 +217,30 @@ class GitRepositoryTest extends Specification {
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
         remoteRawRepository.tag.list()*.fullName == ['refs/tags/release-push']
+    }
+
+    def "should not push commits if the pushTagsOnly flag is set to true"() {
+        File remoteProjectDir = ProjectBuilder.builder().build().file('./remoteTagsOnly')
+        Grgit tagsOnlyRemoteRepository = Grgit.init(dir: remoteProjectDir)
+        tagsOnlyRemoteRepository.add(patterns: ['*'])
+        tagsOnlyRemoteRepository.commit(message: 'InitialCommit')
+
+        Project tagsOnlyProject = ProjectBuilder.builder().build()
+        File tagsOnlyProjectDir = tagsOnlyProject.file('./remoteTagsOnly/repo')
+        Grgit.clone(dir: tagsOnlyProjectDir, uri: "file://$remoteProjectDir.canonicalPath")
+
+        ScmInitializationOptions options = ScmInitializationOptions.fromProject(tagsOnlyProject, 'origin', true)
+        GitRepository tagsOnlyRepo = new GitRepository(tagsOnlyProjectDir, identity, options, project.logger)
+
+        tagsOnlyRepo.tag('release-push')
+        tagsOnlyRepo.commit(['*'], 'commit after release-push')
+
+        when:
+        tagsOnlyRepo.push(ScmIdentity.defaultIdentity(), 'origin')
+
+        then:
+        tagsOnlyRemoteRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
+        tagsOnlyRemoteRepository.tag.list()*.fullName == ['refs/tags/release-push']
     }
 
     def "should push changes to remote with custom name"() {
