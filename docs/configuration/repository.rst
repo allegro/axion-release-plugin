@@ -34,10 +34,10 @@ which is allowed even when a local branch is not checked out::
         }
     }
 
-A command line flag, ``repository.pushTagsOnly`` is also available in case you do not want to set this in your
+A command line flag, ``release.pushTagsOnly`` is also available in case you do not want to set this in your
 build script::
 
-    ./gradlew release -Prepository.pushTagsOnly
+    ./gradlew release -Prelease.pushTagsOnly
 
 The command line flag **will** override the build script even if the script has explicitly set the ``pushTagsOnly``
 flag to false.
