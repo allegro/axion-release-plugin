@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
+import groovy.util.logging.Slf4j
 import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
@@ -14,11 +15,14 @@ import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.*
+import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
+
+    private final Logger log;
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
@@ -30,7 +34,8 @@ class GitRepository implements ScmRepository {
 
     private final boolean pushTagsOnly
 
-    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options) {
+    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options, Logger logger) {
+        this.log = logger;
         try {
             this.repositoryDir = repositoryDir
             repository = Grgit.open(dir: repositoryDir)
@@ -74,6 +79,8 @@ class GitRepository implements ScmRepository {
         boolean isOnExistingTag = repository.tag.list().any({it.name == tagName && it.commit.id == headId})
         if (!isOnExistingTag) {
             repository.tag.add(name: tagName)
+        } else {
+            log.debug("The head commit $headId already has the tag $tagName.")
         }
     }
 
