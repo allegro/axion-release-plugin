@@ -42,7 +42,7 @@ class ScmRepositoryFactoryTest extends Specification {
         config.pushTagsOnly = configSetting
 
         if(useCommandLineFlag) {
-            project.extensions.extraProperties.set('repository.pushTagsOnly', null)
+            project.extensions.extraProperties.set('release.pushTagsOnly', null)
         }
 
         when:

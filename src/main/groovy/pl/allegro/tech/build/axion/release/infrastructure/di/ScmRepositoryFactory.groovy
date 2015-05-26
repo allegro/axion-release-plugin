@@ -14,14 +14,14 @@ class ScmRepositoryFactory {
 
     private static final String GIT = 'git'
 
-    private static final String REPOSITORY_PUSH_TAGS_ONLY_FLAG = "repository.pushTagsOnly";
+    private static final String RELEASE_PUSH_TAGS_ONLY_FLAG = "release.pushTagsOnly";
 
     ScmRepository create(Project project, RepositoryConfig config) {
         if(config.type != GIT) {
             throw new IllegalArgumentException("Unsupported repository type $config.type")
         }
 
-        boolean pushTagsOnly = (project.hasProperty(REPOSITORY_PUSH_TAGS_ONLY_FLAG) ?
+        boolean pushTagsOnly = (project.hasProperty(RELEASE_PUSH_TAGS_ONLY_FLAG) ?
                 true : config.pushTagsOnly)
 
         ScmRepository repository
