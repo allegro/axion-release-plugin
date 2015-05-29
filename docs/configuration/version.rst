@@ -138,11 +138,11 @@ You can set one of predefined rules via ``scmVersion.versionIncrementingRule`` m
         versionIncrementingRule 'incrementPatch'
     }
 
-Alternatively you can specify a custom rule by setting a closure that would accept a version, position and configuration
-and return a version object::
+Alternatively you can specify a custom rule by setting a closure that would accept a context object containing version,
+position and configuration and return a version object::
 
     scmVersion {
-        versionIncrementingRule {version, position, versionConfig -> ...}
+        versionIncrementingRule {context -> ...}
     }
 
 If incrementMinorIfNotOnRelease rule is activated then the property ``releaseBranchPattern`` is used to match the release

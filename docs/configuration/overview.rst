@@ -44,7 +44,7 @@ All ``axion-release-plugin`` configuration options:
 
         // :ref:`version-incrementing`
         releaseBranchPattern "release" // Release branch name pattern. "release/.+" by default
-        versionIncrementingRule {version, position, versionConfig -> ...} // closure that increments a version from raw version and current position in scm
+        versionIncrementingRule {context -> ...} // closure that increments a version from the raw version, current position in scm and config
         versionIncrementingRule 'incrementPatch' // use one of predefined version incrementing rules
 
         // :doc:`hooks`
