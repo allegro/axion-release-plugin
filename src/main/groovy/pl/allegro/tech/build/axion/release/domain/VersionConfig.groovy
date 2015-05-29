@@ -24,7 +24,7 @@ class VersionConfig {
 
     Map<String, Closure> branchVersionCreators
 
-    Closure versionIncrementer = PredefinedVersionIncrementer.INCREMENT_PATCH_VERSION.versionIncrementer
+    Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
     Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
 
@@ -92,6 +92,10 @@ class VersionConfig {
 
     void versionIncrementingRule(String ruleName) {
         this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName)
+    }
+
+    void versionIncrementingRule(String ruleName, Map configuration) {
+        this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration)
     }
 
     void versionIncrementingRule(Closure c) {

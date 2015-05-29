@@ -7,22 +7,23 @@ import static String.format
 
 enum PredefinedVersionIncrementer {
 
-    INCREMENT_PATCH_VERSION('incrementPatch', { VersionIncrementerContext context ->
+    INCREMENT_PATCH_VERSION('incrementPatch', { VersionIncrementerContext context, Map configuration ->
         return context.version.incrementPatchVersion()
     }),
 
-    INCREMENT_MINOR_VERSION('incrementMinor', { VersionIncrementerContext context ->
+    INCREMENT_MINOR_VERSION('incrementMinor', { VersionIncrementerContext context, Map configuration ->
         return context.version.incrementMinorVersion()
     }),
 
-    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context ->
+    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context,
+                                                                               Map configuration ->
         if (context.versionConfig.releaseBranchPattern.matcher(context.scmPosition.branch).matches()) {
             return context.version.incrementPatchVersion()
         }
         return context.version.incrementMinorVersion()
     }),
 
-    INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context ->
+    INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map configuration ->
         // version.incrementPreReleaseVersion() does increment -rc1 into -rc1.1, so incrementing manually
         if (context.version.preReleaseVersion) {
             Matcher matcher = context.version.preReleaseVersion =~ /^(.*?)(\d+)$/
@@ -49,12 +50,12 @@ enum PredefinedVersionIncrementer {
         this.versionIncrementer = c
     }
 
-    static Closure<Version> versionIncrementerFor(String name) {
+    static Closure<Version> versionIncrementerFor(String name, Map configuration = [:]) {
         PredefinedVersionIncrementer creator = values().find { it.name == name }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
                     "You can choose from: ${values().collect { it.name }}");
         }
-        return creator.versionIncrementer
+        return {VersionIncrementerContext context -> creator.versionIncrementer(context, configuration)}
     }
 }
