@@ -16,7 +16,7 @@ class VersionFactory {
             } else {
                 version = Version.valueOf(readVersionFromPosition(context, config))
                 if (!context.position.onTag && !context.nextVersionTag) {
-                    version = version.incrementPatchVersion()
+                    version = config.versionIncrementer(new VersionIncrementerContext(version, context.position, config))
                 }
             }
         }

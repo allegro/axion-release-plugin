@@ -6,6 +6,7 @@ import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 
 import javax.inject.Inject
+import java.util.regex.Pattern
 
 class VersionConfig {
 
@@ -22,6 +23,10 @@ class VersionConfig {
     Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
 
     Map<String, Closure> branchVersionCreators
+
+    Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
+
+    Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
 
     ChecksConfig checks = new ChecksConfig()
 
@@ -83,6 +88,22 @@ class VersionConfig {
 
     void versionCreator(Closure c) {
         this.versionCreator = c
+    }
+
+    void versionIncrementingRule(String ruleName) {
+        this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName)
+    }
+
+    void versionIncrementingRule(String ruleName, Map configuration) {
+        this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration)
+    }
+
+    void versionIncrementingRule(Closure c) {
+        this.versionIncrementer = c
+    }
+
+    void releaseBranchPattern(String releaseBranchPattern) {
+        this.releaseBranchPattern = Pattern.compile(releaseBranchPattern)
     }
 
     String getVersion() {

@@ -37,11 +37,16 @@ All ``axion-release-plugin`` configuration options:
             serializer = { nextVersionConfig, version -> ... } // append suffix to version tag
             deserializer = { nextVersionConfig, position -> ... } // strip suffix off version tag
         }
-    
+
         // :ref:`version-decorating`
         versionCreator { version, position -> ... } // creates version visible for Gradle from raw version and current position in scm
         versionCreator 'versionWithBranch' // use one of predefined version creators
-    
+
+        // :ref:`version-incrementing`
+        releaseBranchPattern "release" // Release branch name pattern. "release/.+" by default
+        versionIncrementingRule {context -> ...} // closure that increments a version from the raw version, current position in scm and config
+        versionIncrementingRule 'incrementPatch' // use one of predefined version incrementing rules
+
         // :doc:`hooks`
         createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
         releaseCommitMessage { version, position -> ... } // custom commit message if commits are created
