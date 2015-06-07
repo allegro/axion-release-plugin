@@ -28,18 +28,14 @@ class GitRepositoryTest extends Specification {
     GitRepository repository
 
     void setup() {
-        File remoteProjectDir = ProjectBuilder.builder().build().file('./')
-        remoteRawRepository = Grgit.init(dir: remoteProjectDir)
-        remoteRawRepository.add(patterns: ['*'])
-        remoteRawRepository.commit(message: 'InitialCommit')
-
+        Project remoteProject = ProjectBuilder.builder().build()
+        remoteRawRepository = GitProjectBuilder.gitProject(remoteProject).withInitialCommit().build()[Grgit]
+        
         project = ProjectBuilder.builder().build()
-        File projectDir = project.file('./repo')
-
-        rawRepository = Grgit.clone(dir: projectDir, uri: "file://$remoteProjectDir.canonicalPath")
-
-        initializationOptions = ScmInitializationOptions.fromProject(project, 'origin')
-        repository = new GitRepository(projectDir, identity, initializationOptions, project.logger)
+        Map repositories = GitProjectBuilder.gitProject(project, remoteProject).build()
+        
+        rawRepository = repositories[Grgit]
+        repository = repositories[GitRepository]
     }
 
     def "should throw unavailable exception when initializing in unexisitng repository"() {
@@ -95,7 +91,7 @@ class GitRepositoryTest extends Specification {
 
     def "should signal there are uncommitted changes"() {
         when:
-        project.file('repo/uncommitted').createNewFile()
+        project.file('uncommitted').createNewFile()
 
         then:
         repository.checkUncommittedChanges()
@@ -116,12 +112,8 @@ class GitRepositoryTest extends Specification {
 
     def "should return default position when no commit in repository"() {
         given:
-        Project commitlessProject = ProjectBuilder.builder().build()
-        File projectDir = commitlessProject.file('./')
-
-        Grgit.init(dir: projectDir)
-        GitRepository commitlessRepository = new GitRepository(projectDir, identity, initializationOptions, project.logger)
-
+        GitRepository commitlessRepository = GitProjectBuilder.gitProject(ProjectBuilder.builder().build()).build()[GitRepository]
+        
         when:
         ScmPosition position = commitlessRepository.currentPosition(~/^release.*/)
 
@@ -220,27 +212,24 @@ class GitRepositoryTest extends Specification {
     }
 
     def "should not push commits if the pushTagsOnly flag is set to true"() {
-        File remoteProjectDir = ProjectBuilder.builder().build().file('./remoteTagsOnly')
-        Grgit tagsOnlyRemoteRepository = Grgit.init(dir: remoteProjectDir)
-        tagsOnlyRemoteRepository.add(patterns: ['*'])
-        tagsOnlyRemoteRepository.commit(message: 'InitialCommit')
-
+        Project remoteProject = ProjectBuilder.builder().build()
+        Grgit remoteRepository = GitProjectBuilder.gitProject(remoteProject)
+                .withInitialCommit().build()[Grgit]
+        
         Project tagsOnlyProject = ProjectBuilder.builder().build()
-        File tagsOnlyProjectDir = tagsOnlyProject.file('./remoteTagsOnly/repo')
-        Grgit.clone(dir: tagsOnlyProjectDir, uri: "file://$remoteProjectDir.canonicalPath")
+        GitRepository tagsOnlyRepository = GitProjectBuilder.gitProject(tagsOnlyProject, remoteProject)
+                .usingInitializationOptions(ScmInitializationOptions.fromProject(tagsOnlyProject, 'origin', true))
+                .build()[GitRepository]
 
-        ScmInitializationOptions options = ScmInitializationOptions.fromProject(tagsOnlyProject, 'origin', true)
-        GitRepository tagsOnlyRepo = new GitRepository(tagsOnlyProjectDir, identity, options, project.logger)
-
-        tagsOnlyRepo.tag('release-push')
-        tagsOnlyRepo.commit(['*'], 'commit after release-push')
-
+        tagsOnlyRepository.tag('release-push')
+        tagsOnlyRepository.commit(['*'], 'commit after release-push')
+        
         when:
-        tagsOnlyRepo.push(ScmIdentity.defaultIdentity(), 'origin')
+        tagsOnlyRepository.push(ScmIdentity.defaultIdentity(), 'origin')
 
         then:
-        tagsOnlyRemoteRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
-        tagsOnlyRemoteRepository.tag.list()*.fullName == ['refs/tags/release-push']
+        remoteRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
+        remoteRepository.tag.list()*.fullName == ['refs/tags/release-push']
     }
 
     def "should push changes to remote with custom name"() {
