@@ -10,6 +10,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 import spock.lang.Specification
 
@@ -204,7 +205,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), 'origin', true)
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('origin', false), true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -212,24 +213,15 @@ class GitRepositoryTest extends Specification {
     }
 
     def "should not push commits if the pushTagsOnly flag is set to true"() {
-        Project remoteProject = ProjectBuilder.builder().build()
-        Grgit remoteRepository = GitProjectBuilder.gitProject(remoteProject)
-                .withInitialCommit().build()[Grgit]
-        
-        Project tagsOnlyProject = ProjectBuilder.builder().build()
-        GitRepository tagsOnlyRepository = GitProjectBuilder.gitProject(tagsOnlyProject, remoteProject)
-                .usingInitializationOptions(ScmInitializationOptions.fromProject(tagsOnlyProject, 'origin', true))
-                .build()[GitRepository]
-
-        tagsOnlyRepository.tag('release-push')
-        tagsOnlyRepository.commit(['*'], 'commit after release-push')
+        repository.tag('release-push')
+        repository.commit(['*'], 'commit after release-push')
         
         when:
-        tagsOnlyRepository.push(ScmIdentity.defaultIdentity(), 'origin')
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('origin', true))
 
         then:
-        remoteRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
-        remoteRepository.tag.list()*.fullName == ['refs/tags/release-push']
+        remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
+        remoteRawRepository.tag.list()*.fullName == ['refs/tags/release-push']
     }
 
     def "should push changes to remote with custom name"() {
@@ -242,7 +234,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), 'customRemote', true)
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('customRemote', false), true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']

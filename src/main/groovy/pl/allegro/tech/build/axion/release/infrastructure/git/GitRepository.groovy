@@ -1,6 +1,5 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import groovy.util.logging.Slf4j
 import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
@@ -32,8 +31,6 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
-    private final boolean pushTagsOnly
-
     GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options, Logger logger) {
         this.log = logger;
         try {
@@ -50,8 +47,6 @@ class GitRepository implements ScmRepository {
         if (options.fetchTags) {
             this.fetchTags(identity, options.remote)
         }
-
-        this.pushTagsOnly = options.pushTagsOnly
     }
 
     @Override
@@ -85,26 +80,26 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    void push(ScmIdentity identity, String remoteName) {
-        push(identity, remoteName, false)
+    void push(ScmIdentity identity, ScmPushOptions pushOptions) {
+        push(identity, pushOptions, false)
     }
 
-    void push(ScmIdentity identity, String remoteName, boolean all) {
-        identity.useDefault ? callPush(remoteName, all) : callLowLevelPush(identity, remoteName, all)
+    void push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
+        identity.useDefault ? callPush(pushOptions, all) : callLowLevelPush(identity, pushOptions, all)
     }
 
-    private void callPush(String remoteName, boolean all) {
-        if(!pushTagsOnly) {
-            repository.push(remote: remoteName, all: all)
+    private void callPush(ScmPushOptions pushOptions, boolean all) {
+        if(!pushOptions.tagsOnly) {
+            repository.push(remote: pushOptions.remote, all: all)
         }
-        repository.push(remote: remoteName, tags: true, all: all)
+        repository.push(remote: pushOptions.remote, tags: true, all: all)
     }
 
-    private void callLowLevelPush(ScmIdentity identity, String remoteName, boolean all) {
-        if(!pushTagsOnly) {
-            pushCommand(identity, remoteName, all).call()
+    private void callLowLevelPush(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
+        if(!pushOptions.tagsOnly) {
+            pushCommand(identity, pushOptions.remote, all).call()
         }
-        pushCommand(identity, remoteName, all).setPushTags().call()
+        pushCommand(identity, pushOptions.remote, all).setPushTags().call()
     }
 
     private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
