@@ -10,7 +10,7 @@ import spock.lang.Specification
 class VersionFactoryTest extends Specification {
 
     static Project project = ProjectBuilder.builder().build()
-    
+
     VersionConfig versionConfig = new VersionConfig(project)
 
     VersionFactory factory = new VersionFactory()
@@ -22,136 +22,15 @@ class VersionFactoryTest extends Specification {
     def "should return current version read from position"() {
         given:
         ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-1.0.0', true), 
+                new ScmPosition('master', 'release-1.0.0', true),
                 versionConfig.nextVersion
         )
-        
+
         when:
         Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
         version.toString() == '1.0.0'
-    }
-
-    def "patch version increased when not on tag and incrementPatchVersion incrementer"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-1.0.0', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.0.1'
-    }
-
-    def "minor version increased when not on tag and incrementMinorVersion incrementer"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementMinor')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-1.0.2', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.1.0'
-    }
-
-    def "minor version increased when not on tag and incrementMinorIfNotOnRelease incrementer and on master"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementMinorIfNotOnRelease')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-1.0.2', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.1.0'
-    }
-
-    def "patch version increased when not on tag and incrementMinorIfNotOnRelease incrementer and on release"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementMinorIfNotOnRelease')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('release/1.0', 'release-1.0.2', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.0.3'
-    }
-
-    def "patch version increased when not on tag and incrementMinorIfNotOnRelease incrementer"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementMinorIfNotOnRelease')
-        versionConfig.releaseBranchPattern('ga/.+')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('ga/1.1', 'release-1.1.0', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '1.1.1'
-    }
-
-    def "prerelease version increased when not on tag and incrementPrerelease incrementer"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPrerelease')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-2.0.0-rc19', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '2.0.0-rc20'
-    }
-
-    def "prerelease version increased when not on tag and incrementPrerelease incrementer. Honor leading zeros"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPrerelease')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-2.0.0-b05', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '2.0.0-b06'
-    }
-
-    def "patch version increased when not on tag and incrementPrerelease incrementer and prerelease version without trailing digits"() {
-        given:
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPrerelease')
-        ScmPositionContext context = new ScmPositionContext(
-                new ScmPosition('master', 'release-2.0.0-pre', false),
-                versionConfig.nextVersion
-        )
-
-        when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
-
-        then:
-        version.toString() == '2.0.1'
     }
 
     def "should return forced version when forcing is on"() {
@@ -210,7 +89,7 @@ class VersionFactoryTest extends Specification {
         then:
         version.toString() == '2.0.0'
     }
-    
+
     def "should not increment patch version when being on position after next version tag"() {
         given:
         ScmPositionContext context = new ScmPositionContext(

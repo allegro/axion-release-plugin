@@ -77,6 +77,8 @@ You can implement own deserializer by setting closure that would accept deserial
 * ``prefix``: tag prefix
 * ``separator``: separator between prefix and version
 
+.. _scm-position:
+
 ``position`` object contains:
 
 * ``latestTag`` - the name of the latest tag
@@ -124,29 +126,62 @@ Input objects have same structure as deserialization closure inputs.
 Incrementing
 ------------
 
-Incrementing phase does incrementing the version in accordance with *version incrementer* rule. By default version patch
-(least significant) number is incremented. There are predefined rules:
+Incrementing phase does incrementing the version in accordance with *version incrementer*. By default version patch
+(least significant) number is incremented. There are other predefined rules:
 
-- *incrementPatch* - increment patch number
-- *incrementMinor* - increment minor (middle) number
-- *incrementMinorIfNotOnRelease* - increment patch number if on release branch. Increment minor otherwise
-- *incrementPrerelease* - increment pre-release suffix if possible (-rc1 to -rc2). Increment patch otherwise
+* *incrementPatch* - increment patch number
+* *incrementMinor* - increment minor (middle) number
+* *incrementMinorIfNotOnRelease* - increment patch number if on release branch. Increment minor otherwise
+* *incrementPrerelease* - increment pre-release suffix if possible (-rc1 to -rc2). Increment patch otherwise
+* *branchSpecific* - call other incrementer based on branch name
 
-You can set one of predefined rules via ``scmVersion.versionIncrementingRule`` method::
+You can set one of predefined rules via ``scmVersion.versionIncrementer`` method::
 
     scmVersion {
-        versionIncrementingRule 'incrementPatch'
+        versionIncrementer 'incrementPatch'
+    }
+
+If rule accepts parameters, they can be passed via configuration map::
+
+    scmVersion {
+        versionIncrementer 'branchSpecific', [:]
     }
 
 Alternatively you can specify a custom rule by setting a closure that would accept a context object containing version,
 position and configuration and return a version object::
 
     scmVersion {
-        versionIncrementingRule {context -> ...}
+        versionIncrementer { context, config -> ... }
     }
 
-If incrementMinorIfNotOnRelease rule is activated then the property ``releaseBranchPattern`` is used to match the release
-branch. By default it's set to 'release/.+'.
+The context object passed to closure contains the following:
+
+* *currentVersion* - current Version object that should be used to calculate next version
+* *position* - widely used position object, for more see :doc:`scm-position`
+
+incrementMinorIfNotOnRelease
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This rule uses additional parameter ``releaseBranchPattern`` (by default it's set to 'release/.+')::
+
+    scmVersion {
+        versionIncrementingRule 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+    }
+
+branchSpecific
+^^^^^^^^^^^^^^
+
+This rule accepts map of ``branch pattern -> incrementer name`` and uses first incrementer that matches branch pattern::
+
+    scmVersion {
+        versionIncrementingRule 'branchSpecific', ['master': 'incrementPatch', 'feature/.*': 'incrementMinor']
+    }
+
+The arguments map will be passed on to called incrementer, so you can add some more parameters at the end of it::
+
+    scmVersion {
+        versionIncrementingRule 'branchSpecific', ['master': 'incrementPatch', '.*': 'incrementMinorIfNotOnRelease', releaseBranchPattern: 'release.*']
+    }
 
 .. _version-decorating:
 

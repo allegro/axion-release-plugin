@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure
 import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 import java.util.regex.Pattern
@@ -30,7 +31,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    void push(ScmIdentity identity, String remoteName) {
+    void push(ScmIdentity identity, ScmPushOptions pushOptions) {
         log('push')
     }
 

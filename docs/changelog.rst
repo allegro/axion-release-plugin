@@ -1,6 +1,8 @@
 Changelog
 =========
-
+* **1.3.0** (07.11.2017)
+    * support for custom version incrementation rules - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
+    * ability to push only tags to remote repo - thanks to `erichsend <https://github.com/erichsend>`_ for contribution
 * **1.2.4** (03.05.2015)
     * support for pre-release versions (i.e. 2.0.0-rc2) - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
 * **1.2.3** (29.03.2015)

@@ -14,24 +14,19 @@ class ScmRepositoryFactory {
 
     private static final String GIT = 'git'
 
-    private static final String RELEASE_PUSH_TAGS_ONLY_FLAG = "release.pushTagsOnly";
-
     ScmRepository create(Project project, RepositoryConfig config) {
         if(config.type != GIT) {
             throw new IllegalArgumentException("Unsupported repository type $config.type")
         }
 
-        boolean pushTagsOnly = (project.hasProperty(RELEASE_PUSH_TAGS_ONLY_FLAG) ?
-                true : config.pushTagsOnly)
-
         ScmRepository repository
         try {
-            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote, pushTagsOnly)
+            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote)
             ScmIdentity identity = ScmIdentityResolver.resolve(config)
             repository = new GitRepository(config.directory, identity, initializationOptions, project.logger)
         }
         catch(ScmRepositoryUnavailableException exception) {
-            project.logger.warn("Failed top open repository, trying to work without it", exception)
+            project.logger.warn('Failed top open repository, trying to work without it', exception)
             repository = new DummyRepository(project.logger)
         }
 

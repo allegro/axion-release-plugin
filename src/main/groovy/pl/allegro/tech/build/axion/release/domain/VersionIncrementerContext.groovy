@@ -7,8 +7,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 @Canonical
 class VersionIncrementerContext {
 
-    Version version
+    Version currentVersion
+    
     ScmPosition scmPosition
-    VersionConfig versionConfig
-
 }

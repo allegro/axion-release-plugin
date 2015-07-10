@@ -2,12 +2,15 @@ package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
-import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentityResolver
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class GradleAwareScmService implements ScmService {
 
     private final Project project
-    
+
     private final RepositoryConfig config
 
     private ScmRepository repository
@@ -26,8 +29,10 @@ class GradleAwareScmService implements ScmService {
     @Override
     void push() {
         project.logger.quiet("Pushing all to remote: ${config.remote}")
-        ScmIdentity identity = ScmIdentityResolver.resolve(config)
-        repository.push(identity, config.remote)
+        repository.push(
+                ScmIdentityResolver.resolve(config),
+                ScmPushOptions.fromProject(project, config)
+        )
     }
 
     @Override

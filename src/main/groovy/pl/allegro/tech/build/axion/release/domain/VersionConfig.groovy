@@ -90,20 +90,16 @@ class VersionConfig {
         this.versionCreator = c
     }
 
-    void versionIncrementingRule(String ruleName) {
+    void versionIncrementer(String ruleName) {
         this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName)
     }
 
-    void versionIncrementingRule(String ruleName, Map configuration) {
+    void versionIncrementer(String ruleName, Map configuration) {
         this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration)
     }
 
-    void versionIncrementingRule(Closure c) {
+    void versionIncrementer(Closure c) {
         this.versionIncrementer = c
-    }
-
-    void releaseBranchPattern(String releaseBranchPattern) {
-        this.releaseBranchPattern = Pattern.compile(releaseBranchPattern)
     }
 
     String getVersion() {

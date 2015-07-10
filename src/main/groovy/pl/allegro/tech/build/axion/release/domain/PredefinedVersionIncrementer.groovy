@@ -7,38 +7,44 @@ import static String.format
 
 enum PredefinedVersionIncrementer {
 
-    INCREMENT_PATCH_VERSION('incrementPatch', { VersionIncrementerContext context, Map configuration ->
-        return context.version.incrementPatchVersion()
+    INCREMENT_PATCH('incrementPatch', { VersionIncrementerContext context, Map config ->
+        return context.currentVersion.incrementPatchVersion()
     }),
 
-    INCREMENT_MINOR_VERSION('incrementMinor', { VersionIncrementerContext context, Map configuration ->
-        return context.version.incrementMinorVersion()
+    INCREMENT_MINOR('incrementMinor', { VersionIncrementerContext context, Map config ->
+        return context.currentVersion.incrementMinorVersion()
     }),
 
-    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context,
-                                                                               Map configuration ->
-        if (context.versionConfig.releaseBranchPattern.matcher(context.scmPosition.branch).matches()) {
-            return context.version.incrementPatchVersion()
+    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
+        if(!config.releaseBranchPattern) {
+            config.releaseBranchPattern = 'release/.+'
         }
-        return context.version.incrementMinorVersion()
+        if(context.scmPosition.branch ==~ config.releaseBranchPattern) {
+            return context.currentVersion.incrementPatchVersion()
+        }
+        return context.currentVersion.incrementMinorVersion()
     }),
 
-    INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map configuration ->
-        // version.incrementPreReleaseVersion() does increment -rc1 into -rc1.1, so incrementing manually
-        if (context.version.preReleaseVersion) {
-            Matcher matcher = context.version.preReleaseVersion =~ /^(.*?)(\d+)$/
+    INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map config ->
+        if (context.currentVersion.preReleaseVersion) {
+            Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
             if (matcher.matches()) {
                 long nextNumber = Long.parseLong(matcher.group(2)) + 1
                 String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
                 String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
 
                 return new Version.Builder()
-                        .setNormalVersion(context.version.normalVersion)
+                        .setNormalVersion(context.currentVersion.normalVersion)
                         .setPreReleaseVersion(nextPreReleaseVersion)
                         .build();
             }
         }
-        return context.version.incrementPatchVersion()
+        return context.currentVersion.incrementPatchVersion()
+    }),
+
+    BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
+        def incrementer = config.find { context.scmPosition.branch ==~ it.key }
+        return versionIncrementerFor(incrementer.value, config)(context)
     })
 
     private final String name
@@ -56,6 +62,6 @@ enum PredefinedVersionIncrementer {
             throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
                     "You can choose from: ${values().collect { it.name }}");
         }
-        return {VersionIncrementerContext context -> creator.versionIncrementer(context, configuration)}
+        return { VersionIncrementerContext context -> creator.versionIncrementer(context, configuration) }
     }
 }

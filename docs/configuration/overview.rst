@@ -43,9 +43,8 @@ All ``axion-release-plugin`` configuration options:
         versionCreator 'versionWithBranch' // use one of predefined version creators
 
         // :ref:`version-incrementing`
-        releaseBranchPattern "release" // Release branch name pattern. "release/.+" by default
-        versionIncrementingRule {context -> ...} // closure that increments a version from the raw version, current position in scm and config
-        versionIncrementingRule 'incrementPatch' // use one of predefined version incrementing rules
+        versionIncrementer {context, config -> ...} // closure that increments a version from the raw version, current position in scm and config
+        versionIncrementer 'incrementPatch' // use one of predefined version incrementing rules
 
         // :doc:`hooks`
         createReleaseCommit true // should create empty commit to annotate release in commit history, false by default

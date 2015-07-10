@@ -8,7 +8,7 @@ interface ScmRepository {
 
     void tag(String tagName)
 
-    void push(ScmIdentity identity, String remoteName)
+    void push(ScmIdentity identity, ScmPushOptions pushOptions)
 
     void commit(List patterns, String message)
 
