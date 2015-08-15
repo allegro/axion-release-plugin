@@ -60,6 +60,20 @@ current version and SCM position as arguments::
         }
     }
 
+push
+----
+
+Pushes all changes to the remote::
+
+    scmVersion {
+        hooks {
+            post 'push'
+        }
+    }
+
+There is no additional magic in this action. Use with care, only when you have some commits that need to be pushed for
+example as a `post` action. Remember, that push is always done during the release.
+
 Custom action
 -------------
 
