@@ -4,7 +4,8 @@ enum PredefinedReleaseHookAction {
 
     DEFAULT('default', new SimpleReleaseHookAction.Factory()),
     FILE_UPDATE('fileUpdate', new FileUpdateHookAction.Factory()),
-    COMMIT('commit', new CommitHookAction.Factory());
+    COMMIT('commit', new CommitHookAction.Factory()),
+    PUSH('push', new PushHookAction.Factory());
 
     private final String type
 

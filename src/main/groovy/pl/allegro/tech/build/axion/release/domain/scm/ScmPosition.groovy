@@ -7,19 +7,22 @@ class ScmPosition {
     final String latestTag
 
     final boolean onTag
+    
+    final boolean hasUncommittedChanges
 
-    ScmPosition(String branch, String latestTag, boolean onTag) {
+    ScmPosition(String branch, String latestTag, boolean onTag, boolean hasUncommittedChanges = false) {
         this.branch = branch
         this.latestTag = latestTag
         this.onTag = onTag
+        this.hasUncommittedChanges = hasUncommittedChanges
     }
 
     static ScmPosition defaultPosition() {
-        return new ScmPosition('master', null, false)
+        return new ScmPosition('master', null, false, false)
     }
 
     static ScmPosition onTag(String tagName) {
-        return new ScmPosition('master', tagName, true)
+        return new ScmPosition('master', tagName, true, false)
     }
     
     boolean tagless() {
@@ -27,11 +30,11 @@ class ScmPosition {
     }
 
     ScmPosition asOnTagPosition() {
-        return new ScmPosition(branch, latestTag, latestTag != null)
+        return new ScmPosition(branch, latestTag, latestTag != null, hasUncommittedChanges)
     }
 
     ScmPosition asNotOnTagPosition() {
-        return new ScmPosition(branch, latestTag, false)
+        return new ScmPosition(branch, latestTag, false, hasUncommittedChanges)
     }
     
     @Override

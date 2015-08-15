@@ -4,7 +4,6 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import spock.lang.Shared
 import spock.lang.Specification
 
 class VersionFactoryTest extends Specification {
@@ -102,5 +101,19 @@ class VersionFactoryTest extends Specification {
 
         then:
         version.toString() == '2.0.0'
+    }
+
+    def "should nincrement patch version when there are uncommited changes even when on tag"() {
+        given:
+        ScmPositionContext context = new ScmPositionContext(
+                new ScmPosition('master', 'release-1.0.0', true, true),
+                versionConfig.nextVersion
+        )
+
+        when:
+        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+
+        then:
+        version.toString() == '1.0.1'
     }
 }

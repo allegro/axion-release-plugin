@@ -15,7 +15,7 @@ class HookContext {
     
     final String previousVersion
     
-    final String currentVersion
+    private String currentVersion
     
     final List<String> patternsToCommit = []
     
@@ -28,6 +28,14 @@ class HookContext {
         this.currentVersion = currentVersion.toString()
     }
 
+    String getCurrentVersion() {
+        return currentVersion
+    }
+    
+    void updateVersion(Version currentVersion) {
+       this.currentVersion = currentVersion.toString() 
+    }
+    
     void commit(List patterns, String message) {
         scmService.commit(patterns, message)
     }
@@ -38,5 +46,9 @@ class HookContext {
 
     void addCommitPattern(Collection patterns) {
         patternsToCommit.addAll(patterns)
+    }
+
+    void push() {
+        scmService.push()
     }
 }

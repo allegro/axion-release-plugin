@@ -14,7 +14,7 @@ class ReleaseHooksRunnerTest extends Specification {
     private VersionWithPosition version = new VersionWithPosition(
             new Version.Builder().setNormalVersion('2.0.0-SNAPSHOT').build(),
             new Version.Builder().setNormalVersion('1.0.0').build(),
-            new ScmPosition('master', 'release-1.0.0', false)
+            new ScmPosition('master', 'release-1.0.0', false, false)
     )
     
     private Version releaseVersion = new Version.Builder().setNormalVersion('2.0.0').build()
