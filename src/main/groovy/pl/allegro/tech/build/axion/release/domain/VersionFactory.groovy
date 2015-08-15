@@ -15,8 +15,11 @@ class VersionFactory {
                 version = Version.valueOf(initialVersion(config.tag, context.position))
             } else {
                 version = Version.valueOf(readVersionFromPosition(context, config))
-                boolean repositoryHasChanges = !context.position.onTag || context.position.hasUncommittedChanges
-                if (repositoryHasChanges && !context.nextVersionTag) {
+                
+                boolean hasUncommitedChanges = !options.ignoreUncommittedChanges && context.position.hasUncommittedChanges
+                boolean hasChanges = !context.position.onTag || hasUncommitedChanges
+                
+                if (hasChanges && !context.nextVersionTag) {
                     version = config.versionIncrementer(new VersionIncrementerContext(version, context.position))
                 }
             }

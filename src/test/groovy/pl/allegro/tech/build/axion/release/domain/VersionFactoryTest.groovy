@@ -40,7 +40,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0'))
+        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0', true))
 
         then:
         version.toString() == '2.0.0'
@@ -103,7 +103,21 @@ class VersionFactoryTest extends Specification {
         version.toString() == '2.0.0'
     }
 
-    def "should nincrement patch version when there are uncommited changes even when on tag"() {
+    def "should increment patch version when there are uncommitted changes and not ignoring them, even when on tag"() {
+        given:
+        ScmPositionContext context = new ScmPositionContext(
+                new ScmPosition('master', 'release-1.0.0', true, true),
+                versionConfig.nextVersion
+        )
+
+        when:
+        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, false))
+
+        then:
+        version.toString() == '1.0.1'
+    }
+
+    def "should not increment patch version when there are uncommitted changes but they are ignored (default)"() {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true, true),
@@ -114,6 +128,6 @@ class VersionFactoryTest extends Specification {
         Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
 
         then:
-        version.toString() == '1.0.1'
+        version.toString() == '1.0.0'
     }
 }

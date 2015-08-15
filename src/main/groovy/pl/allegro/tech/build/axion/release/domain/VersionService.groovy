@@ -19,7 +19,7 @@ class VersionService {
     VersionWithPosition currentVersion(VersionConfig versionConfig, VersionReadOptions options) {
         VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options)
 
-        if (!positionedVersion.position.onTag) {
+        if(isSnapshotVersion(positionedVersion, options)) {
             positionedVersion.asSnapshotVersion()
         }
 
@@ -34,10 +34,15 @@ class VersionService {
             version = sanitizer.sanitize(version)
         }
 
-        if (!positionedVersion.position.onTag) {
+        if(isSnapshotVersion(positionedVersion, options)) {
             version = version + '-' + SNAPSHOT
         }
 
         return version
+    }
+    
+    private boolean isSnapshotVersion(VersionWithPosition positionedVersion, VersionReadOptions options) {
+        boolean hasUncommittedChanges = !options.ignoreUncommittedChanges && positionedVersion.position.hasUncommittedChanges
+        return !positionedVersion.position.onTag || hasUncommittedChanges
     }
 }

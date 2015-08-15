@@ -7,12 +7,18 @@ import static org.gradle.testfixtures.ProjectBuilder.builder
 
 class VersionReadOptionsTest extends Specification {
 
+    private Project project
+    
+    private VersionConfig versionConfig
+    
+    def setup() {
+        project = builder().build()
+        versionConfig = new VersionConfig(project)
+    }
+    
     def "should return forceVersion false when project has no 'release.forceVersion' property"() {
-        given:
-        Project project = builder().build()
-
         when:
-        VersionReadOptions options = VersionReadOptions.fromProject(project)
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
 
         then:
         !options.forceVersion
@@ -20,11 +26,10 @@ class VersionReadOptionsTest extends Specification {
 
     def "should return forceVersion false when project has 'release.forceVersion' property with empty value"() {
         given:
-        Project project = builder().build()
         project.extensions.extraProperties.set('release.forceVersion', '')
 
         when:
-        VersionReadOptions options = VersionReadOptions.fromProject(project)
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
 
         then:
         !options.forceVersion
@@ -32,11 +37,10 @@ class VersionReadOptionsTest extends Specification {
 
     def "should return forceVersion true when project has 'release.forceVersion' property with non-empty value"() {
         given:
-        Project project = builder().build()
         project.extensions.extraProperties.set('release.forceVersion', 'version')
 
         when:
-        VersionReadOptions options = VersionReadOptions.fromProject(project)
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
 
         then:
         options.forceVersion
@@ -45,15 +49,37 @@ class VersionReadOptionsTest extends Specification {
 
     def "should return trimmed forcedVersion when project has 'release.forceVersion' property with leading or trailing spaces"() {
         given:
-        Project project = builder().build()
         project.extensions.extraProperties.set('release.forceVersion', ' version ')
 
         when:
-        VersionReadOptions options = VersionReadOptions.fromProject(project)
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
 
         then:
         options.forceVersion
         options.forcedVersion == 'version'
+    }
+    
+    def "should return ignore uncommitted changes flag from version config when no project flag present"() {
+        given:
+        versionConfig.ignoreUncommittedChanges = false
+        
+        when:
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
+        
+        then:
+        !options.ignoreUncommittedChanges
+    }
+
+    def "should return ignore uncommitted changes as true when project flag present"() {
+        given:
+        versionConfig.ignoreUncommittedChanges = false
+        project.extensions.extraProperties.set('release.ignoreUncommittedChanges', true)
+        
+        when:
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
+
+        then:
+        options.ignoreUncommittedChanges
     }
 
 }

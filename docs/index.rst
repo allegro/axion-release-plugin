@@ -24,6 +24,7 @@ Configuration
     configuration/authorization
     configuration/version
     configuration/force_version
+    configuration/uncommitted_changes
     configuration/next_version
     configuration/checks
     configuration/dry_run
