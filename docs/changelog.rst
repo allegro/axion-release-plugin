@@ -4,7 +4,7 @@ Changelog
 * **1.3.1** (16.08.2015)
     * added option to treat uncommitted changes as repository change
     * added ``push`` hook action
-* **1.3.0** (11.17.2015)
+* **1.3.0** (11.07.2015)
     * support for custom version incrementation rules - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
     * ability to push only tags to remote repo - thanks to `erichsend <https://github.com/erichsend>`_ for contribution
 * **1.2.4** (03.05.2015)
