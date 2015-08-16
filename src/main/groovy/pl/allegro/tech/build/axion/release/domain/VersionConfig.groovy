@@ -16,6 +16,8 @@ class VersionConfig {
 
     boolean dryRun
 
+    boolean ignoreUncommittedChanges = true
+    
     RepositoryConfig repository
 
     TagNameSerializationRules tag = new TagNameSerializationRules()
@@ -105,7 +107,7 @@ class VersionConfig {
     String getVersion() {
         if (resolvedVersion == null) {
             ensureVersionServiceExists()
-            resolvedVersion = versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project))
+            resolvedVersion = versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project, this))
         }
         return resolvedVersion
     }
@@ -113,7 +115,7 @@ class VersionConfig {
     VersionWithPosition getRawVersion() {
         if (rawVersion == null) {
             ensureVersionServiceExists()
-            rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project))
+            rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project, this))
         }
         return rawVersion
     }

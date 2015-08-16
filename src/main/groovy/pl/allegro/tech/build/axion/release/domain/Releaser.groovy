@@ -30,7 +30,7 @@ class Releaser {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
-        if (notOnTagAlready(positionedVersion) || VersionReadOptions.fromProject(project).forceVersion) {
+        if (notOnTagAlready(positionedVersion) || VersionReadOptions.fromProject(project, versionConfig).forceVersion) {
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
             if (versionConfig.createReleaseCommit) {

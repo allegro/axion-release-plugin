@@ -19,6 +19,9 @@ All ``axion-release-plugin`` configuration options:
 
         // :doc:`dry_run`
         localOnly = false // never connect to remote
+        
+        // :doc:`uncommitted_changes`
+        ignoreUncommittedChanges = true // should uncommitted changes force version bump
     
         // :ref:`version-sanitization`
         sanitizeVersion = true // should created version be sanitized, true by default

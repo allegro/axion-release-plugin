@@ -36,7 +36,7 @@ class VersionServiceTest extends Specification {
 
         then:
         version.version.toString() == '1.0.0'
-        version.snapshotVersion == false
+        !version.snapshotVersion
     }
 
     def "should return snapshot version with increased patch when not on tag"() {
@@ -52,7 +52,24 @@ class VersionServiceTest extends Specification {
 
         then:
         version.version.toString() == '1.0.1'
-        version.snapshotVersion == true
+        version.snapshotVersion
+    }
+
+    def "should return snapshot version with increased patch when on tag but there are uncommitted changes"() {
+        given:
+        VersionReadOptions readOptions = new VersionReadOptions(null, false)
+        resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf("1.0.1"),
+                Version.valueOf("1.0.1"),
+                new ScmPosition('master', 'release-1.0.0', false)
+        )
+
+        when:
+        VersionWithPosition version = service.currentVersion(versionConfig, readOptions)
+
+        then:
+        version.version.toString() == '1.0.1'
+        version.snapshotVersion
     }
 
     def "should sanitize version if flag is set to true"() {

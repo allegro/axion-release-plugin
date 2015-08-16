@@ -180,7 +180,7 @@ class GitRepository implements ScmRepository {
         walk.dispose()
 
         boolean onTag = (commit == null) ? null : commit.id.name() == headId.name()
-        return new ScmPosition(branch, tagName, onTag)
+        return new ScmPosition(branch, tagName, onTag, checkUncommittedChanges())
     }
 
     private boolean hasCommits() {

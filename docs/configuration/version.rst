@@ -165,7 +165,7 @@ incrementMinorIfNotOnRelease
 This rule uses additional parameter ``releaseBranchPattern`` (by default it's set to 'release/.+')::
 
     scmVersion {
-        versionIncrementingRule 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+        versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
     }
 
 branchSpecific
@@ -174,13 +174,13 @@ branchSpecific
 This rule accepts map of ``branch pattern -> incrementer name`` and uses first incrementer that matches branch pattern::
 
     scmVersion {
-        versionIncrementingRule 'branchSpecific', ['master': 'incrementPatch', 'feature/.*': 'incrementMinor']
+        versionIncrementer 'branchSpecific', ['master': 'incrementPatch', 'feature/.*': 'incrementMinor']
     }
 
 The arguments map will be passed on to called incrementer, so you can add some more parameters at the end of it::
 
     scmVersion {
-        versionIncrementingRule 'branchSpecific', ['master': 'incrementPatch', '.*': 'incrementMinorIfNotOnRelease', releaseBranchPattern: 'release.*']
+        versionIncrementer 'branchSpecific', ['master': 'incrementPatch', '.*': 'incrementMinorIfNotOnRelease', releaseBranchPattern: 'release.*']
     }
 
 .. _version-decorating:

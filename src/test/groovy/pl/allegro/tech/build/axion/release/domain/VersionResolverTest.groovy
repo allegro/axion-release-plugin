@@ -68,7 +68,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.commit(['*'], 'some commit')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, new VersionReadOptions('2.0.0'))
+        VersionWithPosition version = resolver.resolveVersion(config, new VersionReadOptions('2.0.0', true))
 
         then:
         version.previousVersion.toString() == '1.1.0'
