@@ -1,0 +1,50 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath group: 'io.codearte.gradle.nexus', name: 'gradle-nexus-staging-plugin', version: '0.5.3'
+        classpath group: 'com.bmuschko', name: 'gradle-nexus-plugin', version: '2.3.1'
+    }
+}
+
+apply plugin: 'io.codearte.nexus-staging'
+apply plugin: 'com.bmuschko.nexus'
+
+modifyPom {
+    project {
+        name project.name
+        description 'Gradle release and version management plugin'
+        url 'https://github.com/allegro/axion-release-plugin'
+        inceptionYear '2014'
+
+        scm {
+            url 'https://github.com/allegro/axion-release-plugin'
+            connection 'scm:git@github.com:allegro/axion-release-plugin.git'
+            developerConnection 'scm:git@github.com:allegro/axion-release-plugin.git'
+        }
+
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+        }
+
+        developers {
+            developer {
+                id 'adamdubiel'
+                name 'Adam Dubiel'
+            }
+        }
+    }
+}
+
+
+nexusStaging {
+    packageGroup = "pl.allegro"
+
+    numberOfRetries = 15
+    delayBetweenRetriesInMillis = 5000
+}
