@@ -22,7 +22,7 @@ Most common scenario is to update version in README::
 
     scmVersion {
         hooks {
-            pre 'fileUpdate', [file: 'README.md', pattern: {v, p -> /version: $v/}, replacement: {v, p -> "version: $v"}]
+            pre 'fileUpdate', [file: 'README.md', pattern: {v, c -> /version: $v/}, replacement: {v, c -> "version: $v"}]
         }
     }
 
@@ -30,8 +30,8 @@ Syntax of action is simple: first comes name, then map of arguments. Supported a
 
 * file - path to file in form of string or ``File`` instance to update
 * files - array of files, takes precedence over single file definition if not empty
-* pattern - closure that should return String pattern, arguments are **previous version** and current position in SCM
-* replacement - closure that should return replacement, arguments are **current version** and current position in SCM
+* pattern - closure that should return String pattern, arguments are **previous version** and context (described below)
+* replacement - closure that should return replacement, arguments are **current version** and context
 
 All patterns have multiline flag switched on by default to match against content of whole file. SCM position object
 has been described in :doc:`version`.
@@ -91,5 +91,6 @@ Of course nothing can stop you from implementing own action. It can be any closu
 * *position* - SCM position object described in :doc:`version`
 * *previousVersion* - version before release
 * *currentVersion* - released version
+* *readVersion()* - force reevaluation of version, returns fresh version as if called ``./gradlew currentVersion`` command
 * *commit(List patterns, String message)* - force commit of given patterns with message
 * *addCommitPattern(String pattern)* - add pattern to commit, you can commit everything at once by adding commit hook to the chain

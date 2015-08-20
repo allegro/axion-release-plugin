@@ -9,6 +9,7 @@ buildscript {
 
 plugins {
     id 'groovy'
+    id 'maven'
     id 'jacoco'
     id 'pl.allegro.tech.build.axion-release' version '1.2.3'
     id 'com.github.kt3k.coveralls' version '2.3.1'

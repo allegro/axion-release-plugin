@@ -7,13 +7,10 @@ class NextVersionMarker {
 
     private final ScmService repository
 
-    private final LocalOnlyResolver localOnlyResolver
-
     private final Logger logger
 
-    NextVersionMarker(ScmService repository, LocalOnlyResolver localOnlyResolver, Logger logger) {
+    NextVersionMarker(ScmService repository, Logger logger) {
         this.repository = repository
-        this.localOnlyResolver = localOnlyResolver
         this.logger = logger
     }
 
@@ -23,12 +20,6 @@ class NextVersionMarker {
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
         repository.tag(nextVersionTag)
-
-        if(!localOnlyResolver.localOnly(repository.remoteAttached())) {
-            repository.push()
-        }
-        else {
-            logger.quiet("Changes made to local repository only")
-        }
+        repository.push()
     }
 }

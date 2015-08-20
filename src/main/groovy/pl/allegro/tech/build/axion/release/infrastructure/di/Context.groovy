@@ -49,7 +49,7 @@ class Context {
     }
 
     ScmService scmService() {
-        return new GradleAwareScmService(project, config().repository, repository())
+        return new GradleAwareScmService(project, config().repository, localOnlyResolver(), repository())
     }
     
     VersionFactory versionFactory() {
@@ -71,8 +71,7 @@ class Context {
     Releaser releaser() {
         return new Releaser(
                 scmService(),
-                new ReleaseHooksRunner(project.logger, scmService(), config().hooks),
-                localOnlyResolver(),
+                new ReleaseHooksRunner(project.logger, config(), scmService(), config().hooks),
                 project
         )
     }

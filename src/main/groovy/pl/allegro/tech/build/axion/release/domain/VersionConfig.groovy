@@ -106,12 +106,16 @@ class VersionConfig {
 
     String getVersion() {
         if (resolvedVersion == null) {
-            ensureVersionServiceExists()
-            resolvedVersion = versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project, this))
+            resolvedVersion = getUncachedVersion()
         }
         return resolvedVersion
     }
 
+    String getUncachedVersion() {
+        ensureVersionServiceExists()
+        return versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project, this))
+    }
+    
     VersionWithPosition getRawVersion() {
         if (rawVersion == null) {
             ensureVersionServiceExists()

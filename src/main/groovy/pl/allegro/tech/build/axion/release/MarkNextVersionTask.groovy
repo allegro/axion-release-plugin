@@ -20,10 +20,9 @@ class MarkNextVersionTask extends DefaultTask {
 
         NextVersionMarker marker = new NextVersionMarker(
                 context.scmService(),
-                context.localOnlyResolver(),
                 logger
         )
-        marker.markNextVersion(context.config(), project.property(NEXT_VERSION_PROPERTY))
+        marker.markNextVersion(context.config(), (String) project.property(NEXT_VERSION_PROPERTY))
     }
 
 }

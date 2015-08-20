@@ -22,6 +22,10 @@ class HooksConfig {
         preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(customAction))
     }
 
+    void post(String type) {
+        postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create())
+    }
+    
     void post(Closure c) {
         postReleaseHooks.add(PredefinedReleaseHookAction.DEFAULT.factory.create(c))
     }
