@@ -12,7 +12,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         repository = context.repository()
         versionService = context.versionService()
 
-        nextVersionMarker = new NextVersionMarker(context.scmService(), context.localOnlyResolver(), project.logger)
+        nextVersionMarker = new NextVersionMarker(context.scmService(), project.logger)
     }
     
     def "should create next version tag with given version"() {

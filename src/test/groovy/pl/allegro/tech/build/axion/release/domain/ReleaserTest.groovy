@@ -11,9 +11,7 @@ class ReleaserTest extends RepositoryBasedTest {
     def setup() {
         ScmService scmService = context.scmService()
         
-        releaser = new Releaser(scmService, new ReleaseHooksRunner(project.logger, scmService, config.hooks),
-                context.localOnlyResolver(),
-                project)
+        releaser = new Releaser(scmService, new ReleaseHooksRunner(project.logger, config, scmService, config.hooks), project)
     }
 
     def "should release new version when not on tag"() {

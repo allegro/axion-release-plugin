@@ -12,16 +12,13 @@ class Releaser {
 
     private final ReleaseHooksRunner hooksRunner
 
-    private final LocalOnlyResolver localOnlyResolver
-
     private final Logger logger
 
     private Project project
 
-    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, LocalOnlyResolver localOnlyResolver, Project project) {
+    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, Project project) {
         this.repository = repository
         this.hooksRunner = hooksRunner
-        this.localOnlyResolver = localOnlyResolver
         this.project = project
         this.logger = project.logger
     }
@@ -50,12 +47,7 @@ class Releaser {
     }
 
     void pushRelease() {
-        if (!localOnlyResolver.localOnly(repository.remoteAttached())) {
-            repository.push()
-        } else {
-            logger.quiet("Changes made to local repository only")
-        }
-
+        repository.push()
     }
 
     private boolean notOnTagAlready(VersionWithPosition positionedVersion) {

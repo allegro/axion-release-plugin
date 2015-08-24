@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* **1.3.2** (24.08.2015)
+    * added possibility to read uncached, current version in hooks
 * **1.3.1** (16.08.2015)
     * added option to treat uncommitted changes as repository change
     * added ``push`` hook action
