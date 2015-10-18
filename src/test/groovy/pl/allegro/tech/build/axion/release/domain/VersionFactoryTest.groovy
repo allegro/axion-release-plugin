@@ -40,7 +40,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0', true))
+        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0', true, false))
 
         then:
         version.toString() == '2.0.0'
@@ -111,7 +111,7 @@ class VersionFactoryTest extends Specification {
         )
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, false))
+        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, false, false))
 
         then:
         version.toString() == '1.0.1'
@@ -129,5 +129,19 @@ class VersionFactoryTest extends Specification {
 
         then:
         version.toString() == '1.0.0'
+    }
+
+    def "should increment version when has release.forceSnapshot"() {
+        given:
+        ScmPositionContext context = new ScmPositionContext(
+                new ScmPosition('master', 'release-1.0.0', true),
+                versionConfig.nextVersion
+        )
+
+        when:
+        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, true, true))
+
+        then:
+        version.toString() == '1.0.1'
     }
 }
