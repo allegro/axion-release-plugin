@@ -209,6 +209,8 @@ You can also set decorators per branches that match specific regular expression:
 Per-branch version creators must be closures, there is no support for predefined creators. First match wins, but the order
 depends on collection type used (default for ``[:]`` is LinkedHashMap).
 
+.. _versionWithBranch:
+
 versionWithBranch
 ^^^^^^^^^^^^^^^^^
 
