@@ -25,6 +25,8 @@ Disabling checks is necessary because ``axion-release`` is not able to verify if
 Setting pushTagsOnly ensures that git will not throw an error by attempting to push commits while not working
 on a branch.
 
+To use the :ref:`versionWithBranch` version creator from Jenkins, you need to override the default behavior of the Jenkins git plugin to avoid the 'detached-head' state.  In the Git section of the job configuration page, add the 'Additional Behaviour' called 'Check out to specific local branch' and enter your branch name.
+
 Bamboo
 ------
 
