@@ -28,7 +28,7 @@ class ScmInitializationOptions {
                 remote,
                 project.hasProperty(FETCH_TAGS_PROPERTY),
                 project.hasProperty(ATTACH_REMOTE_PROPERTY),
-                (String) project.hasProperty(ATTACH_REMOTE_PROPERTY) ? project.property(ATTACH_REMOTE_PROPERTY) : null
+                (String) (project.hasProperty(ATTACH_REMOTE_PROPERTY) ? project.property(ATTACH_REMOTE_PROPERTY) : null)
         )
     }
 
