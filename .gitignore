@@ -25,3 +25,5 @@ sonar-project.properties
 # sphinx
 _build
 
+# Vim
+*.swp
