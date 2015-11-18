@@ -23,7 +23,7 @@ class VersionServiceTest extends Specification {
         service = new VersionService(resolver)
     }
 
-    def "should return resolver version when on tag"() {
+    def "should return stable version when on tag"() {
         given:
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
                 Version.valueOf('1.0.0'),
@@ -37,6 +37,23 @@ class VersionServiceTest extends Specification {
         then:
         version.version.toString() == '1.0.0'
         !version.snapshotVersion
+    }
+
+    def "should return snapshot version with increased patch when has release.forceSnapshot"() {
+        given:
+        VersionReadOptions readOptions = new VersionReadOptions(null, true, true)
+        resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
+                Version.valueOf('1.0.1'),
+                Version.valueOf('1.0.1'),
+                new ScmPosition('master', 'release-1.0.0', true)
+        )
+
+        when:
+        VersionWithPosition version = service.currentVersion(versionConfig, readOptions)
+
+        then:
+        version.version.toString() == '1.0.1'
+        version.snapshotVersion
     }
 
     def "should return snapshot version with increased patch when not on tag"() {
@@ -57,7 +74,7 @@ class VersionServiceTest extends Specification {
 
     def "should return snapshot version with increased patch when on tag but there are uncommitted changes"() {
         given:
-        VersionReadOptions readOptions = new VersionReadOptions(null, false)
+        VersionReadOptions readOptions = new VersionReadOptions(null, false, false)
         resolver.resolveVersion(versionConfig, readOptions) >> new VersionWithPosition(
                 Version.valueOf("1.0.1"),
                 Version.valueOf("1.0.1"),

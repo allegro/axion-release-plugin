@@ -17,7 +17,7 @@ class VersionFactory {
                 version = Version.valueOf(readVersionFromPosition(context, config))
                 
                 boolean hasUncommitedChanges = !options.ignoreUncommittedChanges && context.position.hasUncommittedChanges
-                boolean hasChanges = !context.position.onTag || hasUncommitedChanges
+                boolean hasChanges = !context.position.onTag || hasUncommitedChanges || options.forceSnapshot
                 
                 if (hasChanges && !context.nextVersionTag) {
                     version = config.versionIncrementer(new VersionIncrementerContext(version, context.position))

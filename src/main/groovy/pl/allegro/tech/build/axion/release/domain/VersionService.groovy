@@ -43,6 +43,6 @@ class VersionService {
     
     private boolean isSnapshotVersion(VersionWithPosition positionedVersion, VersionReadOptions options) {
         boolean hasUncommittedChanges = !options.ignoreUncommittedChanges && positionedVersion.position.hasUncommittedChanges
-        return !positionedVersion.position.onTag || hasUncommittedChanges
+        return !positionedVersion.position.onTag || hasUncommittedChanges || options.forceSnapshot
     }
 }
