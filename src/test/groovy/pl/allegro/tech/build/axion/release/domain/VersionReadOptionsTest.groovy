@@ -16,7 +16,7 @@ class VersionReadOptionsTest extends Specification {
         versionConfig = new VersionConfig(project)
     }
     
-    def "should return forceVersion false when project has no 'release.forceVersion' property"() {
+    def "should return forceVersion false when project has no 'release.version' property"() {
         when:
         VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
 
@@ -24,9 +24,9 @@ class VersionReadOptionsTest extends Specification {
         !options.forceVersion
     }
 
-    def "should return forceVersion false when project has 'release.forceVersion' property with empty value"() {
+    def "should return forceVersion false when project has 'release.version' property with empty value"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', '')
+        project.extensions.extraProperties.set('release.version', '')
 
         when:
         VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
@@ -35,9 +35,9 @@ class VersionReadOptionsTest extends Specification {
         !options.forceVersion
     }
 
-    def "should return forceVersion true when project has 'release.forceVersion' property with non-empty value"() {
+    def "should return forceVersion true when project has 'release.version' property with non-empty value"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', 'version')
+        project.extensions.extraProperties.set('release.version', 'version')
 
         when:
         VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
@@ -47,9 +47,21 @@ class VersionReadOptionsTest extends Specification {
         options.forcedVersion == 'version'
     }
 
-    def "should return trimmed forcedVersion when project has 'release.forceVersion' property with leading or trailing spaces"() {
+    def "should return trimmed forcedVersion when project has 'release.Version' property with leading or trailing spaces"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', ' version ')
+        project.extensions.extraProperties.set('release.version', ' version ')
+
+        when:
+        VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
+
+        then:
+        options.forceVersion
+        options.forcedVersion == 'version'
+    }
+
+    def "should return forceVersion true when project has deprecated 'release.forceVersion' property with non-empty value"() {
+        given:
+        project.extensions.extraProperties.set('release.forceVersion', 'version')
 
         when:
         VersionReadOptions options = VersionReadOptions.fromProject(project, versionConfig)
