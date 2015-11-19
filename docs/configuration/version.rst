@@ -147,16 +147,15 @@ If rule accepts parameters, they can be passed via configuration map::
         versionIncrementer 'branchSpecific', [:]
     }
 
-Alternatively you can specify a custom rule by setting a closure that would accept a context object containing version,
-position and configuration and return a version object::
+Alternatively you can specify a custom rule by setting a closure that would accept a context object and return a ``Version`` object::
 
     scmVersion {
-        versionIncrementer { context, config -> ... }
+        versionIncrementer { context -> ... }
     }
 
 The context object passed to closure contains the following:
 
-* *currentVersion* - current Version object that should be used to calculate next version
+* *currentVersion* - current ``Version`` object that should be used to calculate next version (`Version API <https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java>`_)
 * *position* - widely used position object, for more see :doc:`scm-position`
 
 incrementMinorIfNotOnRelease

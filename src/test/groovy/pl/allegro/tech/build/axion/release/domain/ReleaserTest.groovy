@@ -16,7 +16,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should release new version when not on tag"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', '2.0.0')
+        project.extensions.extraProperties.set('release.version', '2.0.0')
 
         when:
         releaser.release(config)
@@ -38,7 +38,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should release with forced pre-released versions"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', '3.0.0-rc4')
+        project.extensions.extraProperties.set('release.version', '3.0.0-rc4')
         config.createReleaseCommit = false
 
         when:
@@ -73,7 +73,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should create release commit if configured"() {
         given:
-        project.extensions.extraProperties.set('release.forceVersion', '3.0.0')
+        project.extensions.extraProperties.set('release.version', '3.0.0')
         config.createReleaseCommit = true
 
         when:
@@ -87,7 +87,7 @@ class ReleaserTest extends RepositoryBasedTest {
     def "should create release commit when on tag but forced"() {
         given:
         repository.tag('release-3.1.0')
-        project.extensions.extraProperties.set('release.forceVersion', '3.2.0')
+        project.extensions.extraProperties.set('release.version', '3.2.0')
         config.createReleaseCommit = true
 
         when:
