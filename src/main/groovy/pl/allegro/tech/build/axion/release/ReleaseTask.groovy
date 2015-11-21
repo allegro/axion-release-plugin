@@ -12,7 +12,7 @@ class ReleaseTask extends DefaultTask {
         Context context = new Context(project)
         Releaser releaser = context.releaser()
         
-        releaser.release(context.config())
+        releaser.release(context.config(), context.tagNameSerializationRules())
         releaser.pushRelease()
     }
 }

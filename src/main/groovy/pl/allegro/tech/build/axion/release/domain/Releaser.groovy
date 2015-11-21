@@ -23,12 +23,12 @@ class Releaser {
         this.logger = project.logger
     }
 
-    void release(VersionConfig versionConfig) {
+    void release(VersionConfig versionConfig, TagNameSerializationRules tagConfig) {
         VersionWithPosition positionedVersion = versionConfig.getRawVersion()
         Version version = positionedVersion.version
 
         if (notOnTagAlready(positionedVersion) || VersionReadOptions.fromProject(project, versionConfig).forceVersion) {
-            String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
+            String tagName = versionConfig.tag.serialize(tagConfig, version.toString())
 
             if (versionConfig.createReleaseCommit) {
                 logger.quiet("Creating release commit")

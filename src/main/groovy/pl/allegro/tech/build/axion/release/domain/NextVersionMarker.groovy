@@ -14,8 +14,8 @@ class NextVersionMarker {
         this.logger = logger
     }
 
-    void markNextVersion(VersionConfig versionConfig, String nextVersion) {
-        String tagName = versionConfig.tag.serialize(versionConfig.tag, nextVersion)
+    void markNextVersion(VersionConfig versionConfig, TagNameSerializationRules tagConfig, String nextVersion) {
+        String tagName = versionConfig.tag.serialize(tagConfig, nextVersion)
         String nextVersionTag = versionConfig.nextVersion.serializer(versionConfig.nextVersion, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")

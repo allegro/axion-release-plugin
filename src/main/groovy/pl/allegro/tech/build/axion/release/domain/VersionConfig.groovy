@@ -17,10 +17,10 @@ class VersionConfig {
     boolean dryRun
 
     boolean ignoreUncommittedChanges = true
-    
+
     RepositoryConfig repository
 
-    TagNameSerializationRules tag = new TagNameSerializationRules()
+    TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
     Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
 
@@ -41,8 +41,8 @@ class VersionConfig {
     NextVersionConfig nextVersion = new NextVersionConfig()
 
     HooksConfig hooks = new HooksConfig()
-    
-    VersionService versionService
+
+    private Context context
 
     private String resolvedVersion = null
 
@@ -112,21 +112,30 @@ class VersionConfig {
     }
 
     String getUncachedVersion() {
-        ensureVersionServiceExists()
-        return versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project, this))
+        ensureContextExists()
+        return context.versionService().currentDecoratedVersion(this,
+                VersionReadOptions.fromProject(project, this),
+                context.tagNameSerializationRules())
     }
-    
+
     VersionWithPosition getRawVersion() {
         if (rawVersion == null) {
-            ensureVersionServiceExists()
-            rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project, this))
+            ensureContextExists()
+            rawVersion = context.versionService().currentVersion(this,
+                    VersionReadOptions.fromProject(project, this),
+                    context.tagNameSerializationRules())
         }
         return rawVersion
     }
 
-    private void ensureVersionServiceExists() {
-        if (versionService == null) {
-            this.versionService = new Context(project).versionService()
+    VersionService getVersionService() {
+        ensureContextExists()
+        return context.versionService()
+    }
+
+    private void ensureContextExists() {
+        if (context == null) {
+            this.context = new Context(project)
         }
     }
 }

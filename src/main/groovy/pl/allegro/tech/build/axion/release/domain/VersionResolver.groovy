@@ -15,11 +15,13 @@ class VersionResolver {
         this.versionFactory = versionFactory
     }
     
-    VersionWithPosition resolveVersion(VersionConfig versionConfig, VersionReadOptions readOptions) {
-        Map positions = readPositions(versionConfig)
+    VersionWithPosition resolveVersion(VersionConfig versionConfig,
+                                       VersionReadOptions readOptions,
+                                       TagNameSerializationRules tagConfig) {
+        Map positions = readPositions(versionConfig, tagConfig)
 
-        Version currentVersion = versionFactory.create(positions.currentPosition, versionConfig, readOptions)        
-        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, VersionReadOptions.defaultOptions())
+        Version currentVersion = versionFactory.create(positions.currentPosition, versionConfig, readOptions, tagConfig)
+        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, VersionReadOptions.defaultOptions(), tagConfig)
 
         ScmPosition position = positions.currentPosition.position
         if(positions.currentPosition.nextVersionTag) {
@@ -30,13 +32,13 @@ class VersionResolver {
     }
 
 
-    private Map readPositions(VersionConfig config) {
-        ScmPosition currentPosition = repository.currentPosition(~/^${config.tag.prefix}.*(|${config.nextVersion.suffix})$/)
+    private Map readPositions(VersionConfig config, TagNameSerializationRules tagConfig) {
+        ScmPosition currentPosition = repository.currentPosition(~/^${tagConfig.prefix}.*(|${config.nextVersion.suffix})$/)
         ScmPositionContext currentPositionContext = new ScmPositionContext(currentPosition, config.nextVersion)
 
         ScmPosition lastReleasePosition
         if(currentPositionContext.nextVersionTag) {
-            lastReleasePosition = repository.currentPosition(~/^${config.tag.prefix}.*/, ~/.*${config.nextVersion.suffix}$/).asOnTagPosition()
+            lastReleasePosition = repository.currentPosition(~/^${tagConfig.prefix}.*/, ~/.*${config.nextVersion.suffix}$/).asOnTagPosition()
         }
         else {
             lastReleasePosition = currentPosition.asOnTagPosition()

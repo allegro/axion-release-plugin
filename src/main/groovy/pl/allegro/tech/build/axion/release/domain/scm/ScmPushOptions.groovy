@@ -19,8 +19,8 @@ class ScmPushOptions {
     static ScmPushOptions fromProject(Project project, RepositoryConfig config) {
         return new ScmPushOptions(
                 config.remote,
-                project.hasProperty(RELEASE_PUSH_TAGS_ONLY_PROPERTY) ? true : config.pushTagsOnly
-        );
+                (boolean) project.hasProperty(RELEASE_PUSH_TAGS_ONLY_PROPERTY) ? true : config.pushTagsOnly
+        )
     }
     
 }

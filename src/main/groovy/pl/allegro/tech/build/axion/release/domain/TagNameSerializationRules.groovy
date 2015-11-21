@@ -1,26 +1,25 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import java.util.regex.Pattern
 
 class TagNameSerializationRules {
 
-    static final String DEFAULT_VERSION_SEPARATOR = '-'
+    final String prefix
 
-    static final String DEFAULT_PREFIX = 'release'
+    final String versionSeparator
 
-    String prefix = DEFAULT_PREFIX
+    TagNameSerializationRules(String prefix, String versionSeparator) {
+        this.prefix = prefix
+        this.versionSeparator = versionSeparator
+    }
 
-    String versionSeparator = DEFAULT_VERSION_SEPARATOR
-
-    Closure serialize = TagNameSerializer.DEFAULT.serializer
-
-    Closure deserialize = TagNameSerializer.DEFAULT.deserializer
-
-    Closure initialVersion = defaultInitialVersion()
-
-    private static Closure defaultInitialVersion() {
-        return { TagNameSerializationRules rules, ScmPosition position ->
-            return '0.1.0'
+    static TagNameSerializationRules calculate(TagNameSerializationConfig config, String currentBranch) {
+         String prefix = config.branchPrefix.findResult { pattern, prefix ->
+            Pattern.compile(pattern).matcher(currentBranch).matches() ? prefix : null
         }
+
+        prefix = prefix ?: config.prefix
+
+        return new TagNameSerializationRules(prefix, config.versionSeparator)
     }
 }

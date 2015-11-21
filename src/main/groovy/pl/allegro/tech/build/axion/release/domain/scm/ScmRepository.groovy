@@ -14,6 +14,8 @@ interface ScmRepository {
 
     void attachRemote(String remoteName, String url)
 
+    String currentBranch()
+
     ScmPosition currentPosition(Pattern tagPattern)
     
     ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern)

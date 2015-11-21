@@ -16,8 +16,8 @@ class VersionService {
         this.sanitizer = new VersionSanitizer()
     }
 
-    VersionWithPosition currentVersion(VersionConfig versionConfig, VersionReadOptions options) {
-        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options)
+    VersionWithPosition currentVersion(VersionConfig versionConfig, VersionReadOptions options, TagNameSerializationRules tagConfig) {
+        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options, tagConfig)
 
         if(isSnapshotVersion(positionedVersion, options)) {
             positionedVersion.asSnapshotVersion()
@@ -26,8 +26,8 @@ class VersionService {
         return positionedVersion
     }
 
-    String currentDecoratedVersion(VersionConfig versionConfig, VersionReadOptions options) {
-        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options)
+    String currentDecoratedVersion(VersionConfig versionConfig, VersionReadOptions options, TagNameSerializationRules tagConfig) {
+        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options, tagConfig)
         String version = versionDecorator.createVersion(versionConfig, positionedVersion)
 
         if (versionConfig.sanitizeVersion) {

@@ -7,7 +7,7 @@ class TagNameSerializerTest extends Specification {
 
     def "default serializer should return concatenated prefix, version separator and version by default"() {
         given:
-        TagNameSerializationRules rules = new TagNameSerializationRules()
+        TagNameSerializationConfig rules = new TagNameSerializationConfig()
         rules.prefix = 'release'
         rules.versionSeparator = '-'
 
@@ -17,7 +17,7 @@ class TagNameSerializerTest extends Specification {
 
     def "default deserializer should read version by stripping off prefix and version separator"() {
         given:
-        TagNameSerializationRules rules = new TagNameSerializationRules()
+        TagNameSerializationConfig rules = new TagNameSerializationConfig()
         rules.prefix = 'release'
         rules.versionSeparator = '-'
 
@@ -27,7 +27,7 @@ class TagNameSerializerTest extends Specification {
 
     def "default serializer should use empty version separator when prefix is empty"() {
         given:
-        TagNameSerializationRules rules = new TagNameSerializationRules()
+        TagNameSerializationConfig rules = new TagNameSerializationConfig()
         rules.prefix = ''
         rules.versionSeparator = '-'
 
@@ -37,7 +37,7 @@ class TagNameSerializerTest extends Specification {
 
     def "default deserializer should use empty version separator when prefix is empty"() {
         given:
-        TagNameSerializationRules rules = new TagNameSerializationRules()
+        TagNameSerializationConfig rules = new TagNameSerializationConfig()
         rules.prefix = ''
         rules.versionSeparator = '-'
 

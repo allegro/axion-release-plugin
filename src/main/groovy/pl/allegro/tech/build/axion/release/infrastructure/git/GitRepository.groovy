@@ -145,6 +145,10 @@ class GitRepository implements ScmRepository {
         repository.commit(message: message)
     }
 
+    String currentBranch() {
+        return repository.branch.current.name
+    }
+
     @Override
     ScmPosition currentPosition(Pattern pattern) {
         return currentPosition(pattern, Pattern.compile('$a^'))

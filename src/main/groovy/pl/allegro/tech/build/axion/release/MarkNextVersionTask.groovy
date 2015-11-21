@@ -18,7 +18,7 @@ class MarkNextVersionTask extends DefaultTask {
                 logger
         )
 
-        marker.markNextVersion(context.config(), nextVersionOptions.nextVersion)
+        marker.markNextVersion(context.config(), context.tagNameSerializationRules(), nextVersionOptions.nextVersion)
     }
 
 }

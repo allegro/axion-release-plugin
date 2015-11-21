@@ -6,6 +6,7 @@ import org.gradle.logging.StyledTextOutputFactory
 import pl.allegro.tech.build.axion.release.domain.ChecksResolver
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.Releaser
+import pl.allegro.tech.build.axion.release.domain.TagNameSerializationRules
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionFactory
 import pl.allegro.tech.build.axion.release.domain.VersionResolver
@@ -42,6 +43,10 @@ class Context {
     
     VersionConfig config() {
         return project.extensions.getByType(VersionConfig)
+    }
+
+    TagNameSerializationRules tagNameSerializationRules() {
+        return TagNameSerializationRules.calculate(config().tag, repository().currentBranch())
     }
 
     ScmRepository repository() {
