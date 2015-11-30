@@ -131,6 +131,7 @@ Incrementing phase does incrementing the version in accordance with *version inc
 
 * *incrementPatch* - increment patch number
 * *incrementMinor* - increment minor (middle) number
+* *incrementMajor* - increment major number
 * *incrementMinorIfNotOnRelease* - increment patch number if on release branch. Increment minor otherwise
 * *incrementPrerelease* - increment pre-release suffix if possible (-rc1 to -rc2). Increment patch otherwise
 * *branchSpecific* - call other incrementer based on branch name
