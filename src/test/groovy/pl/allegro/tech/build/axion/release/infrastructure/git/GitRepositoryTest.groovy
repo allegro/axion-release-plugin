@@ -44,7 +44,7 @@ class GitRepositoryTest extends Specification {
         Project gitlessProject = ProjectBuilder.builder().build()
 
         when:
-        new GitRepository(gitlessProject.file('./'), identity, initializationOptions, project.logger)
+        new GitRepository(gitlessProject.file('./'), identity, initializationOptions)
 
         then:
         thrown(ScmRepositoryUnavailableException)

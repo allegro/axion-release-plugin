@@ -10,24 +10,29 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableEx
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 class ScmRepositoryFactory {
 
     private static final String GIT = 'git'
 
-    ScmRepository create(Project project, RepositoryConfig config) {
+    private final Logger logger = LoggerFactory.getLogger(ScmRepositoryFactory.getClass())
+
+    ScmRepository create(Map<String, ?> properties, RepositoryConfig config) {
         if(config.type != GIT) {
             throw new IllegalArgumentException("Unsupported repository type $config.type")
         }
 
         ScmRepository repository
         try {
-            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(project, config.remote)
+            ScmInitializationOptions initializationOptions = ScmInitializationOptions.fromProject(properties, config.remote)
             ScmIdentity identity = ScmIdentityResolver.resolve(config)
-            repository = new GitRepository(config.directory, identity, initializationOptions, project.logger)
+            repository = new GitRepository(config.directory, identity, initializationOptions)
         }
         catch(ScmRepositoryUnavailableException exception) {
-            project.logger.warn('Failed top open repository, trying to work without it', exception)
-            repository = new DummyRepository(project.logger)
+            logger.warn('Failed top open repository, trying to work without it', exception)
+            repository = new DummyRepository()
         }
 
         return repository
