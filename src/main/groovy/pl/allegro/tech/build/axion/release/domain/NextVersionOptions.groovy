@@ -1,9 +1,12 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
-import org.gradle.api.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class NextVersionOptions {
+
+    private final static Logger logger = LoggerFactory.getLogger(NextVersionOptions)
 
     private static final String NEXT_VERSION_PROPERTY = "release.version"
 
@@ -16,7 +19,7 @@ class NextVersionOptions {
         this.nextVersion = nextVersion
     }
 
-    static NextVersionOptions fromProject(Project project, Logger logger) {
+    static NextVersionOptions fromProject(Project project) {
         String nextVersion = project.hasProperty(NEXT_VERSION_PROPERTY) ? project.property(NEXT_VERSION_PROPERTY) : null
         if(nextVersion == null && project.hasProperty(DEPRECATED_NEXT_VERSION_PROPERTY)) {
             logger.warn("Using deprecated parameter: $DEPRECATED_NEXT_VERSION_PROPERTY! Use $NEXT_VERSION_PROPERTY instead.")

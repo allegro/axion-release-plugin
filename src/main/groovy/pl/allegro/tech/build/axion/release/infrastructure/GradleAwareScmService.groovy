@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.Project
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentityResolver
@@ -9,6 +11,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class GradleAwareScmService implements ScmService {
+
+    private final Logger logger = LoggerFactory.getLogger(GradleAwareScmService)
 
     private final LocalOnlyResolver localOnlyResolver
 
@@ -33,13 +37,13 @@ class GradleAwareScmService implements ScmService {
     @Override
     void push() {
         if (!localOnlyResolver.localOnly(this.remoteAttached())) {
-            project.logger.quiet("Pushing all to remote: ${config.remote}")
+            logger.trace("Pushing all to remote: ${config.remote}")
             repository.push(
                     ScmIdentityResolver.resolve(config),
                     ScmPushOptions.fromProject(project, config)
             )
         } else {
-            project.logger.quiet("Changes made to local repository only")
+            logger.trace("Changes made to local repository only")
         }
     }
 

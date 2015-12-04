@@ -9,7 +9,7 @@ class ReleaseHooksRunnerTest extends Specification {
     
     private HooksConfig config = new HooksConfig()
     
-    private ReleaseHooksRunner runner = new ReleaseHooksRunner(null, null, null, config)
+    private ReleaseHooksRunner runner = new ReleaseHooksRunner(null, null, config)
     
     private VersionWithPosition version = new VersionWithPosition(
             new Version.Builder().setNormalVersion('2.0.0-SNAPSHOT').build(),

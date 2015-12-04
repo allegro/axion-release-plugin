@@ -66,7 +66,7 @@ class GitProjectBuilder {
     Map build() {
         Map map = [:]
         map[Grgit] = rawRepository
-        map[GitRepository] = new GitRepository(repositoryDir, identity, initializationOptions, project.logger)
+        map[GitRepository] = new GitRepository(repositoryDir, identity, initializationOptions)
         
         return map
     }

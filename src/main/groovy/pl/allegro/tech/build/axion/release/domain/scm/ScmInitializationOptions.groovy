@@ -23,12 +23,25 @@ class ScmInitializationOptions {
         this.remoteUrl = remoteUrl
     }
 
+    static Map<String, ?> extractParameters(Project project) {
+        return [ATTACH_REMOTE_PROPERTY : extractOptionalParameter(project, ATTACH_REMOTE_PROPERTY),
+                FETCH_TAGS_PROPERTY : extractOptionalParameter(project, FETCH_TAGS_PROPERTY)]
+    }
+
+    private static def extractOptionalParameter(Project project, String paramName) {
+        return (String) (project.hasProperty(paramName) ? project.property(paramName) : null)
+    }
+
     static ScmInitializationOptions fromProject(Project project, String remote) {
+        return fromProject(extractParameters(project), remote)
+    }
+
+    static ScmInitializationOptions fromProject(Map<String, ?> properties, String remote) {
         return new ScmInitializationOptions(
                 remote,
-                project.hasProperty(FETCH_TAGS_PROPERTY),
-                project.hasProperty(ATTACH_REMOTE_PROPERTY),
-                (String) (project.hasProperty(ATTACH_REMOTE_PROPERTY) ? project.property(ATTACH_REMOTE_PROPERTY) : null)
+                properties.containsKey(FETCH_TAGS_PROPERTY),
+                properties.containsKey(ATTACH_REMOTE_PROPERTY),
+                (String) (properties.containsKey(ATTACH_REMOTE_PROPERTY) ? properties.get(ATTACH_REMOTE_PROPERTY) : null)
         )
     }
 

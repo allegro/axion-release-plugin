@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
-import org.gradle.api.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -10,12 +11,8 @@ import java.util.regex.Pattern
 
 class DummyRepository implements ScmRepository {
 
-    private final Logger logger
+    private final Logger logger = LoggerFactory.getLogger(DummyRepository)
 
-    DummyRepository(Logger logger) {
-        this.logger = logger
-    }
-    
     private void log(String commandName) {
         logger.quiet("Couldn't perform $commandName command on uninitialized repository")
     }

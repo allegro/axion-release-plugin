@@ -18,6 +18,7 @@ plugins {
 }
 
 apply plugin: 'com.gradle.plugin-publish'
+apply plugin: 'maven-publish'
 
 if(project.hasProperty('mavenCentral')) {
     apply from: 'gradle/mavenCentral.gradle'
@@ -101,5 +102,22 @@ pluginBundle {
     mavenCoordinates {
         groupId = 'pl.allegro.tech.build'
         artifactId = 'axion-release-plugin'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            // change to point to your repo, e.g. http://my.org/repo
+            url "/Users/marcin.cylke/.m2/repo"
+        }
     }
 }

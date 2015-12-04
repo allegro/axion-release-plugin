@@ -18,7 +18,7 @@ class NextVersionOptionsTest extends Specification {
         project.extensions.extraProperties.set('release.version', '1.0.0')
 
         when:
-        NextVersionOptions options = NextVersionOptions.fromProject(project, project.logger)
+        NextVersionOptions options = NextVersionOptions.fromProject(project)
 
         then:
         options.nextVersion
@@ -30,7 +30,7 @@ class NextVersionOptionsTest extends Specification {
         project.extensions.extraProperties.set('release.nextVersion', '1.0.0')
 
         when:
-        NextVersionOptions options = NextVersionOptions.fromProject(project, project.logger)
+        NextVersionOptions options = NextVersionOptions.fromProject(project)
 
         then:
         options.nextVersion
@@ -39,7 +39,7 @@ class NextVersionOptionsTest extends Specification {
 
     def "should throw exception when no 'release.version' property present"() {
         when:
-        NextVersionOptions.fromProject(project, project.logger)
+        NextVersionOptions.fromProject(project)
 
         then:
         thrown(IllegalArgumentException)

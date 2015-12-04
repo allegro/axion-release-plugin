@@ -14,14 +14,15 @@ import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.*
-import org.gradle.api.logging.Logger
+import org.slf4j.LoggerFactory
 import pl.allegro.tech.build.axion.release.domain.scm.*
+import org.slf4j.Logger
 
 import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
 
-    private final Logger log;
+    private final Logger log = LoggerFactory.getLogger(GitRepository)
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
@@ -31,8 +32,7 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
-    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options, Logger logger) {
-        this.log = logger;
+    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options) {
         try {
             this.repositoryDir = repositoryDir
             repository = Grgit.open(dir: repositoryDir)
@@ -184,11 +184,11 @@ class GitRepository implements ScmRepository {
     }
 
     private boolean hasCommits() {
-        LogCommand log = repository.repository.jgit.log()
-        log.maxCount = 1
+        LogCommand logCommand = repository.repository.jgit.log()
+        logCommand.maxCount = 1
 
         try {
-            log.call()
+            logCommand.call()
             return true
         }
         catch(NoHeadException exception) {

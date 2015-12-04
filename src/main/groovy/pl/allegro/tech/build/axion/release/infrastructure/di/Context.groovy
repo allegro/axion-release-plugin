@@ -12,6 +12,7 @@ import pl.allegro.tech.build.axion.release.domain.VersionResolver
 import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
+import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.GradleAwareScmService
@@ -32,7 +33,7 @@ class Context {
 
     private void initialize(Project project) {
         instances[VersionFactory] = new VersionFactory()
-        instances[ScmRepository] = new ScmRepositoryFactory().create(project, config().repository)
+        instances[ScmRepository] = new ScmRepositoryFactory().create(ScmInitializationOptions.extractParameters(project), config().repository)
         instances[VersionService] = new VersionService(new VersionResolver(get(ScmRepository), get(VersionFactory)))
     }
 
@@ -45,7 +46,7 @@ class Context {
     }
 
     ScmRepository repository() {
-        return config().dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
+        return config().dryRun ? new DryRepository(get(ScmRepository)) : get(ScmRepository)
     }
 
     ScmService scmService() {
@@ -71,7 +72,7 @@ class Context {
     Releaser releaser() {
         return new Releaser(
                 scmService(),
-                new ReleaseHooksRunner(project.logger, config(), scmService(), config().hooks),
+                new ReleaseHooksRunner(config(), scmService(), config().hooks),
                 project
         )
     }

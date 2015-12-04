@@ -2,17 +2,18 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
-import org.gradle.api.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class Releaser {
 
+    private final Logger logger = LoggerFactory.getLogger(ReleaseHooksRunner)
+
     private final ScmService repository
 
     private final ReleaseHooksRunner hooksRunner
-
-    private final Logger logger
 
     private Project project
 
@@ -20,7 +21,6 @@ class Releaser {
         this.repository = repository
         this.hooksRunner = hooksRunner
         this.project = project
-        this.logger = project.logger
     }
 
     void release(VersionConfig versionConfig) {
@@ -31,18 +31,18 @@ class Releaser {
             String tagName = versionConfig.tag.serialize(versionConfig.tag, version.toString())
 
             if (versionConfig.createReleaseCommit) {
-                logger.quiet("Creating release commit")
+                logger.trace("Creating release commit")
                 versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
             }
 
             hooksRunner.runPreReleaseHooks(positionedVersion, version)
 
-            logger.quiet("Creating tag: $tagName")
+            logger.trace("Creating tag: $tagName")
             repository.tag(tagName)
 
             hooksRunner.runPostReleaseHooks(positionedVersion, version)
         } else {
-            logger.quiet("Working on released version ${versionConfig.version}, nothing to release.")
+            logger.trace("Working on released version ${versionConfig.version}, nothing to release.")
         }
     }
 

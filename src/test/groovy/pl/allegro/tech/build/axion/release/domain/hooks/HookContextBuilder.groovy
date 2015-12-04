@@ -17,7 +17,7 @@ class HookContextBuilder {
     String currentVersion = '2.0.0'
     
     HookContext build() {
-        return new HookContext({} as Logger, null, scmService, position,
+        return new HookContext(null, scmService, position,
                 new Version.Builder().setNormalVersion(previousVersion).build(),
                 new Version.Builder().setNormalVersion(currentVersion).build())
     }
