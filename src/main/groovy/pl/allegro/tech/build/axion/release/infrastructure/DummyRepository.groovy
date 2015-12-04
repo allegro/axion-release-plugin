@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 
 class DummyRepository implements ScmRepository {
 
-    private final Logger logger = LoggerFactory.getLogger(DummyRepository.getClass())
+    private final Logger logger = LoggerFactory.getLogger(DummyRepository)
 
     private void log(String commandName) {
         logger.quiet("Couldn't perform $commandName command on uninitialized repository")

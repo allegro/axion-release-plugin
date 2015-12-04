@@ -17,7 +17,7 @@ class ScmRepositoryFactory {
 
     private static final String GIT = 'git'
 
-    private final Logger logger = LoggerFactory.getLogger(ScmRepositoryFactory.getClass())
+    private final Logger logger = LoggerFactory.getLogger(ScmRepositoryFactory)
 
     ScmRepository create(Map<String, ?> properties, RepositoryConfig config) {
         if(config.type != GIT) {

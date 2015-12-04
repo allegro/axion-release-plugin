@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
 
-    private final Logger log = LoggerFactory.getLogger(GitRepository.getClass())
+    private final Logger log = LoggerFactory.getLogger(GitRepository)
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 

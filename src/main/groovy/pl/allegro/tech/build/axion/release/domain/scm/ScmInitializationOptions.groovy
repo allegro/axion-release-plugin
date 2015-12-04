@@ -12,9 +12,9 @@ class ScmInitializationOptions {
 
     final String remoteUrl
 
-    static final String ATTACH_REMOTE_PROPERTY = 'release.attachRemote'
+    private static final String ATTACH_REMOTE_PROPERTY = 'release.attachRemote'
 
-    static final String FETCH_TAGS_PROPERTY = 'release.fetchTags'
+    private static final String FETCH_TAGS_PROPERTY = 'release.fetchTags'
 
     ScmInitializationOptions(String remote, boolean fetchTags, boolean attachRemote, String remoteUrl) {
         this.remote = remote

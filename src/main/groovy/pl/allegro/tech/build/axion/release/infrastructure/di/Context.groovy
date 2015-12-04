@@ -46,7 +46,7 @@ class Context {
     }
 
     ScmRepository repository() {
-        return config().dryRun ? new DryRepository(get(ScmRepository), project.logger) : get(ScmRepository)
+        return config().dryRun ? new DryRepository(get(ScmRepository)) : get(ScmRepository)
     }
 
     ScmService scmService() {
@@ -72,7 +72,7 @@ class Context {
     Releaser releaser() {
         return new Releaser(
                 scmService(),
-                new ReleaseHooksRunner(project.logger, config(), scmService(), config().hooks),
+                new ReleaseHooksRunner(config(), scmService(), config().hooks),
                 project
         )
     }

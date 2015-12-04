@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
-import org.gradle.api.logging.Logger
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -11,12 +12,11 @@ import java.util.regex.Pattern
 class DryRepository implements ScmRepository {
     
     private final ScmRepository delegateRepository
-    
-    private final Logger logger
 
-    DryRepository(ScmRepository delegateRepository, Logger logger) {
+    private final Logger logger = LoggerFactory.getLogger(DryRepository)
+
+    DryRepository(ScmRepository delegateRepository) {
         this.delegateRepository = delegateRepository
-        this.logger = logger
     }
 
     @Override
@@ -82,6 +82,6 @@ class DryRepository implements ScmRepository {
     }
 
     private void log(String msg) {
-        logger.quiet("DRY-RUN: $msg")
+        logger.trace("DRY-RUN: $msg")
     }
 }
