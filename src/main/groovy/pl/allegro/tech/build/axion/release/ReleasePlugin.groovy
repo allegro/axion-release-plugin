@@ -17,7 +17,7 @@ class ReleasePlugin implements Plugin<Project> {
     
     public static final String PUSH_RELEASE_TASK = 'pushRelease'
 
-    public static final String MARK_NEXT_VERSION_TASK = 'markNextVersionTask'
+    public static final String MARK_NEXT_VERSION_TASK = 'markNextVersion'
 
     public static final String CURRENT_VERSION_TASK = 'currentVersion'
 

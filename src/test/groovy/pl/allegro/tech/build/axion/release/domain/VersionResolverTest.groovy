@@ -1,20 +1,31 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+
+import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
+import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
+import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
 
 class VersionResolverTest extends RepositoryBasedTest {
     
     VersionResolver resolver
-    
-    VersionReadOptions options = VersionReadOptions.defaultOptions()
-    
+
+    TagProperties tagRules = tagProperties().build()
+
+    NextVersionProperties nextVersionRules = nextVersionProperties().build()
+
+    VersionProperties defaultVersionRules = versionProperties().build()
+
     def setup() {
         resolver = new VersionResolver(repository, context.versionFactory())
     }
     
     def "should return default previous and current version when no tag in repository"() {
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, options)
+        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
         
         then:
         version.previousVersion.toString() == '0.1.0'
@@ -27,7 +38,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('release-1.1.0')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, options)
+        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
@@ -40,7 +51,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.commit(['*'], 'some commit')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, options)
+        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
@@ -54,7 +65,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('release-2.0.0-alpha')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, options)
+        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
@@ -67,8 +78,10 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('release-1.1.0')
         repository.commit(['*'], 'some commit')
 
+        VersionProperties versionRules = versionProperties().forceVersion('2.0.0').build()
+
         when:
-        VersionWithPosition version = resolver.resolveVersion(config, new VersionReadOptions('2.0.0', true, false))
+        VersionWithPosition version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'

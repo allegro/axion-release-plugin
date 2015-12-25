@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
@@ -15,13 +18,12 @@ class VersionResolver {
         this.versionFactory = versionFactory
     }
     
-    VersionWithPosition resolveVersion(VersionConfig versionConfig,
-                                       VersionReadOptions readOptions,
-                                       TagNameSerializationRules tagConfig) {
-        Map positions = readPositions(versionConfig, tagConfig)
+    VersionWithPosition resolveVersion(VersionProperties versionRules, TagProperties tagRules, NextVersionProperties nextVersionRules) {
+        Map positions = readPositions(tagRules, nextVersionRules)
 
-        Version currentVersion = versionFactory.create(positions.currentPosition, versionConfig, readOptions, tagConfig)
-        Version previousVersion = versionFactory.create(positions.lastReleasePosition, versionConfig, VersionReadOptions.defaultOptions(), tagConfig)
+        Version currentVersion = versionFactory.create(positions.currentPosition, versionRules, tagRules, nextVersionRules)
+        VersionProperties disableForceRules = versionRules.withoutForce()
+        Version previousVersion = versionFactory.create(positions.lastReleasePosition, disableForceRules, tagRules, nextVersionRules)
 
         ScmPosition position = positions.currentPosition.position
         if(positions.currentPosition.nextVersionTag) {
@@ -32,13 +34,13 @@ class VersionResolver {
     }
 
 
-    private Map readPositions(VersionConfig config, TagNameSerializationRules tagConfig) {
-        ScmPosition currentPosition = repository.currentPosition(~/^${tagConfig.prefix}.*(|${config.nextVersion.suffix})$/)
-        ScmPositionContext currentPositionContext = new ScmPositionContext(currentPosition, config.nextVersion)
+    private Map readPositions(TagProperties tagRules, NextVersionProperties nextVersionRules) {
+        ScmPosition currentPosition = repository.currentPosition(~/^${tagRules.prefix}.*(|${nextVersionRules.suffix})$/)
+        ScmPositionContext currentPositionContext = new ScmPositionContext(currentPosition, nextVersionRules)
 
         ScmPosition lastReleasePosition
         if(currentPositionContext.nextVersionTag) {
-            lastReleasePosition = repository.currentPosition(~/^${tagConfig.prefix}.*/, ~/.*${config.nextVersion.suffix}$/).asOnTagPosition()
+            lastReleasePosition = repository.currentPosition(~/^${tagRules.prefix}.*/, ~/.*${nextVersionRules.suffix}$/).asOnTagPosition()
         }
         else {
             lastReleasePosition = currentPosition.asOnTagPosition()
@@ -46,7 +48,7 @@ class VersionResolver {
         
         return [
                 currentPosition: currentPositionContext,
-                lastReleasePosition: new ScmPositionContext(lastReleasePosition, config.nextVersion)
+                lastReleasePosition: new ScmPositionContext(lastReleasePosition, nextVersionRules)
         ]
     }
     

@@ -4,7 +4,10 @@ import org.ajoberstar.grgit.BranchStatus
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
 import org.ajoberstar.grgit.operation.FetchOp
-import org.eclipse.jgit.api.*
+import org.eclipse.jgit.api.FetchCommand
+import org.eclipse.jgit.api.LogCommand
+import org.eclipse.jgit.api.PushCommand
+import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Config
@@ -13,15 +16,18 @@ import org.eclipse.jgit.lib.ObjectId
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.transport.*
-import org.gradle.api.logging.Logger
+import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.TagOpt
+import org.eclipse.jgit.transport.Transport
+import org.eclipse.jgit.transport.URIish
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
 
-    private final Logger log;
+    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(GitRepository)
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
@@ -31,21 +37,23 @@ class GitRepository implements ScmRepository {
     
     private final Grgit repository
 
-    GitRepository(File repositoryDir, ScmIdentity identity, ScmInitializationOptions options, Logger logger) {
-        this.log = logger;
+    private final ScmProperties properties
+
+    GitRepository(ScmProperties properties) {
         try {
-            this.repositoryDir = repositoryDir
+            this.repositoryDir = properties.directory
             repository = Grgit.open(dir: repositoryDir)
+            this.properties = properties
         }
         catch(RepositoryNotFoundException exception) {
             throw new ScmRepositoryUnavailableException(exception)
         }
 
-        if (options.attachRemote) {
-            this.attachRemote(options.remote, options.remoteUrl)
+        if (properties.attachRemote) {
+            this.attachRemote(properties.remote, properties.remoteUrl)
         }
-        if (options.fetchTags) {
-            this.fetchTags(identity, options.remote)
+        if (properties.fetchTags) {
+            this.fetchTags(properties.identity, properties.remote)
         }
     }
 
@@ -75,7 +83,7 @@ class GitRepository implements ScmRepository {
         if (!isOnExistingTag) {
             repository.tag.add(name: tagName)
         } else {
-            log.debug("The head commit $headId already has the tag $tagName.")
+            logger.debug("The head commit $headId already has the tag $tagName.")
         }
     }
 
@@ -89,14 +97,14 @@ class GitRepository implements ScmRepository {
     }
 
     private void callPush(ScmPushOptions pushOptions, boolean all) {
-        if(!pushOptions.tagsOnly) {
+        if(!pushOptions.pushTagsOnly) {
             repository.push(remote: pushOptions.remote, all: all)
         }
         repository.push(remote: pushOptions.remote, tags: true, all: all)
     }
 
     private void callLowLevelPush(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
-        if(!pushOptions.tagsOnly) {
+        if(!pushOptions.pushTagsOnly) {
             pushCommand(identity, pushOptions.remote, all).call()
         }
         pushCommand(identity, pushOptions.remote, all).setPushTags().call()

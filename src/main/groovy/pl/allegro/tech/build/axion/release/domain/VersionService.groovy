@@ -1,10 +1,12 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+
 class VersionService {
 
-    static final String SNAPSHOT = "SNAPSHOT"
-
-    private final VersionDecorator versionDecorator
+    public static final String SNAPSHOT = "SNAPSHOT"
 
     private final VersionResolver versionResolver
 
@@ -12,37 +14,36 @@ class VersionService {
 
     VersionService(VersionResolver versionResolver) {
         this.versionResolver = versionResolver
-        this.versionDecorator = new VersionDecorator()
         this.sanitizer = new VersionSanitizer()
     }
 
-    VersionWithPosition currentVersion(VersionConfig versionConfig, VersionReadOptions options, TagNameSerializationRules tagConfig) {
-        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options, tagConfig)
+    VersionWithPosition currentVersion(VersionProperties versionRules, TagProperties tagRules, NextVersionProperties nextVersionRules) {
+        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionRules, tagRules, nextVersionRules)
 
-        if(isSnapshotVersion(positionedVersion, options)) {
+        if(isSnapshotVersion(positionedVersion, versionRules)) {
             positionedVersion.asSnapshotVersion()
         }
 
         return positionedVersion
     }
 
-    String currentDecoratedVersion(VersionConfig versionConfig, VersionReadOptions options, TagNameSerializationRules tagConfig) {
-        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionConfig, options, tagConfig)
-        String version = versionDecorator.createVersion(versionConfig, positionedVersion)
+    String currentDecoratedVersion(VersionProperties versionRules, TagProperties tagRules, NextVersionProperties nextVersionRules) {
+        VersionWithPosition positionedVersion = versionResolver.resolveVersion(versionRules, tagRules, nextVersionRules)
+        String version = versionRules.versionCreator(positionedVersion.version.toString(), positionedVersion.position)
 
-        if (versionConfig.sanitizeVersion) {
+        if (versionRules.sanitizeVersion) {
             version = sanitizer.sanitize(version)
         }
 
-        if(isSnapshotVersion(positionedVersion, options)) {
+        if(isSnapshotVersion(positionedVersion, versionRules)) {
             version = version + '-' + SNAPSHOT
         }
 
         return version
     }
     
-    private boolean isSnapshotVersion(VersionWithPosition positionedVersion, VersionReadOptions options) {
-        boolean hasUncommittedChanges = !options.ignoreUncommittedChanges && positionedVersion.position.hasUncommittedChanges
-        return !positionedVersion.position.onTag || hasUncommittedChanges || options.forceSnapshot
+    private boolean isSnapshotVersion(VersionWithPosition positionedVersion, VersionProperties versionRules) {
+        boolean hasUncommittedChanges = !versionRules.ignoreUncommittedChanges && positionedVersion.position.hasUncommittedChanges
+        return !positionedVersion.position.onTag || hasUncommittedChanges || versionRules.forceSnapshot
     }
 }

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class TagNameSerializationConfig {
@@ -21,7 +22,7 @@ class TagNameSerializationConfig {
     Closure initialVersion = defaultInitialVersion()
 
     private static Closure defaultInitialVersion() {
-        return { TagNameSerializationConfig rules, ScmPosition position ->
+        return { TagProperties rules, ScmPosition position ->
             return '0.1.0'
         }
     }

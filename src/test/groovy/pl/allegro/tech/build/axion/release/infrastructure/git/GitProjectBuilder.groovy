@@ -3,7 +3,8 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 
 class GitProjectBuilder {
     
@@ -13,7 +14,7 @@ class GitProjectBuilder {
     
     private final Grgit rawRepository
     
-    private ScmInitializationOptions initializationOptions
+    private ScmProperties scmProperties
     
     private ScmIdentity identity
     
@@ -22,7 +23,7 @@ class GitProjectBuilder {
         this.repositoryDir = project.file('./')
 
         this.rawRepository = Grgit.init(dir: repositoryDir)
-        this.initializationOptions = ScmInitializationOptions.fromProject(project, 'origin')
+        this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         this.identity = ScmIdentity.defaultIdentity()
     }
 
@@ -31,7 +32,7 @@ class GitProjectBuilder {
         this.repositoryDir = project.file('./')
 
         this.rawRepository =  Grgit.clone(dir: repositoryDir, uri: "file://${cloneFrom.file('./').canonicalPath}")
-        this.initializationOptions = ScmInitializationOptions.fromProject(project, 'origin')
+        this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         this.identity = ScmIdentity.defaultIdentity()
     }
     
@@ -53,8 +54,8 @@ class GitProjectBuilder {
         return this
     }
     
-    GitProjectBuilder usingInitializationOptions(ScmInitializationOptions initializationOptions) {
-        this.initializationOptions = initializationOptions
+    GitProjectBuilder usingProperties(ScmProperties scmProperties) {
+        this.scmProperties = scmProperties
         return this
     }
 
@@ -66,7 +67,7 @@ class GitProjectBuilder {
     Map build() {
         Map map = [:]
         map[Grgit] = rawRepository
-        map[GitRepository] = new GitRepository(repositoryDir, identity, initializationOptions, project.logger)
+        map[GitRepository] = new GitRepository(scmProperties)
         
         return map
     }

@@ -6,9 +6,9 @@ class NextVersionConfig {
 
     String separator = '-'
     
-    Closure serializer = NextVersionSerializer.DEFAULT.serializer
+    Closure<String> serializer = NextVersionSerializer.DEFAULT.serializer
     
-    Closure deserializer = NextVersionSerializer.DEFAULT.deserializer
+    Closure<String> deserializer = NextVersionSerializer.DEFAULT.deserializer
 
     void serializer(String type) {
         this.serializer = NextVersionSerializer.find(type).serializer

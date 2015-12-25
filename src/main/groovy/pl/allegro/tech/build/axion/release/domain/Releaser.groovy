@@ -1,48 +1,42 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
-import org.gradle.api.Project
-import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
+import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class Releaser {
+
+    private final ReleaseLogger logger = ReleaseLogger.Factory.logger(Releaser)
+
+    private final VersionService versionService
 
     private final ScmService repository
 
     private final ReleaseHooksRunner hooksRunner
 
-    private final Logger logger
-
-    private Project project
-
-    Releaser(ScmService repository, ReleaseHooksRunner hooksRunner, Project project) {
+    Releaser(VersionService versionService, ScmService repository, ReleaseHooksRunner hooksRunner) {
+        this.versionService = versionService
         this.repository = repository
         this.hooksRunner = hooksRunner
-        this.project = project
-        this.logger = project.logger
     }
 
-    void release(VersionConfig versionConfig, TagNameSerializationRules tagConfig) {
-        VersionWithPosition positionedVersion = versionConfig.getRawVersion()
+    void release(Properties rules) {
+        VersionWithPosition positionedVersion = versionService.currentVersion(rules.version, rules.tag, rules.nextVersion)
         Version version = positionedVersion.version
 
-        if (notOnTagAlready(positionedVersion) || VersionReadOptions.fromProject(project, versionConfig).forceVersion) {
-            String tagName = versionConfig.tag.serialize(tagConfig, version.toString())
+        if (notOnTagAlready(positionedVersion) || rules.version.forceVersion()) {
+            String tagName = rules.tag.serialize(rules.tag, version.toString())
 
-            if (versionConfig.createReleaseCommit) {
-                logger.quiet("Creating release commit")
-                versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
-            }
-
-            hooksRunner.runPreReleaseHooks(positionedVersion, version)
+            hooksRunner.runPreReleaseHooks(rules.hooks, rules, positionedVersion, version)
 
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            hooksRunner.runPostReleaseHooks(positionedVersion, version)
+            hooksRunner.runPostReleaseHooks(rules.hooks, rules, positionedVersion, version)
         } else {
-            logger.quiet("Working on released version ${versionConfig.version}, nothing to release.")
+            logger.quiet("Working on released version ${version}, nothing to release.")
         }
     }
 

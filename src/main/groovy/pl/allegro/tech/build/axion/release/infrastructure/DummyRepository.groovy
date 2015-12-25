@@ -1,6 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
-import org.gradle.api.logging.Logger
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -10,10 +10,9 @@ import java.util.regex.Pattern
 
 class DummyRepository implements ScmRepository {
 
-    private final Logger logger
+    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(DummyRepository)
 
-    DummyRepository(Logger logger) {
-        this.logger = logger
+    DummyRepository() {
     }
     
     private void log(String commandName) {
@@ -43,6 +42,11 @@ class DummyRepository implements ScmRepository {
     @Override
     void attachRemote(String remoteName, String url) {
         log('attach remote')
+    }
+
+    @Override
+    String currentBranch() {
+        return 'master'
     }
 
     @Override

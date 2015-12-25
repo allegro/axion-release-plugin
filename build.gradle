@@ -58,7 +58,6 @@ dependencies {
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
 
-
     compile group: 'com.jcraft', name: 'jsch', version: '0.1.53'
     compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 

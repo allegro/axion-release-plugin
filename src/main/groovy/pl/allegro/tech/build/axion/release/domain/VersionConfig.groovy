@@ -3,7 +3,9 @@ package pl.allegro.tech.build.axion.release.domain
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.ReleasePlugin
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
+import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
+import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -80,10 +82,12 @@ class VersionConfig {
         this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
     }
 
+    @Deprecated
     void releaseCommitMessage(Closure c) {
         releaseCommitMessage = c
     }
 
+    @Deprecated
     void createReleaseCommit(boolean createReleaseCommit) {
         this.createReleaseCommit = createReleaseCommit
     }
@@ -113,19 +117,8 @@ class VersionConfig {
 
     String getUncachedVersion() {
         ensureContextExists()
-        return context.versionService().currentDecoratedVersion(this,
-                VersionReadOptions.fromProject(project, this),
-                context.tagNameSerializationRules())
-    }
-
-    VersionWithPosition getRawVersion() {
-        if (rawVersion == null) {
-            ensureContextExists()
-            rawVersion = context.versionService().currentVersion(this,
-                    VersionReadOptions.fromProject(project, this),
-                    context.tagNameSerializationRules())
-        }
-        return rawVersion
+        Properties rules = context.rules()
+        return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
     }
 
     VersionService getVersionService() {
@@ -135,7 +128,7 @@ class VersionConfig {
 
     private void ensureContextExists() {
         if (context == null) {
-            this.context = new Context(project)
+            this.context = GradleAwareContext.create(project)
         }
     }
 }

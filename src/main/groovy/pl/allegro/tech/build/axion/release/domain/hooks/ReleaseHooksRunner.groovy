@@ -1,37 +1,35 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
-import org.gradle.api.logging.Logger
-import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.VersionWithPosition
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
+import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
+import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class ReleaseHooksRunner {
 
-    private final Logger logger
+    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(ReleaseHooksRunner)
 
-    private final VersionConfig versionConfig
-    
+    private final VersionService versionService
+
     private final ScmService scmService
 
-    private final HooksConfig hooksConfig
-
-    ReleaseHooksRunner(Logger logger, VersionConfig versionConfig, ScmService scmService, HooksConfig hooksConfig) {
-        this.logger = logger
-        this.versionConfig = versionConfig
+    ReleaseHooksRunner(VersionService versionService, ScmService scmService) {
+        this.versionService = versionService
         this.scmService = scmService
-        this.hooksConfig = hooksConfig
     }
 
-    void runPreReleaseHooks(VersionWithPosition versionWithPosition, Version releaseVersion) {
-        HookContext context = new HookContext(logger, versionConfig,  scmService,
+    void runPreReleaseHooks(HooksProperties hooksRules, Properties rules, VersionWithPosition versionWithPosition, Version releaseVersion) {
+        HookContext context = new HookContext(rules, versionService, scmService,
                 versionWithPosition.position, versionWithPosition.previousVersion, releaseVersion)
-        hooksConfig.preReleaseHooks.each { it.act(context) }
+        hooksRules.preReleaseHooks.each { it.act(context) }
     }
 
-    void runPostReleaseHooks(VersionWithPosition versionWithPosition, Version releaseVersion) {
-        HookContext context = new HookContext(logger, versionConfig, scmService,
+    void runPostReleaseHooks(HooksProperties hooksRules, Properties rules, VersionWithPosition versionWithPosition, Version releaseVersion) {
+        HookContext context = new HookContext(rules, versionService, scmService,
                 versionWithPosition.position, versionWithPosition.previousVersion, releaseVersion)
-        hooksConfig.postReleaseHooks.each { it.act(context) }
+        hooksRules.postReleaseHooks.each { it.act(context) }
     }
 }

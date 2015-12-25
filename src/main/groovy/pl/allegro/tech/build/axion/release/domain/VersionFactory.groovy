@@ -1,44 +1,47 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class VersionFactory {
 
     Version create(ScmPositionContext context,
-                   VersionConfig config,
-                   VersionReadOptions options,
-                   TagNameSerializationRules tagConfig) {
+                   VersionProperties versionRules,
+                   TagProperties tagRules,
+                   NextVersionProperties nextVersionRules) {
         Version version
         
-        if (options.forcedVersion) {
-            version = Version.valueOf(options.forcedVersion)
+        if (versionRules.forcedVersion) {
+            version = Version.valueOf(versionRules.forcedVersion)
         } else {
             if (context.position.tagless()) {
-                version = Version.valueOf(initialVersion(config.tag.initialVersion, tagConfig, context.position))
+                version = Version.valueOf(initialVersion(tagRules.initialVersion, tagRules, context.position))
             } else {
-                version = Version.valueOf(readVersionFromPosition(context, config, tagConfig))
+                version = Version.valueOf(readVersionFromPosition(context, tagRules, nextVersionRules))
                 
-                boolean hasUncommitedChanges = !options.ignoreUncommittedChanges && context.position.hasUncommittedChanges
-                boolean hasChanges = !context.position.onTag || hasUncommitedChanges || options.forceSnapshot
+                boolean hasUncommittedChanges = !versionRules.ignoreUncommittedChanges && context.position.hasUncommittedChanges
+                boolean hasChanges = !context.position.onTag || hasUncommittedChanges || versionRules.forceSnapshot
                 
                 if (hasChanges && !context.nextVersionTag) {
-                    version = config.versionIncrementer(new VersionIncrementerContext(version, context.position))
+                    version = versionRules.versionIncrementer(new VersionIncrementerContext(version, context.position))
                 }
             }
         }
         return version
     }
 
-    private String initialVersion(Closure toCall, TagNameSerializationRules config, ScmPosition currentPosition) {
-        return toCall(config, currentPosition)
+    private String initialVersion(Closure toCall, TagProperties tagRules, ScmPosition currentPosition) {
+        return toCall(tagRules, currentPosition)
     }
 
-    private String readVersionFromPosition(ScmPositionContext context, VersionConfig config, TagNameSerializationRules tagConfig) {
+    private String readVersionFromPosition(ScmPositionContext context, TagProperties tagRules, NextVersionProperties nextVersionRules) {
         String tagWithoutNextVersion = context.position.latestTag
         if(context.nextVersionTag) {
-            tagWithoutNextVersion = config.nextVersion.deserializer(config.nextVersion, context.position)
+            tagWithoutNextVersion = nextVersionRules.deserializer(nextVersionRules, context.position)
         }
-        return config.tag.deserialize(tagConfig, context.position, tagWithoutNextVersion)
+        return tagRules.deserialize(tagRules, context.position, tagWithoutNextVersion)
     }
 }

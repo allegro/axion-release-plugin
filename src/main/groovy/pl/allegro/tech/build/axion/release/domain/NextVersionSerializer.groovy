@@ -1,14 +1,15 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 enum NextVersionSerializer {
 
     DEFAULT('default',
-    { NextVersionConfig rules, String version ->
+    { NextVersionProperties rules, String version ->
         return rules.suffix ? version + rules.separator + rules.suffix : version
     },
-    { NextVersionConfig rules, ScmPosition position ->
+    { NextVersionProperties rules, ScmPosition position ->
         if (rules.suffix.isEmpty()) {
             return position.latestTag
         }
@@ -18,11 +19,11 @@ enum NextVersionSerializer {
 
     private final String type
 
-    final Closure serializer
+    final Closure<String> serializer
 
-    final Closure deserializer
+    final Closure<String> deserializer
 
-    private NextVersionSerializer(String type, Closure serializer, Closure deserializer) {
+    private NextVersionSerializer(String type, Closure<String> serializer, Closure<String> deserializer) {
         this.type = type
         this.serializer = serializer
         this.deserializer = deserializer
