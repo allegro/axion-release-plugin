@@ -209,4 +209,17 @@ class VersionPropertiesFactoryTest extends Specification {
         then:
         rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: ScmPosition.onBranch('someBranch'))) == Version.forIntegers(1, 1)
     }
+
+    def "should use incrementer passed as command line option if present"() {
+        given:
+        versionConfig.versionCreator = { c -> c.currentVersion }
+        project.extensions.extraProperties.set('release.versionIncrementer', 'incrementMajor')
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+
+    }
 }

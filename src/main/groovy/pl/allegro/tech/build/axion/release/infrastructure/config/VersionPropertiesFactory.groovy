@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
+import pl.allegro.tech.build.axion.release.domain.ProjectVersion
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
@@ -18,6 +19,8 @@ class VersionPropertiesFactory {
 
     private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
 
+    private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
+
     static VersionProperties create(Project project, VersionConfig config, String currentBranch) {
         String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
         if (forceVersionValue == null) {
@@ -32,12 +35,16 @@ class VersionPropertiesFactory {
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
                 versionCreator: findVersionCreator(config, currentBranch),
-                versionIncrementer: findVersionIncrementer(config, currentBranch),
+                versionIncrementer: findVersionIncrementer(project, config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion
         )
     }
 
-    private static Closure findVersionIncrementer(VersionConfig config, String currentBranch) {
+    private static Closure findVersionIncrementer(Project project, VersionConfig config, String currentBranch) {
+        if(project.hasProperty(VERSION_INCREMENTER_PROPERTY)) {
+            return PredefinedVersionIncrementer.versionIncrementerFor(project.property(VERSION_INCREMENTER_PROPERTY), [:])
+        }
+
         return find(
                 currentBranch,
                 config.branchVersionIncrementer,

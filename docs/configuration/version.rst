@@ -152,6 +152,10 @@ You can set one of predefined rules via ``scmVersion.versionIncrementer`` method
         versionIncrementer 'incrementPatch'
     }
 
+Or via ``release.versionIncrementer`` command line argument, which overrides any other incrementer settings::
+
+    ./gradlew release -Prelease.versionIncrementer=incrementMajor
+
 If rule accepts parameters, they can be passed via configuration map::
 
     scmVersion {
