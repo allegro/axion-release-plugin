@@ -3,7 +3,9 @@ package pl.allegro.tech.build.axion.release.domain
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.ReleasePlugin
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
+import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
+import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -17,10 +19,10 @@ class VersionConfig {
     boolean dryRun
 
     boolean ignoreUncommittedChanges = true
-    
+
     RepositoryConfig repository
 
-    TagNameSerializationRules tag = new TagNameSerializationRules()
+    TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
     Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
 
@@ -41,8 +43,8 @@ class VersionConfig {
     NextVersionConfig nextVersion = new NextVersionConfig()
 
     HooksConfig hooks = new HooksConfig()
-    
-    VersionService versionService
+
+    private Context context
 
     private String resolvedVersion = null
 
@@ -80,10 +82,12 @@ class VersionConfig {
         this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
     }
 
+    @Deprecated
     void releaseCommitMessage(Closure c) {
         releaseCommitMessage = c
     }
 
+    @Deprecated
     void createReleaseCommit(boolean createReleaseCommit) {
         this.createReleaseCommit = createReleaseCommit
     }
@@ -112,21 +116,19 @@ class VersionConfig {
     }
 
     String getUncachedVersion() {
-        ensureVersionServiceExists()
-        return versionService.currentDecoratedVersion(this, VersionReadOptions.fromProject(project, this))
-    }
-    
-    VersionWithPosition getRawVersion() {
-        if (rawVersion == null) {
-            ensureVersionServiceExists()
-            rawVersion = versionService.currentVersion(this, VersionReadOptions.fromProject(project, this))
-        }
-        return rawVersion
+        ensureContextExists()
+        Properties rules = context.rules()
+        return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
     }
 
-    private void ensureVersionServiceExists() {
-        if (versionService == null) {
-            this.versionService = new Context(project).versionService()
+    VersionService getVersionService() {
+        ensureContextExists()
+        return context.versionService()
+    }
+
+    private void ensureContextExists() {
+        if (context == null) {
+            this.context = GradleAwareContext.create(project)
         }
     }
 }

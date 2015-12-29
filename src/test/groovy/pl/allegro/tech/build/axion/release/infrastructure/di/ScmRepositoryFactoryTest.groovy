@@ -4,9 +4,12 @@ import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import spock.lang.Specification
+
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class ScmRepositoryFactoryTest extends Specification {
 
@@ -24,25 +27,28 @@ class ScmRepositoryFactoryTest extends Specification {
     }
 
     def "should return git repository by default"() {
+        given:
+        ScmProperties properties = scmProperties(project.rootDir).build()
+
         expect:
-        factory.create(project, config) instanceof GitRepository
+        factory.create(properties) instanceof GitRepository
     }
 
     def "should return dummy repository when underlying repository is not initialized"() {
         given:
         Project gitlessProject = ProjectBuilder.builder().build()
-        config.directory = gitlessProject.rootDir
+        ScmProperties properties = scmProperties(gitlessProject.rootDir).build()
 
         expect:
-        factory.create(gitlessProject, config) instanceof DummyRepository
+        factory.create(properties) instanceof DummyRepository
     }
 
     def "should throw exception when trying to construct unknown type of repository"() {
         given:
-        config.type = 'unknown'
+        ScmProperties properties = scmProperties(project.rootDir).ofType('unknown').build()
 
         when:
-        factory.create(project, config)
+        factory.create(properties)
 
         then:
         thrown(IllegalArgumentException)

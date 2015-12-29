@@ -8,20 +8,19 @@ import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmInitializationOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 import spock.lang.Specification
+
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class GitRepositoryTest extends Specification {
 
     Project project
 
-    ScmInitializationOptions initializationOptions
-
-    ScmIdentity identity = ScmIdentity.defaultIdentity()
-    
     Grgit rawRepository
 
     Grgit remoteRawRepository
@@ -42,9 +41,10 @@ class GitRepositoryTest extends Specification {
     def "should throw unavailable exception when initializing in unexisitng repository"() {
         given:
         Project gitlessProject = ProjectBuilder.builder().build()
+        ScmProperties scmProperties = scmProperties(gitlessProject.rootDir).build()
 
         when:
-        new GitRepository(gitlessProject.file('./'), identity, initializationOptions, project.logger)
+        new GitRepository(scmProperties)
 
         then:
         thrown(ScmRepositoryUnavailableException)
@@ -205,7 +205,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('origin', false), true)
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -217,7 +217,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
         
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('origin', true))
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: true))
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
@@ -234,7 +234,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions('customRemote', false), true)
+        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'customRemote', pushTagsOnly: false), true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']

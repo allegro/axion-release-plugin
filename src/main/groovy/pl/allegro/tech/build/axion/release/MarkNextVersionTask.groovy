@@ -3,22 +3,20 @@ package pl.allegro.tech.build.axion.release
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.NextVersionMarker
-import pl.allegro.tech.build.axion.release.domain.NextVersionOptions
+import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
+import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 class MarkNextVersionTask extends DefaultTask {
 
     @TaskAction
     void release() {
-        NextVersionOptions nextVersionOptions = NextVersionOptions.fromProject(project, logger)
-        Context context = new Context(project)
+        Context context = GradleAwareContext.create(project)
 
-        NextVersionMarker marker = new NextVersionMarker(
-                context.scmService(),
-                logger
-        )
+        NextVersionMarker marker = new NextVersionMarker(context.scmService())
 
-        marker.markNextVersion(context.config(), nextVersionOptions.nextVersion)
+        Properties rules = context.rules()
+        marker.markNextVersion(rules.nextVersion, rules.tag)
     }
 
 }

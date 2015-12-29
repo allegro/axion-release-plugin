@@ -1,10 +1,12 @@
-package pl.allegro.tech.build.axion.release.domain
+package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.domain.ChecksConfig
+import pl.allegro.tech.build.axion.release.domain.properties.ChecksProperties
 import spock.lang.Specification
 
-class ChecksResolverTest extends Specification {
+class ChecksPropertiesFactoryTest extends Specification {
 
     private ChecksConfig config = new ChecksConfig()
 
@@ -15,11 +17,11 @@ class ChecksResolverTest extends Specification {
         config.aheadOfRemote = true
         config.uncommittedChanges = true
 
-        ChecksResolver resolver = new ChecksResolver(config, project)
+        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
-        resolver.checkUncommittedChanges()
-        resolver.checkAheadOfRemote()
+        rules.checkUncommittedChanges
+        rules.checkAheadOfRemote
     }
 
     def "should always return false if checks are globally disabled using release.disableChecks"() {
@@ -28,11 +30,11 @@ class ChecksResolverTest extends Specification {
         config.aheadOfRemote = true
         config.uncommittedChanges = true
 
-        ChecksResolver resolver = new ChecksResolver(config, project)
+        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
-        !resolver.checkUncommittedChanges()
-        !resolver.checkAheadOfRemote()
+        !rules.checkUncommittedChanges
+        !rules.checkAheadOfRemote
     }
 
     def "should skip uncommitted changes check if it was disabled using project property"() {
@@ -40,22 +42,10 @@ class ChecksResolverTest extends Specification {
         project.extensions.extraProperties.set('release.disableUncommittedCheck', true)
         config.uncommittedChanges = true
 
-        ChecksResolver resolver = new ChecksResolver(config, project)
+        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
-        !resolver.checkUncommittedChanges()
-    }
-
-    // Old check. Tests backwards compatibility with deprecated property
-    def "should skip uncommited changes check if it was disabled using project property"() {
-        given:
-        project.extensions.extraProperties.set('release.disableUncommitedCheck', true)
-        config.uncommittedChanges = true
-
-        ChecksResolver resolver = new ChecksResolver(config, project)
-
-        expect:
-        !resolver.checkUncommittedChanges()
+        !rules.checkUncommittedChanges
     }
 
     def "should skip ahead of remote check if it was disabled using project property"() {
@@ -63,10 +53,10 @@ class ChecksResolverTest extends Specification {
         project.extensions.extraProperties.set('release.disableRemoteCheck', true)
         config.aheadOfRemote = true
 
-        ChecksResolver resolver = new ChecksResolver(config, project)
+        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
-        !resolver.checkAheadOfRemote()
+        !rules.checkAheadOfRemote
     }
 
 }

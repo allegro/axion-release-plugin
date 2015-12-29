@@ -1,6 +1,5 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import org.gradle.api.logging.Logger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -12,9 +11,7 @@ class DryRepositoryTest extends Specification {
 
     ScmRepository scm = Mock()
 
-    Logger logger = Mock()
-
-    DryRepository dryRepository = new DryRepository(scm, logger)
+    DryRepository dryRepository = new DryRepository(scm)
 
     def "should not create actual tags in scm"() {
         when:

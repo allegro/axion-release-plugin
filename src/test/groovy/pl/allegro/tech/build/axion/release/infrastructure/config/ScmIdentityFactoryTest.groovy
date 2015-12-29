@@ -1,18 +1,19 @@
-package pl.allegro.tech.build.axion.release.domain.scm
+package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import spock.lang.Specification
 
-class ScmIdentityResolverTest extends Specification {
+class ScmIdentityFactoryTest extends Specification {
 
     def "should return default identity when no key set"() {
         given:
         RepositoryConfig config = new RepositoryConfig()
 
         when:
-        ScmIdentity identity = ScmIdentityResolver.resolve(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config)
 
         then:
         identity.useDefault
@@ -23,7 +24,7 @@ class ScmIdentityResolverTest extends Specification {
         RepositoryConfig config = new RepositoryConfig(customKey: 'key', customKeyPassword: 'password')
 
         when:
-        ScmIdentity identity = ScmIdentityResolver.resolve(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config)
 
         then:
         !identity.useDefault
@@ -42,7 +43,7 @@ class ScmIdentityResolverTest extends Specification {
         RepositoryConfig config = new RepositoryConfig(customKey: keyFile, customKeyPassword: 'password')
 
         when:
-        ScmIdentity identity = ScmIdentityResolver.resolve(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config)
 
         then:
         !identity.useDefault

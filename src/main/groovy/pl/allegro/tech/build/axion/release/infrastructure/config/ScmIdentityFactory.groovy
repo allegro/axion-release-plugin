@@ -1,11 +1,12 @@
-package pl.allegro.tech.build.axion.release.domain.scm
+package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
-class ScmIdentityResolver {
+class ScmIdentityFactory {
 
-    static ScmIdentity resolve(RepositoryConfig config) {
+    static ScmIdentity create(RepositoryConfig config) {
         ScmIdentity identity
         if (config.customKey) {
             identity = ScmIdentity.keyIdentity(FileLoader.readIfFile(config.customKey), config.customKeyPassword)

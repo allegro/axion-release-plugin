@@ -31,6 +31,17 @@ and commit number. Information on what prefix to match can be set using ``scmVer
 
 By default it equals ``release``.
 
+There also exist an option to set prefix per-branch (i.e. to use different version prefix on ``legacy-`` branches)::
+
+    scmVersion {
+        tag {
+            prefix = 'default-prefix'
+            branchPrefix = [
+                'legacy.*' : 'legacy-prefix'
+            ]
+        }
+    }
+
 Tree walking algorithm might lead to various misunderstandings. Take this tree as an example::
 
         [T1]

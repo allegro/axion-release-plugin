@@ -1,32 +1,34 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
+import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
+import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
+
 class VersionFactoryTest extends Specification {
-
-    static Project project = ProjectBuilder.builder().build()
-
-    VersionConfig versionConfig = new VersionConfig(project)
 
     VersionFactory factory = new VersionFactory()
 
-    def setup() {
-        versionConfig.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
-    }
+    VersionProperties defaultVersionRules = versionProperties().build()
+
+    TagProperties defaultTagRules = tagProperties().build()
+
+    NextVersionProperties nextVersionRules = new NextVersionProperties(suffix: 'alpha', separator: '-', deserializer: NextVersionSerializer.DEFAULT.deserializer)
 
     def "should return current version read from position"() {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true),
-                versionConfig.nextVersion
+                nextVersionRules
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '1.0.0'
@@ -36,11 +38,12 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true),
-                versionConfig.nextVersion
+                nextVersionRules
         )
+        VersionProperties versionRules = new VersionProperties(forcedVersion: '2.0.0')
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions('2.0.0', true, false))
+        Version version = factory.create(context, versionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '2.0.0'
@@ -50,12 +53,12 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', null, false),
-                versionConfig.nextVersion
+                nextVersionRules
         )
-        versionConfig.tag.initialVersion = { r, p -> '0.0.1' }
+        TagProperties tagRules = new TagProperties(initialVersion: { r, p -> '0.0.1' })
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.toString() == '0.0.1'
@@ -65,11 +68,11 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', null, false),
-                versionConfig.nextVersion
+                nextVersionRules
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '0.1.0'
@@ -79,11 +82,11 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-2.0.0-alpha', false),
-                versionConfig.nextVersion
+                nextVersionRules
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '2.0.0'
@@ -93,11 +96,11 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-2.0.0-alpha', false),
-                versionConfig.nextVersion
+                nextVersionRules
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '2.0.0'
@@ -107,11 +110,12 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true, true),
-                versionConfig.nextVersion
+                nextVersionRules
         )
+        VersionProperties versionRules = versionProperties().dontIgnoreUncommittedChanges().build()
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, false, false))
+        Version version = factory.create(context, versionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '1.0.1'
@@ -121,25 +125,26 @@ class VersionFactoryTest extends Specification {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true, true),
-                versionConfig.nextVersion
+                nextVersionRules
         )
 
         when:
-        Version version = factory.create(context, versionConfig, VersionReadOptions.defaultOptions())
+        Version version = factory.create(context, defaultVersionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '1.0.0'
     }
 
-    def "should increment version when has release.forceSnapshot"() {
+    def "should increment version when forced snapshot is on"() {
         given:
         ScmPositionContext context = new ScmPositionContext(
                 new ScmPosition('master', 'release-1.0.0', true),
-                versionConfig.nextVersion
+                nextVersionRules
         )
+        VersionProperties versionRules = versionProperties().forceSnapshot().build()
 
         when:
-        Version version = factory.create(context, versionConfig, new VersionReadOptions(null, true, true))
+        Version version = factory.create(context, versionRules, defaultTagRules, nextVersionRules)
 
         then:
         version.toString() == '1.0.1'

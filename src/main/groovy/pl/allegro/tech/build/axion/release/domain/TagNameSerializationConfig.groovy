@@ -1,14 +1,17 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
-class TagNameSerializationRules {
+class TagNameSerializationConfig {
 
     static final String DEFAULT_VERSION_SEPARATOR = '-'
 
     static final String DEFAULT_PREFIX = 'release'
 
     String prefix = DEFAULT_PREFIX
+
+    Map<String, String> branchPrefix = [:]
 
     String versionSeparator = DEFAULT_VERSION_SEPARATOR
 
@@ -19,7 +22,7 @@ class TagNameSerializationRules {
     Closure initialVersion = defaultInitialVersion()
 
     private static Closure defaultInitialVersion() {
-        return { TagNameSerializationRules rules, ScmPosition position ->
+        return { TagProperties rules, ScmPosition position ->
             return '0.1.0'
         }
     }

@@ -1,6 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
-import org.gradle.api.logging.Logger
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -10,13 +10,12 @@ import java.util.regex.Pattern
 
 class DryRepository implements ScmRepository {
     
-    private final ScmRepository delegateRepository
-    
-    private final Logger logger
+    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(DryRepository)
 
-    DryRepository(ScmRepository delegateRepository, Logger logger) {
+    private final ScmRepository delegateRepository
+
+    DryRepository(ScmRepository delegateRepository) {
         this.delegateRepository = delegateRepository
-        this.logger = logger
     }
 
     @Override
@@ -32,7 +31,7 @@ class DryRepository implements ScmRepository {
 
     @Override
     void push(ScmIdentity identity, ScmPushOptions pushOptions) {
-        log("pushing to remote: $pushOptions.remote")
+        log("pushing to remote: ${pushOptions.remote}")
     }
 
     @Override
@@ -43,6 +42,11 @@ class DryRepository implements ScmRepository {
     @Override
     void attachRemote(String remoteName, String url) {
         log("attaching remote: $remoteName")
+    }
+
+    @Override
+    String currentBranch() {
+        return delegateRepository.currentBranch()
     }
 
     @Override

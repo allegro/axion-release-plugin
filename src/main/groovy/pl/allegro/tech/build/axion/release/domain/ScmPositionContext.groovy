@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class ScmPositionContext {
@@ -8,12 +9,12 @@ class ScmPositionContext {
     
     final boolean nextVersionTag
 
-    ScmPositionContext(ScmPosition position, NextVersionConfig nextVersionConfig) {
+    ScmPositionContext(ScmPosition position, NextVersionProperties nextVersionRules) {
         this.position = position
-        this.nextVersionTag = afterNextVersionTag(position, nextVersionConfig)
+        this.nextVersionTag = afterNextVersionTag(position, nextVersionRules)
     }
 
-    private static boolean afterNextVersionTag(ScmPosition position, NextVersionConfig config) {
-        return position.latestTag?.endsWith(config.suffix)
+    private static boolean afterNextVersionTag(ScmPosition position, NextVersionProperties nextVersionRules) {
+        return position.latestTag?.endsWith(nextVersionRules.suffix)
     }
 }
