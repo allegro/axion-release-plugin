@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
+import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
@@ -31,22 +32,46 @@ class VersionPropertiesFactory {
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
                 versionCreator: findVersionCreator(config, currentBranch),
-                versionIncrementer: config.versionIncrementer,
+                versionIncrementer: findVersionIncrementer(config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion
         )
     }
 
+    private static Closure findVersionIncrementer(VersionConfig config, String currentBranch) {
+        return find(
+                currentBranch,
+                config.branchVersionIncrementer,
+                config.versionIncrementer,
+                { v ->
+                    if(v instanceof List) {
+                        return PredefinedVersionIncrementer.versionIncrementerFor(v[0], v[1])
+                    }
+                    return PredefinedVersionIncrementer.versionIncrementerFor(v, [:])
+                }
+        )
+    }
+
     private static Closure findVersionCreator(VersionConfig config, String currentBranch) {
-        Object versionCreator = config.branchVersionCreator?.findResult { pattern, creator ->
-            Pattern.matches(pattern, currentBranch) ? creator : null
+        return find(
+                currentBranch,
+                config.branchVersionCreator,
+                config.versionCreator,
+                { String s -> PredefinedVersionCreator.versionCreatorFor(s) }
+        )
+    }
+
+    private
+    static Closure find(String currentBranch, Map<String, Object> collection, Closure defaultValue, Closure<Closure> converter) {
+        Object value = collection?.findResult { pattern, value ->
+            Pattern.matches(pattern, currentBranch) ? value : null
         }
 
-        if (versionCreator == null) {
-            return config.versionCreator
-        } else if (!(versionCreator instanceof Closure)) {
-            return PredefinedVersionCreator.versionCreatorFor((String) versionCreator)
+        if (value == null) {
+            return defaultValue
+        } else if (!(value instanceof Closure)) {
+            return converter.call(value)
         } else {
-            return versionCreator
+            return value
         }
     }
 }

@@ -30,6 +30,8 @@ class VersionConfig {
 
     Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
+    Map<String, Object> branchVersionIncrementer = [:]
+    
     Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
 
     ChecksConfig checks = new ChecksConfig()
@@ -96,6 +98,10 @@ class VersionConfig {
         this.versionCreator = c
     }
 
+    void branchVersionCreator(Map<String, Object> creators) {
+        this.branchVersionCreator = creators
+    }
+
     void branchVersionCreators(Map<String, Object> creators) {
         this.branchVersionCreator = creators
     }
@@ -110,6 +116,10 @@ class VersionConfig {
 
     void versionIncrementer(Closure c) {
         this.versionIncrementer = c
+    }
+
+    void branchVersionIncrementer(Map<String, Object> creators) {
+        this.branchVersionIncrementer = creators
     }
 
     String getVersion() {
