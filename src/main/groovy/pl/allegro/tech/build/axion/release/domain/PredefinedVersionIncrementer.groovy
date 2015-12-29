@@ -15,6 +15,10 @@ enum PredefinedVersionIncrementer {
         return context.currentVersion.incrementMinorVersion()
     }),
 
+    INCREMENT_MAJOR('incrementMajor', { VersionIncrementerContext context, Map config ->
+        return context.currentVersion.incrementMajorVersion()
+    }),
+
     INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
         if(!config.releaseBranchPattern) {
             config.releaseBranchPattern = 'release/.+'
