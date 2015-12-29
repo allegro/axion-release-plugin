@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
+import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
@@ -36,10 +37,16 @@ class VersionPropertiesFactory {
     }
 
     private static Closure findVersionCreator(VersionConfig config, String currentBranch) {
-        Closure versionCreator = config.branchVersionCreators?.findResult { pattern, creator ->
+        Object versionCreator = config.branchVersionCreator?.findResult { pattern, creator ->
             Pattern.matches(pattern, currentBranch) ? creator : null
         }
 
-        return versionCreator ?: config.versionCreator
+        if (versionCreator == null) {
+            return config.versionCreator
+        } else if (!(versionCreator instanceof Closure)) {
+            return PredefinedVersionCreator.versionCreatorFor((String) versionCreator)
+        } else {
+            return versionCreator
+        }
     }
 }

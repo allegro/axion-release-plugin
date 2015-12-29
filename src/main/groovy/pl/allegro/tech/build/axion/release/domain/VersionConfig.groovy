@@ -26,7 +26,7 @@ class VersionConfig {
 
     Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
 
-    Map<String, Closure> branchVersionCreators
+    Map<String, Object> branchVersionCreator = [:]
 
     Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
@@ -94,6 +94,10 @@ class VersionConfig {
 
     void versionCreator(Closure c) {
         this.versionCreator = c
+    }
+
+    void branchVersionCreators(Map<String, Object> creators) {
+        this.branchVersionCreator = creators
     }
 
     void versionIncrementer(String ruleName) {

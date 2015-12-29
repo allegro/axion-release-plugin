@@ -210,14 +210,30 @@ you can configure it via ``scmVersion.versionCreator`` method::
 You can also set decorators per branches that match specific regular expression::
 
     scmVersion {
-        branchVersionCreators = [
+        branchVersionCreator = [
             'feature/.*': { version, position -> ...},
-            'bugfix/.*': { version, position -> ...}
+            'bugfix/.*': 'default'
         ]
     }
 
 Per-branch version creators must be closures, there is no support for predefined creators. First match wins, but the order
 depends on collection type used (default for ``[:]`` is LinkedHashMap).
+
+default
+^^^^^^^
+
+Default version creator does nothing::
+
+    decorate(version: '0.1.0') == 0.1.0
+
+It might be useful when you want some branches to do *nothing*::
+
+    scmVersion {
+        branchVersionCreator = [
+            'feature/.*': { version, position -> ...},
+            'release/.*': 'default'
+        ]
+    }
 
 .. _versionWithBranch:
 

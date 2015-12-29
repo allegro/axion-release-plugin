@@ -4,6 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder
@@ -113,7 +114,7 @@ class VersionPropertiesFactoryTest extends Specification {
     def "should pick default version creator if none branch creators match"() {
         given:
         versionConfig.versionCreator = { v, p -> 'default'}
-        versionConfig.branchVersionCreators = [
+        versionConfig.branchVersionCreator = [
                 'some.*': { v, p -> 'someBranch'}
         ]
 
@@ -127,7 +128,7 @@ class VersionPropertiesFactoryTest extends Specification {
     def "should pick version creator suitable for current branch if defined in per branch creators"() {
         given:
         versionConfig.versionCreator = { v, p -> 'default'}
-        versionConfig.branchVersionCreators = [
+        versionConfig.branchVersionCreator = [
                 'some.*': { v, p -> 'someBranch'}
         ]
 
@@ -136,5 +137,19 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionCreator(null, null) == 'someBranch'
+    }
+
+    def "should use predefined version creator when supplied with String in per branch creators"() {
+        given:
+        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.branchVersionCreator = [
+                'some.*': 'versionWithBranch'
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0-someBranch'
     }
 }
