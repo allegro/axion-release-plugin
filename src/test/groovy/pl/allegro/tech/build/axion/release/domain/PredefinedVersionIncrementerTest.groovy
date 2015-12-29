@@ -20,6 +20,11 @@ class PredefinedVersionIncrementerTest extends Specification {
         versionIncrementerFor('incrementMinor')(context) == Version.valueOf('0.2.0')
     }
     
+    def "should increment major when incrementMajor rule used"() {
+        expect:
+        versionIncrementerFor('incrementMajor')(context) == Version.valueOf('1.0.0')
+    }
+
     def "should increment minor if not on release branch and incrementMinorIfNotOnRelease used"() {
         expect:
         versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*'])(context) == Version.valueOf('0.2.0')
