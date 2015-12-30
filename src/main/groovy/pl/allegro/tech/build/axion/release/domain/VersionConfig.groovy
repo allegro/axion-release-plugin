@@ -24,7 +24,7 @@ class VersionConfig {
 
     TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
-    Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
+    Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
     Map<String, Object> branchVersionCreator = [:]
 
