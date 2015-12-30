@@ -24,12 +24,14 @@ class VersionConfig {
 
     TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
-    Closure versionCreator = PredefinedVersionCreator.DEFAULT.versionCreator
+    Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
-    Map<String, Closure> branchVersionCreators
+    Map<String, Object> branchVersionCreator = [:]
 
     Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
+    Map<String, Object> branchVersionIncrementer = [:]
+    
     Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
 
     ChecksConfig checks = new ChecksConfig()
@@ -96,6 +98,14 @@ class VersionConfig {
         this.versionCreator = c
     }
 
+    void branchVersionCreator(Map<String, Object> creators) {
+        this.branchVersionCreator = creators
+    }
+
+    void branchVersionCreators(Map<String, Object> creators) {
+        this.branchVersionCreator = creators
+    }
+
     void versionIncrementer(String ruleName) {
         this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName)
     }
@@ -106,6 +116,10 @@ class VersionConfig {
 
     void versionIncrementer(Closure c) {
         this.versionIncrementer = c
+    }
+
+    void branchVersionIncrementer(Map<String, Object> creators) {
+        this.branchVersionIncrementer = creators
     }
 
     String getVersion() {

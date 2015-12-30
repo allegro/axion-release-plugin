@@ -7,7 +7,7 @@ class PredefinedVersionCreatorTest extends Specification {
 
     def "default version creator should just return version string"() {
         expect:
-        PredefinedVersionCreator.DEFAULT.versionCreator('version', new ScmPosition('branch', 'tag', true)) == 'version'
+        PredefinedVersionCreator.SIMPLE.versionCreator('version', new ScmPosition('branch', 'tag', true)) == 'version'
     }
 
     def "versionWithBranch version creator should return simple version when on master"() {
@@ -22,7 +22,7 @@ class PredefinedVersionCreatorTest extends Specification {
 
     def "should return version creator of given type"() {
         expect:
-        PredefinedVersionCreator.versionCreatorFor('default')('version', null) == 'version'
+        PredefinedVersionCreator.versionCreatorFor('simple')('version', null) == 'version'
     }
 
     def "should throw exception when trying to obtain undefined version creator"() {

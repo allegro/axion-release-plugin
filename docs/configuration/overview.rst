@@ -28,6 +28,10 @@ All ``axion-release-plugin`` configuration options:
     
         tag { // :ref:`version-parsing`
             prefix = 'tag-prefix' // prefix to be used, 'release' by default
+            branchPrefix = [ // set different prefix per branch
+                'legacy/.*' : 'legacy'
+            ]
+
             versionSeparator = '-' // separator between prefix and version number, '-' by default
             serialize = { tag, version -> ... } // creates tag name from raw version
             deserialize = { tag, position, tagName -> ... } // reads raw version from tag
@@ -44,20 +48,20 @@ All ``axion-release-plugin`` configuration options:
         // :ref:`version-decorating`
         versionCreator { version, position -> ... } // creates version visible for Gradle from raw version and current position in scm
         versionCreator 'versionWithBranch' // use one of predefined version creators
+        branchVersionCreator = [ // use different creator per branch
+            'feature/.*': 'default'
+        ]
 
         // :ref:`version-incrementing`
         versionIncrementer {context, config -> ...} // closure that increments a version from the raw version, current position in scm and config
         versionIncrementer 'incrementPatch' // use one of predefined version incrementing rules
+        branchVersionIncrementer = [ // use different incrementer per branch
+            'feature/.*': 'incrementMinor'
+        ]
 
         // :doc:`hooks`
         createReleaseCommit true // should create empty commit to annotate release in commit history, false by default
         releaseCommitMessage { version, position -> ... } // custom commit message if commits are created
-    
-        // :ref:`version-decorating`
-        branchVersionCreators = [
-            'feature/.*': { version, position -> ... },
-            'bugfix/.*': { version, position -> ... }
-        ]
     
         // :doc:`checks`
         checks {

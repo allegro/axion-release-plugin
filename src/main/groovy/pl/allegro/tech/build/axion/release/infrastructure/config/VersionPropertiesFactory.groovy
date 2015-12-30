@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
+import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
+import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
+import pl.allegro.tech.build.axion.release.domain.ProjectVersion
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
@@ -16,6 +19,8 @@ class VersionPropertiesFactory {
 
     private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
 
+    private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
+
     static VersionProperties create(Project project, VersionConfig config, String currentBranch) {
         String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
         if (forceVersionValue == null) {
@@ -30,16 +35,50 @@ class VersionPropertiesFactory {
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
                 versionCreator: findVersionCreator(config, currentBranch),
-                versionIncrementer: config.versionIncrementer,
+                versionIncrementer: findVersionIncrementer(project, config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion
         )
     }
 
-    private static Closure findVersionCreator(VersionConfig config, String currentBranch) {
-        Closure versionCreator = config.branchVersionCreators?.findResult { pattern, creator ->
-            Pattern.matches(pattern, currentBranch) ? creator : null
+    private static Closure findVersionIncrementer(Project project, VersionConfig config, String currentBranch) {
+        if(project.hasProperty(VERSION_INCREMENTER_PROPERTY)) {
+            return PredefinedVersionIncrementer.versionIncrementerFor(project.property(VERSION_INCREMENTER_PROPERTY), [:])
         }
 
-        return versionCreator ?: config.versionCreator
+        return find(
+                currentBranch,
+                config.branchVersionIncrementer,
+                config.versionIncrementer,
+                { v ->
+                    if(v instanceof List) {
+                        return PredefinedVersionIncrementer.versionIncrementerFor(v[0], v[1])
+                    }
+                    return PredefinedVersionIncrementer.versionIncrementerFor(v, [:])
+                }
+        )
+    }
+
+    private static Closure findVersionCreator(VersionConfig config, String currentBranch) {
+        return find(
+                currentBranch,
+                config.branchVersionCreator,
+                config.versionCreator,
+                { String s -> PredefinedVersionCreator.versionCreatorFor(s) }
+        )
+    }
+
+    private
+    static Closure find(String currentBranch, Map<String, Object> collection, Closure defaultValue, Closure<Closure> converter) {
+        Object value = collection?.findResult { pattern, value ->
+            Pattern.matches(pattern, currentBranch) ? value : null
+        }
+
+        if (value == null) {
+            return defaultValue
+        } else if (!(value instanceof Closure)) {
+            return converter.call(value)
+        } else {
+            return value
+        }
     }
 }

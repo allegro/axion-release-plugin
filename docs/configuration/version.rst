@@ -145,7 +145,6 @@ Incrementing phase does incrementing the version in accordance with *version inc
 * *incrementMajor* - increment major number
 * *incrementMinorIfNotOnRelease* - increment patch number if on release branch. Increment minor otherwise
 * *incrementPrerelease* - increment pre-release suffix if possible (-rc1 to -rc2). Increment patch otherwise
-* *branchSpecific* - call other incrementer based on branch name
 
 You can set one of predefined rules via ``scmVersion.versionIncrementer`` method::
 
@@ -153,10 +152,14 @@ You can set one of predefined rules via ``scmVersion.versionIncrementer`` method
         versionIncrementer 'incrementPatch'
     }
 
+Or via ``release.versionIncrementer`` command line argument, which overrides any other incrementer settings::
+
+    ./gradlew release -Prelease.versionIncrementer=incrementMajor
+
 If rule accepts parameters, they can be passed via configuration map::
 
     scmVersion {
-        versionIncrementer 'branchSpecific', [:]
+        versionIncrementer 'someIncrementer', [:]
     }
 
 Alternatively you can specify a custom rule by setting a closure that would accept a context object and return a ``Version`` object::
@@ -170,6 +173,19 @@ The context object passed to closure contains the following:
 * *currentVersion* - current ``Version`` object that should be used to calculate next version (`Version API <https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java>`_)
 * *position* - widely used position object, for more see :doc:`scm-position`
 
+You can also specify different incrementers per branch. They can be either closure, name of predefined incrementer or
+name and list of arguments in case predefined incrementer requires configuration::
+
+    scmVersion {
+        branchVersionIncrementer = [
+            'feature/.*' : 'incrementMinor',
+            'bugfix/.*' : { c -> c.currentVersion.incrementPatchVersion() },
+            'legacy/.*' : [ 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'legacy/release.*'] ]
+        ]
+    }
+
+If none matches current branch, incrementer set in ``versionIncrementer`` field is used.
+
 incrementMinorIfNotOnRelease
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -177,21 +193,6 @@ This rule uses additional parameter ``releaseBranchPattern`` (by default it's se
 
     scmVersion {
         versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
-    }
-
-branchSpecific
-^^^^^^^^^^^^^^
-
-This rule accepts map of ``branch pattern -> incrementer name`` and uses first incrementer that matches branch pattern::
-
-    scmVersion {
-        versionIncrementer 'branchSpecific', ['master': 'incrementPatch', 'feature/.*': 'incrementMinor']
-    }
-
-The arguments map will be passed on to called incrementer, so you can add some more parameters at the end of it::
-
-    scmVersion {
-        versionIncrementer 'branchSpecific', ['master': 'incrementPatch', '.*': 'incrementMinorIfNotOnRelease', releaseBranchPattern: 'release.*']
     }
 
 .. _version-decorating:
@@ -211,14 +212,30 @@ you can configure it via ``scmVersion.versionCreator`` method::
 You can also set decorators per branches that match specific regular expression::
 
     scmVersion {
-        branchVersionCreators = [
+        branchVersionCreator = [
             'feature/.*': { version, position -> ...},
-            'bugfix/.*': { version, position -> ...}
+            'bugfix/.*': 'simple'
         ]
     }
 
 Per-branch version creators must be closures, there is no support for predefined creators. First match wins, but the order
 depends on collection type used (default for ``[:]`` is LinkedHashMap).
+
+simple
+^^^^^^^
+
+This is the default version creator that does nothing::
+
+    decorate(version: '0.1.0') == 0.1.0
+
+It might be useful when you want some branches to do *nothing*::
+
+    scmVersion {
+        branchVersionCreator = [
+            'feature/.*': { version, position -> ...},
+            'release/.*': 'simple'
+        ]
+    }
 
 .. _versionWithBranch:
 

@@ -24,6 +24,10 @@ class ScmPosition {
     static ScmPosition onTag(String tagName) {
         return new ScmPosition('master', tagName, true, false)
     }
+
+    static ScmPosition onBranch(String branchName) {
+        return new ScmPosition(branchName, null, true, false)
+    }
     
     boolean tagless() {
         return latestTag == null

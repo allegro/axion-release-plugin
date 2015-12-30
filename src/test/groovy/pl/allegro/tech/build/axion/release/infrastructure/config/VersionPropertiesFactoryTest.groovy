@@ -3,7 +3,9 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder
@@ -113,7 +115,7 @@ class VersionPropertiesFactoryTest extends Specification {
     def "should pick default version creator if none branch creators match"() {
         given:
         versionConfig.versionCreator = { v, p -> 'default'}
-        versionConfig.branchVersionCreators = [
+        versionConfig.branchVersionCreator = [
                 'some.*': { v, p -> 'someBranch'}
         ]
 
@@ -127,7 +129,7 @@ class VersionPropertiesFactoryTest extends Specification {
     def "should pick version creator suitable for current branch if defined in per branch creators"() {
         given:
         versionConfig.versionCreator = { v, p -> 'default'}
-        versionConfig.branchVersionCreators = [
+        versionConfig.branchVersionCreator = [
                 'some.*': { v, p -> 'someBranch'}
         ]
 
@@ -136,5 +138,88 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionCreator(null, null) == 'someBranch'
+    }
+
+    def "should use predefined version creator when supplied with String in per branch creators"() {
+        given:
+        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.branchVersionCreator = [
+                'some.*': 'versionWithBranch'
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0-someBranch'
+    }
+
+    def "should pick default version incrementer if none branch incrementers match"() {
+        given:
+        versionConfig.versionIncrementer = { c -> c.currentVersion }
+        versionConfig.branchVersionIncrementer = [
+                'some.*': { c -> c.currentVersion.incrementMajorVersion() }
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(1)
+    }
+
+    def "should pick version incrementer suitable for current branch if defined in per branch incrementer"() {
+        given:
+        versionConfig.versionIncrementer = { c -> c.currentVersion }
+        versionConfig.branchVersionIncrementer = [
+                'some.*': { c -> c.currentVersion.incrementMajorVersion() }
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+    }
+
+    def "should use predefined incrementer creator when supplied with String in per branch incrementer"() {
+        given:
+        versionConfig.versionCreator = { c -> c.currentVersion }
+        versionConfig.branchVersionIncrementer = [
+                'some.*': 'incrementMajor'
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+    }
+
+    def "should use predefined incrementer creator with config options when supplied with String in per branch incrementer"() {
+        given:
+        versionConfig.versionCreator = { c -> c.currentVersion }
+        versionConfig.branchVersionIncrementer = [
+                'some.*': ['incrementMinorIfNotOnRelease', [releaseBranchPattern: 'someOther.*']]
+        ]
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: ScmPosition.onBranch('someBranch'))) == Version.forIntegers(1, 1)
+    }
+
+    def "should use incrementer passed as command line option if present"() {
+        given:
+        versionConfig.versionCreator = { c -> c.currentVersion }
+        project.extensions.extraProperties.set('release.versionIncrementer', 'incrementMajor')
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+
     }
 }

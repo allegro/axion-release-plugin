@@ -23,7 +23,7 @@ class VersionPropertiesBuilder {
                 forcedVersion: forcedVersion,
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
-                versionCreator: PredefinedVersionCreator.DEFAULT.versionCreator,
+                versionCreator: PredefinedVersionCreator.SIMPLE.versionCreator,
                 versionIncrementer: PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
                 sanitizeVersion: true)
     }

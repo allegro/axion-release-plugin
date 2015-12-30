@@ -4,7 +4,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 enum PredefinedVersionCreator {
 
-    DEFAULT('default', { String versionFromTag, ScmPosition position ->
+    SIMPLE('simple', { String versionFromTag, ScmPosition position ->
         return versionFromTag.toString()
     }),
 

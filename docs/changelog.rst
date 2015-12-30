@@ -1,6 +1,13 @@
 Changelog
 =========
 
+* **1.3.4** (30.12.2015)
+    * added option to specify tag prefix per branch
+    * added option to specify version incrementer per branch
+    * added option to use predefined version incrementers and creators in per-branch settings
+    * (internal) separated all version management logic from Gradle
+* **1.3.3** (19.11.2015)
+    * added ``release.version`` argument that should be used instead of ``release.forceVersion`` and ``release.nextVersion``
 * **1.3.2** (24.08.2015)
     * added possibility to read uncached, current version in hooks
 * **1.3.1** (16.08.2015)
