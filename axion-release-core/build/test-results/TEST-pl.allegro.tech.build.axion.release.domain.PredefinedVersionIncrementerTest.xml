@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:08" hostname="c49884" time="0.028">
+  <properties/>
+  <testcase name="should increment patch when incrementPatch rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.001"/>
+  <testcase name="should increment minor when incrementMinor rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.001"/>
+  <testcase name="should increment major when incrementMajor rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.001"/>
+  <testcase name="should increment minor if not on release branch and incrementMinorIfNotOnRelease used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.002"/>
+  <testcase name="should increment patch if on release branch and incrementMinorIfNotOnRelease used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.0"/>
+  <testcase name="should delegate to first matching incrementer when branchSpecific rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.007"/>
+  <testcase name="should increment prerelease version when incrementPrerelease rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.012"/>
+  <testcase name="should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.002"/>
+  <testcase name="should throw exception when unknown incrementer used" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementerTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

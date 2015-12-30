@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.018">
+  <properties/>
+  <testcase name="default version creator should just return version string" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" time="0.008"/>
+  <testcase name="versionWithBranch version creator should return simple version when on master" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" time="0.001"/>
+  <testcase name="versionWithBranch version creator should return version with appended branch name when not on master" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" time="0.001"/>
+  <testcase name="should return version creator of given type" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" time="0.004"/>
+  <testcase name="should throw exception when trying to obtain undefined version creator" classname="pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreatorTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

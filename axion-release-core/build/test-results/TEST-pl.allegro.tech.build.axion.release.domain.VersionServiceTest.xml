@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.17">
+  <properties/>
+  <testcase name="should return stable version when on tag" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.15"/>
+  <testcase name="should return snapshot version with increased patch when forcing snapshot" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.003"/>
+  <testcase name="should return snapshot version with increased patch when not on tag" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.003"/>
+  <testcase name="should return snapshot version with increased patch when on tag but there are uncommitted changes" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.002"/>
+  <testcase name="should sanitize version if flag is set to true" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.007"/>
+  <testcase name="should not sanitize version if flag is set to false" classname="pl.allegro.tech.build.axion.release.domain.VersionServiceTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

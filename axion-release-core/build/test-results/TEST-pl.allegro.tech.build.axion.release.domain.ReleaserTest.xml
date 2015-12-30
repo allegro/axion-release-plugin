@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.ReleaserTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:07" hostname="c49884" time="0.814">
+  <properties/>
+  <testcase name="should release new version when not on tag" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.225"/>
+  <testcase name="should not release version when on tag" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.113"/>
+  <testcase name="should release with forced pre-released versions" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.113"/>
+  <testcase name="should not release version when on pre-released version tag" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.083"/>
+  <testcase name="should increment pre-released version correctly" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.099"/>
+  <testcase name="should create release commit if configured" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.079"/>
+  <testcase name="should create release commit when on tag but forced" classname="pl.allegro.tech.build.axion.release.domain.ReleaserTest" time="0.101"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

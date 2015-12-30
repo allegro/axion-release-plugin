@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.factory.NextVersionPropertiesFactoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:48:29" hostname="c49884" time="0.119">
+  <properties/>
+  <testcase name="should copy non-project properties from NextVersionConfig object" classname="pl.allegro.tech.build.axion.release.factory.NextVersionPropertiesFactoryTest" time="0.058"/>
+  <testcase name="should read nextVersion from 'release.version' property" classname="pl.allegro.tech.build.axion.release.factory.NextVersionPropertiesFactoryTest" time="0.024"/>
+  <testcase name="should read nextVersion from deprecated 'release.nextVersion' property" classname="pl.allegro.tech.build.axion.release.factory.NextVersionPropertiesFactoryTest" time="0.035"/>
+  <system-out><![CDATA[Using deprecated parameter: release.nextVersion! Use release.version instead.
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

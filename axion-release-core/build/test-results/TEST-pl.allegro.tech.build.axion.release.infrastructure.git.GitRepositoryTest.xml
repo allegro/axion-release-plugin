@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:01" hostname="c49884" time="4.046">
+  <properties/>
+  <testcase name="should throw unavailable exception when initializing in unexisitng repository" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.876"/>
+  <testcase name="should create new tag on current commit" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.32"/>
+  <testcase name="should create new tag if it exists and it's on HEAD" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.164"/>
+  <testcase name="should throw an exception if create new tag if it exists before HEAD" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.22"/>
+  <testcase name="should create commit with given message" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.164"/>
+  <testcase name="should signal there are uncommitted changes" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.168"/>
+  <testcase name="should point to last tag in current position in simple case" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.174"/>
+  <testcase name="should return default position when no commit in repository" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.14"/>
+  <testcase name="should indicate that position is on tag when latest commit is tagged" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.16"/>
+  <testcase name="should track back to older tag when commit was made after checking out older version" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.237"/>
+  <testcase name="should return tagless position with branch name when no tag in repository" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.115"/>
+  <testcase name="should return only tags that match with prefix" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.164"/>
+  <testcase name="should attach to remote repository" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.153"/>
+  <testcase name="should provide current branch name in position" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.169"/>
+  <testcase name="should push changes and tag to remote" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.307"/>
+  <testcase name="should not push commits if the pushTagsOnly flag is set to true" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.216"/>
+  <testcase name="should push changes to remote with custom name" classname="pl.allegro.tech.build.axion.release.infrastructure.git.GitRepositoryTest" time="0.29"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

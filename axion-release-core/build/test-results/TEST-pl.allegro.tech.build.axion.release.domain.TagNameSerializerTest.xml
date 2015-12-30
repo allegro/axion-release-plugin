@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.TagNameSerializerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.033">
+  <properties/>
+  <testcase name="default serializer should return concatenated prefix, version separator and version by default" classname="pl.allegro.tech.build.axion.release.domain.TagNameSerializerTest" time="0.006"/>
+  <testcase name="default deserializer should read version by stripping off prefix and version separator" classname="pl.allegro.tech.build.axion.release.domain.TagNameSerializerTest" time="0.018"/>
+  <testcase name="default serializer should use empty version separator when prefix is empty" classname="pl.allegro.tech.build.axion.release.domain.TagNameSerializerTest" time="0.003"/>
+  <testcase name="default deserializer should use empty version separator when prefix is empty" classname="pl.allegro.tech.build.axion.release.domain.TagNameSerializerTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:48:30" hostname="c49884" time="0.435">
+  <properties/>
+  <testcase name="should copy non-project properties from VersionConfig object" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.07"/>
+  <testcase name="should return forceVersion false when project has no 'release.version' property" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.015"/>
+  <testcase name="should return forceVersion false when project has 'release.version' property with empty value" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.022"/>
+  <testcase name="should return forceVersion true when project has 'release.version' property with non-empty value" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.015"/>
+  <testcase name="should return trimmed forcedVersion when project has 'release.Version' property with leading or trailing spaces" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.023"/>
+  <testcase name="should return forceVersion true when project has deprecated 'release.forceVersion' property with non-empty value" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.031"/>
+  <testcase name="should return ignore uncommitted changes flag from version config when no project flag present" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.018"/>
+  <testcase name="should return ignore uncommitted changes as true when project flag present" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.025"/>
+  <testcase name="should pick default version creator if none branch creators match" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.021"/>
+  <testcase name="should pick version creator suitable for current branch if defined in per branch creators" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.023"/>
+  <testcase name="should use predefined version creator when supplied with String in per branch creators" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.022"/>
+  <testcase name="should pick default version incrementer if none branch incrementers match" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.038"/>
+  <testcase name="should pick version incrementer suitable for current branch if defined in per branch incrementer" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.015"/>
+  <testcase name="should use predefined incrementer creator when supplied with String in per branch incrementer" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.015"/>
+  <testcase name="should use predefined incrementer creator with config options when supplied with String in per branch incrementer" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.036"/>
+  <testcase name="should use incrementer passed as command line option if present" classname="pl.allegro.tech.build.axion.release.factory.VersionPropertiesFactoryTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

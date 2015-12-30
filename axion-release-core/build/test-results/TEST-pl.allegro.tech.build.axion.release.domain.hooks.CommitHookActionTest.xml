@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.hooks.CommitHookActionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:08" hostname="c49884" time="0.086">
+  <properties/>
+  <testcase name="should commit files matching patterns with given message" classname="pl.allegro.tech.build.axion.release.domain.hooks.CommitHookActionTest" time="0.086"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.625">
+  <properties/>
+  <testcase name="should return default previous and current version when no tag in repository" classname="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" time="0.092"/>
+  <testcase name="should return same previous and current version when on release tag" classname="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" time="0.11"/>
+  <testcase name="should return unmodified previous and incremented current version when not on tag" classname="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" time="0.12"/>
+  <testcase name="should return previous version from last release tag and current from alpha when on alpha tag" classname="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" time="0.171"/>
+  <testcase name="should return previous version from last release and current from forced version when forcing version" classname="pl.allegro.tech.build.axion.release.domain.VersionResolverTest" time="0.131"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

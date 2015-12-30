@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.factory.ScmPropertiesFactoryTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:48:27" hostname="c49884" time="1.741">
+  <properties/>
+  <testcase name="should return remote name and tagsOnly option from configuration when no flags on project" classname="pl.allegro.tech.build.axion.release.factory.ScmPropertiesFactoryTest" time="1.721"/>
+  <testcase name="should return true for tagsOnly when enabled via project flag" classname="pl.allegro.tech.build.axion.release.factory.ScmPropertiesFactoryTest" time="0.02"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

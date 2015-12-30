@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:48:29" hostname="c49884" time="0.219">
+  <properties/>
+  <testcase name="should set repository directory to rootProject dir by default" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.013"/>
+  <testcase name="should not initialize authorization options when no flags on project" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.024"/>
+  <testcase name="should set authorization options when custom key and password provided" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.01"/>
+  <testcase name="should read key from file when 'release.customKeyFile' property used" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.13"/>
+  <testcase name="should prefer explicit custom key before key read from file when both 'release.customKey*' properties used" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.014"/>
+  <testcase name="should set username and password when provided via 'release.customUsername' and 'release.customPassword'" classname="pl.allegro.tech.build.axion.release.factory.RepositoryConfigFactoryTest" time="0.019"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

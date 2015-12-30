@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.hooks.FileUpdateHookActionTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:08" hostname="c49884" time="0.059">
+  <properties/>
+  <testcase name="should update file by executing given regexp" classname="pl.allegro.tech.build.axion.release.domain.hooks.FileUpdateHookActionTest" time="0.043"/>
+  <testcase name="should update all listed files" classname="pl.allegro.tech.build.axion.release.domain.hooks.FileUpdateHookActionTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

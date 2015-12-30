@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.089">
+  <properties/>
+  <testcase name="should not create actual tags in scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.067"/>
+  <testcase name="should not push anything to scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.001"/>
+  <testcase name="should not commit anything to scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.001"/>
+  <testcase name="should return currentPosition from real scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.015"/>
+  <testcase name="should check uncommitted changes on real scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.003"/>
+  <testcase name="should check ahead of remote on real scm" classname="pl.allegro.tech.build.axion.release.infrastructure.git.DryRepositoryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

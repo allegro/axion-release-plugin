@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactoryTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:01" hostname="c49884" time="0.835">
+  <properties/>
+  <testcase name="should return git repository by default" classname="pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactoryTest" time="0.739"/>
+  <testcase name="should return dummy repository when underlying repository is not initialized" classname="pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactoryTest" time="0.089"/>
+  <testcase name="should throw exception when trying to construct unknown type of repository" classname="pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactoryTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+]]></system-err>
+</testsuite>

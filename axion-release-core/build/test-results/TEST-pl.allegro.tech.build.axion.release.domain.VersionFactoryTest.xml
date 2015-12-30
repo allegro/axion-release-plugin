@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2015-12-30T21:47:06" hostname="c49884" time="0.037">
+  <properties/>
+  <testcase name="should return current version read from position" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.003"/>
+  <testcase name="should return forced version when forcing is on" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.001"/>
+  <testcase name="should return custom initial version when no tag exists" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.008"/>
+  <testcase name="should return default initial version when no tag exists and initial version not explicitly defined" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.002"/>
+  <testcase name="should deserialize nextVersion before deserializing version when on nextVersion tag" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.002"/>
+  <testcase name="should not increment patch version when being on position after next version tag" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.008"/>
+  <testcase name="should increment patch version when there are uncommitted changes and not ignoring them, even when on tag" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.008"/>
+  <testcase name="should not increment patch version when there are uncommitted changes but they are ignored (default)" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.002"/>
+  <testcase name="should increment version when forced snapshot is on" classname="pl.allegro.tech.build.axion.release.domain.VersionFactoryTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

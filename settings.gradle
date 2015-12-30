@@ -1,1 +1,3 @@
 rootProject.name = 'axion-release-plugin'
+
+include 'axion-release-core', 'axion-release-gradle'

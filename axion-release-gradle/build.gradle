@@ -1,0 +1,41 @@
+buildscript {
+    repositories {
+        maven { url 'https://plugins.gradle.org/m2/'  }
+    }
+    dependencies {
+        classpath group: 'com.gradle.publish', name: 'plugin-publish-plugin', version: '0.9.1'
+    }
+}
+
+apply plugin: 'com.gradle.plugin-publish'
+
+dependencies {
+    compile gradleApi()
+    compile localGroovy()
+
+    compile project(':axion-release-core')
+
+    testCompile(group: 'org.spockframework', name: 'spock-core', version: versions.spock) {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+    }
+    testCompile group: 'cglib', name: 'cglib-nodep', version: versions.cglib
+}
+
+pluginBundle {
+    website = 'https://github.com/allegro/axion-release-plugin'
+    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+    description = 'Release and version management plugin.'
+    tags = ['release', 'version']
+
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = 'pl.allegro.tech.build'
+        artifactId = 'axion-release-plugin'
+    }
+}
