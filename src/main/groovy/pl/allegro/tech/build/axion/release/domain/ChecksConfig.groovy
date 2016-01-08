@@ -6,4 +6,6 @@ class ChecksConfig {
 
     boolean uncommittedChanges = true
 
+    boolean snapshotDependencies = true
+
 }

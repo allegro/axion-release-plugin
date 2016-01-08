@@ -9,4 +9,5 @@ class ChecksProperties {
 
     final boolean checkAheadOfRemote
 
+    final boolean checkSnapshotDependencies
 }

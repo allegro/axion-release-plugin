@@ -8,6 +8,7 @@ checks are enabled by default using ``scmVersion.checks`` properties::
         checks {
             uncommittedChanges = false
             aheadOfRemote = false
+            snapshotDependencies = false
         }
     }
 
@@ -47,3 +48,13 @@ You can disable this check using either ``scmVersion.checks.aheadOfRemote`` prop
 ``release.disableRemoteCheck`` command line option::
 
     ./gradlew release -Prelease.disableRemoteCheck
+
+Snapshot dependencies check
+---------------------------
+
+This check performs validation that the build has no snapshot libraries in dependencies.
+
+You can disable this check using either ``scmVersion.checks.snapshotDependencies`` property or via
+``release.disableSnapshotsCheck`` command line option::
+
+    ./gradlew release -Prelease.disableSnapshotsCheck
