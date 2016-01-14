@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
+import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.ChecksProperties
@@ -46,6 +47,17 @@ class VerifyReleaseTask extends DefaultTask {
             }
         } else {
             project.logger.quiet("Skipping ahead of remote check")
+        }
+
+        if (checksRules.checkSnapshotDependencies) {
+            SnapshotDependenciesChecker checker = new SnapshotDependenciesChecker();
+            Collection<String> snapshotVersions = checker.snapshotVersions(project)
+            project.logger.quiet("Checking for snapshot versions.. ${!snapshotVersions.empty ? 'FAILED' : ''}")
+            if (!snapshotVersions.empty) {
+                throw new IllegalStateException("The project uses snapshot versions - can't release. Snapshots found: " + snapshotVersions)
+            }
+        } else {
+            project.logger.quiet("Skipping snapshot dependencies check")
         }
     }
 }

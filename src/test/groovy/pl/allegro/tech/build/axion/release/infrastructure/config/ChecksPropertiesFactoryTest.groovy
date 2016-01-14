@@ -16,12 +16,14 @@ class ChecksPropertiesFactoryTest extends Specification {
         given:
         config.aheadOfRemote = true
         config.uncommittedChanges = true
+        config.snapshotDependencies = true
 
         ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
         rules.checkUncommittedChanges
         rules.checkAheadOfRemote
+        rules.checkSnapshotDependencies
     }
 
     def "should always return false if checks are globally disabled using release.disableChecks"() {
@@ -29,12 +31,14 @@ class ChecksPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.disableChecks', true)
         config.aheadOfRemote = true
         config.uncommittedChanges = true
+        config.snapshotDependencies = true
 
         ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
 
         expect:
         !rules.checkUncommittedChanges
         !rules.checkAheadOfRemote
+        !rules.checkSnapshotDependencies
     }
 
     def "should skip uncommitted changes check if it was disabled using project property"() {
@@ -57,6 +61,17 @@ class ChecksPropertiesFactoryTest extends Specification {
 
         expect:
         !rules.checkAheadOfRemote
+    }
+
+    def "should skip snapshots check if it was disabled using project property"() {
+        given:
+        project.extensions.extraProperties.set('release.disableSnapshotsCheck', true)
+        config.snapshotDependencies = true
+
+        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+
+        expect:
+        !rules.checkSnapshotDependencies
     }
 
 }
