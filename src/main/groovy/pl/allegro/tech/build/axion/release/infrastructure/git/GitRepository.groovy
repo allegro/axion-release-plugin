@@ -175,10 +175,7 @@ class GitRepository implements ScmRepository {
 
         Map tags = repository.tag.list()
                 .grep({ def tag = it.fullName.substring(GIT_TAG_PREFIX.length()); tag ==~ pattern && !(tag ==~ inversePattern) })
-                .inject([:], { map, entry ->
-                    if (map[entry.commit.id] == null) {
-                        map[entry.commit.id] = [] as List<String>
-                    }
+                .inject([:].withDefault {p -> []}, { map, entry ->
                     map[entry.commit.id] << entry.fullName.substring(GIT_TAG_PREFIX.length())
                     return map
                 })
@@ -197,7 +194,7 @@ class GitRepository implements ScmRepository {
         RevCommit commit
         for (commit = walk.next(); commit != null; commit = walk.next()) {
             tagNameList = tags[commit.id.name()]
-            if (tagNameList != null) {
+            if (tagNameList) {
                 break
             }
         }
