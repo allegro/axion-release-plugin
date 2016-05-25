@@ -14,7 +14,7 @@ class TagPropertiesFactory {
                 serialize: config.serialize,
                 deserialize: config.deserialize,
                 initialVersion: config.initialVersion,
-				tagSelector: config.tagSelector
+                tagSelector: config.tagSelector
         )
     }
 

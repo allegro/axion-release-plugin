@@ -19,7 +19,7 @@ class TagPropertiesBuilder {
                 prefix: 'release',
                 versionSeparator: '-',
                 initialVersion: { r, p -> '0.1.0' },
-				tagSelector: ScmRepository.LAST_TAG_SELECTOR
+                tagSelector: ScmRepository.LAST_TAG_SELECTOR
         )
     }
 
