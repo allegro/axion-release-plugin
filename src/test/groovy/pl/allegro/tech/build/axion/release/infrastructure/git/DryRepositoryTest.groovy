@@ -40,7 +40,7 @@ class DryRepositoryTest extends Specification {
     def "should return currentPosition from real scm"() {
         given:
         ScmPosition expectedPosition = new ScmPosition("master", "latest", true)
-        scm.currentPosition(_) >> expectedPosition
+        scm.currentPosition(_, _) >> expectedPosition
 
         when:
         ScmPosition currentPosition = dryRepository.currentPosition(~/^release.*/)

@@ -15,4 +15,6 @@ class TagProperties {
 
     final Closure<String> initialVersion
 
+    final Closure<String> tagSelector
+
 }

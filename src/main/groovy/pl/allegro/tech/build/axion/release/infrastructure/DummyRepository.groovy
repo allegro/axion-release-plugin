@@ -14,7 +14,7 @@ class DummyRepository implements ScmRepository {
 
     DummyRepository() {
     }
-    
+
     private void log(String commandName) {
         logger.quiet("Couldn't perform $commandName command on uninitialized repository")
     }
@@ -54,9 +54,14 @@ class DummyRepository implements ScmRepository {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return ScmPosition.defaultPosition()
     }
-    
+
     @Override
-    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
+    ScmPosition currentPosition(Pattern tagPattern, Closure tagSelector) {
+        return currentPosition(tagPattern)
+    }
+
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern, Closure tagSelector) {
         return currentPosition(tagPattern)
     }
 
