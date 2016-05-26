@@ -136,6 +136,22 @@ class PredefinedVersionIncrementerTest extends Specification {
         e.message == "Already on a prerelease, use incrementPrerelease"
     }
 
+    def "should increment prerelease when incrementPrereleaseOrMinor rule used"() {
+        given:
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc2'), ScmPosition.defaultPosition())
+
+        expect:
+        versionIncrementerFor('incrementPrereleaseOrMinor')(context) == Version.valueOf('0.1.0-rc3')
+    }
+
+    def "should increment minor when not on prerelease when incrementPrereleaseOrMinor rule used"() {
+        given:
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), ScmPosition.defaultPosition())
+
+        expect:
+        versionIncrementerFor('incrementPrereleaseOrMinor')(context) == Version.valueOf('0.2.0')
+    }
+
     def "should throw exception when unknown incrementer used"() {
         when:
         versionIncrementerFor('unknown')(context)

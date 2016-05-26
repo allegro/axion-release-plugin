@@ -30,20 +30,19 @@ enum PredefinedVersionIncrementer {
     }),
 
     INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map config ->
+        Version version
         if (context.currentVersion.preReleaseVersion) {
-            Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
-            if (matcher.matches()) {
-                long nextNumber = Long.parseLong(matcher.group(2)) + 1
-                String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
-                String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
-
-                return new Version.Builder()
-                        .setNormalVersion(context.currentVersion.normalVersion)
-                        .setPreReleaseVersion(nextPreReleaseVersion)
-                        .build();
-            }
+            version = incrementPrereleaseAllowingLeadingZeros(context)
         }
-        return context.currentVersion.incrementPatchVersion()
+        return version ? version : context.currentVersion.incrementPatchVersion()
+    }),
+
+    INCREMENT_PRERELEASE_OR_MINOR('incrementPrereleaseOrMinor', { VersionIncrementerContext context, Map config ->
+        Version version
+        if (context.currentVersion.preReleaseVersion) {
+            version = incrementPrereleaseAllowingLeadingZeros(context)
+        }
+        return version ? version : context.currentVersion.incrementMinorVersion()
     }),
 
     CREATE_MAJOR_RC('createMajorRC', { VersionIncrementerContext context, Map config ->
@@ -77,6 +76,21 @@ enum PredefinedVersionIncrementer {
     private final String name
 
     final Closure<Version> versionIncrementer
+
+    private static incrementPrereleaseAllowingLeadingZeros(VersionIncrementerContext context) {
+        Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
+        if (matcher.matches()) {
+            long nextNumber = Long.parseLong(matcher.group(2)) + 1
+            String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
+            String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
+
+            return new Version.Builder()
+                    .setNormalVersion(context.currentVersion.normalVersion)
+                    .setPreReleaseVersion(nextPreReleaseVersion)
+                    .build();
+        }
+        return null
+    }
 
     private static throwErrorIfPrerelease(VersionIncrementerContext context) {
         if (context.currentVersion.getPreReleaseVersion()) {
