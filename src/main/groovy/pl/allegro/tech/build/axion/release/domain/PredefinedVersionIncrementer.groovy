@@ -46,6 +46,29 @@ enum PredefinedVersionIncrementer {
         return context.currentVersion.incrementPatchVersion()
     }),
 
+    CREATE_MAJOR_RC('createMajorRC', { VersionIncrementerContext context, Map config ->
+        throwErrorIfPrerelease(context)
+        return new Version.Builder()
+            .setNormalVersion(context.currentVersion.incrementMajorVersion().toString())
+            .setPreReleaseVersion("RC1")
+            .build();
+    }),
+
+    CREATE_MINOR_RC('createMinorRC', { VersionIncrementerContext context, Map config ->
+        throwErrorIfPrerelease(context)
+        return new Version.Builder()
+            .setNormalVersion(context.currentVersion.incrementMinorVersion().toString())
+            .setPreReleaseVersion("RC1")
+            .build();
+    }),
+
+    CREATE_FINAL('createFinal', { VersionIncrementerContext context, Map config ->
+        throwErrorIfNotPrerelease(context)
+        return new Version.Builder()
+                .setNormalVersion(context.currentVersion.normalVersion)
+                .build();
+    }),
+
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
         def incrementer = config.find { context.scmPosition.branch ==~ it.key }
         return versionIncrementerFor(incrementer.value, config)(context)
@@ -54,6 +77,18 @@ enum PredefinedVersionIncrementer {
     private final String name
 
     final Closure<Version> versionIncrementer
+
+    private static throwErrorIfPrerelease(VersionIncrementerContext context) {
+        if (context.currentVersion.getPreReleaseVersion()) {
+            throw new IllegalArgumentException("Already on a prerelease, use incrementPrerelease")
+        }
+    }
+
+    private static throwErrorIfNotPrerelease(VersionIncrementerContext context) {
+        if (!context.currentVersion.getPreReleaseVersion()) {
+            throw new IllegalArgumentException("Not on a prerelease, use normal release instead")
+        }
+    }
 
     private PredefinedVersionIncrementer(String name, Closure<Version> c) {
         this.name = name
