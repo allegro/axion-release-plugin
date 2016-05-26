@@ -65,8 +65,8 @@ enum PredefinedVersionIncrementer {
     CREATE_FINAL('createFinal', { VersionIncrementerContext context, Map config ->
         throwErrorIfNotPrerelease(context)
         return new Version.Builder()
-                .setNormalVersion(context.currentVersion.normalVersion)
-                .build();
+            .setNormalVersion(context.currentVersion.normalVersion)
+            .build();
     }),
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->

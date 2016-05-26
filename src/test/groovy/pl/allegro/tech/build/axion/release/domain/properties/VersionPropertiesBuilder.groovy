@@ -1,11 +1,16 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
+import com.github.zafarkhaja.semver.Version;
+
+import groovy.lang.Closure;
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
 
 class VersionPropertiesBuilder {
 
     private String forcedVersion
+
+    private Closure<Version> myVersionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
     private boolean forceSnapshot = false
 
@@ -24,8 +29,13 @@ class VersionPropertiesBuilder {
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
                 versionCreator: PredefinedVersionCreator.SIMPLE.versionCreator,
-                versionIncrementer: PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
+                versionIncrementer: myVersionIncrementer,
                 sanitizeVersion: true)
+    }
+
+    VersionPropertiesBuilder withVersionIncrementer(String incrementer) {
+        this.myVersionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(incrementer)
+        return this
     }
 
     VersionPropertiesBuilder forceVersion(String version) {
