@@ -9,7 +9,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import java.util.regex.Pattern
 
 class DryRepository implements ScmRepository {
-    
+
     private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(DryRepository)
 
     private final ScmRepository delegateRepository
@@ -50,15 +50,20 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern) {
-        return currentPosition(tagPattern)
-    }
-    
-    @Override
-    ScmPosition currentPosition(Pattern tagPattern) {
-        ScmPosition position = delegateRepository.currentPosition(tagPattern)
+    ScmPosition currentPosition(Pattern tagPattern, Closure<String> tagSelector) {
+        ScmPosition position = delegateRepository.currentPosition(tagPattern, tagSelector)
         log("scm position: $position")
         return position
+    }
+
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern, Closure<String> tagSelector) {
+        return currentPosition(tagPattern, tagSelector)
+    }
+
+    @Override
+    ScmPosition currentPosition(Pattern tagPattern) {
+        return currentPosition(tagPattern, LAST_TAG_SELECTOR)
     }
 
     @Override

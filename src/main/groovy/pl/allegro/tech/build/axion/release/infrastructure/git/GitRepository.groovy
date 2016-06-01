@@ -32,9 +32,9 @@ class GitRepository implements ScmRepository {
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
     private final TransportConfigFactory transportConfigFactory = new TransportConfigFactory()
-    
+
     private final File repositoryDir
-    
+
     private final Grgit repository
 
     private final ScmProperties properties
@@ -159,38 +159,47 @@ class GitRepository implements ScmRepository {
 
     @Override
     ScmPosition currentPosition(Pattern pattern) {
-        return currentPosition(pattern, Pattern.compile('$a^'))
+        return currentPosition(pattern, Pattern.compile('$a^'), LAST_TAG_SELECTOR)
     }
-    
+
     @Override
-    ScmPosition currentPosition(Pattern pattern, Pattern inversePattern) {
+    ScmPosition currentPosition(Pattern pattern, Closure<String> tagSelector) {
+        return currentPosition(pattern, Pattern.compile('$a^'), tagSelector)
+    }
+
+    @Override
+    ScmPosition currentPosition(Pattern pattern, Pattern inversePattern, Closure<String> tagSelector) {
         if(!hasCommits()) {
             return ScmPosition.defaultPosition()
         }
 
         Map tags = repository.tag.list()
                 .grep({ def tag = it.fullName.substring(GIT_TAG_PREFIX.length()); tag ==~ pattern && !(tag ==~ inversePattern) })
-                .inject([:], { map, entry -> map[entry.commit.id] = entry.fullName.substring(GIT_TAG_PREFIX.length()); return map; })
+                .inject([:].withDefault {p -> []}, { map, entry ->
+                    map[entry.commit.id] << entry.fullName.substring(GIT_TAG_PREFIX.length())
+                    return map
+                })
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
         String branch = repository.branch.current.name
 
         RevWalk walk = new RevWalk(repository.repository.jgit.repository)
         walk.sort(RevSort.TOPO)
+        walk.sort(RevSort.COMMIT_TIME_DESC, true)
         RevCommit head = walk.parseCommit(headId)
 
-        String tagName = null
+        List<String> tagNameList = null
 
         walk.markStart(head)
         RevCommit commit
         for (commit = walk.next(); commit != null; commit = walk.next()) {
-            tagName = tags[commit.id.name()]
-            if (tagName != null) {
+            tagNameList = tags[commit.id.name()]
+            if (tagNameList) {
                 break
             }
         }
         walk.dispose()
-
+        String tagName = tagSelector(tagNameList)
         boolean onTag = (commit == null) ? null : commit.id.name() == headId.name()
         return new ScmPosition(branch, tagName, onTag, checkUncommittedChanges())
     }

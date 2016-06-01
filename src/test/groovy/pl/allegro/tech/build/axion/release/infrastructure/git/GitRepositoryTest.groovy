@@ -30,10 +30,10 @@ class GitRepositoryTest extends Specification {
     void setup() {
         Project remoteProject = ProjectBuilder.builder().build()
         remoteRawRepository = GitProjectBuilder.gitProject(remoteProject).withInitialCommit().build()[Grgit]
-        
+
         project = ProjectBuilder.builder().build()
         Map repositories = GitProjectBuilder.gitProject(project, remoteProject).build()
-        
+
         rawRepository = repositories[Grgit]
         repository = repositories[GitRepository]
     }
@@ -111,10 +111,30 @@ class GitRepositoryTest extends Specification {
         !position.onTag
     }
 
+    def "should use the given closure to select one of multiple tags on the same commit"() {
+        given:
+        repository.tag('release-1.0.0-rc1')
+        repository.commit(['*'], "commit after release")
+        repository.tag('release-1.0.0-rc2')
+        repository.tag('release-1.0.0')
+
+        Closure<String> tagSelector = { tags ->
+            assert tags == ['release-1.0.0', 'release-1.0.0-rc2']
+            return 'release-1.0.0'
+        }
+
+        when:
+        ScmPosition position = repository.currentPosition(~/^release.*/, tagSelector)
+
+        then:
+        position.latestTag == 'release-1.0.0'
+        position.onTag
+    }
+
     def "should return default position when no commit in repository"() {
         given:
         GitRepository commitlessRepository = GitProjectBuilder.gitProject(ProjectBuilder.builder().build()).build()[GitRepository]
-        
+
         when:
         ScmPosition position = commitlessRepository.currentPosition(~/^release.*/)
 
@@ -215,7 +235,7 @@ class GitRepositoryTest extends Specification {
     def "should not push commits if the pushTagsOnly flag is set to true"() {
         repository.tag('release-push')
         repository.commit(['*'], 'commit after release-push')
-        
+
         when:
         repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: true))
 

@@ -4,6 +4,12 @@
 *.ipr
 *.iws
 
+# Eclipse project files
+.classpath
+.project
+.settings/
+bin/
+
 # gradle config
 .gradle
 
