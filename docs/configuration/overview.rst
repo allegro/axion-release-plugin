@@ -15,6 +15,8 @@ All ``axion-release-plugin`` configuration options:
             // :doc:`authorization`
             customKey = 'AAasaDDSSD...' or project.file('myKey') // custom authorization key (file or String)
             customKeyPassword = 'secret' // key password
+
+            tagSelector = { tags -> ... } // choose tag to process when multiple on commit
         }
 
         // :doc:`dry_run`

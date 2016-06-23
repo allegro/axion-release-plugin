@@ -1,6 +1,9 @@
 Changelog
 =========
 
+* **1.3.5** (23.06.2016)
+    * added ``tagSelector`` option to choose from multiple tags on single commit - thanks to `levsa <https://github.com/levsa>`_ for contribution
+    * added snapshot dependencies check - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
 * **1.3.4** (30.12.2015)
     * added option to specify tag prefix per branch
     * added option to specify version incrementer per branch
