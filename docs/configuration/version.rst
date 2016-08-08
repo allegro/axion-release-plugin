@@ -209,6 +209,10 @@ you can configure it via ``scmVersion.versionCreator`` method::
         versionCreator 'versionWithBranch'
     }
 
+Or via ``release.versionCreator`` command line argument, which overrides any other versionCreator settings::
+
+    ./gradlew release -Prelease.versionCreator=simple
+
 You can also set decorators per branches that match specific regular expression::
 
     scmVersion {

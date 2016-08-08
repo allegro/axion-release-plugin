@@ -21,6 +21,8 @@ class VersionPropertiesFactory {
 
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
 
+    private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
+
     static VersionProperties create(Project project, VersionConfig config, String currentBranch) {
         String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
         if (forceVersionValue == null) {
@@ -34,7 +36,7 @@ class VersionPropertiesFactory {
                 forcedVersion: forceVersionValue?.trim() ? forceVersionValue.trim() : null,
                 forceSnapshot: forceSnapshot,
                 ignoreUncommittedChanges: ignoreUncommittedChanges,
-                versionCreator: findVersionCreator(config, currentBranch),
+                versionCreator: findVersionCreator(project, config, currentBranch),
                 versionIncrementer: findVersionIncrementer(project, config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion
         )
@@ -58,7 +60,11 @@ class VersionPropertiesFactory {
         )
     }
 
-    private static Closure findVersionCreator(VersionConfig config, String currentBranch) {
+    private static Closure findVersionCreator(Project project, VersionConfig config, String currentBranch) {
+        if(project.hasProperty(VERSION_CREATOR_PROPERTY)) {
+            return PredefinedVersionCreator.versionCreatorFor(project.property(VERSION_CREATOR_PROPERTY))
+        }
+
         return find(
                 currentBranch,
                 config.branchVersionCreator,

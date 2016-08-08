@@ -154,6 +154,22 @@ class VersionPropertiesFactoryTest extends Specification {
         rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0-someBranch'
     }
 
+
+    def "should use version creator passed as command line option if present"() {
+        given:
+        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.branchVersionCreator = [
+                'some.*': 'versionWithBranch'
+        ]
+        project.extensions.extraProperties.set('release.versionCreator', 'simple')
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+
+        then:
+        rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0'
+    }
+
     def "should pick default version incrementer if none branch incrementers match"() {
         given:
         versionConfig.versionIncrementer = { c -> c.currentVersion }
