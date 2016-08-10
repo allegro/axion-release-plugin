@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url 'https://plugins.gradle.org/m2/'  }
+        maven { url 'https://plugins.gradle.org/m2/' }
     }
     dependencies {
         classpath group: 'com.gradle.publish', name: 'plugin-publish-plugin', version: '0.9.1'
@@ -11,6 +11,7 @@ buildscript {
 
 plugins {
     id 'groovy'
+    id 'java-gradle-plugin'
     id 'maven'
     id 'jacoco'
     id 'pl.allegro.tech.build.axion-release' version '1.3.1'
@@ -19,7 +20,7 @@ plugins {
 
 apply plugin: 'com.gradle.plugin-publish'
 
-if(project.hasProperty('mavenCentral')) {
+if (project.hasProperty('mavenCentral')) {
     apply from: 'gradle/mavenCentral.gradle'
 }
 
@@ -27,9 +28,9 @@ scmVersion {
     tag {
         prefix = 'axion-release'
     }
-    
+
     hooks {
-        pre 'fileUpdate', [files: ['README.md', 'docs/conf.py'], pattern: {v, p -> /'$v'/ }, replacement: {v, p -> "'$v'"}]
+        pre 'fileUpdate', [files: ['README.md', 'docs/conf.py'], pattern: { v, p -> /'$v'/ }, replacement: { v, p -> "'$v'" }]
         pre 'commit'
     }
 
@@ -49,6 +50,22 @@ project.ext.versions = [
         jgit: '4.1.1.201511131810-r'
 ]
 
+sourceSets {
+    integration {
+        java.srcDir project.file('src/integration/java')
+        groovy.srcDir project.file('src/integration/groovy')
+
+        resources.srcDir project.file('src/integration/resources')
+        resources.srcDir project.sourceSets.test.resources
+        resources.srcDir project.sourceSets.main.resources
+
+        compileClasspath = project.sourceSets.main.output +
+                project.sourceSets.test.output +
+                project.configurations.testRuntime
+        runtimeClasspath = output + compileClasspath
+    }
+}
+
 dependencies {
     compile gradleApi()
     compile localGroovy()
@@ -65,12 +82,45 @@ dependencies {
         exclude group: 'org.codehaus.groovy', module: 'groovy-all'
     }
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
+    testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
+
+    testCompile gradleTestKit()
 }
 
 test {
     testLogging {
+        events 'passed', 'skipped', 'failed'
         exceptionFormat = 'full'
     }
+}
+
+project.configurations {
+    integration {
+        extendsFrom project.configurations.testRuntime
+        description = 'Dependencies for integration tests'
+        transitive = true
+        visible = true
+    }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = project.sourceSets.integration.output.classesDir
+    classpath = project.sourceSets.main.output +
+            project.sourceSets.test.output +
+            project.sourceSets.integration.runtimeClasspath +
+            project.configurations.testRuntime +
+            project.configurations.integrationRuntime
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+}
+
+tasks.check.dependsOn integrationTest
+
+gradlePlugin {
+    testSourceSets project.sourceSets.integration
 }
 
 jacocoTestReport {
@@ -81,7 +131,7 @@ jacocoTestReport {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.8'
+    gradleVersion = '2.14.1'
 }
 
 pluginBundle {
