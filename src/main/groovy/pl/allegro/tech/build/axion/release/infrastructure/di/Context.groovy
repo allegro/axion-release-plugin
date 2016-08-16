@@ -1,7 +1,5 @@
 package pl.allegro.tech.build.axion.release.infrastructure.di
 
-import org.gradle.internal.service.ServiceRegistry
-import org.gradle.logging.StyledTextOutputFactory
 import pl.allegro.tech.build.axion.release.domain.*
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
@@ -73,10 +71,7 @@ class Context {
         )
     }
 
-    ScmChangesPrinter changesPrinter(ServiceRegistry services) {
-        return new GitChangesPrinter(
-                get(ScmRepository) as GitRepository,
-                services.get(StyledTextOutputFactory).create(ScmChangesPrinter)
-        )
+    ScmChangesPrinter changesPrinter() {
+        return new GitChangesPrinter(get(ScmRepository) as GitRepository)
     }
 }

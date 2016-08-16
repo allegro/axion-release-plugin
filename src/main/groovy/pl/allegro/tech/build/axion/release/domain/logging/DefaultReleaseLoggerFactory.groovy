@@ -17,35 +17,11 @@ class DefaultReleaseLoggerFactory implements ReleaseLoggerFactory {
 
     private static class Slf4jReleaseLogger implements ReleaseLogger {
 
+        @Delegate
         private final Logger logger
 
         Slf4jReleaseLogger(Logger logger) {
             this.logger = logger
-        }
-
-        @Override
-        void trace(String message) {
-            logger.trace(message)
-        }
-
-        @Override
-        void debug(String message) {
-            logger.debug(message)
-        }
-
-        @Override
-        void info(String message) {
-            logger.info(message)
-        }
-
-        @Override
-        void warn(String message) {
-            logger.warn(message)
-        }
-
-        @Override
-        void error(String message) {
-            logger.error(message)
         }
 
         @Override
