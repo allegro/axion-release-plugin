@@ -3,9 +3,11 @@ package pl.allegro.tech.build.axion.release.domain
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.ReleasePlugin
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
+import pl.allegro.tech.build.axion.release.infrastructure.output.GradleReleaseLoggerFactory
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -54,6 +56,8 @@ class VersionConfig {
 
     @Inject
     VersionConfig(Project project) {
+        ReleaseLogger.Factory.initialize(new GradleReleaseLoggerFactory())
+
         this.project = project
 
         this.repository = RepositoryConfigFactory.create(project)

@@ -1,19 +1,17 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Status
-import org.gradle.logging.StyledTextOutput
-import org.gradle.logging.StyledTextOutput.Style
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
+import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
 
 class GitChangesPrinter implements ScmChangesPrinter {
 
-    private final StyledTextOutput output
+    private final OutputWriter output = new OutputWriter()
 
     private final GitRepository repository
 
-    GitChangesPrinter(GitRepository repository, StyledTextOutput output) {
+    GitChangesPrinter(GitRepository repository) {
         this.repository = repository
-        this.output = output
     }
 
     @Override
@@ -30,24 +28,23 @@ class GitChangesPrinter implements ScmChangesPrinter {
     }
 
     private void printChangeType(Status.Changes changeset) {
-        printChangeset(Style.Description, 'modified', changeset.modified)
-        printChangeset(Style.Identifier, 'added', changeset.added)
-        printChangeset(Style.Failure, 'removed', changeset.removed)
+        printChangeset('modified', changeset.modified)
+        printChangeset('added', changeset.added)
+        printChangeset('removed', changeset.removed)
     }
 
-    private void printChangeset(Style style, String type, Set<String> changes) {
+    private void printChangeset(String type, Set<String> changes) {
         if (!changes.empty) {
             changes.each { outputLine(style, type, it) }
         }
     }
 
     private void outputHeader(String text) {
-        output.withStyle(Style.Header).println('')
-        output.withStyle(Style.Header).println("$text")
+        output.println('')
+        output.println(text)
     }
 
-    private void outputLine(Style style, String description, String file) {
-        output.withStyle(style).append('    ').text("$description: ")
-        output.println(file)
+    private void outputLine(String description, String file) {
+        output.println("    $description: $file")
     }
 }

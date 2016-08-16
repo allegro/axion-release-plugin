@@ -2,11 +2,8 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
-import org.gradle.logging.StyledTextOutput
-import org.gradle.logging.StyledTextOutputFactory
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
-
-import static org.gradle.logging.StyledTextOutput.Style.*
+import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
 
 class OutputCurrentVersionTask extends DefaultTask {
 
@@ -18,9 +15,9 @@ class OutputCurrentVersionTask extends DefaultTask {
     void output() {
         VersionConfig versionConfig = project.extensions.getByType(VersionConfig)
 
-        StyledTextOutput output = services.get(StyledTextOutputFactory).create(OutputCurrentVersionTask)
-        output.withStyle(Header).println('')
-        output.withStyle(Header).println("Project version: ${versionConfig.version}")
+        OutputWriter output = new OutputWriter()
+        output.println('')
+        output.println("Project version: ${versionConfig.version}")
     }
 
 }
