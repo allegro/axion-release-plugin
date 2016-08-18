@@ -2,7 +2,7 @@ Changelog
 =========
 
 * **1.4.0** (17.08.2016)
-    * comatibility with Gradle 3.0
+    * compatibility with Gradle 3.0
 * **1.3.5** (23.06.2016)
     * added ``tagSelector`` option to choose from multiple tags on single commit - thanks to `levsa <https://github.com/levsa>`_ for contribution
     * added snapshot dependencies check - thanks to `vbuell <https://github.com/vbuell>`_ for contribution
