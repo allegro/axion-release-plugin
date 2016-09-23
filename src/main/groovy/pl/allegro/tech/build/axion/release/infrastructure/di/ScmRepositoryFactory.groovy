@@ -22,7 +22,7 @@ class ScmRepositoryFactory {
         try {
             repository = new GitRepository(properties)
         } catch (ScmRepositoryUnavailableException exception) {
-            logger.warn("Failed top open repository, trying to work without it $exception.message")
+            logger.warn("Failed to open repository, trying to work without it $exception.message")
             repository = new DummyRepository()
         }
         return repository
