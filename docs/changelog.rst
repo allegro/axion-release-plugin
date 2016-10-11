@@ -1,6 +1,8 @@
 Changelog
 =========
 
+* **1.4.1** (11.10.2016)
+    * fixing critical bug in printing Git changes, which could block ``verifyRelease`` task
 * **1.4.0** (17.08.2016)
     * compatibility with Gradle 3.0
 * **1.3.5** (23.06.2016)
