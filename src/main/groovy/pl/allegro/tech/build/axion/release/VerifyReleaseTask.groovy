@@ -28,11 +28,12 @@ class VerifyReleaseTask extends DefaultTask {
         if (checksRules.checkUncommittedChanges) {
             boolean uncommittedChanges = repository.checkUncommittedChanges()
             project.logger.quiet("Looking for uncommitted changes.. ${uncommittedChanges ? 'FAILED' : ''}")
-            if (uncommittedChanges && !dryRun) {
+            if (uncommittedChanges) {
                 changesPrinter.printChanges()
-
-                throw new IllegalStateException("There are uncommitted files in your repository - can't release. " +
-                        "See above for list of all changes.")
+                if (!dryRun) {
+                    throw new IllegalStateException("There are uncommitted files in your repository - can't release. " +
+                            "See above for list of all changes.")
+                }
             }
         } else {
             project.logger.quiet('Skipping uncommitted changes check')
