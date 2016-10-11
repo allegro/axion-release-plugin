@@ -35,7 +35,7 @@ class GitChangesPrinter implements ScmChangesPrinter {
 
     private void printChangeset(String type, Set<String> changes) {
         if (!changes.empty) {
-            changes.each { outputLine(style, type, it) }
+            changes.each { outputLine(type, it) }
         }
     }
 
