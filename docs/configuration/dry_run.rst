@@ -1,4 +1,4 @@
-Dry run & local ony release
+Dry run & local only release
 ===========================
 
 In some cases, especially when setting up ``axion-release-plugin`` or experimenting with new features it is desirable
