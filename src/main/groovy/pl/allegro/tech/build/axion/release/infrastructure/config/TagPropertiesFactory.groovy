@@ -13,8 +13,7 @@ class TagPropertiesFactory {
                 versionSeparator: config.versionSeparator,
                 serialize: config.serialize,
                 deserialize: config.deserialize,
-                initialVersion: config.initialVersion,
-                tagSelector: config.tagSelector
+                initialVersion: config.initialVersion
         )
     }
 

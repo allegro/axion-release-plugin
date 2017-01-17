@@ -20,17 +20,17 @@ class VersionResolverTest extends RepositoryBasedTest {
     VersionProperties defaultVersionRules = versionProperties().build()
 
     def setup() {
-        resolver = new VersionResolver(repository, context.versionFactory())
+        resolver = new VersionResolver(repository)
     }
     
     def "should return default previous and current version when no tag in repository"() {
         when:
-        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
         
         then:
         version.previousVersion.toString() == '0.1.0'
         version.version.toString() == '0.1.0'
-        version.position.tagless()
+        version.snapshot
     }
     
     def "should return same previous and current version when on release tag"() {
@@ -38,11 +38,27 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('release-1.1.0')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '1.1.0'
+        !version.snapshot
+    }
+
+    def "should pick tag with highest version when multiple tags on last commit"() {
+        given:
+        repository.tag('release-1.0.0')
+        repository.tag('release-1.1.0')
+        repository.tag('release-1.2.0')
+
+        when:
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.0'
+        !version.snapshot
     }
     
     def "should return unmodified previous and incremented current version when not on tag"() {
@@ -51,26 +67,27 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.commit(['*'], 'some commit')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '1.1.1'
+        version.snapshot
     }
     
-    def "should return previous version from last release tag and current from alpha when on alpha tag"() {
+    def "should return previous version from last release tag and current from next version when on next version tag"() {
         given:
         repository.tag('release-1.1.0')
         repository.commit(['*'], 'some commit')
         repository.tag('release-2.0.0-alpha')
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '2.0.0'
-        !version.position.onTag
+        version.snapshot
     }
     
     def "should return previous version from last release and current from forced version when forcing version"() {
@@ -81,10 +98,11 @@ class VersionResolverTest extends RepositoryBasedTest {
         VersionProperties versionRules = versionProperties().forceVersion('2.0.0').build()
 
         when:
-        VersionWithPosition version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '2.0.0'
+        version.snapshot
     }
 }

@@ -8,6 +8,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 import pl.allegro.tech.build.axion.release.infrastructure.output.GradleReleaseLoggerFactory
+import pl.allegro.tech.build.axion.release.util.FileLoader
 
 import javax.inject.Inject
 import java.util.regex.Pattern
@@ -52,13 +53,12 @@ class VersionConfig {
 
     private String resolvedVersion = null
 
-    private VersionWithPosition rawVersion = null
+    private VersionContext rawVersion = null
 
     @Inject
     VersionConfig(Project project) {
-        ReleaseLogger.Factory.initialize(new GradleReleaseLoggerFactory())
-
         this.project = project
+        FileLoader.setRoot(project.rootDir)
 
         this.repository = RepositoryConfigFactory.create(project)
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)

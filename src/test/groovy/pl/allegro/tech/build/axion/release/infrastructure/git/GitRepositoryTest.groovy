@@ -7,12 +7,7 @@ import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import pl.allegro.tech.build.axion.release.domain.scm.*
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
@@ -98,49 +93,29 @@ class GitRepositoryTest extends Specification {
         repository.checkUncommittedChanges()
     }
 
-    def "should point to last tag in current position in simple case"() {
+    def "should return last tag in current position in simple case"() {
         given:
         repository.tag('release-1')
         repository.commit(['*'], "commit after release")
 
         when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
+        TagsOnCommit tags = repository.latestTags(~/^release.*/)
 
         then:
-        position.latestTag == 'release-1'
-        !position.onTag
+        tags.tags == ['release-1']
+        !tags.isHead
     }
 
-    def "should use the given closure to select one of multiple tags on the same commit"() {
-        given:
-        repository.tag('release-1.0.0-rc1')
-        repository.commit(['*'], "commit after release")
-        repository.tag('release-1.0.0-rc2')
-        repository.tag('release-1.0.0')
-
-        Closure<String> tagSelector = { tags ->
-            assert tags == ['release-1.0.0', 'release-1.0.0-rc2']
-            return 'release-1.0.0'
-        }
-
-        when:
-        ScmPosition position = repository.currentPosition(~/^release.*/, tagSelector)
-
-        then:
-        position.latestTag == 'release-1.0.0'
-        position.onTag
-    }
-
-    def "should return default position when no commit in repository"() {
+    def "should return no tags when no commit in repository"() {
         given:
         GitRepository commitlessRepository = GitProjectBuilder.gitProject(ProjectBuilder.builder().build()).build()[GitRepository]
 
         when:
-        ScmPosition position = commitlessRepository.currentPosition(~/^release.*/)
+        TagsOnCommit tags = commitlessRepository.latestTags(~/^release.*/)
 
         then:
-        position.branch == 'master'
-        position.tagless()
+        tags.tags == []
+        !tags.isHead
     }
 
     def "should indicate that position is on tag when latest commit is tagged"() {
@@ -148,11 +123,11 @@ class GitRepositoryTest extends Specification {
         repository.tag('release-1')
 
         when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
+        TagsOnCommit tags = repository.latestTags(~/^release.*/)
 
         then:
-        position.latestTag == 'release-1'
-        position.onTag
+        tags.tags == ['release-1']
+        tags.isHead
     }
 
     def "should track back to older tag when commit was made after checking out older version"() {
@@ -166,20 +141,10 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "bugfix after release-1")
 
         when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
+        TagsOnCommit tags = repository.latestTags(~/^release.*/)
 
         then:
-        position.latestTag == 'release-1'
-    }
-
-    def "should return tagless position with branch name when no tag in repository"() {
-        when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
-
-        then:
-        position.branch == 'master'
-        position.tagless()
-        !position.onTag
+        tags.tags == ['release-1']
     }
 
     def "should return only tags that match with prefix"() {
@@ -189,10 +154,37 @@ class GitRepositoryTest extends Specification {
         repository.tag('otherTag')
 
         when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
+        TagsOnCommit tags = repository.latestTags(~/^release.*/)
 
         then:
-        position.latestTag == 'release-1'
+        tags.tags == ['release-1']
+    }
+
+    def "should return latest tagged commit before the given commit id"() {
+        given:
+        repository.tag('tag-to-find')
+        repository.commit(['*'], 'some commit')
+        repository.tag('tag-to-skip')
+
+        String latestCommitId = repository.latestTags(~'^tag.*').commitId
+
+        when:
+        TagsOnCommit tags = repository.latestTags(~'^tag.*', latestCommitId)
+
+        then:
+        tags.tags == ['tag-to-find']
+    }
+
+    def "should return list of tags when multiple matching tags found on same commit"() {
+        given:
+        repository.tag('release-1')
+        repository.tag('release-2')
+
+        when:
+        TagsOnCommit tags = repository.latestTags(~/^release.*/)
+
+        then:
+        tags.tags == ['release-1', 'release-2']
     }
 
     def "should attach to remote repository"() {
@@ -213,10 +205,10 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "first commit")
 
         when:
-        ScmPosition position = repository.currentPosition(~/^release.*/)
+        String branch = repository.currentBranch()
 
         then:
-        position.branch == 'some-branch'
+        branch == 'some-branch'
     }
 
     def "should push changes and tag to remote"() {

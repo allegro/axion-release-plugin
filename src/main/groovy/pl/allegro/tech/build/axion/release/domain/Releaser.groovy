@@ -23,18 +23,18 @@ class Releaser {
     }
 
     void release(Properties rules) {
-        VersionWithPosition positionedVersion = versionService.currentVersion(rules.version, rules.tag, rules.nextVersion)
-        Version version = positionedVersion.version
+        VersionContext versionContext = versionService.currentVersion(rules.version, rules.tag, rules.nextVersion)
+        Version version = versionContext.version
 
-        if (notOnTagAlready(positionedVersion) || rules.version.forceVersion()) {
+        if (versionContext.snapshot) {
             String tagName = rules.tag.serialize(rules.tag, version.toString())
 
-            hooksRunner.runPreReleaseHooks(rules.hooks, rules, positionedVersion, version)
+            hooksRunner.runPreReleaseHooks(rules.hooks, rules, versionContext, version)
 
             logger.quiet("Creating tag: $tagName")
             repository.tag(tagName)
 
-            hooksRunner.runPostReleaseHooks(rules.hooks, rules, positionedVersion, version)
+            hooksRunner.runPostReleaseHooks(rules.hooks, rules, versionContext, version)
         } else {
             logger.quiet("Working on released version ${version}, nothing to release.")
         }
@@ -42,9 +42,5 @@ class Releaser {
 
     void pushRelease() {
         repository.push()
-    }
-
-    private boolean notOnTagAlready(VersionWithPosition positionedVersion) {
-        return positionedVersion.snapshotVersion
     }
 }

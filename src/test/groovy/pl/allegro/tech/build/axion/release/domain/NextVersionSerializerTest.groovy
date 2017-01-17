@@ -20,7 +20,7 @@ class NextVersionSerializerTest extends Specification {
     
     def "default deserializer should trim separator and suffix"() {
         when:
-        String version = NextVersionSerializer.DEFAULT.deserializer(rules, ScmPosition.onTag('release-1.0.0-beta'))
+        String version = NextVersionSerializer.DEFAULT.deserializer(rules, new ScmPosition('master'), 'release-1.0.0-beta')
 
         then:
         version == 'release-1.0.0'

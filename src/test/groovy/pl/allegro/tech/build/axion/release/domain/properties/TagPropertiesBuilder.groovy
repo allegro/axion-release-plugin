@@ -18,8 +18,7 @@ class TagPropertiesBuilder {
                 deserialize: TagNameSerializer.DEFAULT.deserializer,
                 prefix: 'release',
                 versionSeparator: '-',
-                initialVersion: { r, p -> '0.1.0' },
-                tagSelector: ScmRepository.LAST_TAG_SELECTOR
+                initialVersion: { r, p -> '0.1.0' }
         )
     }
 

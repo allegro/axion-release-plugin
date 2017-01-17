@@ -22,15 +22,9 @@ class TagNameSerializationConfig {
 
     Closure initialVersion = defaultInitialVersion()
 	
-	Closure tagSelector = defaultTagSelector()
-
     private static Closure defaultInitialVersion() {
         return { TagProperties rules, ScmPosition position ->
             return '0.1.0'
         }
     }
-	
-	private static Closure defaultTagSelector() {
-		return ScmRepository.LAST_TAG_SELECTOR
-	}
 }

@@ -21,16 +21,4 @@ class VersionProperties {
     boolean forceVersion() {
         return forcedVersion != null
     }
-
-    VersionProperties withoutForce() {
-        return new VersionProperties(
-                forcedVersion: null,
-                forceSnapshot: false,
-                ignoreUncommittedChanges: ignoreUncommittedChanges,
-                versionCreator: versionCreator,
-                versionIncrementer: versionIncrementer,
-                sanitizeVersion: sanitizeVersion
-        )
-    }
-
 }

@@ -44,14 +44,10 @@ class RepositoryBasedTest extends Specification {
     }
 
     protected String currentVersion() {
-        return currentVersion(context.rules())
-    }
-
-    protected String currentVersion(Properties rules) {
         return context.versionService().currentDecoratedVersion(
-                rules.version,
-                rules.tag,
-                rules.nextVersion
+                context.rules().version,
+                context.rules().tag,
+                context.rules().nextVersion
         )
     }
 }

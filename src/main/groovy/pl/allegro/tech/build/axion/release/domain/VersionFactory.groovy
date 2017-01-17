@@ -8,40 +8,54 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class VersionFactory {
 
-    Version create(ScmPositionContext context,
-                   VersionProperties versionRules,
-                   TagProperties tagRules,
-                   NextVersionProperties nextVersionRules) {
-        Version version
-        
-        if (versionRules.forcedVersion) {
-            version = Version.valueOf(versionRules.forcedVersion)
-        } else {
-            if (context.position.tagless()) {
-                version = Version.valueOf(initialVersion(tagRules.initialVersion, tagRules, context.position))
-            } else {
-                version = Version.valueOf(readVersionFromPosition(context, tagRules, nextVersionRules))
-                
-                boolean hasUncommittedChanges = !versionRules.ignoreUncommittedChanges && context.position.hasUncommittedChanges
-                boolean hasChanges = !context.position.onTag || hasUncommittedChanges || versionRules.forceSnapshot
-                
-                if (hasChanges && !context.nextVersionTag) {
-                    version = versionRules.versionIncrementer(new VersionIncrementerContext(version, context.position))
-                }
-            }
-        }
-        return version
+    private final VersionProperties versionProperties
+
+    private final TagProperties tagProperties
+
+    private final NextVersionProperties nextVersionProperties
+
+    private final ScmPosition scmPosition
+
+    VersionFactory(VersionProperties versionProperties,
+                   TagProperties tagProperties,
+                   NextVersionProperties nextVersionProperties,
+                   ScmPosition scmPosition) {
+        this.tagProperties = tagProperties
+        this.nextVersionProperties = nextVersionProperties
+        this.scmPosition = scmPosition
+        this.versionProperties = versionProperties
     }
 
-    private String initialVersion(Closure toCall, TagProperties tagRules, ScmPosition currentPosition) {
-        return toCall(tagRules, currentPosition)
+    Version versionFromTag(String tag) {
+        String tagWithoutNextVersion = tag
+        if (tag ==~ /.*${nextVersionProperties.suffix}$/) {
+            tagWithoutNextVersion = nextVersionProperties.deserializer(nextVersionProperties, scmPosition, tag)
+        }
+        return Version.valueOf(tagProperties.deserialize(tagProperties, scmPosition, tagWithoutNextVersion))
     }
 
-    private String readVersionFromPosition(ScmPositionContext context, TagProperties tagRules, NextVersionProperties nextVersionRules) {
-        String tagWithoutNextVersion = context.position.latestTag
-        if(context.nextVersionTag) {
-            tagWithoutNextVersion = nextVersionRules.deserializer(nextVersionRules, context.position)
+    Version initialVersion() {
+        return Version.valueOf(tagProperties.initialVersion(tagProperties, scmPosition))
+    }
+
+    Map createFinalVersion(ScmState scmState, Version version) {
+        boolean hasUncommittedChanges = !versionProperties.ignoreUncommittedChanges && scmState.hasUncommittedChanges
+        boolean hasCommittedChanges = !scmState.onReleaseTag
+        boolean hasChanges = hasCommittedChanges || hasUncommittedChanges
+
+        boolean isSnapshot = versionProperties.forcedVersion || versionProperties.forceSnapshot || hasChanges || scmState.onNextVersionTag || scmState.noReleaseTagsFound
+        boolean incrementVersion = versionProperties.forceSnapshot || (!scmState.onNextVersionTag && !scmState.noReleaseTagsFound && hasChanges)
+
+        Version finalVersion = version
+        if (versionProperties.forcedVersion) {
+            finalVersion = Version.valueOf(versionProperties.forcedVersion)
+        } else if (incrementVersion) {
+            finalVersion = versionProperties.versionIncrementer(new VersionIncrementerContext(version, scmPosition))
         }
-        return tagRules.deserialize(tagRules, context.position, tagWithoutNextVersion)
+
+        return [
+                version : finalVersion,
+                snapshot: isSnapshot
+        ]
     }
 }

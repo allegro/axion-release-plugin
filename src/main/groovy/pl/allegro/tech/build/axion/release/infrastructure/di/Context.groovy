@@ -29,9 +29,8 @@ class Context {
         this.scmProperties = scmProperties
         this.localOnlyResolver = localOnlyResolver
 
-        instances[VersionFactory] = new VersionFactory()
         instances[ScmRepository] = scmRepository
-        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, get(VersionFactory)))
+        instances[VersionService] = new VersionService(new VersionResolver(scmRepository))
 
     }
 
@@ -49,10 +48,6 @@ class Context {
 
     ScmService scmService() {
         return new ScmService(localOnlyResolver(), scmProperties, repository())
-    }
-
-    VersionFactory versionFactory() {
-        return get(VersionFactory)
     }
 
     LocalOnlyResolver localOnlyResolver() {

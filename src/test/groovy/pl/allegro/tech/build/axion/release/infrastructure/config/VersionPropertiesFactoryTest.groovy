@@ -151,7 +151,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0-someBranch'
+        rules.versionCreator('1.0.0', new ScmPosition('someBranch')) == '1.0.0-someBranch'
     }
 
 
@@ -167,7 +167,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', ScmPosition.onBranch('someBranch')) == '1.0.0'
+        rules.versionCreator('1.0.0', new ScmPosition('someBranch')) == '1.0.0'
     }
 
     def "should pick default version incrementer if none branch incrementers match"() {
@@ -223,7 +223,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: ScmPosition.onBranch('someBranch'))) == Version.forIntegers(1, 1)
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: new ScmPosition('someBranch'))) == Version.forIntegers(1, 1)
     }
 
     def "should use incrementer passed as command line option if present"() {

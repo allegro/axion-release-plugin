@@ -29,6 +29,6 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         nextVersionMarker.markNextVersion(rules, tagRules)
         
         then:
-        repository.currentPosition(~/.*/).latestTag == 'release-2.0.0-alpha'
+        repository.latestTags(~/.*/).tags == ['release-2.0.0-alpha']
     }
 }

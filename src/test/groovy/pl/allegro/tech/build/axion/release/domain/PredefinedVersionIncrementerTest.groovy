@@ -8,7 +8,7 @@ import static pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrem
 
 class PredefinedVersionIncrementerTest extends Specification {
     
-    VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), ScmPosition.defaultPosition())
+    VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), new ScmPosition('master'))
     
     def "should increment patch when incrementPatch rule used"() {
         expect:
@@ -42,7 +42,7 @@ class PredefinedVersionIncrementerTest extends Specification {
     
     def "should increment prerelease version when incrementPrerelease rule used"() {
         given:
-        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), ScmPosition.defaultPosition())
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), new ScmPosition('master'))
         
         expect:
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc2')
@@ -50,7 +50,7 @@ class PredefinedVersionIncrementerTest extends Specification {
 
     def "should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used"() {
         given:
-        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc01'), ScmPosition.defaultPosition())
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc01'), new ScmPosition('master'))
 
         expect:
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc02')
