@@ -1,8 +1,11 @@
 Publishing
 ==========
 
-Publishing release version is simple with ``axion-release-plugin``. Since release does not increase version
-unless you commit something, you can publish release version any time by calling gradle once again::
+Publishing release version is simple with ``axion-release-plugin``. Since it does not increase version
+unless you commit something, you can publish release version any time by calling gradle once again.
+
+For example, if you are using `maven-publish <https://docs.gradle.org/current/userguide/publishing_maven.html>`_
+plugin for publications, call ``publish`` task after creating release::
 
 
     ./gradlew release
