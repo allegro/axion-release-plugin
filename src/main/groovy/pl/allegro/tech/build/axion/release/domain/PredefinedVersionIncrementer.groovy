@@ -30,20 +30,42 @@ enum PredefinedVersionIncrementer {
     }),
 
     INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map config ->
+        Version version
         if (context.currentVersion.preReleaseVersion) {
-            Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
-            if (matcher.matches()) {
-                long nextNumber = Long.parseLong(matcher.group(2)) + 1
-                String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
-                String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
-
-                return new Version.Builder()
-                        .setNormalVersion(context.currentVersion.normalVersion)
-                        .setPreReleaseVersion(nextPreReleaseVersion)
-                        .build();
-            }
+            version = incrementPrereleaseAllowingLeadingZeros(context)
         }
-        return context.currentVersion.incrementPatchVersion()
+        return version ? version : context.currentVersion.incrementPatchVersion()
+    }),
+
+    INCREMENT_PRERELEASE_OR_MINOR('incrementPrereleaseOrMinor', { VersionIncrementerContext context, Map config ->
+        Version version
+        if (context.currentVersion.preReleaseVersion) {
+            version = incrementPrereleaseAllowingLeadingZeros(context)
+        }
+        return version ? version : context.currentVersion.incrementMinorVersion()
+    }),
+
+    CREATE_MAJOR_RC('createMajorRC', { VersionIncrementerContext context, Map config ->
+        throwErrorIfPrerelease(context)
+        return new Version.Builder()
+            .setNormalVersion(context.currentVersion.incrementMajorVersion().toString())
+            .setPreReleaseVersion("RC1")
+            .build();
+    }),
+
+    CREATE_MINOR_RC('createMinorRC', { VersionIncrementerContext context, Map config ->
+        throwErrorIfPrerelease(context)
+        return new Version.Builder()
+            .setNormalVersion(context.currentVersion.incrementMinorVersion().toString())
+            .setPreReleaseVersion("RC1")
+            .build();
+    }),
+
+    CREATE_FINAL('createFinal', { VersionIncrementerContext context, Map config ->
+        throwErrorIfNotPrerelease(context)
+        return new Version.Builder()
+            .setNormalVersion(context.currentVersion.normalVersion)
+            .build();
     }),
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
@@ -54,6 +76,33 @@ enum PredefinedVersionIncrementer {
     private final String name
 
     final Closure<Version> versionIncrementer
+
+    private static incrementPrereleaseAllowingLeadingZeros(VersionIncrementerContext context) {
+        Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
+        if (matcher.matches()) {
+            long nextNumber = Long.parseLong(matcher.group(2)) + 1
+            String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
+            String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
+
+            return new Version.Builder()
+                    .setNormalVersion(context.currentVersion.normalVersion)
+                    .setPreReleaseVersion(nextPreReleaseVersion)
+                    .build();
+        }
+        return null
+    }
+
+    private static throwErrorIfPrerelease(VersionIncrementerContext context) {
+        if (context.currentVersion.getPreReleaseVersion()) {
+            throw new IllegalArgumentException("Already on a prerelease, use incrementPrerelease")
+        }
+    }
+
+    private static throwErrorIfNotPrerelease(VersionIncrementerContext context) {
+        if (!context.currentVersion.getPreReleaseVersion()) {
+            throw new IllegalArgumentException("Not on a prerelease, use normal release instead")
+        }
+    }
 
     private PredefinedVersionIncrementer(String name, Closure<Version> c) {
         this.name = name
