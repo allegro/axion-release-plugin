@@ -9,11 +9,11 @@ enum NextVersionSerializer {
     { NextVersionProperties rules, String version ->
         return rules.suffix ? version + rules.separator + rules.suffix : version
     },
-    { NextVersionProperties rules, ScmPosition position ->
+    { NextVersionProperties rules, ScmPosition position, String tag ->
         if (rules.suffix.isEmpty()) {
-            return position.latestTag
+            return tag
         }
-        return position.latestTag.replaceFirst(rules.separator + rules.suffix, '')
+        return tag.replaceFirst(rules.separator + rules.suffix, '')
     }
     )
 

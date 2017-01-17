@@ -25,6 +25,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
+        releaseResult.output.contains('Creating tag: release-1.0.0')
 
         when:
         def result = runGradle('cV')
@@ -32,5 +33,56 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         then:
         result.output.contains('1.0.0')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should return tag with highest version when there are multiple releases on single commit"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.1.0', '-Prelease.localOnly', '-Prelease.disableChecks', '-Prelease.forceSnapshot')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('1.1.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should return tag with highest version when there are normal and alpha releases on single commit"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('2.0.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should update file in pre release hook"() {
+        given:
+        File versionFile = newFile('version-file')
+        versionFile << "Version: 0.1.0"
+
+        buildFile("""
+            scmVersion {
+                hooks {
+                    pre 'fileUpdate', [files: ['version-file'], pattern: { v, p -> v }, replacement: { v, p -> v }]
+                    pre 'commit'
+                }
+            }
+        """)
+
+        when:
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        versionFile.text == "Version: 1.0.0"
     }
 }

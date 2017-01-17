@@ -19,7 +19,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties rules = new TagProperties(prefix: 'release', versionSeparator: '-')
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(rules, ScmPosition.onTag('release-0.1.0'), 'release-0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer(rules, new ScmPosition('master'), 'release-0.1.0') == '0.1.0'
     }
 
     def "default serializer should use empty version separator when prefix is empty"() {
@@ -35,6 +35,6 @@ class TagNameSerializerTest extends Specification {
         TagProperties rules = new TagProperties(prefix: '', versionSeparator: '-')
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(rules, ScmPosition.onTag('0.1.0'), '0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer(rules, new ScmPosition('master'), '0.1.0') == '0.1.0'
     }
 }

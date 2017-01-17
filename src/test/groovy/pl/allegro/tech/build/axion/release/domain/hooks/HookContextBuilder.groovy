@@ -8,7 +8,7 @@ class HookContextBuilder {
 
     ScmService scmService
 
-    ScmPosition position = ScmPosition.defaultPosition()
+    ScmPosition position = new ScmPosition('master')
 
     String previousVersion = '1.0.0'
 

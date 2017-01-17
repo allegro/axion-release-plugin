@@ -92,9 +92,7 @@ You can implement own deserializer by setting closure that would accept deserial
 
 ``position`` object contains:
 
-* ``latestTag`` - the name of the latest tag
 * ``branch`` - the name of the current branch
-* ``onTag`` - true, if current commit is tagged with release version tag
 
 Last but not least, ``tagName`` contains prepared tag name that should be used to extract version. ``position.latestTag``
 might point to next version tag with additional suffix.
@@ -265,7 +263,7 @@ Custom version creators can be implemented by creating closure::
     {version, position -> ...}
     
 * version - string version resolved by previous steps
-* position - object described above in *Serialization* section
+* position - object described above :doc:`scm-position` section
 
 .. _version-sanitization:
 

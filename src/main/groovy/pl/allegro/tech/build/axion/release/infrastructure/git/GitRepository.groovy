@@ -45,7 +45,7 @@ class GitRepository implements ScmRepository {
             repository = Grgit.open(dir: repositoryDir)
             this.properties = properties
         }
-        catch(RepositoryNotFoundException exception) {
+        catch (RepositoryNotFoundException exception) {
             throw new ScmRepositoryUnavailableException(exception)
         }
 
@@ -79,7 +79,7 @@ class GitRepository implements ScmRepository {
     @Override
     void tag(String tagName) {
         String headId = repository.repository.jgit.repository.resolve(Constants.HEAD).name()
-        boolean isOnExistingTag = repository.tag.list().any({it.name == tagName && it.commit.id == headId})
+        boolean isOnExistingTag = repository.tag.list().any({ it.name == tagName && it.commit.id == headId })
         if (!isOnExistingTag) {
             repository.tag.add(name: tagName)
         } else {
@@ -97,14 +97,14 @@ class GitRepository implements ScmRepository {
     }
 
     private void callPush(ScmPushOptions pushOptions, boolean all) {
-        if(!pushOptions.pushTagsOnly) {
+        if (!pushOptions.pushTagsOnly) {
             repository.push(remote: pushOptions.remote, all: all)
         }
         repository.push(remote: pushOptions.remote, tags: true, all: all)
     }
 
     private void callLowLevelPush(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
-        if(!pushOptions.pushTagsOnly) {
+        if (!pushOptions.pushTagsOnly) {
             pushCommand(identity, pushOptions.remote, all).call()
         }
         pushCommand(identity, pushOptions.remote, all).setPushTags().call()
@@ -114,7 +114,7 @@ class GitRepository implements ScmRepository {
         PushCommand push = repository.repository.jgit.push()
         push.remote = remoteName
 
-        if(all) {
+        if (all) {
             push.setPushAll()
         }
 
@@ -146,7 +146,7 @@ class GitRepository implements ScmRepository {
 
     @Override
     void commit(List patterns, String message) {
-        if(!patterns.isEmpty()) {
+        if (!patterns.isEmpty()) {
             String canonicalPath = Pattern.quote(repositoryDir.canonicalPath + File.separatorChar)
             repository.add(patterns: patterns.collect { it.replaceFirst(canonicalPath, '') })
         }
@@ -157,51 +157,70 @@ class GitRepository implements ScmRepository {
         return repository.branch.current.name
     }
 
-    @Override
-    ScmPosition currentPosition(Pattern pattern) {
-        return currentPosition(pattern, Pattern.compile('$a^'), LAST_TAG_SELECTOR)
+    TagsOnCommit latestTags(Pattern pattern) {
+        return latestTagsInternal(pattern, null, true)
     }
 
-    @Override
-    ScmPosition currentPosition(Pattern pattern, Closure<String> tagSelector) {
-        return currentPosition(pattern, Pattern.compile('$a^'), tagSelector)
+    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
+        return latestTagsInternal(pattern, sinceCommit, false)
     }
 
-    @Override
-    ScmPosition currentPosition(Pattern pattern, Pattern inversePattern, Closure<String> tagSelector) {
-        if(!hasCommits()) {
-            return ScmPosition.defaultPosition()
+    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
+        if (!hasCommits()) {
+            return new TagsOnCommit(null, [], false)
         }
 
-        Map tags = repository.tag.list()
-                .grep({ def tag = it.fullName.substring(GIT_TAG_PREFIX.length()); tag ==~ pattern && !(tag ==~ inversePattern) })
-                .inject([:].withDefault {p -> []}, { map, entry ->
-                    map[entry.commit.id] << entry.fullName.substring(GIT_TAG_PREFIX.length())
-                    return map
-                })
+        Map<String, List<String>> allTags = tagsMatching(pattern)
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
-        String branch = repository.branch.current.name
 
-        RevWalk walk = new RevWalk(repository.repository.jgit.repository)
-        walk.sort(RevSort.TOPO)
-        walk.sort(RevSort.COMMIT_TIME_DESC, true)
-        RevCommit head = walk.parseCommit(headId)
+        ObjectId startingCommit;
+        if (maybeSinceCommit != null) {
+            startingCommit = ObjectId.fromString(maybeSinceCommit)
+        } else {
+            startingCommit = headId
+        }
 
-        List<String> tagNameList = null
+        RevWalk walk = walker(startingCommit)
+        if (!inclusive) {
+            walk.next()
+        }
 
-        walk.markStart(head)
+        List tagsList = null
+
         RevCommit commit
         for (commit = walk.next(); commit != null; commit = walk.next()) {
-            tagNameList = tags[commit.id.name()]
-            if (tagNameList) {
+            tagsList = allTags[commit.id.name()]
+            if (tagsList) {
                 break
             }
         }
         walk.dispose()
-        String tagName = tagSelector(tagNameList)
-        boolean onTag = (commit == null) ? null : commit.id.name() == headId.name()
-        return new ScmPosition(branch, tagName, onTag, checkUncommittedChanges())
+
+        if (commit == null) {
+            return new TagsOnCommit(null, [], false)
+        }
+
+        return new TagsOnCommit(commit.id.name(), tagsList, Objects.equals(commit.id, headId))
+    }
+
+    private RevWalk walker(ObjectId startingCommit) {
+        RevWalk walk = new RevWalk(repository.repository.jgit.repository)
+        walk.sort(RevSort.TOPO)
+        walk.sort(RevSort.COMMIT_TIME_DESC, true)
+        RevCommit head = walk.parseCommit(startingCommit)
+        walk.markStart(head)
+        return walk
+    }
+
+    private Map<String, List<String>> tagsMatching(Pattern pattern) {
+        return repository.tag.list()
+                .collect({ tag -> [id: tag.commit.id, name: tag.fullName.substring(GIT_TAG_PREFIX.length())] })
+                .grep({ tag -> tag.name ==~ pattern })
+                .inject([:].withDefault({ p -> [] }), { map, entry ->
+            map[entry.id] << entry.name
+            return map
+        })
     }
 
     private boolean hasCommits() {
@@ -212,7 +231,7 @@ class GitRepository implements ScmRepository {
             log.call()
             return true
         }
-        catch(NoHeadException exception) {
+        catch (NoHeadException exception) {
             return false
         }
     }

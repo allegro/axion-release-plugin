@@ -31,7 +31,7 @@ class ReleaserTest extends RepositoryBasedTest {
         releaser.release(rules)
 
         then:
-        currentVersion(rules) == '2.0.0'
+        currentVersion() == '2.0.0'
     }
 
     def "should not release version when on tag"() {
@@ -56,7 +56,7 @@ class ReleaserTest extends RepositoryBasedTest {
         releaser.release(rules)
 
         then:
-        currentVersion(rules) == '3.0.0-rc4'
+        currentVersion() == '3.0.0-rc4'
     }
 
     def "should not release version when on pre-released version tag"() {
@@ -93,7 +93,7 @@ class ReleaserTest extends RepositoryBasedTest {
         releaser.release(rules)
 
         then:
-        currentVersion(rules) == '3.0.0'
+        currentVersion() == '3.0.0'
         repository.lastLogMessages(1) == ['release version: 3.0.0']
     }
 
@@ -109,7 +109,7 @@ class ReleaserTest extends RepositoryBasedTest {
         releaser.release(rules)
 
         then:
-        currentVersion(rules) == '3.2.0'
+        currentVersion() == '3.2.0'
         repository.lastLogMessages(1) == ['release version: 3.2.0']
     }
 }

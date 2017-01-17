@@ -14,7 +14,4 @@ class TagProperties {
     final Closure<String> deserialize
 
     final Closure<String> initialVersion
-
-    final Closure<String> tagSelector
-
 }

@@ -2,7 +2,7 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.VersionService
-import pl.allegro.tech.build.axion.release.domain.VersionWithPosition
+import pl.allegro.tech.build.axion.release.domain.VersionContext
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
@@ -21,13 +21,13 @@ class ReleaseHooksRunner {
         this.scmService = scmService
     }
 
-    void runPreReleaseHooks(HooksProperties hooksRules, Properties rules, VersionWithPosition versionWithPosition, Version releaseVersion) {
+    void runPreReleaseHooks(HooksProperties hooksRules, Properties rules, VersionContext versionWithPosition, Version releaseVersion) {
         HookContext context = new HookContext(rules, versionService, scmService,
                 versionWithPosition.position, versionWithPosition.previousVersion, releaseVersion)
         hooksRules.preReleaseHooks.each { it.act(context) }
     }
 
-    void runPostReleaseHooks(HooksProperties hooksRules, Properties rules, VersionWithPosition versionWithPosition, Version releaseVersion) {
+    void runPostReleaseHooks(HooksProperties hooksRules, Properties rules, VersionContext versionWithPosition, Version releaseVersion) {
         HookContext context = new HookContext(rules, versionService, scmService,
                 versionWithPosition.position, versionWithPosition.previousVersion, releaseVersion)
         hooksRules.postReleaseHooks.each { it.act(context) }

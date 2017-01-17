@@ -5,6 +5,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
 
@@ -50,20 +51,17 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(Pattern tagPattern, Closure<String> tagSelector) {
-        ScmPosition position = delegateRepository.currentPosition(tagPattern, tagSelector)
-        log("scm position: $position")
-        return position
+    TagsOnCommit latestTags(Pattern pattern) {
+        TagsOnCommit tags = delegateRepository.latestTags(pattern)
+        log("Latest tags: ${tags.tags}")
+        return tags
     }
 
     @Override
-    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern, Closure<String> tagSelector) {
-        return currentPosition(tagPattern, tagSelector)
-    }
-
-    @Override
-    ScmPosition currentPosition(Pattern tagPattern) {
-        return currentPosition(tagPattern, LAST_TAG_SELECTOR)
+    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
+        TagsOnCommit tags = delegateRepository.latestTags(pattern, sinceCommit)
+        log("Latest tags: ${tags.tags}")
+        return tags
     }
 
     @Override

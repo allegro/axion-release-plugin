@@ -28,7 +28,7 @@ class FileUpdateHookAction implements ReleaseHookAction {
         String pattern = arguments.pattern(hookContext.previousVersion, hookContext)
         String replacement = arguments.replacement(hookContext.releaseVersion, hookContext)
 
-        hookContext.logger.info("Replacing pattern \"$pattern\" with \"$replacement\" in $file.path")
+        hookContext.logger.quiet("Replacing pattern \"$pattern\" with \"$replacement\" in $file.canonicalPath")
         String replacedText = text.replaceAll(Pattern.compile(pattern, Pattern.MULTILINE), replacement)
 
         file.write(replacedText)

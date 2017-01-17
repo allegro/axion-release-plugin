@@ -4,6 +4,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
 import spock.lang.Specification
 
@@ -37,16 +38,16 @@ class DryRepositoryTest extends Specification {
         0 * scm.commit(_)
     }
 
-    def "should return currentPosition from real scm"() {
+    def "should return latest tags from real scm"() {
         given:
-        ScmPosition expectedPosition = new ScmPosition("master", "latest", true)
-        scm.currentPosition(_, _) >> expectedPosition
+        TagsOnCommit expected = new TagsOnCommit('commit-id', [], false)
+        scm.latestTags(_) >> expected
 
         when:
-        ScmPosition currentPosition = dryRepository.currentPosition(~/^release.*/)
+        TagsOnCommit current = dryRepository.latestTags(~/^release.*/)
 
         then:
-        currentPosition == expectedPosition
+        current == expected
     }
 
     def "should check uncommitted changes on real scm"() {

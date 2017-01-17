@@ -5,6 +5,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
 
@@ -50,20 +51,17 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(Pattern tagPattern) {
+    TagsOnCommit latestTags(Pattern pattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
-        return ScmPosition.defaultPosition()
+        return new TagsOnCommit(null, [], false)
     }
 
     @Override
-    ScmPosition currentPosition(Pattern tagPattern, Closure tagSelector) {
-        return currentPosition(tagPattern)
+    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
+        logger.quiet("Could not resolve current position on uninitialized repository, returning default")
+        return new TagsOnCommit(null, [], false)
     }
 
-    @Override
-    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern, Closure tagSelector) {
-        return currentPosition(tagPattern)
-    }
 
     @Override
     boolean remoteAttached(String remoteName) {

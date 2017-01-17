@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.logging
 
+import pl.allegro.tech.build.axion.release.infrastructure.output.GradleReleaseLoggerFactory
+
 interface ReleaseLogger {
 
     void trace(String message)
@@ -16,7 +18,7 @@ interface ReleaseLogger {
 
     static class Factory {
 
-        private static ReleaseLoggerFactory factory = new DefaultReleaseLoggerFactory()
+        private static ReleaseLoggerFactory factory = new GradleReleaseLoggerFactory()
 
         static void initialize(ReleaseLoggerFactory factory) {
             this.factory = factory

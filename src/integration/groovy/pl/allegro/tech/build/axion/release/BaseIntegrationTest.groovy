@@ -9,6 +9,10 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         return temporaryFolder.newFile('build.gradle')
     }
 
+    File newFile(String name) {
+        return temporaryFolder.newFile(name)
+    }
+
     void buildFile(String contents) {
         buildFile() << """
         plugins {

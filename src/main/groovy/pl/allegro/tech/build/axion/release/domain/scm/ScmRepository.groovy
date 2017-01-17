@@ -2,12 +2,7 @@ package pl.allegro.tech.build.axion.release.domain.scm
 
 import java.util.regex.Pattern
 
-import groovy.lang.Closure;
-
 interface ScmRepository {
-    public static final Closure<String> LAST_TAG_SELECTOR = { List<String> tags ->
-        tags && tags.size() > 0 ? tags[-1] : null
-    }
 
     void fetchTags(ScmIdentity identity, String remoteName)
 
@@ -21,11 +16,9 @@ interface ScmRepository {
 
     String currentBranch()
 
-    ScmPosition currentPosition(Pattern tagPattern)
+    TagsOnCommit latestTags(Pattern pattern)
 
-    ScmPosition currentPosition(Pattern tagPattern, Closure<String> tagSelector)
-
-    ScmPosition currentPosition(Pattern tagPattern, Pattern inversePattern, Closure<String> tagSelector)
+    TagsOnCommit latestTags(Pattern pattern, String sinceCommit)
 
     boolean remoteAttached(String remoteName);
 

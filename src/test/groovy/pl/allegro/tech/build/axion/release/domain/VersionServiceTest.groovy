@@ -9,6 +9,9 @@ import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
+import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
+import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
+
 class VersionServiceTest extends Specification {
 
     VersionResolver resolver = Stub(VersionResolver)
@@ -17,9 +20,9 @@ class VersionServiceTest extends Specification {
 
     VersionConfig versionConfig
 
-    TagProperties tagRules = new TagProperties([:])
+    TagProperties tagProperties = tagProperties().build()
 
-    NextVersionProperties nextVersionRules = new NextVersionProperties([:])
+    NextVersionProperties nextVersionProperties = nextVersionProperties().build()
 
     def setup() {
         Project project = ProjectBuilder.builder().build()
@@ -31,86 +34,91 @@ class VersionServiceTest extends Specification {
     def "should return stable version when on tag"() {
         given:
         VersionProperties versionRules = new VersionProperties([:])
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf('1.0.0'),
+                false,
                 Version.valueOf('1.0.0'),
-                new ScmPosition('master', 'release-1.0.0', true)
+                new ScmPosition('master')
         )
 
         when:
-        VersionWithPosition version = service.currentVersion(versionRules, tagRules, nextVersionRules)
+        VersionContext version = service.currentVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version.version.toString() == '1.0.0'
-        !version.snapshotVersion
+        !version.snapshot
     }
 
     def "should return snapshot version with increased patch when forcing snapshot"() {
         given:
         VersionProperties versionRules = new VersionProperties(forceSnapshot: true)
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf('1.0.1'),
+                true,
                 Version.valueOf('1.0.1'),
-                new ScmPosition('master', 'release-1.0.0', true)
+                new ScmPosition('master')
         )
 
         when:
-        VersionWithPosition version = service.currentVersion(versionRules, tagRules, nextVersionRules)
+        VersionContext version = service.currentVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version.version.toString() == '1.0.1'
-        version.snapshotVersion
+        version.snapshot
     }
 
     def "should return snapshot version with increased patch when not on tag"() {
         given:
         VersionProperties versionRules = new VersionProperties([:])
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf("1.0.1"),
+                true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master', 'release-1.0.0', false)
+                new ScmPosition('master')
         )
 
         when:
-        VersionWithPosition version = service.currentVersion(versionRules, tagRules, nextVersionRules)
+        VersionContext version = service.currentVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version.version.toString() == '1.0.1'
-        version.snapshotVersion
+        version.snapshot
     }
 
     def "should return snapshot version with increased patch when on tag but there are uncommitted changes"() {
         given:
         VersionProperties versionRules = new VersionProperties(ignoreUncommittedChanges: false)
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf("1.0.1"),
+                true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master', 'release-1.0.0', false)
+                new ScmPosition('master')
         )
 
         when:
-        VersionWithPosition version = service.currentVersion(versionRules, tagRules, nextVersionRules)
+        VersionContext version = service.currentVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version.version.toString() == '1.0.1'
-        version.snapshotVersion
+        version.snapshot
     }
 
     def "should sanitize version if flag is set to true"() {
         given:
         VersionProperties versionRules = new VersionProperties(
                 sanitizeVersion: true,
-                versionCreator: {v, t -> return v + '-feature/hello'}
+                versionCreator: { v, t -> return v + '-feature/hello' }
         )
 
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf("1.0.1"),
+                true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master', 'release-1.0.0', false)
+                new ScmPosition('master')
         )
 
         when:
-        String version = service.currentDecoratedVersion(versionRules, tagRules, nextVersionRules)
+        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version == '1.0.1-feature-hello-SNAPSHOT'
@@ -120,16 +128,17 @@ class VersionServiceTest extends Specification {
         given:
         VersionProperties versionRules = new VersionProperties(
                 sanitizeVersion: false,
-                versionCreator: {v, t -> return v + '-feature/hello'}
+                versionCreator: { v, t -> return v + '-feature/hello' }
         )
-        resolver.resolveVersion(versionRules, tagRules, nextVersionRules) >> new VersionWithPosition(
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
                 Version.valueOf("1.0.1"),
+                true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master', 'release-1.0.0', false)
+                new ScmPosition('master')
         )
 
         when:
-        String version = service.currentDecoratedVersion(versionRules, tagRules, nextVersionRules)
+        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties)
 
         then:
         version == '1.0.1-feature/hello-SNAPSHOT'
