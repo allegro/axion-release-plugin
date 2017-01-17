@@ -73,6 +73,8 @@ Basic workflow with ``axion-release``::
     # ./gradlew currentVersion
     1.0.0-SNAPSHOT
 
+Note: ``publish`` task comes from Gradle `maven-publish <https://docs.gradle.org/current/userguide/publishing_maven.html>`_ plugin.
+
 Changelog
 =========
 
