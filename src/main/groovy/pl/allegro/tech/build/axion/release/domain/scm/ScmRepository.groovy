@@ -14,7 +14,7 @@ interface ScmRepository {
 
     void attachRemote(String remoteName, String url)
 
-    String currentBranch()
+    ScmPosition currentPosition()
 
     TagsOnCommit latestTags(Pattern pattern)
 

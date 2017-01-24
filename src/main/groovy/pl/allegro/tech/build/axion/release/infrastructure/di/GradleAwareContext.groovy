@@ -17,7 +17,7 @@ class GradleAwareContext {
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
 
         return new Context(
-                RulesFactory.create(project, config, scmRepository.currentBranch()),
+                RulesFactory.create(project, config, scmRepository.currentPosition()),
                 scmRepository,
                 scmProperties,
                 LocalOnlyResolverFactory.create(project, config)

@@ -6,9 +6,11 @@ import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class VersionPropertiesFactoryTest extends Specification {
 
@@ -151,7 +153,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', new ScmPosition('someBranch')) == '1.0.0-someBranch'
+        rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0-someBranch'
     }
 
 
@@ -167,7 +169,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', new ScmPosition('someBranch')) == '1.0.0'
+        rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0'
     }
 
     def "should pick default version incrementer if none branch incrementers match"() {
@@ -223,7 +225,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: new ScmPosition('someBranch'))) == Version.forIntegers(1, 1)
+        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: scmPosition('someBranch'))) == Version.forIntegers(1, 1)
     }
 
     def "should use incrementer passed as command line option if present"() {

@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.BranchStatus
+import org.ajoberstar.grgit.Commit
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.Status
 import org.ajoberstar.grgit.operation.FetchOp
@@ -153,8 +154,19 @@ class GitRepository implements ScmRepository {
         repository.commit(message: message)
     }
 
-    String currentBranch() {
-        return repository.branch.current.name
+    ScmPosition currentPosition() {
+        String revision = ''
+        String shortRevision = ''
+        if (hasCommits()) {
+            Commit head = repository.head()
+            revision = head.id
+            shortRevision = head.abbreviatedId
+        }
+        return new ScmPosition(
+                revision,
+                shortRevision,
+                repository.branch.current.name
+        )
     }
 
     TagsOnCommit latestTags(Pattern pattern) {

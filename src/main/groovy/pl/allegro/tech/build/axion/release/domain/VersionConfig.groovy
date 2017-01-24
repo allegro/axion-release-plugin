@@ -3,11 +3,9 @@ package pl.allegro.tech.build.axion.release.domain
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.ReleasePlugin
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
-import pl.allegro.tech.build.axion.release.infrastructure.output.GradleReleaseLoggerFactory
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
 import javax.inject.Inject
@@ -51,7 +49,7 @@ class VersionConfig {
 
     private Context context
 
-    private String resolvedVersion = null
+    private VersionService.DecoratedVersion resolvedVersion = null
 
     private VersionContext rawVersion = null
 
@@ -127,13 +125,31 @@ class VersionConfig {
     }
 
     String getVersion() {
+        ensureVersionExists()
+        return resolvedVersion.decoratedVersion
+    }
+
+    String getUndecoratedVersion() {
+        ensureVersionExists()
+        return resolvedVersion.undecoratedVersion
+    }
+
+    VersionScmPosition getScmPosition() {
+        ensureVersionExists()
+        return new VersionScmPosition(
+                resolvedVersion.position.revision,
+                resolvedVersion.position.shortRevision,
+                resolvedVersion.position.branch
+        )
+    }
+
+    private void ensureVersionExists() {
         if (resolvedVersion == null) {
             resolvedVersion = getUncachedVersion()
         }
-        return resolvedVersion
     }
 
-    String getUncachedVersion() {
+    VersionService.DecoratedVersion getUncachedVersion() {
         ensureContextExists()
         Properties rules = context.rules()
         return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)

@@ -46,8 +46,8 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    String currentBranch() {
-        return 'master'
+    ScmPosition currentPosition() {
+        return new ScmPosition('', '', 'master')
     }
 
     @Override

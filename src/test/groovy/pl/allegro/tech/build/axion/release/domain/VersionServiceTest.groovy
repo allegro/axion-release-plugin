@@ -38,7 +38,7 @@ class VersionServiceTest extends Specification {
                 Version.valueOf('1.0.0'),
                 false,
                 Version.valueOf('1.0.0'),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
@@ -56,7 +56,7 @@ class VersionServiceTest extends Specification {
                 Version.valueOf('1.0.1'),
                 true,
                 Version.valueOf('1.0.1'),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
@@ -74,7 +74,7 @@ class VersionServiceTest extends Specification {
                 Version.valueOf("1.0.1"),
                 true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
@@ -92,7 +92,7 @@ class VersionServiceTest extends Specification {
                 Version.valueOf("1.0.1"),
                 true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
@@ -101,6 +101,24 @@ class VersionServiceTest extends Specification {
         then:
         version.version.toString() == '1.0.1'
         version.snapshot
+    }
+
+    def "should return both decorated and undecorated version"() {
+        given:
+        VersionProperties versionRules = new VersionProperties(versionCreator: { v, t -> v })
+        resolver.resolveVersion(versionRules, tagProperties, nextVersionProperties) >> new VersionContext(
+                Version.valueOf("1.0.1"),
+                true,
+                Version.valueOf("1.0.1"),
+                new ScmPosition('', '', 'master')
+        )
+
+        when:
+        VersionService.DecoratedVersion version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties)
+
+        then:
+        version.undecoratedVersion == '1.0.1'
+        version.decoratedVersion == '1.0.1-SNAPSHOT'
     }
 
     def "should sanitize version if flag is set to true"() {
@@ -114,11 +132,11 @@ class VersionServiceTest extends Specification {
                 Version.valueOf("1.0.1"),
                 true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
-        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties)
+        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties).decoratedVersion
 
         then:
         version == '1.0.1-feature-hello-SNAPSHOT'
@@ -134,11 +152,11 @@ class VersionServiceTest extends Specification {
                 Version.valueOf("1.0.1"),
                 true,
                 Version.valueOf("1.0.1"),
-                new ScmPosition('master')
+                new ScmPosition('', '', 'master')
         )
 
         when:
-        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties)
+        String version = service.currentDecoratedVersion(versionRules, tagProperties, nextVersionProperties).decoratedVersion
 
         then:
         version == '1.0.1-feature/hello-SNAPSHOT'

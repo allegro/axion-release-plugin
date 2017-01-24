@@ -199,16 +199,17 @@ class GitRepositoryTest extends Specification {
         remote.pushURIs == [new URIish('whatever')]
     }
 
-    def "should provide current branch name in position"() {
+    def "should provide current branch name and commit id in position"() {
         given:
         repository.checkoutBranch('some-branch')
         repository.commit(['*'], "first commit")
 
         when:
-        String branch = repository.currentBranch()
+        ScmPosition position = repository.currentPosition()
 
         then:
-        branch == 'some-branch'
+        position.branch == 'some-branch'
+        position.revision == rawRepository.head().id
     }
 
     def "should push changes and tag to remote"() {
