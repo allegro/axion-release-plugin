@@ -7,7 +7,7 @@ import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
 
 class OutputCurrentVersionTask extends DefaultTask {
 
-    public OutputCurrentVersionTask() {
+    OutputCurrentVersionTask() {
         this.outputs.upToDateWhen { false }
     }
 
@@ -15,9 +15,14 @@ class OutputCurrentVersionTask extends DefaultTask {
     void output() {
         VersionConfig versionConfig = project.extensions.getByType(VersionConfig)
 
+        boolean quiet = project.hasProperty('release.quiet')
+        String outputContent = versionConfig.version
+        if (!quiet) {
+            outputContent = '\nProject version: ' + outputContent
+        }
+
         OutputWriter output = new OutputWriter()
-        output.println('')
-        output.println("Project version: ${versionConfig.version}")
+        output.println(outputContent)
     }
 
 }
