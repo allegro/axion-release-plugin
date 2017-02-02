@@ -20,7 +20,7 @@ class VersionResolver {
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        ScmPosition position = new ScmPosition(repository.currentBranch())
+        ScmPosition position = repository.currentPosition()
 
         VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, position)
 

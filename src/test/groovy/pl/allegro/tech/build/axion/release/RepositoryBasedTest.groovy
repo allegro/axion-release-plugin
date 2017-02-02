@@ -48,6 +48,6 @@ class RepositoryBasedTest extends Specification {
                 context.rules().version,
                 context.rules().tag,
                 context.rules().nextVersion
-        )
+        ).decoratedVersion
     }
 }

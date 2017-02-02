@@ -46,8 +46,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    String currentBranch() {
-        return delegateRepository.currentBranch()
+    ScmPosition currentPosition() {
+        return delegateRepository.currentPosition()
     }
 
     @Override

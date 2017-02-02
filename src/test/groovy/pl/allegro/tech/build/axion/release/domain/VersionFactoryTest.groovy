@@ -4,12 +4,12 @@ import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.ScmStateBuilder.scmState
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class VersionFactoryTest extends Specification {
 
@@ -118,6 +118,6 @@ class VersionFactoryTest extends Specification {
     }
 
     private VersionFactory versionFactory(VersionProperties versionProperties) {
-        return new VersionFactory(versionProperties, tagProperties, nextVersionProperties, new ScmPosition('master'))
+        return new VersionFactory(versionProperties, tagProperties, nextVersionProperties, scmPosition('master'))
     }
 }

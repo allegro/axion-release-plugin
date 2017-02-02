@@ -4,7 +4,10 @@ import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.VersionContext
 import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
+
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class ReleaseHooksRunnerTest extends Specification {
 
@@ -14,7 +17,7 @@ class ReleaseHooksRunnerTest extends Specification {
             new Version.Builder().setNormalVersion('2.0.0-SNAPSHOT').build(),
             true,
             new Version.Builder().setNormalVersion('1.0.0').build(),
-            new ScmPosition('master')
+            scmPosition('master')
     )
 
     private Version releaseVersion = new Version.Builder().setNormalVersion('2.0.0').build()

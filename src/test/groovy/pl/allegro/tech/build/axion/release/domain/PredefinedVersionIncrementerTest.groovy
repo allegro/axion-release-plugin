@@ -2,13 +2,15 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer.versionIncrementerFor
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class PredefinedVersionIncrementerTest extends Specification {
     
-    VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), new ScmPosition('master'))
+    VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
     
     def "should increment patch when incrementPatch rule used"() {
         expect:
@@ -42,7 +44,7 @@ class PredefinedVersionIncrementerTest extends Specification {
     
     def "should increment prerelease version when incrementPrerelease rule used"() {
         given:
-        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), new ScmPosition('master'))
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), scmPosition('master'))
         
         expect:
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc2')
@@ -50,7 +52,7 @@ class PredefinedVersionIncrementerTest extends Specification {
 
     def "should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used"() {
         given:
-        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc01'), new ScmPosition('master'))
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc01'), scmPosition('master'))
 
         expect:
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc02')

@@ -2,7 +2,11 @@ package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
+
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class TagNameSerializerTest extends Specification {
 
@@ -19,7 +23,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties rules = new TagProperties(prefix: 'release', versionSeparator: '-')
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(rules, new ScmPosition('master'), 'release-0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer(rules, scmPosition('master'), 'release-0.1.0') == '0.1.0'
     }
 
     def "default serializer should use empty version separator when prefix is empty"() {
@@ -35,6 +39,6 @@ class TagNameSerializerTest extends Specification {
         TagProperties rules = new TagProperties(prefix: '', versionSeparator: '-')
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(rules, new ScmPosition('master'), '0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer(rules, scmPosition('master'), '0.1.0') == '0.1.0'
     }
 }

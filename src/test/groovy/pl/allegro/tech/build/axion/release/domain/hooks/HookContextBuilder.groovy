@@ -2,13 +2,14 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class HookContextBuilder {
 
     ScmService scmService
 
-    ScmPosition position = new ScmPosition('master')
+    ScmPosition position = ScmPositionBuilder.scmPosition('master')
 
     String previousVersion = '1.0.0'
 
