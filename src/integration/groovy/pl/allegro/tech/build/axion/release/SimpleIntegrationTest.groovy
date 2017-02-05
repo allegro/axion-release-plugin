@@ -12,20 +12,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 0.1.0-SNAPSHOT')
-        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
-    }
-
-    def "should return only version when calling cV with -Prelease.quiet"() {
-        given:
-        buildFile('')
-
-        when:
-        def result = runGradle('currentVersion', '-Prelease.quiet')
-
-        then:
         result.output.contains('0.1.0-SNAPSHOT')
-        !result.output.contains('Project version: ')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
