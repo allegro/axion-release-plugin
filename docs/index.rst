@@ -68,7 +68,7 @@ Basic workflow with ``axion-release``::
     # ./gradlew publish
     published project-0.1.1 release version
 
-    # ./gradlew markNextVersion -Prelease.nextVersion=1.0.0
+    # ./gradlew markNextVersion -Prelease.version=1.0.0
 
     # ./gradlew currentVersion
     1.0.0-SNAPSHOT
