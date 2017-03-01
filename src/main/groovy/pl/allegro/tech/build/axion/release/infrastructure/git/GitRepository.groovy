@@ -57,6 +57,13 @@ class GitRepository implements ScmRepository {
             this.fetchTags(properties.identity, properties.remote)
         }
     }
+		
+		public org.ajoberstar.grgit.Repository getRepository() {
+			if (repository) {
+				return repository.repository
+			}
+			reuturn null;
+		}
 
     @Override
     void fetchTags(ScmIdentity identity, String remoteName) {
@@ -201,13 +208,24 @@ class GitRepository implements ScmRepository {
         List tagsList = null
 
         RevCommit commit
-        for (commit = walk.next(); commit != null; commit = walk.next()) {
-            tagsList = allTags[commit.id.name()]
-            if (tagsList) {
-                break
+        RevCommit currentCommit
+				List<String> currentTagNameList = null
+        for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+            currentTagNameList = tags[currentCommit.id.name()]
+            if (currentTagNameList && !tagNameList) {
+							commit = currentCommit
+							tagNameList = currentTagNameList
             }
+						
+						if (currentTagNameList) {
+							println "TagNameList: $currentTagNameList"
+						}
         }
         walk.dispose()
+				
+				if (tagNameList) {
+					println "Found TagNameList: $tagNameList"
+				}
 
         if (commit == null) {
             return new TagsOnCommit(null, [], false)
