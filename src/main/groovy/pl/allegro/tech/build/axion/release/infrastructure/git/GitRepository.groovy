@@ -21,9 +21,11 @@ import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.transport.Transport
 import org.eclipse.jgit.transport.URIish
+
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
+import java.util.TreeMap
 import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
@@ -183,6 +185,15 @@ class GitRepository implements ScmRepository {
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
         return latestTagsInternal(pattern, sinceCommit, false)
     }
+		
+		private class TagHolder {
+			public RevCommit commit;
+			public List<String> tags;
+			public TagHolder(RevCommit commit, List<String> tags) {
+				this.commit = commit;
+				this.tags = tags;
+			}
+		}
 
     private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
         if (!hasCommits()) {
@@ -190,6 +201,8 @@ class GitRepository implements ScmRepository {
         }
 
         Map<String, List<String>> allTags = tagsMatching(pattern)
+				
+				TreeMap<String, TagHolder> orderedTags = new TreeMap<>(new pl.allegro.tech.build.axion.release.util.VersionComparator<String>());
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
@@ -206,25 +219,26 @@ class GitRepository implements ScmRepository {
         }
 
         List tagsList = null
+				
+//				println "Pattern: $pattern, maybeSinceCommit: $maybeSinceCommit, inclusive: $inclusive"
+//				println "All tags: $allTags"
 
         RevCommit commit
         RevCommit currentCommit
 				List<String> currentTagNameList = null
         for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-            currentTagNameList = tags[currentCommit.id.name()]
-            if (currentTagNameList && !tagNameList) {
-							commit = currentCommit
-							tagNameList = currentTagNameList
-            }
-						
+            currentTagNameList = allTags[currentCommit.id.name()]
 						if (currentTagNameList) {
-							println "TagNameList: $currentTagNameList"
+							for (String version : currentTagNameList) {
+								orderedTags.put(version, new TagHolder(currentCommit, currentTagNameList));
+							}
 						}
         }
         walk.dispose()
-				
-				if (tagNameList) {
-					println "Found TagNameList: $tagNameList"
+				if (orderedTags.size() > 0) {
+					TagHolder tag = orderedTags.get(orderedTags.lastKey());
+					commit = tag.commit;
+					tagsList = tag.tags;
 				}
 
         if (commit == null) {
