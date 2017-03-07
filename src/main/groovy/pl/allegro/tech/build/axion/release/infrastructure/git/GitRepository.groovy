@@ -207,7 +207,7 @@ class GitRepository implements ScmRepository {
 			for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
 					currentTagNameList = allTags[currentCommit.id.name()]
 					if (currentTagNameList) {
-						allTaggedCommits.putAt(currentCommit.id.name(), currentTagNameList)
+						allTaggedCommits.put(currentCommit.id.name(), currentTagNameList)
 					}
 			}
 			walk.dispose()

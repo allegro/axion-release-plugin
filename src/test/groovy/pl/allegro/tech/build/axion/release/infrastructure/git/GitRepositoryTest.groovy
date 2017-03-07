@@ -146,6 +146,31 @@ class GitRepositoryTest extends Specification {
         then:
         tags.tags == ['release-1']
     }
+		
+		def "should return all tagged commits and only those tagged commits matching the pattern provided"() {
+				given:
+				repository.tag('release-1')
+				repository.commit(['*'], "commit after release-1")
+				repository.tag('release-2')
+				repository.commit(['*'], "commit after release-2")
+				repository.tag('another-tag-1')
+				repository.commit(['*'], "commit after another-tag-1")
+				repository.commit(['*'], "commit after another-tag-1-2")
+				repository.tag('release-4')
+				repository.commit(['*'], "commit after release-4")
+				repository.tag('release-3')
+				repository.commit(['*'], "commit after release-3")
+		
+				when:
+				LinkedHashMap<String, List<String>> allTaggedCommits  = repository.allTaggedCommits(~/^release.*/, null, true)
+		
+				then:
+				allTaggedCommits.size() == 4;
+				allTaggedCommits.get(allTaggedCommits.keySet().toArray()[0]).contains('release-3');
+				allTaggedCommits.get(allTaggedCommits.keySet().toArray()[1]).contains('release-4');
+				allTaggedCommits.get(allTaggedCommits.keySet().toArray()[2]).contains('release-2');
+				allTaggedCommits.get(allTaggedCommits.keySet().toArray()[3]).contains('release-1');
+		}
 
     def "should return only tags that match with prefix"() {
         given:
