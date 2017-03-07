@@ -34,7 +34,7 @@ class VersionPropertiesFactory {
         boolean ignoreUncommittedChanges = project.hasProperty(IGNORE_UNCOMMITTED_CHANGES_PROPERTY) ?: config.ignoreUncommittedChanges
         boolean forceSnapshot = project.hasProperty(FORCE_SNAPSHOT_PROPERTY)
 				
-				boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY)
+				boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
 
         return new VersionProperties(
                 forcedVersion: forceVersionValue?.trim() ? forceVersionValue.trim() : null,

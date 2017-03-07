@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+
+import groovy.swing.factory.CellEditorGetValueFactory
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
@@ -11,6 +13,7 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 import java.util.ArrayList
 import java.util.List
+import java.util.Map.Entry
 import java.util.TreeMap
 import java.util.regex.Pattern
 
@@ -82,7 +85,10 @@ class VersionResolver {
 		private Map versionFromTaggedCommits(LinkedHashMap<String, List<String>> taggedCommits,  boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory) {
 			List<Version> versions = []
 			Map<Version, Boolean> isVersionNextVersion = [:].withDefault({false})
-			for (List<String> tags : taggedCommits) {
+			
+			for (Entry<String, List<String>> tagsEntry : taggedCommits) {
+				String commit = tagsEntry.getKey();
+				List<String> tags = tagsEntry.getValue();
 				for (String tag: tags) {
 					boolean isNextVersion = tag ==~ nextVersionTagPattern
 					if (ignoreNextVersionTags && isNextVersion) {
