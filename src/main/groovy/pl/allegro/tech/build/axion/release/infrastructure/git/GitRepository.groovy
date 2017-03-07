@@ -25,7 +25,6 @@ import org.eclipse.jgit.transport.URIish
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
-import java.util.TreeMap
 import java.util.regex.Pattern
 
 class GitRepository implements ScmRepository {
@@ -59,13 +58,6 @@ class GitRepository implements ScmRepository {
             this.fetchTags(properties.identity, properties.remote)
         }
     }
-		
-		public org.ajoberstar.grgit.Repository getRepository() {
-			if (repository) {
-				return repository.repository
-			}
-			reuturn null;
-		}
 
     @Override
     void fetchTags(ScmIdentity identity, String remoteName) {
@@ -186,14 +178,41 @@ class GitRepository implements ScmRepository {
         return latestTagsInternal(pattern, sinceCommit, false)
     }
 		
-		private class TagHolder {
-			public RevCommit commit;
-			public List<String> tags;
-			public TagHolder(RevCommit commit, List<String> tags) {
-				this.commit = commit;
-				this.tags = tags;
-			}
-		}
+		LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
+			LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
+      if (!hasCommits()) {
+          return allTaggedCommits
+      }
+
+      Map<String, List<String>> allTags = tagsMatching(pattern)
+
+      ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+
+      ObjectId startingCommit;
+      if (maybeSinceCommit != null) {
+          startingCommit = ObjectId.fromString(maybeSinceCommit)
+      } else {
+          startingCommit = headId
+      }
+
+      RevWalk walk = walker(startingCommit)
+      if (!inclusive) {
+          walk.next()
+      }
+
+      List tagsList = null
+
+      RevCommit currentCommit
+			List<String> currentTagNameList = null
+      for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+          currentTagNameList = allTags[currentCommit.id.name()]
+					if (currentTagNameList) {
+						allTaggedCommits.putAt(currentCommit.id.name(), currentTagNameList)
+					}
+      }
+      walk.dispose()
+      return allTaggedCommits
+    }
 
     private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
         if (!hasCommits()) {
@@ -201,8 +220,6 @@ class GitRepository implements ScmRepository {
         }
 
         Map<String, List<String>> allTags = tagsMatching(pattern)
-				
-				TreeMap<String, TagHolder> orderedTags = new TreeMap<>(new pl.allegro.tech.build.axion.release.util.VersionComparator<String>());
 
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
@@ -219,27 +236,15 @@ class GitRepository implements ScmRepository {
         }
 
         List tagsList = null
-				
-//				println "Pattern: $pattern, maybeSinceCommit: $maybeSinceCommit, inclusive: $inclusive"
-//				println "All tags: $allTags"
 
         RevCommit commit
-        RevCommit currentCommit
-				List<String> currentTagNameList = null
-        for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-            currentTagNameList = allTags[currentCommit.id.name()]
-						if (currentTagNameList) {
-							for (String version : currentTagNameList) {
-								orderedTags.put(version, new TagHolder(currentCommit, currentTagNameList));
-							}
-						}
-        }
+        for (commit = walk.next(); commit != null; commit = walk.next()) {
+          tagsList = allTags[commit.id.name()]
+          if (tagsList) {
+              break
+          }
+      }
         walk.dispose()
-				if (orderedTags.size() > 0) {
-					TagHolder tag = orderedTags.get(orderedTags.lastKey());
-					commit = tag.commit;
-					tagsList = tag.tags;
-				}
 
         if (commit == null) {
             return new TagsOnCommit(null, [], false)

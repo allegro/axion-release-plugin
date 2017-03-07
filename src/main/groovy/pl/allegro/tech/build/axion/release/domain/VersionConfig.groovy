@@ -148,12 +148,6 @@ class VersionConfig {
             resolvedVersion = getUncachedVersion()
         }
     }
-	
-	String getScmVersion() {
-		ensureContextExists()
-		Properties rules = context.rules()
-		return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
-	}
 
     VersionService.DecoratedVersion getUncachedVersion() {
         ensureContextExists()

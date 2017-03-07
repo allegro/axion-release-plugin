@@ -8,7 +8,6 @@ plugins {
     id "com.gradle.plugin-publish" version "0.9.1"
     id "com.bmuschko.nexus" version "2.3.1" apply false
     id "io.codearte.nexus-staging" version "0.5.3" apply false
-    id 'maven-publish'
 }
 
 if (project.hasProperty('mavenCentral')) {
@@ -112,12 +111,6 @@ tasks.check.dependsOn integrationTest
 
 gradlePlugin {
     testSourceSets project.sourceSets.integration
-		plugins {
-			release {
-				id = "pl.allegro.tech.build.axion-release"
-				implementationClass = "pl.allegro.tech.build.axion.release.ReleasePlugin"
-			}
-		}
 }
 
 jacocoTestReport {
@@ -131,29 +124,21 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
 
-//pluginBundle {
-//    website = 'https://github.com/allegro/axion-release-plugin'
-//    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
-//    description = 'Release and version management plugin.'
-//    tags = ['release', 'version']
-//
-//    plugins {
-//        release {
-//            id = 'pl.allegro.tech.build.axion-release'
-//            displayName = 'axion-release-plugin'
-//        }
-//    }
-//
-//    mavenCoordinates {
-//        groupId = 'pl.allegro.tech.build'
-//        artifactId = 'axion-release-plugin'
-//    }
-//}
+pluginBundle {
+    website = 'https://github.com/allegro/axion-release-plugin'
+    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+    description = 'Release and version management plugin.'
+    tags = ['release', 'version']
 
-publishing {
-	repositories {
-		maven {
-			url uri('file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath)
-		}
-	}
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
+        }
+    }
+
+    mavenCoordinates {
+        groupId = 'pl.allegro.tech.build'
+        artifactId = 'axion-release-plugin'
+    }
 }
