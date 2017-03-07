@@ -22,6 +22,7 @@ import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.transport.Transport
 import org.eclipse.jgit.transport.URIish
 
+import groovyjarjarantlr.StringUtils
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
@@ -169,6 +170,50 @@ class GitRepository implements ScmRepository {
                 repository.branch.current.name
         )
     }
+		
+		boolean isHeadCommit(String commitId) {
+			if(commitId?.trim()) {
+				ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+				return Objects.equals(ObjectId.fromString(commitId), headId)
+			}
+			return false;
+		}
+		
+		LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
+			LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
+			if (!hasCommits()) {
+					return allTaggedCommits
+			}
+
+			Map<String, List<String>> allTags = tagsMatching(pattern)
+
+			ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+
+			ObjectId startingCommit;
+			if (maybeSinceCommit != null) {
+					startingCommit = ObjectId.fromString(maybeSinceCommit)
+			} else {
+					startingCommit = headId
+			}
+
+			RevWalk walk = walker(startingCommit)
+			if (!inclusive) {
+					walk.next()
+			}
+
+			List tagsList = null
+
+			RevCommit currentCommit
+			List<String> currentTagNameList = null
+			for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+					currentTagNameList = allTags[currentCommit.id.name()]
+					if (currentTagNameList) {
+						allTaggedCommits.putAt(currentCommit.id.name(), currentTagNameList)
+					}
+			}
+			walk.dispose()
+			return allTaggedCommits
+		}
 
     TagsOnCommit latestTags(Pattern pattern) {
         return latestTagsInternal(pattern, null, true)
@@ -176,42 +221,6 @@ class GitRepository implements ScmRepository {
 
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
         return latestTagsInternal(pattern, sinceCommit, false)
-    }
-		
-		LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-			LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
-      if (!hasCommits()) {
-          return allTaggedCommits
-      }
-
-      Map<String, List<String>> allTags = tagsMatching(pattern)
-
-      ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
-
-      ObjectId startingCommit;
-      if (maybeSinceCommit != null) {
-          startingCommit = ObjectId.fromString(maybeSinceCommit)
-      } else {
-          startingCommit = headId
-      }
-
-      RevWalk walk = walker(startingCommit)
-      if (!inclusive) {
-          walk.next()
-      }
-
-      List tagsList = null
-
-      RevCommit currentCommit
-			List<String> currentTagNameList = null
-      for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-          currentTagNameList = allTags[currentCommit.id.name()]
-					if (currentTagNameList) {
-						allTaggedCommits.putAt(currentCommit.id.name(), currentTagNameList)
-					}
-      }
-      walk.dispose()
-      return allTaggedCommits
     }
 
     private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {

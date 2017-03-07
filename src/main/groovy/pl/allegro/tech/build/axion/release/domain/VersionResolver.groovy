@@ -53,30 +53,35 @@ class VersionResolver {
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 				
-        TagsOnCommit tags = repository.latestTags(releaseTagPattern)
-        TagsOnCommit previousTags = tags;
-
-        Map currentVersionInfo = null				
+        Map currentVersionInfo = null
+				Map previousVersionInfo = null
+				boolean isHead = false
+				
 				if (versionFactory.versionProperties.useHighestVersion) {
 					LinkedHashMap<String, List<String>> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true)
 					currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
-				} else {
+					String commitId = currentVersionInfo.commit
+					isHead = repository.isHeadCommit(commitId)
+					previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory)
+				} 
+				else {
+					TagsOnCommit tags = repository.latestTags(releaseTagPattern)
+					TagsOnCommit previousTags = tags
+					isHead = tags.isHead
 					currentVersionInfo = versionFromTags(tags.tags, false, nextVersionTagPattern, versionFactory)
+					while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
+						previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
+					}
+					previousVersionInfo = versionFromTags(previousTags.tags, true, nextVersionTagPattern, versionFactory)
 				}
 				
         Version currentVersion = currentVersionInfo.version
-
-
-				// LOOK: Get the previous version
-        while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
-            previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
-        }
-        Version previousVersion = versionFromTags(previousTags.tags, true, nextVersionTagPattern, versionFactory).version
+				Version previousVersion = previousVersionInfo.version
 
         return [
                 current         : currentVersion,
                 previous        : previousVersion,
-                onReleaseTag    : tags.isHead && !currentVersionInfo.isNextVersion,
+                onReleaseTag    : isHead && !currentVersionInfo.isNextVersion,
                 onNextVersionTag: currentVersionInfo.isNextVersion,
                 noTagsFound     : currentVersionInfo.noTagsFound
         ]
@@ -85,6 +90,7 @@ class VersionResolver {
 		private Map versionFromTaggedCommits(LinkedHashMap<String, List<String>> taggedCommits,  boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory) {
 			List<Version> versions = []
 			Map<Version, Boolean> isVersionNextVersion = [:].withDefault({false})
+			Map<Version, String> versionToCommit = new LinkedHashMap<>()
 			
 			for (Entry<String, List<String>> tagsEntry : taggedCommits) {
 				String commit = tagsEntry.getKey();
@@ -97,6 +103,7 @@ class VersionResolver {
 
 					Version version = versionFactory.versionFromTag(tag)
 					versions.add(version)
+					versionToCommit.put(version, commit)
 					isVersionNextVersion[version] = isNextVersion
 				}
 			}
@@ -107,7 +114,8 @@ class VersionResolver {
 			return [
 							version      : version,
 							isNextVersion: isVersionNextVersion.get(version),
-							noTagsFound  : versions.isEmpty()
+							noTagsFound  : versions.isEmpty(),
+							commit			 : versionToCommit.get(version)
 			]
 		}
 

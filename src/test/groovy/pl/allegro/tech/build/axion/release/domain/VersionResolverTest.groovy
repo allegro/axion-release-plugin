@@ -105,4 +105,84 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.version.toString() == '2.0.0'
         version.snapshot
     }
+		
+		def "should return the highest version from the tagged versions"() {
+			given:
+			repository.tag('release-1.0.0')
+			repository.commit(['*'], 'some commit')
+			repository.tag('release-1.5.0')
+			repository.commit(['*'], 'some merge from another branch...')
+			repository.tag('release-1.2.0')
+			repository.commit(['*'], 'some commit')
+			repository.tag('release-1.5.1')
+			
+			VersionProperties versionProps = versionProperties().useHighestVersion().build();
+			
+			when:
+			VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+			
+			then:
+			version.previousVersion.toString() == '1.5.1'
+			version.version.toString() == '1.5.1'
+			!version.snapshot
+		}
+		
+		def "should return the highest version from the tagged versions when not on release"() {
+			given:
+			repository.tag('release-1.0.0')
+			repository.commit(['*'], 'some commit')
+			repository.tag('release-1.5.0')
+			repository.commit(['*'], 'some merge from another branch...')
+			repository.tag('release-1.2.0')
+			repository.commit(['*'], 'some commit')
+			
+			VersionProperties versionProps = versionProperties().useHighestVersion().build();
+			
+			when:
+			VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+			
+			then:
+			version.previousVersion.toString() == '1.5.0'
+			version.version.toString() == '1.5.1'
+			version.snapshot
+		}
+		
+		def "should return the last version as release from the tagged versions no highest version option selected"() {
+			given:
+			repository.tag('release-1.0.0')
+			repository.commit(['*'], 'some commit')
+			repository.tag('release-1.5.0')
+			repository.commit(['*'], 'some merge from another branch...')
+			repository.tag('release-1.2.0')
+			
+			VersionProperties versionProps = versionProperties().build();
+			
+			when:
+			VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+			
+			then:
+			version.previousVersion.toString() == '1.2.0'
+			version.version.toString() == '1.2.0'
+		}
+		
+		def "should return the last version from the tagged versions no highest version option selected"() {
+			given:
+			repository.tag('release-1.0.0')
+			repository.commit(['*'], 'some commit')
+			repository.tag('release-1.5.0')
+			repository.commit(['*'], 'some merge from another branch...')
+			repository.tag('release-1.2.0')
+			repository.commit(['*'], 'some commit')
+			
+			VersionProperties versionProps = versionProperties().build();
+			
+			when:
+			VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+			
+			then:
+			version.previousVersion.toString() == '1.2.0'
+			version.version.toString() == '1.2.1'
+			version.snapshot
+		}
+			
 }
