@@ -2,7 +2,6 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 
-import groovy.swing.factory.CellEditorGetValueFactory
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
@@ -11,13 +10,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
-import java.util.ArrayList
-import java.util.List
 import java.util.Map.Entry
-import java.util.TreeMap
 import java.util.regex.Pattern
-
-import org.eclipse.jgit.revwalk.RevCommit
 
 class VersionResolver {
 
