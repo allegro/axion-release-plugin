@@ -40,9 +40,6 @@ class VersionResolver {
                 versions.noTagsFound,
                 repository.checkUncommittedChanges()
         )
-        
-        if (versionFactory.versionProperties.useHighestVersion)
-          println "SCMState: $scmState"
 
         Map finalVersion = versionFactory.createFinalVersion(scmState, versions.current)
 
