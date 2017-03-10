@@ -26,7 +26,7 @@ class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, position)
 
-        Map versions = null;
+        Map versions = null
         
         if (versionFactory.versionProperties.useHighestVersion) {
           versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties)
@@ -55,7 +55,7 @@ class VersionResolver {
         
         Map currentVersionInfo = null
         Map previousVersionInfo = null
-        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, true);
+        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, true)
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
         boolean isHead = currentVersionInfo.isHead
         
@@ -87,7 +87,7 @@ class VersionResolver {
         Map currentVersionInfo = null
         Map previousVersionInfo = null
         
-        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, false);
+        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, false)
         
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
         String commitId = currentVersionInfo.commit
@@ -114,7 +114,7 @@ class VersionResolver {
       Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
       
       for (TagsOnCommit tagsEntry : taggedCommits) {
-        List<String> tags = tagsEntry.tags;
+        List<String> tags = tagsEntry.tags
         for (String tag: tags) {
           boolean isNextVersion = tag ==~ nextVersionTagPattern
           if (ignoreNextVersionTags && isNextVersion) {

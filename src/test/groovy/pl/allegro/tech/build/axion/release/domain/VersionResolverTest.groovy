@@ -116,10 +116,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.commit(['*'], 'some commit')
       repository.tag('release-1.5.1')
       
-      VersionProperties versionProps = versionProperties().useHighestVersion().build();
+      VersionProperties versionProps = versionProperties().useHighestVersion().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.5.1'
@@ -138,10 +138,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.tag('release-1.3.0')
       repository.tag('release-1.5.1')
       
-      VersionProperties versionProps = versionProperties().useHighestVersion().build();
+      VersionProperties versionProps = versionProperties().useHighestVersion().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.5.1'
@@ -160,10 +160,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.tag('release-1.5.1')
       repository.tag('release-1.3.0')
       
-      VersionProperties versionProps = versionProperties().useHighestVersion().build();
+      VersionProperties versionProps = versionProperties().useHighestVersion().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.5.1'
@@ -181,11 +181,11 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.commit(['*'], 'some commit')
       repository.tag('release-1.3.0')
       
-      VersionProperties versionProps = versionProperties().useHighestVersion().build();
+      VersionProperties versionProps = versionProperties().useHighestVersion().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
-      println "Version Resolved: $version";
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+      println "Version Resolved: $version"
       
       then:
       version.previousVersion.toString() == '1.5.0'
@@ -202,10 +202,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.tag('release-1.2.0')
       repository.commit(['*'], 'some commit')
       
-      VersionProperties versionProps = versionProperties().useHighestVersion().build();
+      VersionProperties versionProps = versionProperties().useHighestVersion().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.5.0'
@@ -221,10 +221,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.commit(['*'], 'some merge from another branch...')
       repository.tag('release-1.2.0')
       
-      VersionProperties versionProps = versionProperties().build();
+      VersionProperties versionProps = versionProperties().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.2.0'
@@ -240,10 +240,10 @@ class VersionResolverTest extends RepositoryBasedTest {
       repository.tag('release-1.2.0')
       repository.commit(['*'], 'some commit')
       
-      VersionProperties versionProps = versionProperties().build();
+      VersionProperties versionProps = versionProperties().build()
       
       when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules);
+      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
       
       then:
       version.previousVersion.toString() == '1.2.0'
