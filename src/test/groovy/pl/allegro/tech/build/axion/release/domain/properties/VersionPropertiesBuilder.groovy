@@ -10,8 +10,8 @@ class VersionPropertiesBuilder {
     private boolean forceSnapshot = false
 
     private boolean ignoreUncommittedChanges = true
-		
-		private boolean useHighestVersion = false
+    
+    private boolean useHighestVersion = false
 
     private VersionPropertiesBuilder() {
     }
@@ -28,7 +28,7 @@ class VersionPropertiesBuilder {
                 versionCreator: PredefinedVersionCreator.SIMPLE.versionCreator,
                 versionIncrementer: PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
                 sanitizeVersion: true,
-								useHighestVersion: useHighestVersion)
+                useHighestVersion: useHighestVersion)
     }
 
     VersionPropertiesBuilder forceVersion(String version) {
@@ -45,9 +45,9 @@ class VersionPropertiesBuilder {
         this.ignoreUncommittedChanges = false
         return this
     }
-		
-		VersionPropertiesBuilder useHighestVersion() {
-			this.useHighestVersion = true
-			return this
-		}
+    
+    VersionPropertiesBuilder useHighestVersion() {
+      this.useHighestVersion = true
+      return this
+    }
 }

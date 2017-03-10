@@ -18,8 +18,8 @@ class VersionPropertiesFactory {
     private static final String IGNORE_UNCOMMITTED_CHANGES_PROPERTY = 'release.ignoreUncommittedChanges'
 
     private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
-		
-		private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
+    
+    private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
 
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
 
@@ -33,8 +33,8 @@ class VersionPropertiesFactory {
 
         boolean ignoreUncommittedChanges = project.hasProperty(IGNORE_UNCOMMITTED_CHANGES_PROPERTY) ?: config.ignoreUncommittedChanges
         boolean forceSnapshot = project.hasProperty(FORCE_SNAPSHOT_PROPERTY)
-				
-				boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
+        
+        boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
 
         return new VersionProperties(
                 forcedVersion: forceVersionValue?.trim() ? forceVersionValue.trim() : null,
@@ -43,7 +43,7 @@ class VersionPropertiesFactory {
                 versionCreator: findVersionCreator(project, config, currentBranch),
                 versionIncrementer: findVersionIncrementer(project, config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion,
-								useHighestVersion: useHighestVersion
+                useHighestVersion: useHighestVersion
         )
     }
 

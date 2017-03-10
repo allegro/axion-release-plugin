@@ -169,50 +169,50 @@ class GitRepository implements ScmRepository {
                 repository.branch.current.name
         )
     }
-		
-		boolean isHeadCommit(String commitId) {
-			if(commitId?.trim()) {
-				ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
-				return Objects.equals(ObjectId.fromString(commitId), headId)
-			}
-			return false;
-		}
-		
-		LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-			LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
-			if (!hasCommits()) {
-					return allTaggedCommits
-			}
+    
+    boolean isHeadCommit(String commitId) {
+      if(commitId?.trim()) {
+        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+        return Objects.equals(ObjectId.fromString(commitId), headId)
+      }
+      return false;
+    }
+    
+    LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
+      LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
+      if (!hasCommits()) {
+          return allTaggedCommits
+      }
 
-			Map<String, List<String>> allTags = tagsMatching(pattern)
+      Map<String, List<String>> allTags = tagsMatching(pattern)
 
-			ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+      ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
-			ObjectId startingCommit;
-			if (maybeSinceCommit != null) {
-					startingCommit = ObjectId.fromString(maybeSinceCommit)
-			} else {
-					startingCommit = headId
-			}
+      ObjectId startingCommit;
+      if (maybeSinceCommit != null) {
+          startingCommit = ObjectId.fromString(maybeSinceCommit)
+      } else {
+          startingCommit = headId
+      }
 
-			RevWalk walk = walker(startingCommit)
-			if (!inclusive) {
-					walk.next()
-			}
+      RevWalk walk = walker(startingCommit)
+      if (!inclusive) {
+          walk.next()
+      }
 
-			List tagsList = null
+      List tagsList = null
 
-			RevCommit currentCommit
-			List<String> currentTagNameList = null
-			for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-					currentTagNameList = allTags[currentCommit.id.name()]
-					if (currentTagNameList) {
-						allTaggedCommits.put(currentCommit.id.name(), currentTagNameList)
-					}
-			}
-			walk.dispose()
-			return allTaggedCommits
-		}
+      RevCommit currentCommit
+      List<String> currentTagNameList = null
+      for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+          currentTagNameList = allTags[currentCommit.id.name()]
+          if (currentTagNameList) {
+            allTaggedCommits.put(currentCommit.id.name(), currentTagNameList)
+          }
+      }
+      walk.dispose()
+      return allTaggedCommits
+    }
 
     TagsOnCommit latestTags(Pattern pattern) {
         return latestTagsInternal(pattern, null, true)
