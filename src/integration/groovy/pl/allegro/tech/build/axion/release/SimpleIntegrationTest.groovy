@@ -109,7 +109,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.2.0', '-Prelease.localOnly', '-Prelease.disableChecks')
   
         when:
-        def result = runGradle('currentVersion', '-Prelease.useHighestVersion=true')
+        def result = runGradle('currentVersion', '-Prelease.useHighestVersion')
   
         then:
         result.output.contains('1.5.1-SNAPSHOT')

@@ -170,25 +170,36 @@ class GitRepository implements ScmRepository {
         )
     }
     
-    boolean isHeadCommit(String commitId) {
-      if(commitId?.trim()) {
-        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
-        return Objects.equals(ObjectId.fromString(commitId), headId)
-      }
-      return false;
+    TagsOnCommit latestTags(Pattern pattern) {
+      return latestTagsInternal(pattern, null, true)
+    }
+  
+    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
+        return latestTagsInternal(pattern, sinceCommit, false)
     }
     
-    LinkedHashMap<String, List<String>> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-      LinkedHashMap<String, List<String>> allTaggedCommits = new ArrayList<>();
+    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
+      List<TagsOnCommit> allTaggedCommits = allTaggedCommits(pattern, maybeSinceCommit, inclusive, true)
+      TagsOnCommit taggedCommit = null
+      if (allTaggedCommits.size() == 0) {
+        taggedCommit = new TagsOnCommit(null, [], false)
+      } else {
+        taggedCommit = allTaggedCommits.get(0)
+      }
+      return taggedCommit
+    }
+    
+    List<TagsOnCommit> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+      List<TagsOnCommit> allTaggedCommits = new ArrayList<>()
       if (!hasCommits()) {
-          return allTaggedCommits
+        return allTaggedCommits
       }
 
       Map<String, List<String>> allTags = tagsMatching(pattern)
 
       ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
-      ObjectId startingCommit;
+      ObjectId startingCommit
       if (maybeSinceCommit != null) {
           startingCommit = ObjectId.fromString(maybeSinceCommit)
       } else {
@@ -203,62 +214,18 @@ class GitRepository implements ScmRepository {
       List tagsList = null
 
       RevCommit currentCommit
-      List<String> currentTagNameList = null
+      List<String> currentTagsList = null
       for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-          currentTagNameList = allTags[currentCommit.id.name()]
-          if (currentTagNameList) {
-            allTaggedCommits.put(currentCommit.id.name(), currentTagNameList)
+          currentTagsList = allTags[currentCommit.id.name()]
+          if (currentTagsList) {
+            TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
+            allTaggedCommits.add(taggedCommit)
+            if (stopOnFirstTag)
+              break
           }
       }
       walk.dispose()
       return allTaggedCommits
-    }
-
-    TagsOnCommit latestTags(Pattern pattern) {
-        return latestTagsInternal(pattern, null, true)
-    }
-
-    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
-        return latestTagsInternal(pattern, sinceCommit, false)
-    }
-
-    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-        if (!hasCommits()) {
-            return new TagsOnCommit(null, [], false)
-        }
-
-        Map<String, List<String>> allTags = tagsMatching(pattern)
-
-        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
-
-        ObjectId startingCommit;
-        if (maybeSinceCommit != null) {
-            startingCommit = ObjectId.fromString(maybeSinceCommit)
-        } else {
-            startingCommit = headId
-        }
-
-        RevWalk walk = walker(startingCommit)
-        if (!inclusive) {
-            walk.next()
-        }
-
-        List tagsList = null
-
-        RevCommit commit
-        for (commit = walk.next(); commit != null; commit = walk.next()) {
-          tagsList = allTags[commit.id.name()]
-          if (tagsList) {
-              break
-          }
-      }
-        walk.dispose()
-
-        if (commit == null) {
-            return new TagsOnCommit(null, [], false)
-        }
-
-        return new TagsOnCommit(commit.id.name(), tagsList, Objects.equals(commit.id, headId))
     }
 
     private RevWalk walker(ObjectId startingCommit) {

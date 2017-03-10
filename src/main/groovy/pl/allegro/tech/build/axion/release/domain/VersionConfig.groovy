@@ -21,7 +21,7 @@ class VersionConfig {
 
     boolean ignoreUncommittedChanges = true
     
-    boolean useHighestVersion = false;
+    boolean useHighestVersion = false
 
     RepositoryConfig repository
 

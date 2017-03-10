@@ -19,4 +19,9 @@ class VersionContext {
         this.previousVersion = previousVersion
         this.position = position
     }
+    
+    @Override
+    public String toString() {
+      return "VersionContext[version = $version, snapshot = $snapshot, previousVersion = $previousVersion, ScmPosition = $position]"
+    }
 }
