@@ -164,7 +164,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after release-3")
     
         when:
-        List<TagsOnCommit> allTaggedCommits  = repository.allTaggedCommits(~/^release.*/, null, true, false)
+        List<TagsOnCommit> allTaggedCommits  = repository.taggedCommits(~/^release.*/)
     
         then:
         allTaggedCommits.size() == 4

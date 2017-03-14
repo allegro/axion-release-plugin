@@ -55,10 +55,8 @@ class VersionResolver {
         
         Map currentVersionInfo = null
         Map previousVersionInfo = null
-        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, true)
+        List<TagsOnCommit> allTaggedCommits = repository.firstTaggedCommitAsList(releaseTagPattern)
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
-        boolean isHead = currentVersionInfo.isHead
-        
         
         TagsOnCommit previousTags = repository.latestTags(releaseTagPattern)
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
@@ -71,7 +69,7 @@ class VersionResolver {
         return [
           current         : currentVersion,
           previous        : previousVersion,
-          onReleaseTag    : isHead && !currentVersionInfo.isNextVersion,
+          onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
           onNextVersionTag: currentVersionInfo.isNextVersion,
           noTagsFound     : currentVersionInfo.noTagsFound
         ]
@@ -87,7 +85,7 @@ class VersionResolver {
         Map currentVersionInfo = null
         Map previousVersionInfo = null
         
-        List<TagsOnCommit> allTaggedCommits = repository.allTaggedCommits(releaseTagPattern, null, true, false)
+        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
         
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
         String commitId = currentVersionInfo.commit

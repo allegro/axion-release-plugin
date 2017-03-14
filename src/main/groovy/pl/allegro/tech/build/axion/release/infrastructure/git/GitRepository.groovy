@@ -179,7 +179,7 @@ class GitRepository implements ScmRepository {
     }
     
     private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-      List<TagsOnCommit> allTaggedCommits = allTaggedCommits(pattern, maybeSinceCommit, inclusive, true)
+      List<TagsOnCommit> allTaggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true)
       TagsOnCommit taggedCommit = null
       if (allTaggedCommits.size() == 0) {
         taggedCommit = new TagsOnCommit(null, [], false)
@@ -189,7 +189,15 @@ class GitRepository implements ScmRepository {
       return taggedCommit
     }
     
-    List<TagsOnCommit> allTaggedCommits(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+    List<TagsOnCommit> firstTaggedCommitAsList(Pattern pattern) {
+      return taggedCommitsInternal(pattern, null, true, true)
+    }
+    
+    List<TagsOnCommit> taggedCommits(Pattern pattern) {
+      return taggedCommitsInternal(pattern, null, true, false)
+    }
+
+    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
       List<TagsOnCommit> allTaggedCommits = new ArrayList<>()
       if (!hasCommits()) {
         return allTaggedCommits
