@@ -12,6 +12,8 @@ import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
+import java.util.List
+
 class GitRepositoryTest extends Specification {
 
     Project project
@@ -145,6 +147,31 @@ class GitRepositoryTest extends Specification {
 
         then:
         tags.tags == ['release-1']
+    }
+    
+    def "should return all tagged commits matching the pattern provided"() {
+        given:
+        repository.tag('release-1')
+        repository.commit(['*'], "commit after release-1")
+        repository.tag('release-2')
+        repository.commit(['*'], "commit after release-2")
+        repository.tag('another-tag-1')
+        repository.commit(['*'], "commit after another-tag-1")
+        repository.commit(['*'], "commit after another-tag-1-2")
+        repository.tag('release-4')
+        repository.commit(['*'], "commit after release-4")
+        repository.tag('release-3')
+        repository.commit(['*'], "commit after release-3")
+    
+        when:
+        List<TagsOnCommit> allTaggedCommits  = repository.taggedCommits(~/^release.*/)
+    
+        then:
+        allTaggedCommits.size() == 4
+        allTaggedCommits.get(0).tags.get(0).equals('release-3')
+        allTaggedCommits.get(1).tags.get(0).equals('release-4')
+        allTaggedCommits.get(2).tags.get(0).equals('release-2')
+        allTaggedCommits.get(3).tags.get(0).equals('release-1')
     }
 
     def "should return only tags that match with prefix"() {

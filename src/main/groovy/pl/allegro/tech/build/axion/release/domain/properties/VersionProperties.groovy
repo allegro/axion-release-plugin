@@ -17,6 +17,8 @@ class VersionProperties {
     final Closure<Version> versionIncrementer
 
     final boolean sanitizeVersion
+    
+    final boolean useHighestVersion
 
     boolean forceVersion() {
         return forcedVersion != null

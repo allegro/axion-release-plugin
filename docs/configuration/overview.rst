@@ -24,6 +24,9 @@ All ``axion-release-plugin`` configuration options:
         
         // :doc:`uncommitted_changes`
         ignoreUncommittedChanges = true // should uncommitted changes force version bump
+        
+        // :doc`use_highest_version`
+        useHighestVersion = false // Defaults as false, setting to true will find the highest visible version in the commit tree
     
         // :ref:`version-sanitization`
         sanitizeVersion = true // should created version be sanitized, true by default

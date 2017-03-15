@@ -20,6 +20,8 @@ class VersionConfig {
     boolean dryRun
 
     boolean ignoreUncommittedChanges = true
+    
+    boolean useHighestVersion = false
 
     RepositoryConfig repository
 

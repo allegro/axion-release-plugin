@@ -32,6 +32,7 @@ Configuration
     configuration/hooks
     configuration/publishing
     configuration/ci_servers
+    configuration/use_highest_version
 
 Examples
 --------
