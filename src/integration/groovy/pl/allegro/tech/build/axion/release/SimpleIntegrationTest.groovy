@@ -115,6 +115,30 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains('1.5.1-SNAPSHOT')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
+        
+    def "should return release tag with highest version if useHighestVersion is set to true"() {
+        given:
+        buildFile('')
+    
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        
+        repository.commit(['*'], "commit after release-1.5.0")
+        
+        runGradle('release', '-Prelease.version=1.2.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        
+        repository.commit(['*'], "commit after release-1.5.0")
+        
+        runGradle('release', '-Prelease.localOnly', '-Prelease.disableChecks', '-Prelease.useHighestVersion')
+    
+        when:
+        def result = runGradle('currentVersion', '-Prelease.useHighestVersion')
+    
+        then:
+        result.output.contains('1.5.1')
+        !result.output.contains('SNAPHOT')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
 
     def "should update file in pre release hook"() {
         given:
