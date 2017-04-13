@@ -19,9 +19,8 @@ Version is kept in repository in form of a tag::
     # git tag
     release-1.0.0 release-1.0.1 release-1.1.0
 
-Git implementation of repository interface starts from current commit and goes up the commit tree until first tag
-with matching prefix is encountered. This tag is returned as current position in repository (along with current branch)
-and commit number. Information on what prefix to match can be set using ``scmVersion.tag.prefix`` property::
+Only tags which math predefined prefix are taken into a count when calculating
+current version. Prefix can be set using ``scmVersion.tag.prefix`` property::
 
     scmVersion {
         tag {
@@ -29,9 +28,9 @@ and commit number. Information on what prefix to match can be set using ``scmVer
         }
     }
 
-By default it equals ``release``.
+Default prefix is ``release``.
 
-There also exist an option to set prefix per-branch (i.e. to use different version prefix on ``legacy-`` branches)::
+There is also an option to set prefix per-branch (i.e. to use different version prefix on ``legacy-`` branches)::
 
     scmVersion {
         tag {
@@ -41,6 +40,18 @@ There also exist an option to set prefix per-branch (i.e. to use different versi
             ]
         }
     }
+
+Git implementation of a repository interface can operate in two modes when
+searching for tag to read the version from.
+
+First tag encountered
+^^^^^^^^^^^^^^^^^^^^^
+
+**This is the default mode**
+
+In default mode, search for tag starts from current commit and goes up the commit tree until first tag
+with matching prefix is encountered. This tag is returned as current position in repository (along with current branch)
+and commit number. 
 
 Tree walking algorithm might lead to various misunderstandings. Take this tree as an example::
 
@@ -57,6 +68,41 @@ on two separate branches. Then, branch on the right has been released and marked
 tree from commit ``C`` upwards, first discovered tag will be ``T1`` and so reported version will come from parsing
 ``T1`` tag, even though tag ``T2`` has higher version number. It all comes down to what is the history of current commit,
 not what has happened in repository in general.
+
+.. _use_highest_version:
+
+Tag with highest version
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Second mode is searching for highest version visible in the git tree's history.
+This means that all commits from HEAD till first commit will be analysed.
+
+In order to activate this feature::
+
+    scmVersion {
+        useHighestVersion = true
+    }
+
+With a tree similar to this::
+
+    Tag: 1.0.0
+    Tag: 1.5.0
+    Tag: 1.2.0
+
+This changes behavior from::
+
+    # ./gradlew currentVersion
+    1.2.0
+
+to::
+
+    # ./gradlew currentVersion
+    1.5.0
+
+You can also active this option using command line::
+
+    # ./gradlew currentVersion -Prelease.useHighestVersion
+    1.5.0
 
 .. _version-parsing:
 

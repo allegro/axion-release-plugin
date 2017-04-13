@@ -1,6 +1,10 @@
 Changelog
 =========
 
+* **1.6.0** (13.04.2017)
+    * added option to find highest version from all tags, not only current branch - thanks to `ProTrent <https://github.com/ProTrent>`_ for contribution
+* **1.5.0** (06.02.2017)
+    * added ordering of tags by version when multiple found on single commit
 * **1.4.1** (11.10.2016)
     * fixing critical bug in printing Git changes, which could block ``verifyRelease`` task
 * **1.4.0** (17.08.2016)
