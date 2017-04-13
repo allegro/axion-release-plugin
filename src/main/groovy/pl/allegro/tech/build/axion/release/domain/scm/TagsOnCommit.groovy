@@ -16,6 +16,10 @@ class TagsOnCommit {
         this.isHead = isHead
     }
 
+    static TagsOnCommit empty() {
+        return new TagsOnCommit(null, [], false)
+    }
+
     boolean hasOnlyMatching(Pattern pattern) {
         return !tags.isEmpty() && tags.every({ it ==~ pattern })
     }

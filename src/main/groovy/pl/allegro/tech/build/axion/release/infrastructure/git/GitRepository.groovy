@@ -21,7 +21,6 @@ import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.transport.Transport
 import org.eclipse.jgit.transport.URIish
-
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
@@ -164,76 +163,72 @@ class GitRepository implements ScmRepository {
             shortRevision = head.abbreviatedId
         }
         return new ScmPosition(
-                revision,
-                shortRevision,
-                repository.branch.current.name
+            revision,
+            shortRevision,
+            repository.branch.current.name
         )
     }
-    
+
     TagsOnCommit latestTags(Pattern pattern) {
-      return latestTagsInternal(pattern, null, true)
+        return latestTagsInternal(pattern, null, true)
     }
-  
+
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
         return latestTagsInternal(pattern, sinceCommit, false)
     }
-    
+
     private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-      List<TagsOnCommit> allTaggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true)
-      TagsOnCommit taggedCommit = null
-      if (allTaggedCommits.size() == 0) {
-        taggedCommit = new TagsOnCommit(null, [], false)
-      } else {
-        taggedCommit = allTaggedCommits.get(0)
-      }
-      return taggedCommit
+        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true)
+        return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits[0]
     }
-    
+
     List<TagsOnCommit> firstTaggedCommitAsList(Pattern pattern) {
-      return taggedCommitsInternal(pattern, null, true, true)
+        return taggedCommitsInternal(pattern, null, true, true)
     }
-    
+
     List<TagsOnCommit> taggedCommits(Pattern pattern) {
-      return taggedCommitsInternal(pattern, null, true, false)
+        return taggedCommitsInternal(pattern, null, true, false)
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
-      List<TagsOnCommit> allTaggedCommits = new ArrayList<>()
-      if (!hasCommits()) {
-        return allTaggedCommits
-      }
+    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern,
+                                                     String maybeSinceCommit,
+                                                     boolean inclusive,
+                                                     boolean stopOnFirstTag) {
+        List<TagsOnCommit> taggedCommits = new ArrayList<>()
+        if (!hasCommits()) {
+            return taggedCommits
+        }
 
-      Map<String, List<String>> allTags = tagsMatching(pattern)
+        Map<String, List<String>> allTags = tagsMatching(pattern)
 
-      ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
-      ObjectId startingCommit
-      if (maybeSinceCommit != null) {
-          startingCommit = ObjectId.fromString(maybeSinceCommit)
-      } else {
-          startingCommit = headId
-      }
+        ObjectId startingCommit
+        if (maybeSinceCommit != null) {
+            startingCommit = ObjectId.fromString(maybeSinceCommit)
+        } else {
+            startingCommit = headId
+        }
 
-      RevWalk walk = walker(startingCommit)
-      if (!inclusive) {
-          walk.next()
-      }
+        RevWalk walk = walker(startingCommit)
+        if (!inclusive) {
+            walk.next()
+        }
 
-      List tagsList = null
-
-      RevCommit currentCommit
-      List<String> currentTagsList = null
-      for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-          currentTagsList = allTags[currentCommit.id.name()]
-          if (currentTagsList) {
-            TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
-            allTaggedCommits.add(taggedCommit)
-            if (stopOnFirstTag)
-              break
-          }
-      }
-      walk.dispose()
-      return allTaggedCommits
+        RevCommit currentCommit
+        List<String> currentTagsList
+        for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+            currentTagsList = allTags[currentCommit.id.name()]
+            if (currentTagsList) {
+                TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
+                taggedCommits.add(taggedCommit)
+                if (stopOnFirstTag) {
+                    break
+                }
+            }
+        }
+        walk.dispose()
+        return taggedCommits
     }
 
     private RevWalk walker(ObjectId startingCommit) {
@@ -247,9 +242,9 @@ class GitRepository implements ScmRepository {
 
     private Map<String, List<String>> tagsMatching(Pattern pattern) {
         return repository.tag.list()
-                .collect({ tag -> [id: tag.commit.id, name: tag.fullName.substring(GIT_TAG_PREFIX.length())] })
-                .grep({ tag -> tag.name ==~ pattern })
-                .inject([:].withDefault({ p -> [] }), { map, entry ->
+            .collect({ tag -> [id: tag.commit.id, name: tag.fullName.substring(GIT_TAG_PREFIX.length())] })
+            .grep({ tag -> tag.name ==~ pattern })
+            .inject([:].withDefault({ p -> [] }), { map, entry ->
             map[entry.id] << entry.name
             return map
         })

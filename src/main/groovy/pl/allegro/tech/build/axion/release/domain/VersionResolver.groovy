@@ -26,8 +26,7 @@ class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, position)
 
-        Map versions = null
-        
+        Map versions
         if (versionFactory.versionProperties.useHighestVersion) {
           versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties)
         } else {
@@ -52,18 +51,18 @@ class VersionResolver {
         GitRepository repository = (GitRepository) this.repository
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
-        
+
         Map currentVersionInfo = null
         Map previousVersionInfo = null
         List<TagsOnCommit> allTaggedCommits = repository.firstTaggedCommitAsList(releaseTagPattern)
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
-        
+
         TagsOnCommit previousTags = repository.latestTags(releaseTagPattern)
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
           previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
         }
         previousVersionInfo = versionFromTags(previousTags.tags, true, nextVersionTagPattern, versionFactory)
-        
+
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
         return [
@@ -74,24 +73,24 @@ class VersionResolver {
           noTagsFound     : currentVersionInfo.noTagsFound
         ]
     }
-    
+
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
                                               TagProperties tagProperties,
                                              NextVersionProperties nextVersionProperties) {
         GitRepository repository = (GitRepository) this.repository
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
-        
+
         Map currentVersionInfo = null
         Map previousVersionInfo = null
-        
+
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
-        
+
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
         String commitId = currentVersionInfo.commit
         boolean isHead = currentVersionInfo.isHead
         previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory)
-        
+
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
         return [
@@ -102,15 +101,15 @@ class VersionResolver {
           noTagsFound     : currentVersionInfo.noTagsFound
         ]
     }
-    
-    private Map versionFromTaggedCommits(List<TagsOnCommit> taggedCommits, 
-                                         boolean ignoreNextVersionTags, 
-                                         Pattern nextVersionTagPattern, 
+
+    private Map versionFromTaggedCommits(List<TagsOnCommit> taggedCommits,
+                                         boolean ignoreNextVersionTags,
+                                         Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory) {
       List<Version> versions = []
       Map<Version, Boolean> isVersionNextVersion = [:].withDefault({false})
       Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
-      
+
       for (TagsOnCommit tagsEntry : taggedCommits) {
         List<String> tags = tagsEntry.tags
         for (String tag: tags) {
@@ -128,7 +127,7 @@ class VersionResolver {
 
       Collections.sort(versions, Collections.reverseOrder())
       Version version = versions.isEmpty() ? versionFactory.initialVersion() : versions[0]
-      
+
       TagsOnCommit versionCommit = versionToCommit.get(version)
       return [
               version      : version,
