@@ -30,7 +30,7 @@ scmVersion {
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.6'
 
 repositories {
     mavenCentral()
