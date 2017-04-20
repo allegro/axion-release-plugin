@@ -40,15 +40,6 @@ currentVersion
 Print current version as seen by ``axion-gradle-plugin``. It's most convenient to use ``cV`` abbreviation when running
 this task often (Gradle understands camel-case abbreviations).
 
-By default this task outputs::
-
-    Project version: <version>
-
-If plain output is needed, call::
-
-    ./gradlew cV -q -Prelease.quiet
-    <version>
-
 markNextVersion
 ---------------
 
