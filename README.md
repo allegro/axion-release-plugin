@@ -1,6 +1,8 @@
 axion-release-plugin
 ====
 
+[![Join the chat at https://gitter.im/axion-release-plugin/Lobby](https://badges.gitter.im/axion-release-plugin/Lobby.svg)](https://gitter.im/axion-release-plugin/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 *gradle release and version management plugin*
 
 [![Join the chat at https://gitter.im/allegro/axion-release-plugin](https://badges.gitter.im/allegro/axion-release-plugin.svg)](https://gitter.im/allegro/axion-release-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
