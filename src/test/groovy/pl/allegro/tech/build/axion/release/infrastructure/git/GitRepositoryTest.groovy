@@ -5,7 +5,6 @@ import org.ajoberstar.grgit.exception.GrgitException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
-import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.*
 import spock.lang.Specification
@@ -14,7 +13,7 @@ import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilde
 
 class GitRepositoryTest extends Specification {
 
-    Project project
+    File repositoryDir
 
     Grgit rawRepository
 
@@ -23,11 +22,11 @@ class GitRepositoryTest extends Specification {
     GitRepository repository
 
     void setup() {
-        Project remoteProject = ProjectBuilder.builder().build()
-        remoteRawRepository = GitProjectBuilder.gitProject(remoteProject).withInitialCommit().build()[Grgit]
+        File remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
+        remoteRawRepository = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()[Grgit]
 
-        project = ProjectBuilder.builder().build()
-        Map repositories = GitProjectBuilder.gitProject(project, remoteProject).build()
+        repositoryDir = File.createTempDir('axion-release', 'tmp')
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).build()
 
         rawRepository = repositories[Grgit]
         repository = repositories[GitRepository]
@@ -35,8 +34,8 @@ class GitRepositoryTest extends Specification {
 
     def "should throw unavailable exception when initializing in unexisitng repository"() {
         given:
-        Project gitlessProject = ProjectBuilder.builder().build()
-        ScmProperties scmProperties = scmProperties(gitlessProject.rootDir).build()
+        File gitlessProject = File.createTempDir('axion-release', 'tmp')
+        ScmProperties scmProperties = scmProperties(gitlessProject).build()
 
         when:
         new GitRepository(scmProperties)
@@ -87,7 +86,7 @@ class GitRepositoryTest extends Specification {
 
     def "should signal there are uncommitted changes"() {
         when:
-        project.file('uncommitted').createNewFile()
+        new File(repositoryDir, 'uncommitted').createNewFile()
 
         then:
         repository.checkUncommittedChanges()
@@ -108,7 +107,7 @@ class GitRepositoryTest extends Specification {
 
     def "should return no tags when no commit in repository"() {
         given:
-        GitRepository commitlessRepository = GitProjectBuilder.gitProject(ProjectBuilder.builder().build()).build()[GitRepository]
+        GitRepository commitlessRepository = GitProjectBuilder.gitProject(File.createTempDir('axion-release', 'tmp')).build()[GitRepository]
 
         when:
         TagsOnCommit tags = commitlessRepository.latestTags(~/^release.*/)
