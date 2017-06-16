@@ -94,7 +94,7 @@ project.configurations {
 }
 
 task integrationTest(type: Test) {
-    testClassesDir = project.sourceSets.integration.output.classesDir
+    testClassesDirs = project.sourceSets.integration.output.classesDirs
     classpath = project.sourceSets.main.output +
             project.sourceSets.test.output +
             project.sourceSets.integration.runtimeClasspath +
@@ -121,7 +121,7 @@ jacocoTestReport {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
+    gradleVersion = '4.0'
 }
 
 pluginBundle {
