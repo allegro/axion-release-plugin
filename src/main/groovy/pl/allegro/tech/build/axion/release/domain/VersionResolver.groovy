@@ -48,13 +48,11 @@ class VersionResolver {
     private Map readVersions(VersionFactory versionFactory,
                              TagProperties tagProperties,
                              NextVersionProperties nextVersionProperties) {
-        GitRepository repository = (GitRepository) this.repository
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 
-        Map currentVersionInfo = null
-        Map previousVersionInfo = null
-        List<TagsOnCommit> allTaggedCommits = repository.firstTaggedCommitAsList(releaseTagPattern)
+        Map currentVersionInfo, previousVersionInfo
+        List<TagsOnCommit> allTaggedCommits = [repository.latestTags(releaseTagPattern)]
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
 
         TagsOnCommit previousTags = repository.latestTags(releaseTagPattern)
@@ -77,13 +75,10 @@ class VersionResolver {
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
                                               TagProperties tagProperties,
                                              NextVersionProperties nextVersionProperties) {
-        GitRepository repository = (GitRepository) this.repository
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 
-        Map currentVersionInfo = null
-        Map previousVersionInfo = null
-
+        Map currentVersionInfo, previousVersionInfo
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
 
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)

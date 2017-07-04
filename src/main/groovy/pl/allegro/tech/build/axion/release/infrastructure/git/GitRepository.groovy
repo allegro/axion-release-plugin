@@ -169,10 +169,12 @@ class GitRepository implements ScmRepository {
         )
     }
 
+    @Override
     TagsOnCommit latestTags(Pattern pattern) {
         return latestTagsInternal(pattern, null, true)
     }
 
+    @Override
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
         return latestTagsInternal(pattern, sinceCommit, false)
     }
@@ -182,10 +184,7 @@ class GitRepository implements ScmRepository {
         return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits[0]
     }
 
-    List<TagsOnCommit> firstTaggedCommitAsList(Pattern pattern) {
-        return taggedCommitsInternal(pattern, null, true, true)
-    }
-
+    @Override
     List<TagsOnCommit> taggedCommits(Pattern pattern) {
         return taggedCommitsInternal(pattern, null, true, false)
     }

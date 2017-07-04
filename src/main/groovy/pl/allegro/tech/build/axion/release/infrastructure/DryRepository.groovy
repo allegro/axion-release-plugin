@@ -65,6 +65,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    List<TagsOnCommit> taggedCommits(Pattern pattern) {
+        return delegateRepository.taggedCommits(pattern)
+    }
+
+    @Override
     boolean remoteAttached(String remoteName) {
         return true
     }
