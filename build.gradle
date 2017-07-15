@@ -8,6 +8,8 @@ plugins {
     id "com.gradle.plugin-publish" version "0.9.1"
     id "com.bmuschko.nexus" version "2.3.1" apply false
     id "io.codearte.nexus-staging" version "0.5.3" apply false
+
+    id "me.champeau.gradle.jmh" version "0.4.3"
 }
 
 if (project.hasProperty('mavenCentral')) {
@@ -108,6 +110,11 @@ task integrationTest(type: Test) {
 }
 
 tasks.check.dependsOn integrationTest
+
+jmh {
+    benchmarkMode = ['ss']
+    duplicateClassesStrategy = 'warn'
+}
 
 gradlePlugin {
     testSourceSets project.sourceSets.integration

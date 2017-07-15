@@ -13,6 +13,15 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import java.util.Map.Entry
 import java.util.regex.Pattern
 
+/**
+ * Returned structure is:
+ * * previousVersion: version read from last release tag
+ * * version: either:
+ *   * forced version
+ *   * version read from last next version tag
+ *   * version read from last release tag and incremented when not on tag
+ *   * version read from last release tag when on tag
+ */
 class VersionResolver {
 
     private final ScmRepository repository
@@ -52,14 +61,14 @@ class VersionResolver {
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 
         Map currentVersionInfo, previousVersionInfo
-        List<TagsOnCommit> allTaggedCommits = [repository.latestTags(releaseTagPattern)]
-        currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
+        TagsOnCommit latestTags = repository.latestTags(releaseTagPattern)
+        currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern, versionFactory)
 
-        TagsOnCommit previousTags = repository.latestTags(releaseTagPattern)
+        TagsOnCommit previousTags = latestTags
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
           previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
         }
-        previousVersionInfo = versionFromTags(previousTags.tags, true, nextVersionTagPattern, versionFactory)
+        previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern, versionFactory)
 
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
@@ -82,8 +91,6 @@ class VersionResolver {
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
 
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
-        String commitId = currentVersionInfo.commit
-        boolean isHead = currentVersionInfo.isHead
         previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory)
 
         Version currentVersion = currentVersionInfo.version
@@ -91,7 +98,7 @@ class VersionResolver {
         return [
           current         : currentVersion,
           previous        : previousVersion,
-          onReleaseTag    : isHead && !currentVersionInfo.isNextVersion,
+          onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
           onNextVersionTag: currentVersionInfo.isNextVersion,
           noTagsFound     : currentVersionInfo.noTagsFound
         ]
@@ -131,32 +138,5 @@ class VersionResolver {
               commit       : versionCommit?.commitId,
               isHead       : versionCommit?.isHead
       ]
-    }
-
-    private Map versionFromTags(List<String> tags,
-                                boolean ignoreNextVersionTags,
-                                Pattern nextVersionTagPattern,
-                                VersionFactory versionFactory) {
-        List<Version> versions = []
-        Map<Version, Boolean> isVersionNextVersion = [:].withDefault({false})
-        for (String tag : tags) {
-            boolean isNextVersion = tag ==~ nextVersionTagPattern
-            if (ignoreNextVersionTags && isNextVersion) {
-                continue
-            }
-
-            Version version = versionFactory.versionFromTag(tag)
-            versions.add(version)
-            isVersionNextVersion[version] = isNextVersion
-        }
-
-        Collections.sort(versions, Collections.reverseOrder())
-        Version version = versions.isEmpty() ? versionFactory.initialVersion() : versions[0]
-
-        return [
-                version      : version,
-                isNextVersion: isVersionNextVersion.get(version),
-                noTagsFound  : versions.isEmpty()
-        ]
     }
 }
