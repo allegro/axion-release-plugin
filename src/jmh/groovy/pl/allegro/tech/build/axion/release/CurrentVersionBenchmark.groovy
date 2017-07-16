@@ -19,7 +19,7 @@ class CurrentVersionBenchmark {
 
     private static final COMMITS = 1_000
 
-    private static final TAG_COMMIT = 0
+    private static final TAG_COMMIT = 800
 
     private final File repositoryDir = File.createTempDir('axion-release-perf', null)
 

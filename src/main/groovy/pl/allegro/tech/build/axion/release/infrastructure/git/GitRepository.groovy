@@ -14,6 +14,7 @@ import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
@@ -198,8 +199,6 @@ class GitRepository implements ScmRepository {
             return taggedCommits
         }
 
-        Map<String, List<String>> allTags = tagsMatching(pattern)
-
         ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
 
         ObjectId startingCommit
@@ -214,10 +213,12 @@ class GitRepository implements ScmRepository {
             walk.next()
         }
 
+        Map<String, List<String>> allTags = tagsMatching(pattern, walk)
+
         RevCommit currentCommit
         List<String> currentTagsList
         for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-            currentTagsList = allTags[currentCommit.id.name()]
+            currentTagsList = allTags[currentCommit.id.name]
             if (currentTagsList) {
                 TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
                 taggedCommits.add(taggedCommit)
@@ -227,26 +228,31 @@ class GitRepository implements ScmRepository {
             }
         }
         walk.dispose()
+
         return taggedCommits
     }
 
     private RevWalk walker(ObjectId startingCommit) {
         RevWalk walk = new RevWalk(repository.repository.jgit.repository)
-        walk.sort(RevSort.TOPO)
-        walk.sort(RevSort.COMMIT_TIME_DESC, true)
+        
+        // explicitly set to NONE
+        // TOPO sorting forces all commits in repo to be read in memory,
+        // making walk incredibly slow
+        walk.sort(RevSort.NONE)
         RevCommit head = walk.parseCommit(startingCommit)
         walk.markStart(head)
         return walk
     }
 
-    private Map<String, List<String>> tagsMatching(Pattern pattern) {
-        return repository.tag.list()
-            .collect({ tag -> [id: tag.commit.id, name: tag.fullName.substring(GIT_TAG_PREFIX.length())] })
+    private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) {
+        List<Ref> tags = repository.repository.jgit.tagList().call()
+        return tags
+            .collect({ tag -> [id: walk.parseCommit(tag.objectId).name, name: tag.name.substring(GIT_TAG_PREFIX.length())] })
             .grep({ tag -> tag.name ==~ pattern })
             .inject([:].withDefault({ p -> [] }), { map, entry ->
-            map[entry.id] << entry.name
-            return map
-        })
+                map[entry.id] << entry.name
+                return map
+            })
     }
 
     private boolean hasCommits() {
