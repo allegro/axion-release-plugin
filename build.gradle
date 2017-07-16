@@ -37,7 +37,7 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '4.1.1.201511131810-r'
+        jgit: '4.5.2.201704071617-r'
 ]
 
 sourceSets {
@@ -60,12 +60,12 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile group: 'org.ajoberstar', name: 'grgit', version: '1.4.1'
+    compile group: 'org.ajoberstar', name: 'grgit', version: '1.7.2'
 
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
 
-    compile group: 'com.jcraft', name: 'jsch', version: '0.1.53'
+    compile group: 'com.jcraft', name: 'jsch', version: '0.1.54'
     compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
     testCompile(group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4') {
