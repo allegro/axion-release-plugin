@@ -109,7 +109,7 @@ class VersionResolver {
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory) {
       List<Version> versions = []
-      Map<Version, Boolean> isVersionNextVersion = [:].withDefault({false})
+      Map<Version, Boolean> isVersionNextVersion = [:]
       Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
 
       for (TagsOnCommit tagsEntry : taggedCommits) {
@@ -123,7 +123,12 @@ class VersionResolver {
           Version version = versionFactory.versionFromTag(tag)
           versions.add(version)
           versionToCommit.put(version, tagsEntry)
-          isVersionNextVersion[version] = isNextVersion
+
+          if(isVersionNextVersion.containsKey(version)) {
+              isVersionNextVersion[version] = isVersionNextVersion[version] && isNextVersion
+          } else {
+              isVersionNextVersion[version] = isNextVersion
+          }
         }
       }
 
@@ -133,7 +138,7 @@ class VersionResolver {
       TagsOnCommit versionCommit = versionToCommit.get(version)
       return [
               version      : version,
-              isNextVersion: isVersionNextVersion.get(version),
+              isNextVersion: isVersionNextVersion.containsKey(version) && isVersionNextVersion[version],
               noTagsFound  : versions.isEmpty(),
               commit       : versionCommit?.commitId,
               isHead       : versionCommit?.isHead
