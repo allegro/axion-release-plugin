@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
@@ -13,9 +14,12 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 class VerifyReleaseTask extends DefaultTask {
 
+    @Optional
+    VersionConfig versionConfig
+
     @TaskAction
     void verify() {
-        Context context = GradleAwareContext.create(project)
+        Context context = versionConfig == null ? GradleAwareContext.create(project) : GradleAwareContext.create(project, versionConfig)
 
         ScmRepository repository = context.repository()
         ScmChangesPrinter changesPrinter = context.changesPrinter()

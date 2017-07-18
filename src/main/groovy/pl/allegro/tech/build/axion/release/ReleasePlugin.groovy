@@ -12,9 +12,9 @@ class ReleasePlugin implements Plugin<Project> {
     public static final String VERIFY_RELEASE_TASK = 'verifyRelease'
 
     public static final String RELEASE_TASK = 'release'
-    
+
     public static final String CREATE_RELEASE_TASK = 'createRelease'
-    
+
     public static final String PUSH_RELEASE_TASK = 'pushRelease'
 
     public static final String MARK_NEXT_VERSION_TASK = 'markNextVersion'
