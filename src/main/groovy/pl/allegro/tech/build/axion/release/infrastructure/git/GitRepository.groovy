@@ -33,6 +33,8 @@ class GitRepository implements ScmRepository {
 
     private static final String GIT_TAG_PREFIX = 'refs/tags/'
 
+    private static final GitCache gitCache = new GitCache();
+
     private final TransportConfigFactory transportConfigFactory = new TransportConfigFactory()
 
     private final File repositoryDir
@@ -84,6 +86,7 @@ class GitRepository implements ScmRepository {
         boolean isOnExistingTag = repository.tag.list().any({ it.name == tagName && it.commit.id == headId })
         if (!isOnExistingTag) {
             repository.tag.add(name: tagName)
+            gitCache.invalidate(repository.repository.jgit.repository)
         } else {
             logger.debug("The head commit $headId already has the tag $tagName.")
         }
@@ -153,6 +156,7 @@ class GitRepository implements ScmRepository {
             repository.add(patterns: patterns.collect { it.replaceFirst(canonicalPath, '') })
         }
         repository.commit(message: message)
+        gitCache.invalidate(repository.repository.jgit.repository)
     }
 
     ScmPosition currentPosition() {
@@ -190,7 +194,7 @@ class GitRepository implements ScmRepository {
         return taggedCommitsInternal(pattern, null, true, false)
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern,
+    private List<TagsOnCommit> taggedCommitsInternal2(Pattern pattern,
                                                      String maybeSinceCommit,
                                                      boolean inclusive,
                                                      boolean stopOnFirstTag) {
@@ -232,9 +236,45 @@ class GitRepository implements ScmRepository {
         return taggedCommits
     }
 
+
+    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern,
+                                                     String maybeSinceCommit,
+                                                     boolean inclusive,
+                                                     boolean stopOnFirstTag) {
+        List<TagsOnCommit> taggedCommits = new ArrayList<>()
+        if (!hasCommits()) {
+            return taggedCommits
+        }
+
+        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+
+        ObjectId startingCommit
+        if (maybeSinceCommit != null) {
+            startingCommit = ObjectId.fromString(maybeSinceCommit)
+        } else {
+            startingCommit = headId
+        }
+
+        CachedGitRepository.CachedGitRevWalk walk = gitCache.walk(repository.repository.jgit.repository, startingCommit)
+        if(!inclusive) {
+            walk.next()
+        }
+
+        for(TagsOnCommit commit = walk.next(); commit != null; commit = walk.next()) {
+            if(commit.hasAnyMatching(pattern)) {
+                taggedCommits.add(commit)
+                if (stopOnFirstTag) {
+                    break
+                }
+            }
+        }
+
+        return taggedCommits
+    }
+
     private RevWalk walker(ObjectId startingCommit) {
         RevWalk walk = new RevWalk(repository.repository.jgit.repository)
-        
+
         // explicitly set to NONE
         // TOPO sorting forces all commits in repo to be read in memory,
         // making walk incredibly slow

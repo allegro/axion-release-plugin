@@ -3,6 +3,8 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
 import org.eclipse.jgit.lib.Config
+import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.revwalk.RevWalk
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
@@ -47,6 +49,11 @@ class GitRepositoryTest extends Specification {
     def "should create new tag on current commit"() {
         when:
         repository.tag('release-1')
+
+        RevWalk r = new RevWalk(rawRepository.repository.jgit.repository)
+        r.markStart(r.parseCommit(rawRepository.repository.jgit.repository.resolve(Constants.HEAD)))
+
+        assert r.next() != null
 
         then:
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']

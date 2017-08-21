@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release
 import com.github.zafarkhaja.semver.Version
 import org.ajoberstar.grgit.Grgit
 import org.openjdk.jmh.annotations.*
+import org.openjdk.jmh.infra.Blackhole
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.PropertiesBuilder
@@ -17,9 +18,11 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactor
 @State(value = Scope.Benchmark)
 class CurrentVersionBenchmark {
 
-    private static final COMMITS = 1_000
+    private static final int ITERATIONS = 5
 
-    private static final TAG_COMMIT = 800
+    private static final int COMMITS = 1_000
+
+    private static final int TAG_COMMIT = 100
 
     private final File repositoryDir = File.createTempDir('axion-release-perf', null)
 
@@ -50,7 +53,7 @@ class CurrentVersionBenchmark {
     }
 
     @Benchmark
-    Version currentVersion() {
+    void currentVersion(Blackhole blackhole) {
         ScmProperties scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
 
@@ -61,11 +64,14 @@ class CurrentVersionBenchmark {
             new LocalOnlyResolver(true)
         )
 
-        return context.versionService().currentVersion(
-            VersionPropertiesBuilder.versionProperties().build(),
-            TagPropertiesBuilder.tagProperties().build(),
-            NextVersionPropertiesBuilder.nextVersionProperties().build()
-        ).version
+        for(int i = 0; i < ITERATIONS; ++i) {
+            Version version = context.versionService().currentVersion(
+                VersionPropertiesBuilder.versionProperties().build(),
+                TagPropertiesBuilder.tagProperties().build(),
+                NextVersionPropertiesBuilder.nextVersionProperties().build()
+            ).version
+            blackhole.consume(version)
+        }
     }
 
 }
