@@ -27,6 +27,8 @@ on a branch.
 
 To use the :ref:`versionWithBranch` version creator from Jenkins, you need to override the default behavior of the Jenkins git plugin to avoid the 'detached-head' state.  In the Git section of the job configuration page, add the 'Additional Behaviour' called 'Check out to specific local branch' and enter your branch name.
 
+Jenkins pipeline now defaults to clone with a narrow refspec, and without tags (as of git plugin 3.4.0).  That saves network bandwidth, time, and disc space.  If you need tags in your Jenkins workspace, add the 'Additional Behaviour' called 'Advanced clone behaviors'.  Adding that behaviour will enable fetching of tags.
+
 Bamboo
 ------
 
