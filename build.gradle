@@ -3,7 +3,7 @@ plugins {
     id 'java-gradle-plugin'
     id 'maven'
     id 'jacoco'
-    id 'pl.allegro.tech.build.axion-release' version '1.5.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.7.0'
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id "com.gradle.plugin-publish" version "0.9.1"
     id "com.bmuschko.nexus" version "2.3.1" apply false
