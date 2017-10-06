@@ -10,16 +10,20 @@ import pl.allegro.tech.build.axion.release.infrastructure.config.ScmPropertiesFa
 
 class GradleAwareContext {
 
-    static Context create(Project project, VersionConfig versionConfig = config(project)) {
+    static Context create(Project project, VersionConfig versionConfig) {
         ScmProperties scmProperties = ScmPropertiesFactory.create(project, versionConfig)
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
 
         return new Context(
-                RulesFactory.create(project, versionConfig, scmRepository.currentPosition()),
-                scmRepository,
-                scmProperties,
-                LocalOnlyResolverFactory.create(project, versionConfig)
+            RulesFactory.create(project, versionConfig, scmRepository.currentPosition()),
+            scmRepository,
+            scmProperties,
+            LocalOnlyResolverFactory.create(project, versionConfig)
         )
+    }
+
+    static VersionConfig configOrCreateFromProject(Project project, VersionConfig versionConfig) {
+        return versionConfig == null ? config(project) : versionConfig
     }
 
     static VersionConfig config(Project project) {

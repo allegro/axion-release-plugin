@@ -23,6 +23,10 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         """ + contents
     }
 
+    void vanillaBuildFile(String contents) {
+        buildFile() << contents
+    }
+
     GradleRunner gradle() {
         return GradleRunner.create()
                 .withProjectDir(directory)

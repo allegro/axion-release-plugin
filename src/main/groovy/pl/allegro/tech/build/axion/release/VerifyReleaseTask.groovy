@@ -19,11 +19,11 @@ class VerifyReleaseTask extends DefaultTask {
 
     @TaskAction
     void verify() {
-        Context context = versionConfig == null ? GradleAwareContext.create(project) : GradleAwareContext.create(project, versionConfig)
+        VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
+        Context context = GradleAwareContext.create(project, config)
 
         ScmRepository repository = context.repository()
         ScmChangesPrinter changesPrinter = context.changesPrinter()
-        VersionConfig config = GradleAwareContext.config(project)
 
         boolean dryRun = context.rules().dryRun
         ChecksProperties checksRules = context.rules().checks

@@ -15,7 +15,8 @@ class PushReleaseTask extends DefaultTask {
 
     @TaskAction
     void release() {
-        Context context = versionConfig == null ? GradleAwareContext.create(project) : GradleAwareContext.create(project, versionConfig)
+        VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
+        Context context = GradleAwareContext.create(project, config)
 
         Releaser releaser = context.releaser()
         releaser.pushRelease()

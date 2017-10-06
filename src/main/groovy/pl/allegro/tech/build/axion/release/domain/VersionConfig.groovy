@@ -162,7 +162,7 @@ class VersionConfig {
 
     private void ensureContextExists() {
         if (context == null) {
-            this.context = GradleAwareContext.create(project)
+            this.context = GradleAwareContext.create(project, this)
         }
     }
 }
