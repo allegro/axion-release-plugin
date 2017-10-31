@@ -21,13 +21,18 @@ class DryRepository implements ScmRepository {
 
     @Override
     void fetchTags(ScmIdentity identity, String remoteName) {
-        log('fetching tags from remote')
+        log("fetching tags from remote")
         delegateRepository.fetchTags(identity, remoteName)
     }
 
     @Override
     void tag(String tagName) {
         log("creating tag with name: $tagName")
+    }
+
+    @Override
+    void dropTag(String tagName) {
+        log("dropping tag with name: $tagName")
     }
 
     @Override

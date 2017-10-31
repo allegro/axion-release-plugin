@@ -9,6 +9,7 @@ import org.eclipse.jgit.api.FetchCommand
 import org.eclipse.jgit.api.LogCommand
 import org.eclipse.jgit.api.PushCommand
 import org.eclipse.jgit.api.TransportCommand
+import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.lib.Config
@@ -18,12 +19,21 @@ import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.transport.PushResult
 import org.eclipse.jgit.transport.RemoteConfig
+import org.eclipse.jgit.transport.RemoteRefUpdate
 import org.eclipse.jgit.transport.TagOpt
 import org.eclipse.jgit.transport.Transport
 import org.eclipse.jgit.transport.URIish
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
-import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmException
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
 
@@ -90,26 +100,48 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
+    void dropTag(String tagName) {
+        callDropTag(tagName)
+    }
+
+    private void callDropTag(String tagName) {
+        try {
+            repository.tag.remove(names: [tagName])
+        } catch (GitAPIException e) {
+            throw new ScmException(e)
+        }
+    }
+
+    @Override
     void push(ScmIdentity identity, ScmPushOptions pushOptions) {
         push(identity, pushOptions, false)
     }
 
     void push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
-        identity.useDefault ? callPush(pushOptions, all) : callLowLevelPush(identity, pushOptions, all)
+        PushCommand command = pushCommand(identity, pushOptions.remote, all)
+
+        if (!pushOptions.pushTagsOnly) {
+            verifyPushResults(callPush(command))
+        }
+
+        verifyPushResults(callPush(command.setPushTags()))
     }
 
-    private void callPush(ScmPushOptions pushOptions, boolean all) {
-        if (!pushOptions.pushTagsOnly) {
-            repository.push(remote: pushOptions.remote, all: all)
+    private Iterable<PushResult> callPush(PushCommand pushCommand) {
+        try {
+            return pushCommand.call()
+        } catch (GitAPIException e) {
+            throw new ScmException(e)
         }
-        repository.push(remote: pushOptions.remote, tags: true, all: all)
     }
 
-    private void callLowLevelPush(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
-        if (!pushOptions.pushTagsOnly) {
-            pushCommand(identity, pushOptions.remote, all).call()
-        }
-        pushCommand(identity, pushOptions.remote, all).setPushTags().call()
+    private void verifyPushResults(Iterable<PushResult> pushResults) {
+        PushResult pushResult = pushResults.iterator().next()
+        Iterator<RemoteRefUpdate> remoteUpdates = pushResult.getRemoteUpdates().iterator()
+
+        remoteUpdates
+            .find { it.getStatus() != RemoteRefUpdate.Status.OK && it.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE }
+            ?.each { RemoteRefUpdate it ->  throw new ScmException(String.format("Push to SCM failed with message [%s]", it.message)) }
     }
 
     private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
@@ -120,7 +152,9 @@ class GitRepository implements ScmRepository {
             push.setPushAll()
         }
 
-        setTransportOptions(identity, push)
+        if (identity.privateKeyBased || identity.usernameBased) {
+            setTransportOptions(identity, push)
+        }
 
         return push
     }
@@ -234,7 +268,7 @@ class GitRepository implements ScmRepository {
 
     private RevWalk walker(ObjectId startingCommit) {
         RevWalk walk = new RevWalk(repository.repository.jgit.repository)
-        
+
         // explicitly set to NONE
         // TOPO sorting forces all commits in repo to be read in memory,
         // making walk incredibly slow

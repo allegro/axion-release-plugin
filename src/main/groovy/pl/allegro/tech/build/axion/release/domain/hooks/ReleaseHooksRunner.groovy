@@ -1,16 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
 import com.github.zafarkhaja.semver.Version
-import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.VersionContext
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
+import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class ReleaseHooksRunner {
-
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(ReleaseHooksRunner)
 
     private final VersionService versionService
 
