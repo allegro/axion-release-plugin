@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
-import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder

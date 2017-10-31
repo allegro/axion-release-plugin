@@ -31,6 +31,11 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    void dropTag(String tagName) {
+        log('drop tag')
+    }
+
+    @Override
     void push(ScmIdentity identity, ScmPushOptions pushOptions) {
         log('push')
     }
