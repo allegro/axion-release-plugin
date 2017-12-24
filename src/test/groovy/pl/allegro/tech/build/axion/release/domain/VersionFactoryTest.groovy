@@ -74,6 +74,30 @@ class VersionFactoryTest extends Specification {
         version.snapshot
     }
 
+    def "should return forced snapshot version when forcing is on and already on tag"() {
+        given:
+        VersionFactory factory = versionFactory(versionProperties().forceVersion('1.5.0').build())
+
+        when:
+        Map version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.0.0'))
+
+        then:
+        version.version.toString() == '1.5.0'
+        version.snapshot
+    }
+
+    def "should return forced version without snapshot when forcing same version as current tag"() {
+        given:
+        VersionFactory factory = versionFactory(versionProperties().forceVersion('1.5.0').build())
+
+        when:
+        Map version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.5.0'))
+
+        then:
+        version.version.toString() == '1.5.0'
+        !version.snapshot
+    }
+
     def "should not increment patch version when being on position after next version tag"() {
         when:
         Map version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))

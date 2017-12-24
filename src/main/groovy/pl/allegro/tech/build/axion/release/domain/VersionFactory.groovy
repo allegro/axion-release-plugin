@@ -49,7 +49,11 @@ class VersionFactory {
         boolean hasCommittedChanges = !scmState.onReleaseTag
         boolean hasChanges = hasCommittedChanges || hasUncommittedChanges
 
-        boolean isSnapshot = versionProperties.forcedVersion || versionProperties.forceSnapshot || hasChanges || scmState.onNextVersionTag || scmState.noReleaseTagsFound
+        boolean forcesSameVersionAsCurrent = versionProperties.forceVersion() &&
+            versionProperties.forcedVersion == version.toString()
+        boolean forceVersionShouldForceSnapshot = versionProperties.forceVersion() && !forcesSameVersionAsCurrent
+
+        boolean isSnapshot = forceVersionShouldForceSnapshot || versionProperties.forceSnapshot || hasChanges || scmState.onNextVersionTag || scmState.noReleaseTagsFound
         boolean incrementVersion = versionProperties.forceSnapshot || (!scmState.onNextVersionTag && !scmState.noReleaseTagsFound && hasChanges)
 
         Version finalVersion = version

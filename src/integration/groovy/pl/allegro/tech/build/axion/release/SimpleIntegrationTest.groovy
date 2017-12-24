@@ -48,6 +48,18 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
+    def "should force returned version with -Prelease.forceVersion flag"() {
+        given:
+        buildFile('')
+
+        when:
+        def result = runGradle('currentVersion', '-Prelease.forceVersion=2.0.0')
+
+        then:
+        result.output.contains('Project version: 2.0.0-SNAPSHOT')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
     def "should update file in pre release hook"() {
         given:
         File versionFile = newFile('version-file')
