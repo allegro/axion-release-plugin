@@ -10,6 +10,7 @@ plugins {
     id 'io.codearte.nexus-staging' version '0.5.3' apply false
 
     id 'me.champeau.gradle.jmh' version '0.4.3'
+    id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
 
 if (project.hasProperty('mavenCentral')) {
@@ -39,7 +40,7 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '4.5.2.201704071617-r'
+        jgit: '4.9.0.201710071750-r'
 ]
 
 sourceSets {
@@ -56,13 +57,29 @@ sourceSets {
                 project.configurations.testRuntime
         runtimeClasspath = output + compileClasspath
     }
+
+    remoteTest {
+        java.srcDir project.file('src/test-remote/java')
+        groovy.srcDir project.file('src/test-remote/groovy')
+
+        resources.srcDir project.file('src/test-remote/resources')
+        resources.srcDir project.sourceSets.test.resources
+        resources.srcDir project.sourceSets.main.resources
+
+        compileClasspath = project.sourceSets.main.output +
+            project.sourceSets.test.output +
+            project.configurations.testRuntime
+        runtimeClasspath = output + compileClasspath
+    }
 }
 
 dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile group: 'org.ajoberstar', name: 'grgit', version: '1.7.2'
+    compile (group: 'org.ajoberstar', name: 'grgit', version: '1.7.2') {
+        exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
+    }
 
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
@@ -75,6 +92,8 @@ dependencies {
     }
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
     testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
+    testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
+    testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
 
     testCompile gradleTestKit()
 }
@@ -93,6 +112,13 @@ project.configurations {
         transitive = true
         visible = true
     }
+
+    remoteTest {
+        extendsFrom project.configurations.testRuntime
+        description = 'Dependencies for tests with Docker'
+        transitive = true
+        visible = true
+    }
 }
 
 task integrationTest(type: Test) {
@@ -107,6 +133,44 @@ task integrationTest(type: Test) {
         events 'passed', 'skipped', 'failed'
         exceptionFormat = 'full'
     }
+}
+
+task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+    inputDir = file('docker')
+    tag = 'test/axion-release-remote:latest'
+}
+
+task createDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer) {
+    dependsOn buildDockerImage
+    targetImageId { buildDockerImage.getImageId() }
+    portBindings = ['2222:22']
+}
+
+task startDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStartContainer) {
+    dependsOn createDockerContainer
+    targetContainerId { createDockerContainer.getContainerId() }
+}
+
+task stopDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStopContainer) {
+    targetContainerId { createDockerContainer.getContainerId() }
+}
+
+
+task remoteTest(type: Test) {
+    testClassesDirs = project.sourceSets.remoteTest.output.classesDirs
+    classpath = project.sourceSets.main.output +
+        project.sourceSets.test.output +
+        project.sourceSets.remoteTest.runtimeClasspath +
+        project.configurations.testRuntime +
+        project.configurations.remoteTestRuntime
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat = 'full'
+    }
+
+    dependsOn startDockerContainer
+    finalizedBy stopDockerContainer
 }
 
 tasks.check.dependsOn integrationTest
