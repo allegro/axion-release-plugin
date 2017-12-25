@@ -4,7 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmException
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 class Releaser {
@@ -43,19 +43,19 @@ class Releaser {
         }
     }
 
-    void releaseAndPush(Properties rules) {
+    ScmPushResult releaseAndPush(Properties rules) {
         Optional<String> releasedTagName = release(rules)
 
-        try {
-            pushRelease()
-        } catch (ScmException e) {
+        ScmPushResult result = pushRelease()
+
+        if (!result.success) {
             releasedTagName.ifPresent { rollbackRelease(it) }
-            throw e
         }
+        return result
     }
 
-    void pushRelease() {
-        repository.push()
+    ScmPushResult pushRelease() {
+        return repository.push()
     }
 
     private void rollbackRelease(String tagName) {
