@@ -10,7 +10,7 @@ interface ScmRepository {
 
     void dropTag(String tagName)
 
-    void push(ScmIdentity identity, ScmPushOptions pushOptions)
+    ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions)
 
     void commit(List patterns, String message)
 

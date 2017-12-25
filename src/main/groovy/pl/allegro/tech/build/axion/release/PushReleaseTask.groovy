@@ -5,6 +5,7 @@ import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
@@ -19,7 +20,12 @@ class PushReleaseTask extends DefaultTask {
         Context context = GradleAwareContext.create(project, config)
 
         Releaser releaser = context.releaser()
-        releaser.pushRelease()
+        ScmPushResult result = releaser.pushRelease()
+
+        if(!result.success) {
+            logger.error("remote message: ${result.remoteMessage}")
+            throw new ReleaseFailedException(result.remoteMessage)
+        }
     }
 
 }

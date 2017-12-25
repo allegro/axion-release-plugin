@@ -75,7 +75,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         """)
 
         when:
-        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks', '-s')
 
         then:
         versionFile.text == "Version: 1.0.0"

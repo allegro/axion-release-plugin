@@ -100,21 +100,24 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    void push(ScmIdentity identity, ScmPushOptions pushOptions) {
-        push(identity, pushOptions, false)
+    ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions) {
+        return push(identity, pushOptions, false)
     }
 
-    void push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
+    ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
         PushCommand command = pushCommand(identity, pushOptions.remote, all)
 
         // command has to be called twice:
         // once for commits (only if needed)
         if (!pushOptions.pushTagsOnly) {
-            verifyPushResults(callPush(command))
+            ScmPushResult result = verifyPushResults(callPush(command))
+            if (!result.success) {
+                return result
+            }
         }
 
         // and another time for tags
-        verifyPushResults(callPush(command.setPushTags()))
+        return verifyPushResults(callPush(command.setPushTags()))
     }
 
     private Iterable<PushResult> callPush(PushCommand pushCommand) {
@@ -125,16 +128,15 @@ class GitRepository implements ScmRepository {
         }
     }
 
-    private void verifyPushResults(Iterable<PushResult> pushResults) {
+    private ScmPushResult verifyPushResults(Iterable<PushResult> pushResults) {
         PushResult pushResult = pushResults.iterator().next()
         Iterator<RemoteRefUpdate> remoteUpdates = pushResult.getRemoteUpdates().iterator()
 
-        remoteUpdates.find({
+        RemoteRefUpdate failedRefUpdate = remoteUpdates.find({
             it.getStatus() != RemoteRefUpdate.Status.OK && it.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE
         })
-            ?.each({ RemoteRefUpdate it ->
-            throw new ScmException(String.format("Push to SCM failed with message [%s]", it.message))
-        })
+
+        return new ScmPushResult(failedRefUpdate == null, Optional.ofNullable(pushResult.messages))
     }
 
     private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
