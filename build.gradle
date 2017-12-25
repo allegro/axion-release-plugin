@@ -173,7 +173,7 @@ task remoteTest(type: Test) {
     finalizedBy stopDockerContainer
 }
 
-tasks.check.dependsOn integrationTest
+tasks.check.dependsOn integrationTest, remoteTest
 
 jmh {
     benchmarkMode = ['ss']

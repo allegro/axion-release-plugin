@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 
 language: java
 
@@ -8,3 +8,6 @@ after_success: ./gradlew jacocoTestReport coveralls
 
 jdk:
   - oraclejdk8
+
+services:
+  - docker
