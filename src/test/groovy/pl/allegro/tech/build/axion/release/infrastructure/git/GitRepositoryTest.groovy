@@ -275,4 +275,9 @@ class GitRepositoryTest extends Specification {
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
         remoteRawRepository.tag.list()*.fullName == []
     }
+
+    def "should return error on push failure"() {
+        expect: 'this test is implemented as part of testRemote suite in RemoteRejectionTest'
+        true
+    }
 }

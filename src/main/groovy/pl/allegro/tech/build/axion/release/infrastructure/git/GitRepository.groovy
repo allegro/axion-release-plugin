@@ -8,7 +8,6 @@ import org.ajoberstar.grgit.operation.FetchOp
 import org.eclipse.jgit.api.FetchCommand
 import org.eclipse.jgit.api.LogCommand
 import org.eclipse.jgit.api.PushCommand
-import org.eclipse.jgit.api.TransportCommand
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
@@ -19,21 +18,9 @@ import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
-import org.eclipse.jgit.transport.PushResult
-import org.eclipse.jgit.transport.RemoteConfig
-import org.eclipse.jgit.transport.RemoteRefUpdate
-import org.eclipse.jgit.transport.TagOpt
-import org.eclipse.jgit.transport.Transport
-import org.eclipse.jgit.transport.URIish
+import org.eclipse.jgit.transport.*
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmException
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
@@ -120,10 +107,13 @@ class GitRepository implements ScmRepository {
     void push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
         PushCommand command = pushCommand(identity, pushOptions.remote, all)
 
+        // command has to be called twice:
+        // once for commits (only if needed)
         if (!pushOptions.pushTagsOnly) {
             verifyPushResults(callPush(command))
         }
 
+        // and another time for tags
         verifyPushResults(callPush(command.setPushTags()))
     }
 
@@ -139,9 +129,12 @@ class GitRepository implements ScmRepository {
         PushResult pushResult = pushResults.iterator().next()
         Iterator<RemoteRefUpdate> remoteUpdates = pushResult.getRemoteUpdates().iterator()
 
-        remoteUpdates
-            .find { it.getStatus() != RemoteRefUpdate.Status.OK && it.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE }
-            ?.each { RemoteRefUpdate it ->  throw new ScmException(String.format("Push to SCM failed with message [%s]", it.message)) }
+        remoteUpdates.find({
+            it.getStatus() != RemoteRefUpdate.Status.OK && it.getStatus() != RemoteRefUpdate.Status.UP_TO_DATE
+        })
+            ?.each({ RemoteRefUpdate it ->
+            throw new ScmException(String.format("Push to SCM failed with message [%s]", it.message))
+        })
     }
 
     private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
@@ -151,16 +144,9 @@ class GitRepository implements ScmRepository {
         if (all) {
             push.setPushAll()
         }
-
-        if (identity.privateKeyBased || identity.usernameBased) {
-            setTransportOptions(identity, push)
-        }
+        push.transportConfigCallback = transportConfigFactory.create(identity)
 
         return push
-    }
-
-    private void setTransportOptions(ScmIdentity identity, TransportCommand command) {
-        command.transportConfigCallback = transportConfigFactory.create(identity)
     }
 
     @Override
@@ -284,9 +270,9 @@ class GitRepository implements ScmRepository {
             .collect({ tag -> [id: walk.parseCommit(tag.objectId).name, name: tag.name.substring(GIT_TAG_PREFIX.length())] })
             .grep({ tag -> tag.name ==~ pattern })
             .inject([:].withDefault({ p -> [] }), { map, entry ->
-                map[entry.id] << entry.name
-                return map
-            })
+            map[entry.id] << entry.name
+            return map
+        })
     }
 
     private boolean hasCommits() {

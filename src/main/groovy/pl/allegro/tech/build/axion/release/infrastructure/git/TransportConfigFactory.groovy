@@ -12,8 +12,22 @@ class TransportConfigFactory {
             return createForSsh(identity)
         } else if (identity.usernameBased) {
             return createForUsername(identity)
+        } else if(identity.useDefault) {
+            return createForDefault(identity)
         }
-        throw new IllegalArgumentException("Transport callback can be created only for private key or username based identity")
+        throw new IllegalArgumentException("Transport callback can be created only for none (empty), private key or username based identity")
+    }
+
+    private TransportConfigCallback createForDefault(ScmIdentity identity) {
+        return new TransportConfigCallback() {
+            @Override
+            void configure(Transport transport) {
+                if(transport instanceof SshTransport) {
+                    SshTransport sshTransport = (SshTransport) transport
+                    sshTransport.setSshSessionFactory(new SshConnector(identity))
+                }
+            }
+        }
     }
 
     private TransportConfigCallback createForSsh(ScmIdentity identity) {
