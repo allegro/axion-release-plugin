@@ -1,6 +1,11 @@
 Changelog
 =========
 
+* **1.8.2** (29.12.2017)
+    * prints errors from remote when remote rejects push (they were silently ignored before this change) - thanks to `mareck https://github.com/mareckmareck` for contribution
+    * `-Prelease.forceVersion` no longer forces -SNAPSHOT when forced version is equal to current version
+* **1.8.1** (07.10.2017)
+    * fixes in Gradle Portal publishing code, verison 1.8.0 was not published correctly
 * **1.8.0** (07.10.2017)
     * allows on extending axion-release tasks - thanks to `Maria Camenzuli <https://github.com/maria-camenzuli>`_ for contribution
     * moves travis builds to JDK 8 only - from this time on JDK 7 compatibility is no longer tested
