@@ -104,6 +104,23 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.snapshot
     }
 
+    def "should return release version when there is also a next version tag when on release tag"() {
+        given:
+        repository.tag('release-1.1.0-alpha')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.1.0')
+
+        VersionProperties versionRules = versionProperties().useHighestVersion().build()
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '1.1.0'
+        !version.snapshot
+    }
+
     def "should return previous version from last release and current from forced version when forcing version"() {
         given:
         repository.tag('release-1.1.0')

@@ -108,7 +108,7 @@ class VersionResolver {
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory) {
-      List<Version> versions = []
+      Set<Version> versions = []
       Map<Version, Boolean> isVersionNextVersion = [:]
       Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
 
@@ -121,8 +121,9 @@ class VersionResolver {
           }
 
           Version version = versionFactory.versionFromTag(tag)
-          versions.add(version)
-          versionToCommit.put(version, tagsEntry)
+          if (versions.add(version) || !isNextVersion) {
+              versionToCommit.put(version, tagsEntry)
+          }
 
           if(isVersionNextVersion.containsKey(version)) {
               isVersionNextVersion[version] = isVersionNextVersion[version] && isNextVersion
@@ -132,8 +133,9 @@ class VersionResolver {
         }
       }
 
-      Collections.sort(versions, Collections.reverseOrder())
-      Version version = versions.isEmpty() ? versionFactory.initialVersion() : versions[0]
+      def versionList = versions.asList()
+      Collections.sort(versionList, Collections.reverseOrder())
+      Version version = versions.isEmpty() ? versionFactory.initialVersion() : versionList[0]
 
       TagsOnCommit versionCommit = versionToCommit.get(version)
       return [
