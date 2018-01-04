@@ -1,16 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
-
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
-import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
-import java.util.Map.Entry
 import java.util.regex.Pattern
 
 /**
@@ -37,16 +34,16 @@ class VersionResolver {
 
         Map versions
         if (versionFactory.versionProperties.useHighestVersion) {
-          versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties)
+            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties)
         } else {
-          versions = readVersions(versionFactory, tagProperties, nextVersionProperties)
+            versions = readVersions(versionFactory, tagProperties, nextVersionProperties)
         }
 
         ScmState scmState = new ScmState(
-                versions.onReleaseTag,
-                versions.onNextVersionTag,
-                versions.noTagsFound,
-                repository.checkUncommittedChanges()
+            versions.onReleaseTag,
+            versions.onNextVersionTag,
+            versions.noTagsFound,
+            repository.checkUncommittedChanges()
         )
 
         Map finalVersion = versionFactory.createFinalVersion(scmState, versions.current)
@@ -66,23 +63,23 @@ class VersionResolver {
 
         TagsOnCommit previousTags = latestTags
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
-          previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
+            previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
         }
         previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern, versionFactory)
 
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
         return [
-          current         : currentVersion,
-          previous        : previousVersion,
-          onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
-          onNextVersionTag: currentVersionInfo.isNextVersion,
-          noTagsFound     : currentVersionInfo.noTagsFound
+            current         : currentVersion,
+            previous        : previousVersion,
+            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onNextVersionTag: currentVersionInfo.isNextVersion,
+            noTagsFound     : currentVersionInfo.noTagsFound
         ]
     }
 
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
-                                              TagProperties tagProperties,
+                                             TagProperties tagProperties,
                                              NextVersionProperties nextVersionProperties) {
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
@@ -96,11 +93,11 @@ class VersionResolver {
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
         return [
-          current         : currentVersion,
-          previous        : previousVersion,
-          onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
-          onNextVersionTag: currentVersionInfo.isNextVersion,
-          noTagsFound     : currentVersionInfo.noTagsFound
+            current         : currentVersion,
+            previous        : previousVersion,
+            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onNextVersionTag: currentVersionInfo.isNextVersion,
+            noTagsFound     : currentVersionInfo.noTagsFound
         ]
     }
 
@@ -108,42 +105,45 @@ class VersionResolver {
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory) {
-      Set<Version> versions = []
-      Map<Version, Boolean> isVersionNextVersion = [:]
-      Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
+        Set<Version> versions = []
+        Map<Version, Boolean> isVersionNextVersion = [:]
+        Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
 
-      for (TagsOnCommit tagsEntry : taggedCommits) {
-        List<String> tags = tagsEntry.tags
-        for (String tag: tags) {
-          boolean isNextVersion = tag ==~ nextVersionTagPattern
-          if (ignoreNextVersionTags && isNextVersion) {
-              continue
-          }
+        for (TagsOnCommit tagsEntry : taggedCommits) {
+            List<String> tags = tagsEntry.tags
+            for (String tag : tags) {
+                boolean isNextVersion = tag ==~ nextVersionTagPattern
+                if (ignoreNextVersionTags && isNextVersion) {
+                    continue
+                }
 
-          Version version = versionFactory.versionFromTag(tag)
-          if (versions.add(version) || !isNextVersion) {
-              versionToCommit.put(version, tagsEntry)
-          }
+                Version version = versionFactory.versionFromTag(tag)
+                // normal tags have precedence over nextVersion
+                // if normal tag already exists, nextVersion will be discarded
+                // if nextVersion already exists, normal tag will overwrite it
+                if (versions.add(version) || !isNextVersion) {
+                    versionToCommit.put(version, tagsEntry)
+                }
 
-          if(isVersionNextVersion.containsKey(version)) {
-              isVersionNextVersion[version] = isVersionNextVersion[version] && isNextVersion
-          } else {
-              isVersionNextVersion[version] = isNextVersion
-          }
+                if (isVersionNextVersion.containsKey(version)) {
+                    isVersionNextVersion[version] = isVersionNextVersion[version] && isNextVersion
+                } else {
+                    isVersionNextVersion[version] = isNextVersion
+                }
+            }
         }
-      }
 
-      def versionList = versions.asList()
-      Collections.sort(versionList, Collections.reverseOrder())
-      Version version = versions.isEmpty() ? versionFactory.initialVersion() : versionList[0]
+        def versionList = versions.asList()
+        Collections.sort(versionList, Collections.reverseOrder())
+        Version version = versions.isEmpty() ? versionFactory.initialVersion() : versionList[0]
 
-      TagsOnCommit versionCommit = versionToCommit.get(version)
-      return [
-              version      : version,
-              isNextVersion: isVersionNextVersion.containsKey(version) && isVersionNextVersion[version],
-              noTagsFound  : versions.isEmpty(),
-              commit       : versionCommit?.commitId,
-              isHead       : versionCommit?.isHead
-      ]
+        TagsOnCommit versionCommit = versionToCommit.get(version)
+        return [
+            version      : version,
+            isNextVersion: isVersionNextVersion.containsKey(version) && isVersionNextVersion[version],
+            noTagsFound  : versions.isEmpty(),
+            commit       : versionCommit?.commitId,
+            isHead       : versionCommit?.isHead
+        ]
     }
 }
