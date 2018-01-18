@@ -26,7 +26,7 @@ class SshConnector extends JschConfigSessionFactory {
     @Override
     protected JSch getJSch(OpenSshConfig.Host hc, FS fs) throws JSchException {
         if(this.jsch == null) {
-            this.jsch = createJSch()
+            this.jsch = (!identity.useDefault) ? createJSch() : super.getJSch(hc, fs)
         }
 
         return this.jsch
@@ -34,11 +34,8 @@ class SshConnector extends JschConfigSessionFactory {
 
     private JSch createJSch() {
         JSch jsch = new JSch()
-        if(!identity.useDefault) {
-            byte[] passPhrase = identity.passPhrase != null ? identity.passPhrase.bytes : null
-            jsch.addIdentity('key', identity.privateKey.bytes, null, passPhrase)
-        }
-
+        byte[] passPhrase = identity.passPhrase != null ? identity.passPhrase.bytes : null
+        jsch.addIdentity('key', identity.privateKey.bytes, null, passPhrase)
         return jsch
     }
 }
