@@ -3,12 +3,12 @@ plugins {
     id 'java-gradle-plugin'
     id 'maven'
     id 'jacoco'
+    	id 'com.github.johnrengelman.plugin-shadow' version '2.0.2'
     id 'pl.allegro.tech.build.axion-release' version '1.8.1'
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'com.gradle.plugin-publish' version '0.9.8'
     id 'com.bmuschko.nexus' version '2.3.1' apply false
     id 'io.codearte.nexus-staging' version '0.5.3' apply false
-
     id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
@@ -29,6 +29,9 @@ scmVersion {
 
     versionCreator 'versionWithBranch'
 }
+
+// Remove the gradleApi so it isn't merged into the jar file.
+configurations.compile.dependencies.remove dependencies.gradleApi()
 
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
@@ -74,8 +77,8 @@ sourceSets {
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+    shadow gradleApi()
+    shadow localGroovy()
 
     compile (group: 'org.ajoberstar', name: 'grgit', version: '1.7.2') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
@@ -97,6 +100,22 @@ dependencies {
 
     testCompile gradleTestKit()
 }
+
+shadowJar {
+	relocate 'org.ajoberstar','axion.org.ojoberstar'
+    relocate 'org.eclipse.jgit','axion.org.eclipse.jgit'
+    relocate 'com.jcraft','axion.com.jcraft'
+    relocate 'com.github.zafarkhaja','axion.com.github.zafarkhaja'
+    relocate 'com.googlecode','axion.com.googlecode'
+    relocate 'org.apache.commons','axion.org.apache.commons'
+    relocate 'org.apache.http','axion.org.apache.http'
+    relocate 'org.slf4j','axion.org.slf4j'
+    relocate 'com.sun.jna','axion.com.sun.jna'
+    
+	classifier = ''
+}
+
+tasks.build.dependsOn tasks.shadowJar
 
 test {
     testLogging {
