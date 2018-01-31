@@ -304,7 +304,7 @@ class GitRepository implements ScmRepository {
 
     @Override
     boolean checkAheadOfRemote() {
-        BranchStatus status = repository.branch.status(branch: repository.branch.current.fullName)
+        BranchStatus status = repository.branch.status(name: repository.branch.current.fullName)
         return status.aheadCount != 0 || status.behindCount != 0
     }
 

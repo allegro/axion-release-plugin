@@ -3,7 +3,7 @@ plugins {
     id 'java-gradle-plugin'
     id 'maven'
     id 'jacoco'
-    id 'pl.allegro.tech.build.axion-release' version '1.8.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.8.2'
     id 'com.github.kt3k.coveralls' version '2.3.1'
     id 'com.gradle.plugin-publish' version '0.9.8'
     id 'com.bmuschko.nexus' version '2.3.1' apply false
@@ -33,14 +33,15 @@ scmVersion {
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
-sourceCompatibility = '1.7'
+sourceCompatibility = '1.8'
 
 repositories {
+	jcenter()
     mavenCentral()
 }
 
 project.ext.versions = [
-        jgit: '4.9.0.201710071750-r'
+        jgit: '4.10.0.201712302008-r'
 ]
 
 sourceSets {
@@ -77,7 +78,7 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
 
-    compile (group: 'org.ajoberstar', name: 'grgit', version: '1.7.2') {
+    compile (group: 'org.ajoberstar', name: 'grgit', version: '2.1.0') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
     }
 

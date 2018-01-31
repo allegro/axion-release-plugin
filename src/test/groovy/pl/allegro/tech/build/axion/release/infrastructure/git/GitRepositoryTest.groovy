@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.exception.GrgitException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
@@ -72,7 +71,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('release-1')
 
         then:
-        thrown(GrgitException)
+        thrown(Exception)
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
