@@ -1,6 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import org.ajoberstar.grgit.Status
+import org.eclipse.jgit.api.Status
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
 
@@ -19,18 +19,16 @@ class GitChangesPrinter implements ScmChangesPrinter {
         Status status = repository.listChanges()
 
         outputHeader('Staged changes:')
-        printChangeType(status.staged)
+        printChangeset('modified', status.changed)
+        printChangeset('added', status.added)
+        printChangeset('removed', status.removed)
 
         outputHeader('Unstaged changes:')
-        printChangeType(status.unstaged)
+        printChangeset('modified', status.modified)
+        printChangeset('added', status.untracked)
+        printChangeset('removed', status.missing)
 
         output.println()
-    }
-
-    private void printChangeType(Status.Changes changeset) {
-        printChangeset('modified', changeset.modified)
-        printChangeset('added', changeset.added)
-        printChangeset('removed', changeset.removed)
     }
 
     private void printChangeset(String type, Set<String> changes) {

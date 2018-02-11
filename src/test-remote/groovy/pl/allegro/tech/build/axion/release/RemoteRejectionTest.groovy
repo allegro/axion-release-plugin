@@ -4,7 +4,6 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.TransportConfigCallback
 import org.eclipse.jgit.transport.SshTransport
 import org.eclipse.jgit.transport.Transport
-import pl.allegro.tech.build.axion.release.domain.scm.ScmException
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
@@ -47,5 +46,4 @@ class RemoteRejectionTest extends Specification {
         !result.success
         result.remoteMessage.get().contains("I reject this push!")
     }
-
 }
