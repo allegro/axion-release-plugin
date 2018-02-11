@@ -1,20 +1,10 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import org.ajoberstar.grgit.BranchStatus
-import org.ajoberstar.grgit.Commit
-import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.Status
-import org.ajoberstar.grgit.operation.FetchOp
-import org.eclipse.jgit.api.FetchCommand
-import org.eclipse.jgit.api.LogCommand
-import org.eclipse.jgit.api.PushCommand
+import org.eclipse.jgit.api.*
 import org.eclipse.jgit.api.errors.GitAPIException
 import org.eclipse.jgit.api.errors.NoHeadException
 import org.eclipse.jgit.errors.RepositoryNotFoundException
-import org.eclipse.jgit.lib.Config
-import org.eclipse.jgit.lib.Constants
-import org.eclipse.jgit.lib.ObjectId
-import org.eclipse.jgit.lib.Ref
+import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
@@ -34,14 +24,14 @@ class GitRepository implements ScmRepository {
 
     private final File repositoryDir
 
-    private final Grgit repository
+    private final Git jgitRepository
 
     private final ScmProperties properties
 
     GitRepository(ScmProperties properties) {
         try {
             this.repositoryDir = properties.directory
-            repository = Grgit.open(dir: repositoryDir)
+            this.jgitRepository = Git.open(repositoryDir)
             this.properties = properties
         }
         catch (RepositoryNotFoundException exception) {
@@ -56,44 +46,49 @@ class GitRepository implements ScmRepository {
         }
     }
 
+    /**
+     * This fetch method behaves like git fetch, meaning it only fetches thing without merging.
+     * As a result, any fetchet tags will not be visible via GitRepository tag listing methods
+     * because they do commit-tree walk, not tag listing.
+     *
+     * This method is only useful if you have bare repo on CI systems, where merge is not neccessary, because newest
+     * version of content has already been fetched.
+     */
     @Override
     void fetchTags(ScmIdentity identity, String remoteName) {
-        identity.useDefault ? callFetch(remoteName) : callLowLevelFetch(identity, remoteName);
-    }
-
-    private void callFetch(String remoteName) {
-        repository.fetch(remote: remoteName, tagMode: FetchOp.TagMode.ALL, refSpecs: [Transport.REFSPEC_TAGS])
-    }
-
-    private void callLowLevelFetch(ScmIdentity identity, String remoteName) {
-        FetchCommand fetch = repository.repository.jgit.fetch()
-        fetch.remote = remoteName
-        fetch.tagOpt = TagOpt.FETCH_TAGS
-        fetch.refSpecs = [Transport.REFSPEC_TAGS]
-        setTransportOptions(identity, fetch)
-
+        FetchCommand fetch = jgitRepository.fetch()
+            .setRemote(remoteName)
+            .setTagOpt(TagOpt.FETCH_TAGS)
+            .setTransportConfigCallback(transportConfigFactory.create(identity))
         fetch.call()
     }
 
     @Override
     void tag(String tagName) {
-        String headId = repository.repository.jgit.repository.resolve(Constants.HEAD).name()
-        boolean isOnExistingTag = repository.tag.list().any({ it.name == tagName && it.commit.id == headId })
+        String headId = head().name()
+
+        boolean isOnExistingTag = jgitRepository.tagList().call().any({
+            it -> it.name == GIT_TAG_PREFIX + tagName && jgitRepository.repository.peel(it).peeledObjectId.name == headId
+        })
         if (!isOnExistingTag) {
-            repository.tag.add(name: tagName)
+            jgitRepository.tag()
+                .setName(tagName)
+                .call()
         } else {
             logger.debug("The head commit $headId already has the tag $tagName.")
         }
     }
 
-    @Override
-    void dropTag(String tagName) {
-        callDropTag(tagName)
+    private ObjectId head() {
+        return jgitRepository.repository.resolve(Constants.HEAD)
     }
 
-    private void callDropTag(String tagName) {
+    @Override
+    void dropTag(String tagName) {
         try {
-            repository.tag.remove(names: [tagName])
+            jgitRepository.tagDelete()
+                .setTags(GIT_TAG_PREFIX + tagName)
+                .call()
         } catch (GitAPIException e) {
             throw new ScmException(e)
         }
@@ -140,7 +135,7 @@ class GitRepository implements ScmRepository {
     }
 
     private PushCommand pushCommand(ScmIdentity identity, String remoteName, boolean all) {
-        PushCommand push = repository.repository.jgit.push()
+        PushCommand push = jgitRepository.push()
         push.remote = remoteName
 
         if (all) {
@@ -153,7 +148,7 @@ class GitRepository implements ScmRepository {
 
     @Override
     void attachRemote(String remoteName, String remoteUrl) {
-        Config config = repository.repository.jgit.repository.config
+        Config config = jgitRepository.repository.config
 
         RemoteConfig remote = new RemoteConfig(config, remoteName)
         // clear other push specs
@@ -172,23 +167,28 @@ class GitRepository implements ScmRepository {
     void commit(List patterns, String message) {
         if (!patterns.isEmpty()) {
             String canonicalPath = Pattern.quote(repositoryDir.canonicalPath + File.separatorChar)
-            repository.add(patterns: patterns.collect { it.replaceFirst(canonicalPath, '') })
+            AddCommand command = jgitRepository.add()
+            patterns.collect({ it.replaceFirst(canonicalPath, '') }).each({ command.addFilepattern(it) })
+            command.call()
         }
-        repository.commit(message: message)
+        jgitRepository.commit()
+            .setMessage(message)
+            .call()
     }
 
     ScmPosition currentPosition() {
         String revision = ''
         String shortRevision = ''
         if (hasCommits()) {
-            Commit head = repository.head()
-            revision = head.id
-            shortRevision = head.abbreviatedId
+            ObjectId head = head()
+            revision = head.name()
+            shortRevision = revision[0..(7 - 1)]
         }
+
         return new ScmPosition(
             revision,
             shortRevision,
-            repository.branch.current.name
+            jgitRepository.repository.branch
         )
     }
 
@@ -221,7 +221,7 @@ class GitRepository implements ScmRepository {
             return taggedCommits
         }
 
-        ObjectId headId = repository.repository.jgit.repository.resolve(Constants.HEAD)
+        ObjectId headId = jgitRepository.repository.resolve(Constants.HEAD)
 
         ObjectId startingCommit
         if (maybeSinceCommit != null) {
@@ -255,7 +255,7 @@ class GitRepository implements ScmRepository {
     }
 
     private RevWalk walker(ObjectId startingCommit) {
-        RevWalk walk = new RevWalk(repository.repository.jgit.repository)
+        RevWalk walk = new RevWalk(jgitRepository.repository)
 
         // explicitly set to NONE
         // TOPO sorting forces all commits in repo to be read in memory,
@@ -267,7 +267,7 @@ class GitRepository implements ScmRepository {
     }
 
     private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) {
-        List<Ref> tags = repository.repository.jgit.tagList().call()
+        List<Ref> tags = jgitRepository.tagList().call()
         return tags
             .collect({ tag -> [id: walk.parseCommit(tag.objectId).name, name: tag.name.substring(GIT_TAG_PREFIX.length())] })
             .grep({ tag -> tag.name ==~ pattern })
@@ -278,7 +278,7 @@ class GitRepository implements ScmRepository {
     }
 
     private boolean hasCommits() {
-        LogCommand log = repository.repository.jgit.log()
+        LogCommand log = jgitRepository.log()
         log.maxCount = 1
 
         try {
@@ -292,32 +292,30 @@ class GitRepository implements ScmRepository {
 
     @Override
     boolean remoteAttached(String remoteName) {
-        Config config = repository.repository.jgit.repository.config
-
+        Config config = jgitRepository.repository.config
         return config.getSubsections('remote').any { it == remoteName }
     }
 
     @Override
     boolean checkUncommittedChanges() {
-        return !repository.status().isClean()
+        return !jgitRepository.status().call().isClean()
     }
 
     @Override
     boolean checkAheadOfRemote() {
-        BranchStatus status = repository.branch.status(branch: repository.branch.current.fullName)
+        String branchName = jgitRepository.repository.fullBranch
+        BranchTrackingStatus status = BranchTrackingStatus.of(jgitRepository.repository, branchName)
         return status.aheadCount != 0 || status.behindCount != 0
     }
 
-    void checkoutBranch(String branchName) {
-        repository.checkout(branch: branchName, createBranch: true)
-    }
-
     Status listChanges() {
-        return repository.status()
+        return jgitRepository.status().call()
     }
 
     @Override
     List<String> lastLogMessages(int messageCount) {
-        return repository.log(maxCommits: messageCount)*.fullMessage
+        return jgitRepository.log()
+            .setMaxCount(messageCount)
+            .call()*.fullMessage
     }
 }

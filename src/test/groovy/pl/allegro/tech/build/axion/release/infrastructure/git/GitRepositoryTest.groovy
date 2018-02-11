@@ -2,6 +2,9 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.TagCommand
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
@@ -15,15 +18,21 @@ class GitRepositoryTest extends Specification {
 
     File repositoryDir
 
+    File remoteRepositoryDir
+
     Grgit rawRepository
 
     Grgit remoteRawRepository
 
+    GitRepository remoteRepository
+
     GitRepository repository
 
     void setup() {
-        File remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
-        remoteRawRepository = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()[Grgit]
+        remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
+        Map remoteRepositories = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()
+        remoteRawRepository = remoteRepositories[Grgit]
+        remoteRepository = remoteRepositories[GitRepository]
 
         repositoryDir = File.createTempDir('axion-release', 'tmp')
         Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).build()
@@ -72,7 +81,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('release-1')
 
         then:
-        thrown(GrgitException)
+        thrown(RefAlreadyExistsException)
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
@@ -221,7 +230,7 @@ class GitRepositoryTest extends Specification {
 
     def "should provide current branch name and commit id in position"() {
         given:
-        repository.checkoutBranch('some-branch')
+        rawRepository.checkout(branch: 'some-branch', createBranch: true)
         repository.commit(['*'], "first commit")
 
         when:
@@ -279,5 +288,52 @@ class GitRepositoryTest extends Specification {
     def "should return error on push failure"() {
         expect: 'this test is implemented as part of testRemote suite in RemoteRejectionTest'
         true
+    }
+
+    def "should fetch tags from remote repository"() {
+        given:
+        remoteRepository.commit(['*'], 'remote commit')
+        remoteRepository.tag("remote-tag-to-fetch")
+
+        when:
+        repository.fetchTags(ScmIdentity.defaultIdentity(), 'origin')
+
+        then:
+        rawRepository.tag.list().size() == 1
+    }
+
+    def "should remove tag"() {
+        given:
+        repository.tag("release-1")
+        int intermediateSize = repository.taggedCommits(~/.*/).size()
+
+        when:
+        repository.dropTag("release-1")
+
+        then:
+        intermediateSize == 1
+        repository.taggedCommits(~/.*/).isEmpty()
+    }
+
+    def "should pass ahead of remote check when in sync with remote"() {
+        expect:
+        !repository.checkAheadOfRemote()
+    }
+
+    def "should fail ahead of remote check when repository behind remote"() {
+        given:
+        remoteRepository.commit(["*"], "remote commit")
+        repository.fetchTags(ScmIdentity.defaultIdentity(), "origin")
+
+        expect:
+        repository.checkAheadOfRemote()
+    }
+
+    def "should fail ahead of remote check when repository has local commits"() {
+        given:
+        repository.commit(["*"], "local commit")
+
+        expect:
+        repository.checkAheadOfRemote()
     }
 }
