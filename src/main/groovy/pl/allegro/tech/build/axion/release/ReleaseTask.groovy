@@ -22,8 +22,9 @@ class ReleaseTask extends DefaultTask {
         ScmPushResult result = releaser.releaseAndPush(context.rules())
 
         if(!result.success) {
-            logger.error("remote message: ${result.remoteMessage}")
-            throw new ReleaseFailedException(result.remoteMessage)
+            def message = result.remoteMessage.orElse("Unknown error during push")
+            logger.error("remote message: ${message}")
+            throw new ReleaseFailedException(message)
         }
     }
 
