@@ -28,29 +28,37 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.9.0'
 }
 
-scmVersion {
-    tag {
-        prefix = 'my-project-name'
-    }
-}
-
 project.version = scmVersion.version
+```
+
+```
+$ git tag
+<empty list>
+
+$ ./gradlew currentVersion
+0.1.0-SNAPSHOT
+
+$ ./gradlew release
+
+$ git tag
+release-0.1.0
+
+$ ./gradlew cV
+0.1.0
+
+$ git add -A && git commit -m "Updates something" && ./gradlew release
+
+$ git tag
+release-0.1.0
+release-0.1.1
+
+$ ./gradlew cV
+0.1.1
 ```
 
 ## Documentation
 
 Documentation is available at [axion-release read the docs](https://readthedocs.org/docs/axion-release-plugin/en/latest).
-
-## Why write new plugin?
-
-There are a few plugins that try to do the same - question is do we need another one?
-
-* [build-version-plugin](https://github.com/GeoNet/gradle-build-version-plugin/) - plugin that was main source of inspiration, reads build version but lacks release options
-* [ari gradle-release-plugin](https://github.com/ari/gradle-release-plugin) - takes only branch/tag name for version
-* [townsfolk gradle-release-plugin](https://github.com/townsfolk/gradle-release) - more oldschhol, maven-release-plugin-like approach
-
-What I needed was plugin that exposes version taken from nearest tag (like **build-version-plugin**) which at the same time
-will be easily integrated with maven-publish and signing. It also needs to be Continuous Integration-aware.
 
 ## License
 
