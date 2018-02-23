@@ -1,9 +1,11 @@
 Changelog
 =========
 
-* **1.8.2** (29.12.2017)
-    * prints errors from remote when remote rejects push (they were silently ignored before this change) - thanks to `mareck https://github.com/mareckmareck` for contribution
-    * `-Prelease.forceVersion` no longer forces -SNAPSHOT when forced version is equal to current version
+* **1.9.0** (23.02.2018)
+    * removes GrGit dependency
+* **1.8.3** (30.01.2018)
+    * fixes issue with obtaining SSH credentials - thanks to `Cliffred van Velzen <https://github.com/cliffred>`_ for contribution
+    * issue with ordering of tags when using alpha versions - thanks to `Cliffred van Velzen <https://github.com/cliffred>`_ for contribution
 * **1.8.1** (07.10.2017)
     * fixes in Gradle Portal publishing code, verison 1.8.0 was not published correctly
 * **1.8.0** (07.10.2017)
