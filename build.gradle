@@ -192,10 +192,6 @@ jacocoTestReport {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.2'
-}
-
 pluginBundle {
     website = 'https://github.com/allegro/axion-release-plugin'
     vcsUrl = 'https://github.com/allegro/axion-release-plugin'
