@@ -185,6 +185,10 @@ gradlePlugin {
     testSourceSets project.sourceSets.integration
 }
 
+jacoco {
+    toolVersion = '0.8.1'
+}
+
 jacocoTestReport {
     reports {
         xml.enabled = true
