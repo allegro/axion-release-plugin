@@ -1,0 +1,35 @@
+site_name: axion-release-plugin
+site_description: Gradle release & version mamangement plugin.
+site_author: allegro.tech
+
+repo_url: https://github.com/allegro/axion-release-plugin
+
+theme:
+  name: null
+  custom_dir: docs/theme
+
+markdown_extensions:
+  - toc:
+      anchorlink: true
+
+extra:
+  version: '1.9.2'
+
+pages:
+  - Home: 'index.md'
+  - Changelog: 'changelog.md'
+  - Examples: 'examples/examples.md'
+  - Configuration:
+    - Overview: 'configuration/overview.md'
+    - Basic usage: 'configuration/basic_usage.md'
+    - Tasks: 'configuration/tasks.md'
+    - Version creation: 'configuration/version.md'
+    - Repository: 'configuration/repository.md'
+    - Overriding version: 'configuration/force_version.md'
+    - Next version markers: 'configuration/next_version.md'
+    - Pre/post release hooks: 'configuration/hooks.md'
+    - Pre-release checks: 'configuration/checks.md'
+    - Uncommitted changes: 'configuration/uncommitted_changes.md'
+    - Publishing: 'configuration/publishing.md'
+    - Dry run: 'configuration/dry_run.md'
+    - CI Servers: 'configuration/ci_servers.md'

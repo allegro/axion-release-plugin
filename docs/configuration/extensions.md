@@ -1,10 +1,11 @@
-Extending axion-release tasks
-=============================
+# Extending axion-release tasks
 
-Since version 1.8.0, each task that is created by ``axion-release`` can be used to create
-new task that extends it using standard Gradle mechanisms.
+Since version 1.8.0, each task that is created by `axion-release` can be
+used to create new task that extends it using standard Gradle
+mechanisms.
 
-For example to extend ``OutputCurrentVersionTask`` and add action that will print additional message::
+For example to extend `OutputCurrentVersionTask` and add action that
+will print additional message:
 
     plugins {
         // if you want axion-release tasks to be applied:
@@ -24,7 +25,7 @@ For example to extend ``OutputCurrentVersionTask`` and add action that will prin
         println 'My custom message'
     }
 
-Custom task can now be called::
+Custom task can now be called:
 
     ./gradlew customTask
     My custom message

@@ -1,0 +1,5 @@
+defaults:
+  -
+    values:
+      layout: "main"
+
