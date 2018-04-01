@@ -28,8 +28,5 @@ sonar-project.properties
 .nb-gradle
 .nb-gradle-properties
 
-# sphinx
-_build
-
 # Vim
 *.swp
