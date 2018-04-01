@@ -6,9 +6,6 @@ import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
-import sun.misc.Version
-
-import javax.inject.Inject
 
 class OutputCurrentVersionTask extends DefaultTask {
 
