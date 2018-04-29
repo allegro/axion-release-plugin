@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.TagCommand
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
+import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
@@ -61,7 +62,7 @@ class GitRepositoryTest extends Specification {
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
-    def "should create new tag if it exists and it's on HEAD"() {
+    def "should create tag when on HEAD even if it already exists on the same commit"() {
         given:
         repository.tag('release-1')
 
@@ -72,7 +73,7 @@ class GitRepositoryTest extends Specification {
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
-    def "should throw an exception if create new tag if it exists before HEAD"() {
+    def "should throw an exception when creating new tag that already exists and it's not on HEAD"() {
         given:
         repository.tag('release-1')
         repository.commit(['*'], "commit after release")
@@ -237,8 +238,21 @@ class GitRepositoryTest extends Specification {
         ScmPosition position = repository.currentPosition()
 
         then:
+        println rawRepository.branch.current.name
         position.branch == 'some-branch'
         position.revision == rawRepository.head().id
+    }
+
+    def "should provide current branch name as HEAD when in detached state"() {
+        given:
+        String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        rawRepository.repository.jgit.checkout().setName(headCommitId).call()
+
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'HEAD'
     }
 
     def "should push changes and tag to remote"() {
