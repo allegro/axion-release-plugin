@@ -5,7 +5,7 @@ plugins {
     id 'jacoco'
     id 'pl.allegro.tech.build.axion-release' version '1.9.0'
     id 'com.github.kt3k.coveralls' version '2.3.1'
-    id 'com.gradle.plugin-publish' version '0.9.8'
+    id 'com.gradle.plugin-publish' version '0.9.10'
     id 'com.bmuschko.nexus' version '2.3.1' apply false
     id 'io.codearte.nexus-staging' version '0.11.0' apply false
 
