@@ -47,6 +47,10 @@ class ScmService {
         }
     }
 
+    ScmPosition position(){
+        repository.currentPosition()
+    }
+
     void commit(List patterns, String message) {
         repository.commit(patterns, message)
     }

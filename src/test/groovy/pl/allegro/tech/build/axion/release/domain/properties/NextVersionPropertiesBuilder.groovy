@@ -4,7 +4,9 @@ import pl.allegro.tech.build.axion.release.domain.NextVersionSerializer
 
 class NextVersionPropertiesBuilder {
 
-    private String nextVersion = '2.0.0'
+    private String nextVersion
+
+    private String versionIncrementer
 
     private String suffix = 'alpha'
 
@@ -19,6 +21,7 @@ class NextVersionPropertiesBuilder {
         return new NextVersionProperties(
                 nextVersion: nextVersion,
                 suffix: suffix,
+                versionIncrementer: versionIncrementer,
                 separator: '-',
                 deserializer: NextVersionSerializer.DEFAULT.deserializer,
                 serializer: NextVersionSerializer.DEFAULT.serializer
@@ -27,6 +30,11 @@ class NextVersionPropertiesBuilder {
 
     NextVersionPropertiesBuilder withNextVersion(String nextVersion) {
         this.nextVersion = nextVersion
+        return this
+    }
+
+    NextVersionPropertiesBuilder withVersionIncrementer(String incrementer) {
+        this.versionIncrementer = incrementer
         return this
     }
 
