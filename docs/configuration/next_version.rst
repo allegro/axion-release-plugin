@@ -10,19 +10,21 @@ version number and last tag is next version marker, version is treated as SNAPSH
 
     # git tag
     release-1.5.0
-    
+
     # ./gradlew cV
     1.5.1-SNAPSHOT
-    
+
     # ./gradlew markNextVersion -Prelease.version=2.0.0
-    
+
     # git tag
     release-1.5.0 release-2.0.0-alpha
-    
+
     # ./gradlew cV
     2.0.0-SNAPSHOT
 
-To create next version marker use ``markNextVersion`` task along with obligatory command line option ``release.version``.
+To create next version marker use ``markNextVersion``. Without parameters next version will be created with default version incrementer - incrementMinor,
+witch can be overwritten with ``release.incrementer`` parameter.
+Custom next version can be created along with command line option ``release.version``.
 
 Default next version marker serializer/deserializer can be customized using ``scmVersion.nextVersion.suffix`` and
 ``scmVersion.nextVersion.separator`` properties::

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
@@ -9,22 +10,34 @@ class NextVersionMarker {
 
     private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(NextVersionMarker)
 
-    private final ScmService repository
+    private final ScmService repositoryService
+    private final VersionConfig versionConfig
 
-    NextVersionMarker(ScmService repository) {
-        this.repository = repository
+        NextVersionMarker(ScmService repositoryService, VersionConfig config) {
+            this.repositoryService = repositoryService
+            this.versionConfig = config
     }
 
     void markNextVersion(NextVersionProperties nextVersionRules, TagProperties tagRules) {
-        if (nextVersionRules.nextVersion == null) {
-            throw new IllegalArgumentException("No next version specified! Use -Prelease.version to set next version.")
+
+        def version = nextVersionRules.nextVersion
+        def currentVersion = Version.valueOf(versionConfig.version)
+
+        if (nextVersionRules.versionIncrementer){
+            versionConfig.versionIncrementer(nextVersionRules.versionIncrementer)
         }
 
-        String tagName = tagRules.serialize(tagRules, nextVersionRules.nextVersion)
+        if (!version) {
+            def context = new VersionIncrementerContext(currentVersion, repositoryService.position())
+            version = versionConfig.versionIncrementer(context)
+            logger.info("Next Version not specified. Creating next version with default incrementer: $version")
+        }
+
+        String tagName = tagRules.serialize(tagRules, version.toString())
         String nextVersionTag = nextVersionRules.serializer(nextVersionRules, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
-        repository.tag(nextVersionTag)
-        repository.push()
+        repositoryService.tag(nextVersionTag)
+        repositoryService.push()
     }
 }

@@ -3,7 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import com.github.zafarkhaja.semver.Version
 
 import java.util.regex.Matcher
-import static String.format
+import static java.lang.String.format
 
 enum PredefinedVersionIncrementer {
 
@@ -34,13 +34,13 @@ enum PredefinedVersionIncrementer {
             Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
             if (matcher.matches()) {
                 long nextNumber = Long.parseLong(matcher.group(2)) + 1
-                String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber);
+                String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber)
                 String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
 
                 return new Version.Builder()
-                        .setNormalVersion(context.currentVersion.normalVersion)
-                        .setPreReleaseVersion(nextPreReleaseVersion)
-                        .build();
+                    .setNormalVersion(context.currentVersion.normalVersion)
+                    .setPreReleaseVersion(nextPreReleaseVersion)
+                    .build()
             }
         }
         return context.currentVersion.incrementPatchVersion()
@@ -64,7 +64,7 @@ enum PredefinedVersionIncrementer {
         PredefinedVersionIncrementer creator = values().find { it.name == name }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
-                    "You can choose from: ${values().collect { it.name }}");
+                "You can choose from: ${values().collect { it.name }}")
         }
         return { VersionIncrementerContext context -> creator.versionIncrementer(context, configuration) }
     }

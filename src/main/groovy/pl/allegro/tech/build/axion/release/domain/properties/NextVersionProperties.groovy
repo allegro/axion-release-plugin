@@ -11,6 +11,8 @@ class NextVersionProperties {
 
     final String separator
 
+    final String versionIncrementer
+
     final Closure<String> serializer
 
     final Closure<String> deserializer

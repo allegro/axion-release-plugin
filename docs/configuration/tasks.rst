@@ -53,4 +53,5 @@ markNextVersion
 ---------------
 
 Create next-version marker tag, that affects current version resolution. Tag is pushed to remote. See :doc:`next_version`
-for details.
+for details. Without ``release.version`` parameter task will create next version with default incrementer.
+To specify next version incrementer use ``release.incrementer`` parameter.
