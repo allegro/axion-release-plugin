@@ -22,8 +22,18 @@ version number and last tag is next version marker, version is treated as SNAPSH
     # ./gradlew cV
     2.0.0-SNAPSHOT
 
+    # ./gradlew markNextVersion
+
+    # ./gradlew cV
+     2.0.1-SNAPSHOT
+
+    # ./gradlew nextVersion –Pincrementer=incrementMinor
+
+    # ./gradlew cV
+     2.1.0-SNAPSHOT
+
 To create next version marker use ``markNextVersion``. Without parameters next version will be created with default version incrementer - incrementMinor,
-witch can be overwritten with ``release.incrementer`` parameter.
+which can be overwritten with ``release.incrementer`` parameter.
 Custom next version can be created along with command line option ``release.version``.
 
 Default next version marker serializer/deserializer can be customized using ``scmVersion.nextVersion.suffix`` and
