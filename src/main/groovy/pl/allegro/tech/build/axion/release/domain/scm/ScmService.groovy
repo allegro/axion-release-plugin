@@ -47,7 +47,7 @@ class ScmService {
         }
     }
 
-    ScmPosition position(){
+    ScmPosition position() {
         repository.currentPosition()
     }
 

@@ -13,9 +13,9 @@ class NextVersionMarker {
     private final ScmService repositoryService
     private final VersionConfig versionConfig
 
-        NextVersionMarker(ScmService repositoryService, VersionConfig config) {
-            this.repositoryService = repositoryService
-            this.versionConfig = config
+    NextVersionMarker(ScmService repositoryService, VersionConfig config) {
+        this.repositoryService = repositoryService
+        this.versionConfig = config
     }
 
     void markNextVersion(NextVersionProperties nextVersionRules, TagProperties tagRules) {
@@ -23,7 +23,7 @@ class NextVersionMarker {
         def version = nextVersionRules.nextVersion
         def currentVersion = Version.valueOf(versionConfig.version)
 
-        if (nextVersionRules.versionIncrementer){
+        if (nextVersionRules.versionIncrementer) {
             versionConfig.versionIncrementer(nextVersionRules.versionIncrementer)
         }
 
