@@ -61,6 +61,23 @@ class VersionResolverTest extends RepositoryBasedTest {
         !version.snapshot
     }
 
+    def "should pick tag with highest version when multiple release and non-release tags on last commit"() {
+        given:
+        repository.tag('release-1.0.0')
+        repository.tag('release-1.1.0')
+        repository.tag('release-1.1.5-alpha')
+        repository.tag('release-1.2.0')
+        repository.tag('release-1.4.0-alpha')
+
+        when:
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.0'
+        !version.snapshot
+    }
+
     def "should prefer normal version to nextVersion when both on same commit"() {
         given:
         repository.tag('release-1.1.0-alpha')
@@ -72,6 +89,20 @@ class VersionResolverTest extends RepositoryBasedTest {
         then:
         version.previousVersion.toString() == '1.1.0'
         version.version.toString() == '1.1.0'
+        !version.snapshot
+    }
+
+    def "should prefer normal version to newer nextVersion when both on same commit"() {
+        given:
+        repository.tag('release-1.0.0')
+        repository.tag('release-1.1.0-alpha')
+
+        when:
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.0.0'
+        version.version.toString() == '1.0.0'
         !version.snapshot
     }
 

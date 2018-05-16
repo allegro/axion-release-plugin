@@ -135,7 +135,8 @@ class VersionResolver {
 
         def versionList = versions.asList()
         Collections.sort(versionList, Collections.reverseOrder())
-        Version version = versions.isEmpty() ? versionFactory.initialVersion() : versionList[0]
+        
+        Version version = versionList.find { !isVersionNextVersion[it] } ?: versionList[0] ?: versionFactory.initialVersion()
 
         TagsOnCommit versionCommit = versionToCommit.get(version)
         return [
