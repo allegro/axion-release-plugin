@@ -50,6 +50,24 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
+    def "should return snapshot of highest alpha tag when there are normal and alpha releases on single history commit"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        repository.commit(['*'], "commit after release-2.0.0-alpha")
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('2.0.0-SNAPSHOT')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
     def "should return tag with last version if useHighestVersion is set to false"() {
         given:
         buildFile('')
