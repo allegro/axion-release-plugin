@@ -275,6 +275,24 @@ class VersionResolverTest extends RepositoryBasedTest {
       version.snapshot
     }
 
+    def "should return snapshot version of the more recent version when final and snapshot tags on the same commit in the past"() {
+        given:
+        repository.tag('release-1.0.0')
+        repository.tag('release-1.1.0-alpha')
+        repository.commit(['*'], 'some commit')
+        repository.commit(['*'], 'some merge from another branch...')
+
+        VersionProperties versionProps = versionProperties().build()
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.0.0'
+        version.version.toString() == '1.1.0'
+        version.snapshot
+    }
+
     def "should return the last version as release from the tagged versions no highest version option selected"() {
       given:
       repository.tag('release-1.0.0')
