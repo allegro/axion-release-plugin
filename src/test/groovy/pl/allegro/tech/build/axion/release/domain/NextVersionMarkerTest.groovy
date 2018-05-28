@@ -31,7 +31,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
 
         releaser = new Releaser(versionService, scmService, new ReleaseHooksRunner(versionService, scmService))
 
-        nextVersionMarker = new NextVersionMarker(context.scmService(), config)
+        nextVersionMarker = new NextVersionMarker(context.scmService())
     }
 
     def "should create next version tag with given version"() {
@@ -40,7 +40,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         NextVersionProperties rules = nextVersionProperties().withNextVersion('2.0.0').build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules)
+        nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-2.0.0-alpha']
@@ -52,7 +52,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         NextVersionProperties rules = nextVersionProperties().build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules)
+        nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-0.1.1-alpha']
@@ -66,7 +66,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
             .build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules)
+        nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-1.0.0-alpha']

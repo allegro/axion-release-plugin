@@ -11,29 +11,24 @@ class NextVersionMarker {
     private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(NextVersionMarker)
 
     private final ScmService repositoryService
-    private final VersionConfig versionConfig
 
-    NextVersionMarker(ScmService repositoryService, VersionConfig config) {
+    NextVersionMarker(ScmService repositoryService) {
         this.repositoryService = repositoryService
-        this.versionConfig = config
     }
 
-    void markNextVersion(NextVersionProperties nextVersionRules, TagProperties tagRules) {
+    void markNextVersion(NextVersionProperties nextVersionRules, TagProperties tagRules, VersionConfig versionConfig) {
 
-        def version = nextVersionRules.nextVersion
-        def currentVersion = Version.valueOf(versionConfig.version)
-
-        if (nextVersionRules.versionIncrementer) {
-            versionConfig.versionIncrementer(nextVersionRules.versionIncrementer)
+        String nextVersion = null
+        if (nextVersionRules.nextVersion) {
+            nextVersion = nextVersionRules.nextVersion
+        } else {
+            Version currentVersion = Version.valueOf(versionConfig.undecoratedVersion)
+            VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position())
+            nextVersion = nextVersionRules.versionIncrementer(context)
+            logger.info("Next Version not specified. Creating next version with default incrementer: $nextVersion")
         }
 
-        if (!version) {
-            def context = new VersionIncrementerContext(currentVersion, repositoryService.position())
-            version = versionConfig.versionIncrementer(context)
-            logger.info("Next Version not specified. Creating next version with default incrementer: $version")
-        }
-
-        String tagName = tagRules.serialize(tagRules, version.toString())
+        String tagName = tagRules.serialize(tagRules, nextVersion.toString())
         String nextVersionTag = nextVersionRules.serializer(nextVersionRules, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
