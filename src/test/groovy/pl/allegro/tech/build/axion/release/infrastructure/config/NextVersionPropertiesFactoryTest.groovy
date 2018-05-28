@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.NextVersionConfig
+import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import spock.lang.Specification
 
@@ -11,10 +12,13 @@ class NextVersionPropertiesFactoryTest extends Specification {
 
     private Project project
 
+    private VersionConfig versionConfig
+
     private NextVersionConfig config = new NextVersionConfig()
 
     def setup() {
         project = builder().build()
+        versionConfig = project.extensions.create('versionConfig', VersionConfig, project)
     }
 
     def "should copy non-project properties from NextVersionConfig object"() {
@@ -26,8 +30,10 @@ class NextVersionPropertiesFactoryTest extends Specification {
         config.suffix = 'something'
         config.separator = '='
 
+        versionConfig.nextVersion = config
+
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, versionConfig)
 
         then:
         rules.serializer() == 'serialize'
@@ -41,7 +47,7 @@ class NextVersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.version', '1.0.0')
 
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, versionConfig)
 
         then:
         rules.nextVersion
@@ -53,7 +59,7 @@ class NextVersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.nextVersion', '1.0.0')
 
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, versionConfig)
 
         then:
         rules.nextVersion
