@@ -17,9 +17,6 @@ class NextVersionPropertiesFactory {
     static NextVersionProperties create(Project project, VersionConfig versionConfig) {
         String nextVersion = project.hasProperty(NEXT_VERSION_PROPERTY) ? project.property(NEXT_VERSION_PROPERTY) : null
         String versionIncrementerName = project.hasProperty(NEXT_VERSION_INCREMENTER_PROPERTY) ? project.property(NEXT_VERSION_INCREMENTER_PROPERTY) : null
-        Closure<Version> versionIncrementer = versionIncrementerName ?
-            PredefinedVersionIncrementer.versionIncrementerFor(versionIncrementerName) :
-            versionConfig.versionIncrementer
 
         if (nextVersion == null && project.hasProperty(DEPRECATED_NEXT_VERSION_PROPERTY)) {
             project.logger.warn("Using deprecated parameter: $DEPRECATED_NEXT_VERSION_PROPERTY! Use $NEXT_VERSION_PROPERTY instead.")
@@ -27,7 +24,7 @@ class NextVersionPropertiesFactory {
         }
 
         return new NextVersionProperties(nextVersion: nextVersion,
-            versionIncrementer: versionIncrementer,
+            versionIncrementer: versionIncrementerName,
             suffix: versionConfig.nextVersion.suffix,
             separator: versionConfig.nextVersion.separator,
             serializer: versionConfig.nextVersion.serializer,
