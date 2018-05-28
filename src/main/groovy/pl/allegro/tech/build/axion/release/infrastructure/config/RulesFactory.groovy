@@ -10,12 +10,12 @@ class RulesFactory {
 
     static Properties create(Project project, VersionConfig versionConfig, ScmPosition position) {
         return new Properties(
-                project.hasProperty(ReleasePlugin.DRY_RUN_FLAG),
-                VersionPropertiesFactory.create(project, versionConfig, position.branch),
-                TagPropertiesFactory.create(versionConfig.tag, position.branch),
-                ChecksPropertiesFactory.create(project, versionConfig.checks),
-                NextVersionPropertiesFactory.create(project, versionConfig.nextVersion),
-                HooksPropertiesFactory.create(versionConfig, versionConfig.hooks)
+            project.hasProperty(ReleasePlugin.DRY_RUN_FLAG),
+            VersionPropertiesFactory.create(project, versionConfig, position.branch),
+            TagPropertiesFactory.create(versionConfig.tag, position.branch),
+            ChecksPropertiesFactory.create(project, versionConfig.checks),
+            NextVersionPropertiesFactory.create(project, versionConfig),
+            HooksPropertiesFactory.create(versionConfig, versionConfig.hooks)
         )
     }
 
