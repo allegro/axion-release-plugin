@@ -313,4 +313,21 @@ class VersionResolverTest extends RepositoryBasedTest {
       version.snapshot
     }
 
+    def 'should not raise exception when tags has overlapping prefix'() {
+        repository.tag('release-1.0.0')
+        repository.tag('release-1.0.0-rc1')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-blabla-1.0.0')
+        repository.tag('release-blabla-1.0.5')
+        repository.tag('release-1.10')
+
+        VersionProperties versionProps = versionProperties().build()
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+
+        then:
+        version.version.toString() == '1.0.1'
+        version.snapshot
+    }
 }

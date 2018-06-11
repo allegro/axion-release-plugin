@@ -54,7 +54,7 @@ class VersionResolver {
     private Map readVersions(VersionFactory versionFactory,
                              TagProperties tagProperties,
                              NextVersionProperties nextVersionProperties) {
-        Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
+        Pattern releaseTagPattern = ~/^${tagProperties.prefix}${tagProperties.versionSeparator}\d+\.\d+\.\d+.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 
         Map currentVersionInfo, previousVersionInfo
@@ -81,7 +81,8 @@ class VersionResolver {
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
                                              TagProperties tagProperties,
                                              NextVersionProperties nextVersionProperties) {
-        Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
+
+        Pattern releaseTagPattern = ~/^${tagProperties.prefix}${tagProperties.versionSeparator}\d+\.\d+\.\d+.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
 
         Map currentVersionInfo, previousVersionInfo
@@ -135,7 +136,7 @@ class VersionResolver {
 
         def versionList = versions.asList()
         Collections.sort(versionList, Collections.reverseOrder())
-        
+
         Version version = versionList.find { !isVersionNextVersion[it] } ?: versionList[0] ?: versionFactory.initialVersion()
 
         TagsOnCommit versionCommit = versionToCommit.get(version)
