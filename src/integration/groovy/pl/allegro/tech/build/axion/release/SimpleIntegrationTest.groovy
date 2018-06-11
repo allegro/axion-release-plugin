@@ -81,15 +81,15 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         versionFile.text == "Version: 1.0.0"
     }
 
-    def "should fail gracefuly when failed to parse tag"() {
+    def "should not fail when not exact tag found and return initial version"() {
         given:
         buildFile('')
         repository.tag('release-blabla-1.0.0')
 
         when:
-        def result = gradle().withArguments('cV').buildAndFail()
+        def result = gradle().withArguments('cV').build()
 
         then:
-        result.output.contains('release-blabla')
+        result.output.contains('0.1.0-SNAPSHOT')
     }
 }
