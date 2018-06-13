@@ -130,5 +130,20 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
+    def "should return alpha tag if useHighestVersion is set to true"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        repository.commit(['*'], "commit after release-1.0.0")
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        when:
+        def result = runGradle('currentVersion', '-Prelease.useHighestVersion')
+
+        then:
+        result.output.contains('2.0.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
 
 }
