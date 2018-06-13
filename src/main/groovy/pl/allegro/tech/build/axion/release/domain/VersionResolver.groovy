@@ -23,8 +23,11 @@ class VersionResolver {
 
     private final ScmRepository repository
 
+    private final VersionSorter sorter
+
     VersionResolver(ScmRepository repository) {
         this.repository = repository
+        this.sorter = new VersionSorter()
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
@@ -105,48 +108,6 @@ class VersionResolver {
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory) {
-        Set<Version> versions = []
-        Map<Version, Boolean> isVersionNextVersion = [:]
-        Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
-
-        for (TagsOnCommit tagsEntry : taggedCommits) {
-            List<String> tags = tagsEntry.tags
-            for (String tag : tags) {
-                boolean isNextVersion = tag ==~ nextVersionTagPattern
-                if (ignoreNextVersionTags && isNextVersion) {
-                    continue
-                }
-
-                Version version = versionFactory.versionFromTag(tag)
-                // normal tags have precedence over nextVersion
-                // if normal tag already exists, nextVersion will be discarded
-                // if nextVersion already exists, normal tag will overwrite it
-                if (versions.add(version) || !isNextVersion) {
-                    versionToCommit.put(version, tagsEntry)
-                }
-
-                if (isVersionNextVersion.containsKey(version)) {
-                    isVersionNextVersion[version] = isVersionNextVersion[version] && isNextVersion
-                } else {
-                    isVersionNextVersion[version] = isNextVersion
-                }
-            }
-        }
-
-        def versionList = versions.asList()
-        Collections.sort(versionList, Collections.reverseOrder())
-
-        Version version = versionList.find {
-            !isVersionNextVersion[it] || !versionToCommit[it].isHead
-        } ?: versionList[0] ?: versionFactory.initialVersion()
-
-        TagsOnCommit versionCommit = versionToCommit.get(version)
-        return [
-            version      : version,
-            isNextVersion: isVersionNextVersion.containsKey(version) && isVersionNextVersion[version],
-            noTagsFound  : versions.isEmpty(),
-            commit       : versionCommit?.commitId,
-            isHead       : versionCommit?.isHead
-        ]
+        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, nextVersionTagPattern, versionFactory)
     }
 }
