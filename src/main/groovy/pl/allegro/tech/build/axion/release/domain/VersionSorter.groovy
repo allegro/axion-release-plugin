@@ -30,9 +30,15 @@ class VersionSorter {
 
         for (TagsOnCommit tagsEntry : taggedCommits) {
             List<String> tags = tagsEntry.tags
+
+            // next version should be igored when tag is on head
+            // and there are other, normal tags on it
+            // because when on single commit on head - normal ones have precedence
+            boolean ignoreNextVersionOnHead = tagsEntry.isHead && !tagsEntry.hasOnlyMatching(nextVersionTagPattern)
+
             for (String tag : tags) {
                 boolean isNextVersion = tag ==~ nextVersionTagPattern
-                if (isNextVersion && ignoreNextVersionTags) {
+                if (isNextVersion && (ignoreNextVersionTags || ignoreNextVersionOnHead)) {
                     continue
                 }
 
@@ -56,10 +62,7 @@ class VersionSorter {
 
         List<Version> versionList = versions.asList()
         Collections.sort(versionList, Collections.reverseOrder())
-
-        Version version = versionList.find {
-            !isVersionNextVersion[it] || !versionToCommit[it].isHead
-        } ?: versionList[0] ?: versionFactory.initialVersion()
+        Version version = versionList[0] ?: versionFactory.initialVersion()
 
         TagsOnCommit versionCommit = versionToCommit.get(version)
 
