@@ -6,5 +6,9 @@ class ScmRepositoryUnavailableException extends RuntimeException {
         super(cause)
     }
 
+    ScmRepositoryUnavailableException(String message) {
+        super(message)
+    }
+
 }
 
