@@ -8,7 +8,9 @@ import org.eclipse.jgit.lib.*
 import org.eclipse.jgit.revwalk.RevCommit
 import org.eclipse.jgit.revwalk.RevSort
 import org.eclipse.jgit.revwalk.RevWalk
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.eclipse.jgit.transport.*
+import org.eclipse.jgit.util.FS
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.*
 
@@ -31,7 +33,11 @@ class GitRepository implements ScmRepository {
     GitRepository(ScmProperties properties) {
         try {
             this.repositoryDir = properties.directory
-            this.jgitRepository = Git.open(repositoryDir)
+            def gitRepository = new FileRepositoryBuilder().setFS(FS.DETECTED).setMustExist(true).findGitDir(repositoryDir)
+            if (gitRepository.getGitDir() == null) {
+                throw new ScmRepositoryUnavailableException("Can't detect git repo in the project.rootDir or in any of its parent directories")
+            }
+            this.jgitRepository = Git.wrap(gitRepository.build())
             this.properties = properties
         }
         catch (RepositoryNotFoundException exception) {
