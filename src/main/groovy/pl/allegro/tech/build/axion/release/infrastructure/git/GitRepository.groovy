@@ -310,6 +310,11 @@ class GitRepository implements ScmRepository {
     boolean checkAheadOfRemote() {
         String branchName = jgitRepository.repository.fullBranch
         BranchTrackingStatus status = BranchTrackingStatus.of(jgitRepository.repository, branchName)
+
+        if (status == null) {
+            throw new ScmException("Branch $branchName is not set to track another branch")
+        }
+
         return status.aheadCount != 0 || status.behindCount != 0
     }
 
