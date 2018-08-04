@@ -8,6 +8,7 @@ RUN passwd -d git \
   && git init --bare repos/rejecting-repo \
   && echo -e "#!/bin/sh\necho 'I reject this push!' >&2\nexit 1" > repos/rejecting-repo/hooks/pre-receive \
   && chmod +x repos/rejecting-repo/hooks/pre-receive \
+  && git init --bare repos/existing-tag-repo \
   && sh /etc/init.d/sshd restart
 
 CMD ["sh", "start.sh"]

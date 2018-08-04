@@ -1,10 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import org.ajoberstar.grgit.Branch
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.exception.GrgitException
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.TagCommand
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.lib.Constants

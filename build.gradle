@@ -169,6 +169,7 @@ task remoteTest(type: Test) {
     testLogging {
         events 'passed', 'skipped', 'failed'
         exceptionFormat = 'full'
+        showStandardStreams = true
     }
 
     dependsOn startDockerContainer
