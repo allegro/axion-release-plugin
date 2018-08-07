@@ -1,9 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
-import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
-import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
-import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.NextVersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 
 class NextVersionPropertiesFactory {
@@ -14,7 +12,7 @@ class NextVersionPropertiesFactory {
 
     private static final String DEPRECATED_NEXT_VERSION_PROPERTY = "release.nextVersion"
 
-    static NextVersionProperties create(Project project, VersionConfig versionConfig) {
+    static NextVersionProperties create(Project project, NextVersionConfig config) {
         String nextVersion = project.hasProperty(NEXT_VERSION_PROPERTY) ? project.property(NEXT_VERSION_PROPERTY) : null
         String versionIncrementerName = project.hasProperty(NEXT_VERSION_INCREMENTER_PROPERTY) ? project.property(NEXT_VERSION_INCREMENTER_PROPERTY) : null
 
@@ -25,10 +23,10 @@ class NextVersionPropertiesFactory {
 
         return new NextVersionProperties(nextVersion: nextVersion,
             versionIncrementer: versionIncrementerName,
-            suffix: versionConfig.nextVersion.suffix,
-            separator: versionConfig.nextVersion.separator,
-            serializer: versionConfig.nextVersion.serializer,
-            deserializer: versionConfig.nextVersion.deserializer)
+            suffix: config.suffix,
+            separator: config.separator,
+            serializer: config.serializer,
+            deserializer: config.deserializer)
     }
 
 }
