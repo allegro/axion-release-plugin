@@ -19,8 +19,11 @@ class BaseIntegrationTest extends RepositoryBasedTest {
             id 'pl.allegro.tech.build.axion-release'
         }
 
+        """ + contents +
+            """
+
         project.version = scmVersion.version
-        """ + contents
+        """
     }
 
     void vanillaBuildFile(String contents) {
@@ -29,8 +32,8 @@ class BaseIntegrationTest extends RepositoryBasedTest {
 
     GradleRunner gradle() {
         return GradleRunner.create()
-                .withProjectDir(directory)
-                .withPluginClasspath()
+            .withProjectDir(directory)
+            .withPluginClasspath()
     }
 
     BuildResult runGradle(String... arguments) {

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
+import org.ajoberstar.grgit.Branch
 import org.ajoberstar.grgit.Grgit
 import org.ajoberstar.grgit.exception.GrgitException
 import org.eclipse.jgit.api.Git
@@ -349,5 +350,24 @@ class GitRepositoryTest extends Specification {
 
         expect:
         repository.checkAheadOfRemote()
+    }
+
+    def "should fail ahead of remote check when on branch with no remote tracking"() {
+        given:
+        def repos = GitProjectBuilder.gitProject(File.createTempDir('axion-release', 'tmp'))
+            .withInitialCommit()
+            .build()
+
+        GitRepository noRemoteRepository = repos[GitRepository]
+        Grgit rawRepository = repos[Grgit]
+
+        rawRepository.branch.add(name: 'new-branch')
+        rawRepository.branch.change(name: 'new-branch', startPoint: 'new-branch')
+
+        when:
+        noRemoteRepository.checkAheadOfRemote()
+
+        then:
+        thrown(ScmException)
     }
 }

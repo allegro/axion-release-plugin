@@ -92,4 +92,22 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         then:
         result.output.contains('release-blabla')
     }
+
+    def "should use initial verison setting"() {
+        given:
+        buildFile("""
+            scmVersion {
+                tag {
+                    initialVersion = { t, p -> '0.0.1' }
+                }
+            }
+        """)
+
+        when:
+        def result = runGradle('cV')
+
+        then:
+        result.output.contains('Project version: 0.0.1-SNAPSHOT')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
 }

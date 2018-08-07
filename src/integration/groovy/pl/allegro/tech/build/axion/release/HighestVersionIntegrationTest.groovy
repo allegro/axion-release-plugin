@@ -19,7 +19,7 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should return tag with highest version when there are normal and alpha releases on single commit"() {
+    def "should return tag with stable version when there are normal and alpha releases on single commit"() {
         given:
         buildFile('')
 
@@ -30,7 +30,41 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('2.0.0')
+        result.output.contains('1.0.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should return tag with highest stable version when there are normal and alpha releases on single commit"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('1.5.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should return snapshot of highest alpha tag when there are normal and alpha releases on single history commit"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        repository.commit(['*'], "commit after release-2.0.0-alpha")
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('2.0.0-SNAPSHOT')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
@@ -96,5 +130,20 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
+    def "should return alpha tag if useHighestVersion is set to true"() {
+        given:
+        buildFile('')
+
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        repository.commit(['*'], "commit after release-1.0.0")
+        runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        when:
+        def result = runGradle('currentVersion', '-Prelease.useHighestVersion')
+
+        then:
+        result.output.contains('2.0.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
 
 }
