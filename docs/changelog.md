@@ -1,5 +1,12 @@
 # Changelog
 
+* **1.9.3** (26.08.2018)
+    * `nextVersion -Prelease.incrementer=...` can create next version using selected incrementer - thanks to [jplucinski](https://github.com/jplucinski) for contribution
+    * adds user-friendly message when no tracking branch present
+* **1.9.2** (15.06.2018)
+    * further clarification of behavior when multiple tags on single commit - see `VersionSorter` class and tests
+* **1.9.1** (20.05.2018)
+    * fixes behavior when two tags on the same commit - thanks to [lwasylkowski](https://github.com/lwasylkowski) for contribution
 * **1.9.0** (23.02.2018)
     * removes GrGit dependency
 * **1.8.3** (30.01.2018)
