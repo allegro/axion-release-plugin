@@ -24,15 +24,29 @@ final class FileLoader {
         if (file instanceof File) {
             return file
         } else {
-            return new File(adjustStringPath(file.toString()))
+            return fileFromStringPath(file.toString())
         }
     }
 
-    private static String adjustStringPath(String string) {
+    private static File fileFromStringPath(String string) {
+        // fixes using release.customKey property on windows
+        // 'C:/path/to/keyFile.ppk' is not recognized as absolute path
+
+        // WAS:
+        /*
         if (!string.startsWith(File.separator) && root != null) {
             return root.canonicalPath + File.separator + string
         }
         return string
+        */
+        
+        // FIX:
+        File path = new File(string)
+        
+        if (!path.isAbsolute() && root != null) {
+            return new File(root, string)
+        }
+        return path
     }
 
 }
