@@ -189,8 +189,8 @@ class VersionResolverTest extends RepositoryBasedTest {
         then:
         version.previousVersion.toString() == '1.1.0'
 
-        // The following assertion fails -- if forceSnapshots specified, than 'nextReleaseVersion'
-        // is incremented once again yielding the 2.0.1-SNAPSHOT version, which is NOT CORRECT.
+        // The following assertion failed -- if forceSnapshots was specified, than 'nextReleaseVersion'
+        // was incremented once again yielding the 2.0.1-SNAPSHOT version, which is NOT CORRECT.
         version.version.toString() == '2.0.0'
         version.snapshot
     }
