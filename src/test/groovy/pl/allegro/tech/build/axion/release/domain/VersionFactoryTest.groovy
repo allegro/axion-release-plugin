@@ -116,9 +116,9 @@ class VersionFactoryTest extends Specification {
         !version.snapshot
     }
 
-    def "should increment patch version when there are uncommitted changes and not ignoring them, even when on tag"() {
+    def "should increment patch version when there are uncommitted changes and not ignoring them, even when on tag"(VersionProperties versionProps) {
         given:
-        VersionFactory factory = versionFactory(versionProperties().dontIgnoreUncommittedChanges().build())
+        VersionFactory factory = versionFactory(versionProps)
 
         when:
         Map version = factory.createFinalVersion(scmState().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))
@@ -126,28 +126,66 @@ class VersionFactoryTest extends Specification {
         then:
         version.version.toString() == '1.0.1'
         version.snapshot
+
+        where:
+        versionProps << [
+            versionProperties().dontIgnoreUncommittedChanges().build(),
+            versionProperties().dontIgnoreUncommittedChanges().forceSnapshot().build()
+        ]
     }
 
-    def "should increment version when forced snapshot is on"() {
+    def "should increment version when forced snapshot is on" (ScmState scmStateParam) {
         given:
         VersionFactory factory = versionFactory(versionProperties().forceSnapshot().build())
 
         when:
-        Map version = factory.createFinalVersion(scmState().build(), Version.valueOf('1.0.0'))
+        Map version = factory.createFinalVersion(scmStateParam, Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.1'
         version.snapshot
+        
+        where:
+        scmStateParam << [
+            scmState().build(),
+            scmState().onReleaseTag().build(), // on release tag
+            scmState().onReleaseTag().hasUncomittedChanges().build(), // with uncomitted changes
+        ]
     }
 
-    def "should not increment version when this is initial version"() {
+    def "should not increment version when forced snapshot is on and is on nextVersion tag"() {
+        given:
+        VersionFactory factory = versionFactory(versionProperties().forceSnapshot().build())
+
+        when:
+        // This simulates nextVersionTag == 'release-1.0.0-alpha'
+        Map version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
+
+        then:
+        // So snapshot version of this is '1.0.0-SNAPSHOT'
+        version.version.toString() == '1.0.0'
+        version.snapshot
+    }
+
+    def "should not increment version when this is initial version"(VersionProperties versionProps) {
+        given:
+        VersionFactory factory = versionFactory(versionProps)
+
         when:
         Map version = factory.createFinalVersion(scmState().noReleaseTagsFound().build(), Version.valueOf('0.1.0'))
 
         then:
         version.version.toString() == '0.1.0'
         version.snapshot
+
+        where:
+        versionProps << [
+            versionProperties().build(),
+            versionProperties().forceSnapshot().build()
+        ]
+
     }
+
 
     private VersionFactory versionFactory(VersionProperties versionProperties) {
         return new VersionFactory(versionProperties, tagProperties, nextVersionProperties, scmPosition('master'))
