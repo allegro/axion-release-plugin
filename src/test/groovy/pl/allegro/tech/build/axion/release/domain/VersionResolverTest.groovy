@@ -120,6 +120,21 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.snapshot
     }
 
+    def "should return unmodified previous and incremented current version when not on tag (and force snapshot)"() {
+        given:
+        repository.tag('release-1.1.0')
+        repository.commit(['*'], 'some commit')
+        def versionRulesForceSnapshot = versionProperties().forceSnapshot().build()
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionRulesForceSnapshot, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '1.1.1'
+        version.snapshot
+    }
+
     def "should return previous version from last release tag and current from next version when on next version tag"() {
         given:
         repository.tag('release-1.1.0')
@@ -134,6 +149,28 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.version.toString() == '2.0.0'
         version.snapshot
     }
+
+    // This test case reproduces issue #263
+    def "should return previous version from last release tag and current from next version when on next version tag (and force snapshot)"() {
+
+        given: "there is nextVersionTag on current commit (2.0.0-alpha)"
+        repository.tag('release-1.1.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-2.0.0-alpha')
+        def versionRulesForceSnapshot = versionProperties().forceSnapshot().build()
+
+        when: "resolving version with property 'release.forceSnapshot'"
+        VersionContext version = resolver.resolveVersion(versionRulesForceSnapshot, tagRules, nextVersionRules)
+
+        then: "the resolved version should be snapshot towards the next version (2.0.0-SNAPSHOT)"
+        version.previousVersion.toString() == '1.1.0'
+
+        // The following assertion fails -- if forceSnapshots specified, than 'nextReleaseVersion'
+        // is incremented once again yielding the 2.0.1-SNAPSHOT version, which is NOT CORRECT.
+        version.version.toString() == '2.0.0'
+        version.snapshot
+    }
+
 
     def "should return release version when there is also a next version tag when on release tag"() {
         given:
