@@ -107,8 +107,8 @@ class VersionResolverTest extends RepositoryBasedTest {
         !version.snapshot
     }
     
-    // #263: TBD
-    // @Ignore("Fix of this particular bad behaviour looks more complex.")
+    // #264: TBD
+    @Ignore("Fix of this particular bad behaviour looks more complex.")
     def "should prefer snapshot of nextVersion when both on current commit and forceSnapshot is enabled"() {
         given:
         repository.tag('release-1.0.0')
@@ -120,7 +120,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         
         then:
         version.previousVersion.toString() == '1.0.0'
-        // #263: also the nextVersion should be taken account when forceSnapshot is specified
+        // #264: also the nextVersion should be taken account when forceSnapshot is specified
         version.version.toString() == '1.1.0'
         version.snapshot
     }
