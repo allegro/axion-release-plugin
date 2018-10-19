@@ -31,6 +31,7 @@ class VersionSorterTest extends Specification {
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('b', ['release-2.0.0'], false)],
             false,
+            false,
             ~/.*-alpha$/,
             factory
         )
@@ -43,6 +44,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0'], false)],
+            false,
             false,
             ~/.*-alpha$/,
             factory
@@ -58,6 +60,7 @@ class VersionSorterTest extends Specification {
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('b', ['release-2.0.0-alpha'], true)],
             false,
+            false,
             ~/.*-alpha$/,
             factory
         )
@@ -71,6 +74,7 @@ class VersionSorterTest extends Specification {
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], true)],
             false,
+            false,
             ~/.*-alpha$/,
             factory
         )
@@ -79,11 +83,26 @@ class VersionSorterTest extends Specification {
         versionData.version.toString() == '1.0.0'
     }
 
+    def "should prefer alpha version to normal version when on head, versions on single commit and snapshot is forced"() {
+        when:
+        def versionData = sorter.pickTaggedCommit(
+            [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], true)],
+            false,
+            true,
+            ~/.*-alpha$/,
+            factory
+        )
+
+        then:
+        versionData.version.toString() == '2.0.0'
+    }
+
     def "should ignore any nextVersion commits when asked"() {
         when:
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('a', ['release-2.0.0-alpha'], false)],
             true,
+            false,
             ~/.*-alpha$/,
             factory
         )
@@ -97,6 +116,7 @@ class VersionSorterTest extends Specification {
         def versionData = sorter.pickTaggedCommit(
             [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], false)],
             true,
+            false,
             ~/.*-alpha$/,
             factory
         )

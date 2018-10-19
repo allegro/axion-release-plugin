@@ -107,8 +107,6 @@ class VersionResolverTest extends RepositoryBasedTest {
         !version.snapshot
     }
 
-    // This test case reproduces issue #264
-    @Ignore("Issue under test is now ignored in order to resolve #263")
     def "should prefer snapshot of nextVersion when both on current commit and forceSnapshot is enabled"() {
 
         given: "there is releaseTag and nextVersionTag on current commit"
