@@ -37,9 +37,9 @@ class VersionResolver {
 
         Map versions
         if (versionFactory.versionProperties.useHighestVersion) {
-            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties)
+            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionRules)
         } else {
-            versions = readVersions(versionFactory, tagProperties, nextVersionProperties)
+            versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionRules)
         }
 
         ScmState scmState = new ScmState(
@@ -56,19 +56,24 @@ class VersionResolver {
 
     private Map readVersions(VersionFactory versionFactory,
                              TagProperties tagProperties,
-                             NextVersionProperties nextVersionProperties) {
+                             NextVersionProperties nextVersionProperties,
+                             VersionProperties versionProperties) {
+
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
+        boolean forceSnapshot = versionProperties.forceSnapshot
 
         Map currentVersionInfo, previousVersionInfo
         TagsOnCommit latestTags = repository.latestTags(releaseTagPattern)
-        currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern, versionFactory)
+        currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern,
+            versionFactory, forceSnapshot)
 
         TagsOnCommit previousTags = latestTags
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
             previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
         }
-        previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern, versionFactory)
+        previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern,
+            versionFactory, forceSnapshot)
 
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
@@ -83,15 +88,20 @@ class VersionResolver {
 
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
                                              TagProperties tagProperties,
-                                             NextVersionProperties nextVersionProperties) {
+                                             NextVersionProperties nextVersionProperties,
+                                             VersionProperties versionProperties) {
+
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
+        boolean forceSnapshot = versionProperties.forceSnapshot
 
         Map currentVersionInfo, previousVersionInfo
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
 
-        currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory)
-        previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory)
+        currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern,
+            versionFactory, forceSnapshot)
+        previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern,
+            versionFactory, forceSnapshot)
 
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
@@ -107,7 +117,14 @@ class VersionResolver {
     private Map versionFromTaggedCommits(List<TagsOnCommit> taggedCommits,
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
-                                         VersionFactory versionFactory) {
-        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, nextVersionTagPattern, versionFactory)
+                                         VersionFactory versionFactory,
+                                         boolean forceSnapshot) {
+
+        return sorter.pickTaggedCommit(
+            taggedCommits,
+            ignoreNextVersionTags,
+            forceSnapshot,
+            nextVersionTagPattern,
+            versionFactory)
     }
 }

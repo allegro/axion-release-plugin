@@ -22,6 +22,7 @@ class VersionSorter {
 
     Map pickTaggedCommit(List<TagsOnCommit> taggedCommits,
                                   boolean ignoreNextVersionTags,
+                                  boolean forceSnapshot,
                                   Pattern nextVersionTagPattern,
                                   VersionFactory versionFactory) {
         Set<Version> versions = []
@@ -34,7 +35,11 @@ class VersionSorter {
             // next version should be igored when tag is on head
             // and there are other, normal tags on it
             // because when on single commit on head - normal ones have precedence
-            boolean ignoreNextVersionOnHead = tagsEntry.isHead && !tagsEntry.hasOnlyMatching(nextVersionTagPattern)
+            // however, we should take into account next version
+            // in case of forced snapshot
+            boolean ignoreNextVersionOnHead = tagsEntry.isHead &&
+                !tagsEntry.hasOnlyMatching(nextVersionTagPattern) &&
+                !forceSnapshot
 
             for (String tag : tags) {
                 boolean isNextVersion = tag ==~ nextVersionTagPattern
