@@ -12,6 +12,8 @@ class ScmPropertiesFactory {
 
     private static final String RELEASE_PUSH_TAGS_ONLY_PROPERTY = 'release.pushTagsOnly'
 
+    private static final String DISABLE_SSH_AGENT = 'release.disableSshAgent'
+
     static ScmProperties create(Project project, VersionConfig config) {
         return new ScmProperties(
                 config.repository.type,
@@ -21,7 +23,7 @@ class ScmPropertiesFactory {
                 project.hasProperty(FETCH_TAGS_PROPERTY),
                 project.hasProperty(ATTACH_REMOTE_PROPERTY),
                 (String) (project.hasProperty(ATTACH_REMOTE_PROPERTY) ? project.property(ATTACH_REMOTE_PROPERTY) : null),
-                ScmIdentityFactory.create(config.repository)
+                ScmIdentityFactory.create(config.repository, project.hasProperty(DISABLE_SSH_AGENT))
         )
     }
 

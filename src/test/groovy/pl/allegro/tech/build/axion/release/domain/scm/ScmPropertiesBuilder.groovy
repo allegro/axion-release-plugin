@@ -23,7 +23,7 @@ class ScmPropertiesBuilder {
                 false,
                 false,
                 null,
-                ScmIdentity.defaultIdentity()
+                ScmIdentity.defaultIdentityWithoutAgents()
         )
     }
 

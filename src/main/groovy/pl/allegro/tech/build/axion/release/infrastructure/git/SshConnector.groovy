@@ -25,17 +25,29 @@ class SshConnector extends JschConfigSessionFactory {
 
     @Override
     protected JSch getJSch(OpenSshConfig.Host hc, FS fs) throws JSchException {
-        if(this.jsch == null) {
-            this.jsch = (!identity.useDefault) ? createJSch() : super.getJSch(hc, fs)
+        if (this.jsch == null) {
+            this.jsch = (!identity.useDefault) ? createKeyBasedJSch() : createSshAgentBasedJSch(hc, fs)
         }
 
         return this.jsch
     }
 
-    private JSch createJSch() {
+    private JSch createKeyBasedJSch() {
         JSch jsch = new JSch()
         byte[] passPhrase = identity.passPhrase != null ? identity.passPhrase.bytes : null
         jsch.addIdentity('key', identity.privateKey.bytes, null, passPhrase)
         return jsch
+    }
+
+    private JSch createSshAgentBasedJSch(OpenSshConfig.Host hc, FS fs) {
+        JSch ljsch = super.getJSch(hc, fs)
+
+        if (!identity.disableAgentSupport) {
+            SshAgentIdentityRepositoryFactory.tryToCreateIdentityRepository().ifPresent({
+                r -> ljsch.setIdentityRepository(r)
+            })
+        }
+
+        return ljsch
     }
 }

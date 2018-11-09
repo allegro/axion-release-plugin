@@ -48,7 +48,7 @@ class GitRepository implements ScmRepository {
 
     /**
      * This fetch method behaves like git fetch, meaning it only fetches thing without merging.
-     * As a result, any fetchet tags will not be visible via GitRepository tag listing methods
+     * As a result, any fetched tags will not be visible via GitRepository tag listing methods
      * because they do commit-tree walk, not tag listing.
      *
      * This method is only useful if you have bare repo on CI systems, where merge is not neccessary, because newest

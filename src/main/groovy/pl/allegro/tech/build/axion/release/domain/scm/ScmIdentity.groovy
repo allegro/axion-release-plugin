@@ -7,20 +7,26 @@ public class ScmIdentity {
 
     final boolean useDefault
 
+    final boolean disableAgentSupport
+
     final boolean privateKeyBased
-    
+
     final boolean usernameBased
-    
+
     final String privateKey
 
     final String passPhrase
-    
+
     final String username
-    
+
     final String password
 
     static ScmIdentity defaultIdentity() {
         return new ScmIdentity(useDefault: true)
+    }
+
+    static ScmIdentity defaultIdentityWithoutAgents() {
+        return new ScmIdentity(useDefault: true, disableAgentSupport: true)
     }
 
     static ScmIdentity keyIdentity(String privateKey, String passPhrase) {

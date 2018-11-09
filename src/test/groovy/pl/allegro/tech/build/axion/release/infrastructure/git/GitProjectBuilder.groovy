@@ -20,7 +20,7 @@ class GitProjectBuilder {
 
         this.rawRepository = Grgit.init(dir: repositoryDir)
         this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
-        this.identity = ScmIdentity.defaultIdentity()
+        this.identity = ScmIdentity.defaultIdentityWithoutAgents()
     }
 
     private GitProjectBuilder(File project, File cloneFrom) {
@@ -28,7 +28,7 @@ class GitProjectBuilder {
 
         this.rawRepository = Grgit.clone(dir: repositoryDir, uri: "file://${cloneFrom.canonicalPath}")
         this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
-        this.identity = ScmIdentity.defaultIdentity()
+        this.identity = ScmIdentity.defaultIdentityWithoutAgents()
     }
 
     static GitProjectBuilder gitProject(File project) {

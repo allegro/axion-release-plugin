@@ -262,7 +262,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -274,7 +274,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: true))
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'origin', pushTagsOnly: true))
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
@@ -291,7 +291,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'customRemote', pushTagsOnly: false), true)
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'customRemote', pushTagsOnly: false), true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']
@@ -311,7 +311,7 @@ class GitRepositoryTest extends Specification {
         remoteRepository.tag("remote-tag-to-fetch")
 
         when:
-        repository.fetchTags(ScmIdentity.defaultIdentity(), 'origin')
+        repository.fetchTags(ScmIdentity.defaultIdentityWithoutAgents(), 'origin')
 
         then:
         rawRepository.tag.list().size() == 1
@@ -338,7 +338,7 @@ class GitRepositoryTest extends Specification {
     def "should fail ahead of remote check when repository behind remote"() {
         given:
         remoteRepository.commit(["*"], "remote commit")
-        repository.fetchTags(ScmIdentity.defaultIdentity(), "origin")
+        repository.fetchTags(ScmIdentity.defaultIdentityWithoutAgents(), "origin")
 
         expect:
         repository.checkAheadOfRemote()
