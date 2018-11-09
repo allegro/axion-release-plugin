@@ -13,10 +13,23 @@ class ScmIdentityFactoryTest extends Specification {
         RepositoryConfig config = new RepositoryConfig()
 
         when:
-        ScmIdentity identity = ScmIdentityFactory.create(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config, false)
 
         then:
         identity.useDefault
+        !identity.disableAgentSupport
+    }
+
+    def "should return no-ssh-agent identity when support for ssh agents disabled"() {
+        given:
+        RepositoryConfig config = new RepositoryConfig()
+
+        when:
+        ScmIdentity identity = ScmIdentityFactory.create(config, true)
+
+        then:
+        identity.useDefault
+        identity.disableAgentSupport
     }
 
     def "should return custom identity when key set"() {
@@ -24,7 +37,7 @@ class ScmIdentityFactoryTest extends Specification {
         RepositoryConfig config = new RepositoryConfig(customKey: 'key', customKeyPassword: 'password')
 
         when:
-        ScmIdentity identity = ScmIdentityFactory.create(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config, false)
 
         then:
         !identity.useDefault
@@ -43,7 +56,7 @@ class ScmIdentityFactoryTest extends Specification {
         RepositoryConfig config = new RepositoryConfig(customKey: keyFile, customKeyPassword: 'password')
 
         when:
-        ScmIdentity identity = ScmIdentityFactory.create(config)
+        ScmIdentity identity = ScmIdentityFactory.create(config, false)
 
         then:
         !identity.useDefault
