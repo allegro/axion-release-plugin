@@ -27,7 +27,7 @@ class RemoteRejectionTest extends Specification {
             @Override
             void configure(Transport transport) {
                 SshTransport sshTransport = (SshTransport) transport
-                sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentity()))
+                sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
             }
         })
             .setURI("ssh://git@localhost:${SSH_PORT}/git-server/repos/rejecting-repo")
@@ -40,7 +40,7 @@ class RemoteRejectionTest extends Specification {
         repository.commit(['*'], 'commit after release-custom')
 
         when:
-        ScmPushResult result = repository.push(ScmIdentity.defaultIdentity(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
+        ScmPushResult result = repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
 
         then:
         !result.success
