@@ -12,7 +12,7 @@ either before (*pre*) or after (*post*) the release:
 
 Implementing action for common tasks would be a waste, this is why
 `axion-release` comes bundled with two predefined actions. If you come
-up with some useful implementation, don\'t hesitate to create pull
+up with some useful implementation, don't hesitate to create pull
 request!
 
 ## fileUpdate
@@ -39,8 +39,7 @@ Supported arguments:
     **current version** and context
 
 All patterns have multiline flag switched on by default to match against
-content of whole file. SCM position object has been described in
-[version]{role="doc"}.
+content of whole file.
 
 File update operation adds all changed files to set of files to commit
 in context, which are later processed by **commit** hook.
@@ -58,30 +57,27 @@ Creates commit. Only files (patterns) that were added to context via
         }
     }
 
-Default commit message is
-`Release version: $version`. It can be customized by passing closure that accepts
-current version and SCM position as arguments::
+Default commit message is `Release version: $version`.
+It can be customized by passing closure that accepts current version and SCM position as arguments:
 
     scmVersion {
        hooks {
-            pre \'commit\', {v, p -\> \"This is my great new commit message for version \$v\"}
+            pre 'commit', {v, p -\> "This is my great new commit message for version $v"}
         }
     }
 
-push
-\-\-\--
+## push
 
 Pushes all changes to the remote::
 
     scmVersion {
         hooks {
-            post \'push\'
+            post 'push'
         }
     }
 
 There is no additional magic in this action. Use with care, only when you have some commits that need to be pushed for
-example as a post\` action. Remember, that push is always done during
-the release.
+example as a post action. Remember, that push is always done during the release.
 
 ## Custom action
 
@@ -97,7 +93,7 @@ any closure that accepts `HookContext` object:
 `HookContext` object fields and methods:
 
 -   *logger* - instance of Gradle project logger
--   *position* - SCM position object described in [version]{role="doc"}
+-   *position* - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy)
 -   *previousVersion* - version before release
 -   *currentVersion* - released version
 -   *readVersion()* - force reevaluation of version, returns fresh

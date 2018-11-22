@@ -80,7 +80,7 @@ repository in general.
 
 ### Tag with highest version
 
-Second mode is searching for highest version visible in the git tree\'s
+Second mode is searching for highest version visible in the git tree's
 history. This means that all commits from HEAD till first commit will be
 analysed.
 
@@ -227,8 +227,7 @@ The context object passed to closure contains the following:
 -   *currentVersion* - current `Version` object that should be used to
     calculate next version ([Version
     API](https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java))
--   *position* - widely used position object, for more see
-    [scm-position]{role="doc"}
+-   *position* - widely used position object, for more see [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy)
 
 You can also specify different incrementers per branch. They can be
 either closure, name of predefined incrementer or name and list of
@@ -248,7 +247,7 @@ field is used.
 ### incrementMinorIfNotOnRelease
 
 This rule uses additional parameter `releaseBranchPattern` (by default
-it\'s set to \'release/.+\'):
+it's set to `release/.+`):
 
     scmVersion {
         versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
@@ -259,7 +258,7 @@ it\'s set to \'release/.+\'):
 Decorating phase happens only when version is read (and deserialized).
 During this phase version can be decorated with i.e. branch name.
 Default decorator does nothing. `axion-release-plugin` supports adding
-predefined named version creators (so don\'t be afraid to post pull
+predefined named version creators (so don't be afraid to post pull
 request if you have something useful!). Decoration phase is conducted by
 *version creators*, you can configure it via `scmVersion.versionCreator`
 method:
@@ -321,12 +320,12 @@ Custom version creators can be implemented by creating closure:
     {version, position -> ...}
 
 -   version - string version resolved by previous steps
--   position - object described above [scm-position]{role="doc"} section
+-   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
 
 ## Sanitization
 
 After decorating versions, there might be some characters left in
-version that are not i.e. filename friendly. That\'s why last phase of
+version that are not i.e. filename friendly. That's why last phase of
 version creation is sanitizing version string. By all characters that do
 not match `[A-Za-z0-9._-]` group are replaced with -. For example:
 

@@ -15,7 +15,7 @@ TBD
 ## Jenkins
 
 Jenkins and `axion-release` cooperate nicely. However, because Jenkins
-will check out git repositories in a \'detached head\' state, two flags
+will check out git repositories in a `detached head` state, two flags
 should be set when running the release task:
 
     ./gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly
@@ -25,16 +25,16 @@ verify if current commit is ahead of remote. Setting pushTagsOnly
 ensures that git will not throw an error by attempting to push commits
 while not working on a branch.
 
-To use the [versionWithBranch]{role="ref"} version creator from Jenkins,
+To use the [versionWithBranch](version.md#versionwithbranch) version creator from Jenkins,
 you need to override the default behavior of the Jenkins git plugin to
-avoid the \'detached-head\' state. In the Git section of the job
-configuration page, add the \'Additional Behaviour\' called \'Check out
-to specific local branch\' and enter your branch name.
+avoid the `detached-head` state. In the Git section of the job
+configuration page, add the `Additional Behaviour` called `Check out
+to specific local branch` and enter your branch name.
 
 Jenkins pipeline now defaults to clone with a narrow refspec, and
 without tags (as of git plugin 3.4.0). That saves network bandwidth,
 time, and disc space. If you need tags in your Jenkins workspace, add
-the \'Additional Behaviour\' called \'Advanced clone behaviors\'. Adding
+the `Additional Behaviour` called `Advanced clone behaviors`. Adding
 that behaviour will enable fetching of tags.
 
 ## Bamboo
@@ -42,7 +42,7 @@ that behaviour will enable fetching of tags.
 ### Enable tags fetch
 
 Bamboo fetches bare minimum of information from git. By default it
-won\'t even fetch tags. To change this:
+won't even fetch tags. To change this:
 
 -   go to plan configuration
 -   open *Repositories* tab
