@@ -1,5 +1,7 @@
 # Changelog
 
+* **1.9.4** (22.11.2018)
+    * fixes next version behavior when used with force snapshot - thanks to [Theer108](https://github.com/Theer108) and [trohr](https://github.com/trohr) for contribution
 * **1.9.3** (26.08.2018)
     * `nextVersion -Prelease.incrementer=...` can create next version using selected incrementer - thanks to [jplucinski](https://github.com/jplucinski) for contribution
     * adds user-friendly message when no tracking branch present
