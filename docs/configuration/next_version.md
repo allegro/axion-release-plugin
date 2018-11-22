@@ -51,7 +51,7 @@ using `scmVersion.nextVersion.suffix` and
     }
 
 As with normal tags, you can specify custom serializers and
-deserializers for next version markers. See [version]{role="doc"}
+deserializers for next version markers. See [Version Creation](version.md)
 documentation to see what serializers and deserializers are:
 
     scmVersion {

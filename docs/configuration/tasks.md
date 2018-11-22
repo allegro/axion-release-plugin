@@ -12,7 +12,7 @@
 ## verifyRelease
 
 Runs all checks before release. **release** task depends on it. See
-[checks]{role="doc"} for detailed configuration.
+[checks](checks.md) for detailed configuration.
 
 ## release
 

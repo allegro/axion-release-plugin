@@ -13,4 +13,4 @@ plugin for publications, call `publish` task after creating release:
 
 Why not make it work in single Gradle run? **maven-publish** plugin
 reads **project.version** in configuration phase. Any change made by
-tasks running prior to publishing won\'t be recognized.
+tasks running prior to publishing won't be recognized.
