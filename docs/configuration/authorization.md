@@ -1,14 +1,11 @@
 # Authorization
 
-## Interactive
+## SSH Agent
 
-All interactive authorization mechanisms are provided by
-[grgit](https://github.com/ajoberstar/grgit), see [authorization
-docs](http://ajoberstar.org/grgit/docs/groovydoc/org/ajoberstar/grgit/auth/AuthConfig.html)
-for more information.
+If no other options are used and repository requires authorization, `axion-release`
+will try to fetch authorization options from SSH agent (`ssh-agent` on Linux and `pageant` on Windows).
 
-Interactive mode is default option, switched off by using any special
-properties described below.
+All interaction with SSH agent is logged on info and debug levels.
 
 ## SSH Key/password
 
