@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.10.x
+
+* **1.10.0** (22.11.2018)
+    * reintroduces support for SSH agents: `ssh-agent` on Linux and `pageant` on Windows
+
 ### 1.9.x
 
 * **1.9.4** (22.11.2018)

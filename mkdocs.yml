@@ -25,6 +25,7 @@ pages:
     - Tasks: 'configuration/tasks.md'
     - Version creation: 'configuration/version.md'
     - Repository: 'configuration/repository.md'
+    - Authorization: 'configuration/authorization.md'
     - Overriding version: 'configuration/force_version.md'
     - Next version markers: 'configuration/next_version.md'
     - Pre/post release hooks: 'configuration/hooks.md'
