@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import groovy.util.logging.Slf4j
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
@@ -19,6 +20,7 @@ import java.util.regex.Pattern
  *   * version read from last release tag and incremented when not on tag
  *   * version read from last release tag when on tag
  */
+@Slf4j
 class VersionResolver {
 
     private final ScmRepository repository
@@ -77,13 +79,18 @@ class VersionResolver {
 
         Version currentVersion = currentVersionInfo.version
         Version previousVersion = previousVersionInfo.version
-        return [
+
+        Map result = [
             current         : currentVersion,
             previous        : previousVersion,
             onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
             onNextVersionTag: currentVersionInfo.isNextVersion,
             noTagsFound     : currentVersionInfo.noTagsFound
         ]
+
+        log.debug("read versions: {}", result)
+
+        return result
     }
 
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,

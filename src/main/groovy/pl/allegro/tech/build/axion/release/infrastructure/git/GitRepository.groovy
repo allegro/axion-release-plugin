@@ -303,7 +303,16 @@ class GitRepository implements ScmRepository {
 
     @Override
     boolean checkUncommittedChanges() {
-        return !jgitRepository.status().call().isClean()
+        Status status = jgitRepository.status().call()
+        logger.debug("""git status check:
+            |  added:       ${status.added}
+            |  changed:     ${status.changed}
+            |  removed:     ${status.removed}
+            |  missing:     ${status.missing}
+            |  modified:    ${status.modified}
+            |  conflicting: ${status.conflicting}
+            |  untracked:   ${status.untracked}""".stripMargin())
+        return !status.isClean()
     }
 
     @Override

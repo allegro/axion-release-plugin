@@ -2,12 +2,13 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.ParseException
 import com.github.zafarkhaja.semver.Version
-import org.gradle.api.GradleException
+import groovy.util.logging.Slf4j
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
+@Slf4j
 class VersionFactory {
 
     private final VersionProperties versionProperties
@@ -45,9 +46,14 @@ class VersionFactory {
     }
 
     Map createFinalVersion(ScmState scmState, Version version) {
+
+        log.debug("create final version, scmState: {}, version: {}", scmState, version)
+
         boolean hasUncommittedChanges = !versionProperties.ignoreUncommittedChanges && scmState.hasUncommittedChanges
         boolean hasCommittedChanges = !scmState.onReleaseTag
         boolean hasChanges = hasCommittedChanges || hasUncommittedChanges
+
+        log.debug("hasUncommittedChanges: {}, hasCommittedChanges: {}, hasChanges: {}", hasUncommittedChanges, hasCommittedChanges, hasChanges)
 
         boolean forcesSameVersionAsCurrent = versionProperties.forceVersion() &&
             versionProperties.forcedVersion == version.toString()
