@@ -9,7 +9,6 @@ plugins {
     id 'com.bmuschko.nexus' version '2.3.1' apply false
     id 'io.codearte.nexus-staging' version '0.11.0' apply false
 
-    id 'me.champeau.gradle.jmh' version '0.4.3'
     id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
 
@@ -185,11 +184,6 @@ task remoteTest(type: Test) {
 }
 
 tasks.check.dependsOn integrationTest, remoteTest
-
-jmh {
-    benchmarkMode = ['ss']
-    duplicateClassesStrategy = 'warn'
-}
 
 gradlePlugin {
     testSourceSets project.sourceSets.integration
