@@ -5,7 +5,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperti
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 
 import java.util.regex.Pattern

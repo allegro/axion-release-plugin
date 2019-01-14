@@ -79,7 +79,8 @@ class GitRepositoryTest extends Specification {
         repository.tag('release-1')
 
         then:
-        thrown(RefAlreadyExistsException)
+        ScmException e = thrown(ScmException)
+        e.getCause() instanceof RefAlreadyExistsException
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
@@ -296,7 +297,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'origin', pushTagsOnly: false), true)
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('origin', false), true)
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-push']
@@ -308,7 +309,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'commit after release-push')
 
         when:
-        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'origin', pushTagsOnly: true))
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('origin', true))
 
         then:
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
@@ -325,7 +326,7 @@ class GitRepositoryTest extends Specification {
         repository.attachRemote('customRemote', "file://$customRemoteProjectDir.canonicalPath")
 
         when:
-        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions(remote: 'customRemote', pushTagsOnly: false), true)
+        repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('customRemote', false), true)
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after release-custom']
