@@ -5,11 +5,10 @@ import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitChangesPrinter
-import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 class Context {
 

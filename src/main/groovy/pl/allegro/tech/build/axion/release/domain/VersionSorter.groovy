@@ -2,7 +2,6 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
 

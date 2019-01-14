@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
 import pl.allegro.tech.build.axion.release.domain.TagNameSerializer
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 
 class TagPropertiesBuilder {
 

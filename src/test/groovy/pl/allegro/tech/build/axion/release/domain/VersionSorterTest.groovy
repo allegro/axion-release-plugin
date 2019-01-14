@@ -6,7 +6,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBu
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+
 import spock.lang.Specification
 
 /**
