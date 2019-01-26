@@ -27,13 +27,13 @@ class NextVersionPropertiesFactoryTest extends Specification {
         config.separator = '='
 
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties properties = NextVersionPropertiesFactory.create(project, config)
 
         then:
-        rules.serializer() == 'serialize'
-        rules.deserializer() == 'deserialize'
-        rules.suffix == 'something'
-        rules.separator == '='
+        properties.serializer() == 'serialize'
+        properties.deserializer() == 'deserialize'
+        properties.suffix == 'something'
+        properties.separator == '='
     }
 
     def "should read nextVersion from 'release.version' property"() {
@@ -41,11 +41,11 @@ class NextVersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.version', '1.0.0')
 
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties properties = NextVersionPropertiesFactory.create(project, config)
 
         then:
-        rules.nextVersion
-        rules.nextVersion == '1.0.0'
+        properties.nextVersion
+        properties.nextVersion == '1.0.0'
     }
 
     def "should read nextVersion from deprecated 'release.nextVersion' property"() {
@@ -53,10 +53,10 @@ class NextVersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.nextVersion', '1.0.0')
 
         when:
-        NextVersionProperties rules = NextVersionPropertiesFactory.create(project, config)
+        NextVersionProperties properties = NextVersionPropertiesFactory.create(project, config)
 
         then:
-        rules.nextVersion
-        rules.nextVersion == '1.0.0'
+        properties.nextVersion
+        properties.nextVersion == '1.0.0'
     }
 }

@@ -4,9 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
-import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
+
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder
@@ -15,9 +13,9 @@ import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.
 class VersionPropertiesFactoryTest extends Specification {
 
     private Project project
-    
+
     private VersionConfig versionConfig
-    
+
     def setup() {
         project = builder().build()
         versionConfig = new VersionConfig(project)
@@ -25,7 +23,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should copy non-project properties from VersionConfig object"() {
         given:
-        versionConfig.versionIncrementer = {new Version.Builder('1.2.3').build()}
+        versionConfig.versionIncrementer = { new Version.Builder('1.2.3').build() }
         versionConfig.sanitizeVersion = false
 
         when:
@@ -90,14 +88,14 @@ class VersionPropertiesFactoryTest extends Specification {
         rules.forceVersion()
         rules.forcedVersion == 'version'
     }
-    
+
     def "should return ignore uncommitted changes flag from version config when no project flag present"() {
         given:
         versionConfig.ignoreUncommittedChanges = false
-        
+
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
-        
+
         then:
         !rules.ignoreUncommittedChanges
     }
@@ -106,7 +104,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.ignoreUncommittedChanges = false
         project.extensions.extraProperties.set('release.ignoreUncommittedChanges', true)
-        
+
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
 
@@ -116,9 +114,9 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should pick default version creator if none branch creators match"() {
         given:
-        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.versionCreator = { v, p -> 'default' }
         versionConfig.branchVersionCreator = [
-                'some.*': { v, p -> 'someBranch'}
+            'some.*': { v, p -> 'someBranch' }
         ]
 
         when:
@@ -130,9 +128,9 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should pick version creator suitable for current branch if defined in per branch creators"() {
         given:
-        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.versionCreator = { v, p -> 'default' }
         versionConfig.branchVersionCreator = [
-                'some.*': { v, p -> 'someBranch'}
+            'some.*': { v, p -> 'someBranch' }
         ]
 
         when:
@@ -144,9 +142,9 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should use predefined version creator when supplied with String in per branch creators"() {
         given:
-        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.versionCreator = { v, p -> 'default' }
         versionConfig.branchVersionCreator = [
-                'some.*': 'versionWithBranch'
+            'some.*': 'versionWithBranch'
         ]
 
         when:
@@ -159,9 +157,9 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should use version creator passed as command line option if present"() {
         given:
-        versionConfig.versionCreator = { v, p -> 'default'}
+        versionConfig.versionCreator = { v, p -> 'default' }
         versionConfig.branchVersionCreator = [
-                'some.*': 'versionWithBranch'
+            'some.*': 'versionWithBranch'
         ]
         project.extensions.extraProperties.set('release.versionCreator', 'simple')
 
@@ -176,56 +174,64 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionIncrementer = { c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
-                'some.*': { c -> c.currentVersion.incrementMajorVersion() }
+            'some.*': { c -> c.currentVersion.incrementMajorVersion() }
         ]
 
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(1)
+        rules.versionIncrementer(
+            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+        ) == Version.forIntegers(1)
     }
 
     def "should pick version incrementer suitable for current branch if defined in per branch incrementer"() {
         given:
         versionConfig.versionIncrementer = { c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
-                'some.*': { c -> c.currentVersion.incrementMajorVersion() }
+            'some.*': { c -> c.currentVersion.incrementMajorVersion() }
         ]
 
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+        rules.versionIncrementer(
+            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+        ) == Version.forIntegers(2)
     }
 
     def "should use predefined incrementer creator when supplied with String in per branch incrementer"() {
         given:
         versionConfig.versionCreator = { c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
-                'some.*': 'incrementMajor'
+            'some.*': 'incrementMajor'
         ]
 
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+        rules.versionIncrementer(
+            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+        ) == Version.forIntegers(2)
     }
 
     def "should use predefined incrementer creator with config options when supplied with String in per branch incrementer"() {
         given:
         versionConfig.versionCreator = { c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
-                'some.*': ['incrementMinorIfNotOnRelease', [releaseBranchPattern: 'someOther.*']]
+            'some.*': ['incrementMinorIfNotOnRelease', [releaseBranchPattern: 'someOther.*']]
         ]
 
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1), scmPosition: scmPosition('someBranch'))) == Version.forIntegers(1, 1)
+        rules.versionIncrementer(
+            new VersionIncrementerContext(Version.forIntegers(1), scmPosition('someBranch'))
+        ) == Version.forIntegers(1, 1)
     }
 
     def "should use incrementer passed as command line option if present"() {
@@ -237,7 +243,9 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(new VersionIncrementerContext(currentVersion: Version.forIntegers(1))) == Version.forIntegers(2)
+        rules.versionIncrementer(
+            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+        ) == Version.forIntegers(2)
 
     }
 }

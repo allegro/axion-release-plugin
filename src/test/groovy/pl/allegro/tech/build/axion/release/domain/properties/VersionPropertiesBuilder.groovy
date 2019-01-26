@@ -15,6 +15,10 @@ class VersionPropertiesBuilder {
 
     private MonorepoProperties monorepoProperties = new MonorepoProperties()
 
+    private Closure<String> versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+
+    private boolean sanitizeVersion = true
+
     private VersionPropertiesBuilder() {
     }
 
@@ -24,14 +28,15 @@ class VersionPropertiesBuilder {
 
     VersionProperties build() {
         return new VersionProperties(
-                forcedVersion: forcedVersion,
-                forceSnapshot: forceSnapshot,
-                ignoreUncommittedChanges: ignoreUncommittedChanges,
-                versionCreator: PredefinedVersionCreator.SIMPLE.versionCreator,
-                versionIncrementer: PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
-                sanitizeVersion: true,
-                useHighestVersion: useHighestVersion,
-                monorepoProperties: monorepoProperties)
+            forcedVersion,
+            forceSnapshot,
+            ignoreUncommittedChanges,
+            versionCreator,
+            PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
+            sanitizeVersion,
+            useHighestVersion,
+            monorepoProperties
+        )
     }
 
     VersionPropertiesBuilder forceVersion(String version) {
@@ -50,12 +55,23 @@ class VersionPropertiesBuilder {
     }
 
     VersionPropertiesBuilder useHighestVersion() {
-      this.useHighestVersion = true
-      return this
+        this.useHighestVersion = true
+        return this
     }
 
+
     VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
-      this.monorepoProperties = monorepoProperties
-      return this
+        this.monorepoProperties = monorepoProperties
+        return this
+    }
+
+    VersionPropertiesBuilder withVersionCreator(Closure<String> creator) {
+        this.versionCreator = creator
+        return this
+    }
+
+    VersionPropertiesBuilder dontSanitizeVersion() {
+        this.sanitizeVersion = false
+        return this
     }
 }

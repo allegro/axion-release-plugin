@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 public class TaggedCommits {
 
-    private List<TagsOnCommit> commits;
-    private String latestCommitRevision;
+    private final List<TagsOnCommit> commits;
+    private final String latestCommitRevision;
 
     private TaggedCommits(ScmPosition latestTagPosition, List<TagsOnCommit> commits) {
         this.commits = commits;

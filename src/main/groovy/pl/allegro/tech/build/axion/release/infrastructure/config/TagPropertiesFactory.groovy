@@ -9,11 +9,11 @@ class TagPropertiesFactory {
 
     static TagProperties create(TagNameSerializationConfig config, String currentBranch) {
         return new TagProperties(
-                prefix: findPrefix(config, currentBranch),
-                versionSeparator: config.versionSeparator,
-                serialize: config.serialize,
-                deserialize: config.deserialize,
-                initialVersion: config.initialVersion
+            findPrefix(config, currentBranch),
+            config.versionSeparator,
+            config.serialize,
+            config.deserialize,
+            config.initialVersion
         )
     }
 

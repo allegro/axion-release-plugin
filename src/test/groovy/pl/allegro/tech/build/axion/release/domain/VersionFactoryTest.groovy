@@ -3,10 +3,11 @@ package pl.allegro.tech.build.axion.release.domain
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
-import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.ScmStateBuilder.scmState
+import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
@@ -17,7 +18,7 @@ class VersionFactoryTest extends Specification {
 
     TagProperties tagProperties = tagProperties().build()
 
-    NextVersionProperties nextVersionProperties = new NextVersionProperties(suffix: 'alpha', separator: '-', deserializer: NextVersionSerializer.DEFAULT.deserializer)
+    NextVersionProperties nextVersionProperties = nextVersionProperties().build()
 
     VersionFactory factory = versionFactory(versionProperties)
 
@@ -55,7 +56,7 @@ class VersionFactoryTest extends Specification {
 
     def "should increment patch version when not on tag when creating final version on default settings"() {
         when:
-        Map version = factory.createFinalVersion(scmState().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.1'
@@ -67,7 +68,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProperties().forceVersion('1.5.0').build())
 
         when:
-        Map version = factory.createFinalVersion(scmState().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.5.0'
@@ -79,7 +80,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProperties().forceVersion('1.5.0').build())
 
         when:
-        Map version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.5.0'
@@ -91,7 +92,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProperties().forceVersion('1.5.0').build())
 
         when:
-        Map version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.5.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.5.0'))
 
         then:
         version.version.toString() == '1.5.0'
@@ -100,7 +101,7 @@ class VersionFactoryTest extends Specification {
 
     def "should not increment patch version when being on position after next version tag"() {
         when:
-        Map version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.0'
@@ -109,7 +110,7 @@ class VersionFactoryTest extends Specification {
 
     def "should not increment patch version when on tag and there are uncommitted changes but they are ignored (default)"() {
         when:
-        Map version = factory.createFinalVersion(scmState().onReleaseTag().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onReleaseTag().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.0'
@@ -121,7 +122,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProps)
 
         when:
-        Map version = factory.createFinalVersion(scmState().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.1'
@@ -139,12 +140,12 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProperties().forceSnapshot().build())
 
         when:
-        Map version = factory.createFinalVersion(scmStateParam, Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmStateParam, Version.valueOf('1.0.0'))
 
         then:
         version.version.toString() == '1.0.1'
         version.snapshot
-        
+
         where:
         scmStateParam << [
             scmState().build(),
@@ -159,7 +160,7 @@ class VersionFactoryTest extends Specification {
 
         when:
         // This simulates nextVersionTag == 'release-1.0.0-alpha'
-        Map version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
 
         then:
         // So snapshot version of this is '1.0.0-SNAPSHOT'
@@ -172,7 +173,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProps)
 
         when:
-        Map version = factory.createFinalVersion(scmState().noReleaseTagsFound().build(), Version.valueOf('0.1.0'))
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().noReleaseTagsFound().build(), Version.valueOf('0.1.0'))
 
         then:
         version.version.toString() == '0.1.0'
@@ -186,8 +187,7 @@ class VersionFactoryTest extends Specification {
 
     }
 
-
     private VersionFactory versionFactory(VersionProperties versionProperties) {
-        return new VersionFactory(versionProperties, tagProperties, nextVersionProperties, scmPosition('master'))
+        return new VersionFactory(versionProperties, tagProperties, nextVersionProperties, scmPosition().build())
     }
 }

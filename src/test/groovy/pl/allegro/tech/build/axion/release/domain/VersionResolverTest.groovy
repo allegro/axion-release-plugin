@@ -3,7 +3,6 @@ package pl.allegro.tech.build.axion.release.domain
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
-import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -405,13 +404,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('prefix2-1.2.0')
 
         when:
-        TagProperties tagProps = new TagProperties(
-            serialize: TagNameSerializer.DEFAULT.serializer,
-            deserialize: TagNameSerializer.DEFAULT.deserializer,
-            prefix: tagPrefix,
-            versionSeparator: '-',
-            initialVersion: { r, p -> '0.1.0' }
-        )
+        TagProperties tagProps = tagProperties().withPrefix(tagPrefix).build()
         VersionContext version = resolver.resolveVersion(versionProps, tagProps, nextVersionRules)
 
         then:

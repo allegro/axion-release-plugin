@@ -36,45 +36,45 @@ class VersionPropertiesFactory {
         boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
 
         return new VersionProperties(
-                forcedVersion: forceVersionValue?.trim() ? forceVersionValue.trim() : null,
-                forceSnapshot: forceSnapshot,
-                ignoreUncommittedChanges: ignoreUncommittedChanges,
-                versionCreator: findVersionCreator(project, config, currentBranch),
-                versionIncrementer: findVersionIncrementer(project, config, currentBranch),
-                sanitizeVersion: config.sanitizeVersion,
-                useHighestVersion: useHighestVersion,
-                monorepoProperties: MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
+            forceVersionValue?.trim() ? forceVersionValue.trim() : null,
+            forceSnapshot,
+            ignoreUncommittedChanges,
+            findVersionCreator(project, config, currentBranch),
+            findVersionIncrementer(project, config, currentBranch),
+            config.sanitizeVersion,
+            useHighestVersion,
+            MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
         )
     }
 
     private static Closure findVersionIncrementer(Project project, VersionConfig config, String currentBranch) {
-        if(project.hasProperty(VERSION_INCREMENTER_PROPERTY)) {
+        if (project.hasProperty(VERSION_INCREMENTER_PROPERTY)) {
             return PredefinedVersionIncrementer.versionIncrementerFor(project.property(VERSION_INCREMENTER_PROPERTY), [:])
         }
 
         return find(
-                currentBranch,
-                config.branchVersionIncrementer,
-                config.versionIncrementer,
-                { v ->
-                    if(v instanceof List) {
-                        return PredefinedVersionIncrementer.versionIncrementerFor(v[0], v[1])
-                    }
-                    return PredefinedVersionIncrementer.versionIncrementerFor(v, [:])
+            currentBranch,
+            config.branchVersionIncrementer,
+            config.versionIncrementer,
+            { v ->
+                if (v instanceof List) {
+                    return PredefinedVersionIncrementer.versionIncrementerFor(v[0], v[1])
                 }
+                return PredefinedVersionIncrementer.versionIncrementerFor(v, [:])
+            }
         )
     }
 
     private static Closure findVersionCreator(Project project, VersionConfig config, String currentBranch) {
-        if(project.hasProperty(VERSION_CREATOR_PROPERTY)) {
+        if (project.hasProperty(VERSION_CREATOR_PROPERTY)) {
             return PredefinedVersionCreator.versionCreatorFor(project.property(VERSION_CREATOR_PROPERTY))
         }
 
         return find(
-                currentBranch,
-                config.branchVersionCreator,
-                config.versionCreator,
-                { String s -> PredefinedVersionCreator.versionCreatorFor(s) }
+            currentBranch,
+            config.branchVersionCreator,
+            config.versionCreator,
+            { String s -> PredefinedVersionCreator.versionCreatorFor(s) }
         )
     }
 
