@@ -10,7 +10,7 @@ class NextVersionPropertiesBuilder {
 
     private String suffix = 'alpha'
 
-    private NextVersionPropertiesBuilder(){
+    private NextVersionPropertiesBuilder() {
     }
 
     static NextVersionPropertiesBuilder nextVersionProperties() {
@@ -19,12 +19,12 @@ class NextVersionPropertiesBuilder {
 
     NextVersionProperties build() {
         return new NextVersionProperties(
-                nextVersion: nextVersion,
-                suffix: suffix,
-                versionIncrementer: versionIncrementer,
-                separator: '-',
-                deserializer: NextVersionSerializer.DEFAULT.deserializer,
-                serializer: NextVersionSerializer.DEFAULT.serializer
+            nextVersion,
+            suffix,
+            '-',
+            versionIncrementer,
+            NextVersionSerializer.DEFAULT.serializer,
+            NextVersionSerializer.DEFAULT.deserializer
         )
     }
 

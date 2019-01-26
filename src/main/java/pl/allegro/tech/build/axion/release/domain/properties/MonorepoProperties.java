@@ -5,9 +5,9 @@ import groovy.transform.Immutable;
 import java.util.Collections;
 import java.util.List;
 
-@Immutable
 public class MonorepoProperties {
-    public final List<String> dirsToExclude;
+
+    private final List<String> dirsToExclude;
 
     public MonorepoProperties() {
         this.dirsToExclude = Collections.emptyList();
@@ -15,5 +15,9 @@ public class MonorepoProperties {
 
     public MonorepoProperties(List<String> dirsToExclude) {
         this.dirsToExclude = Collections.unmodifiableList(dirsToExclude);
+    }
+
+    public List<String> getDirsToExclude() {
+        return dirsToExclude;
     }
 }

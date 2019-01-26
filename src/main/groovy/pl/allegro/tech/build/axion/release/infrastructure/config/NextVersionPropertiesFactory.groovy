@@ -21,12 +21,13 @@ class NextVersionPropertiesFactory {
             nextVersion = project.property(DEPRECATED_NEXT_VERSION_PROPERTY)
         }
 
-        return new NextVersionProperties(nextVersion: nextVersion,
-            versionIncrementer: versionIncrementerName,
-            suffix: config.suffix,
-            separator: config.separator,
-            serializer: config.serializer,
-            deserializer: config.deserializer)
+        return new NextVersionProperties(
+            nextVersion,
+            config.suffix,
+            config.separator,
+            versionIncrementerName,
+            config.serializer,
+            config.deserializer)
     }
 
 }
