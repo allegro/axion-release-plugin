@@ -62,3 +62,10 @@ variables:
 
 We also need to disable checks, as there is no way to verify if current
 commit is ahead of remote.
+
+## Bitbucket Pipelines
+
+Bitbucket Pipelines allow to commit to repository without any configuration. 
+However it requires git client to use local proxy. It can be configured by passing following parameters:
+
+    ./gradlew release -Dhttp.proxyHost=localhost -Dhttp.proxyPort=29418
