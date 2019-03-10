@@ -8,7 +8,7 @@ class PropertiesBuilder {
 
     private VersionProperties versionProperties = VersionPropertiesBuilder.versionProperties().build()
 
-    private ChecksProperties checksProperties = new ChecksProperties(checkUncommittedChanges: true, checkAheadOfRemote: true)
+    private ChecksProperties checksProperties = new ChecksProperties(true, true, false)
 
     private HooksProperties hooksProperties = new HooksProperties([], [])
 
