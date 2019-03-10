@@ -16,9 +16,9 @@ class ChecksPropertiesFactory {
 
     static ChecksProperties create(Project project, ChecksConfig config) {
         return new ChecksProperties(
-                checkUncommittedChanges: checkUncommittedChanges(project, config),
-                checkAheadOfRemote: checkAheadOfRemote(project, config),
-                checkSnapshotDependencies: checkSnapshotDependencies(project, config)
+                checkUncommittedChanges(project, config),
+                checkAheadOfRemote(project, config),
+                checkSnapshotDependencies(project, config)
         )
     }
 

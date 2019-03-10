@@ -11,7 +11,7 @@ class HooksPropertiesFactory {
             versionConfig.hooks.pre('commit', versionConfig.releaseCommitMessage)
         }
 
-        return new HooksProperties(preReleaseHooks: config.preReleaseHooks, postReleaseHooks: config.postReleaseHooks)
+        return new HooksProperties(config.preReleaseHooks, config.postReleaseHooks)
     }
 
 }
