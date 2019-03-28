@@ -43,7 +43,7 @@ enum PredefinedVersionIncrementer {
                     .build()
             }
         }
-        return context.currentVersion.incrementPatchVersion()
+        return context.currentVersion.incrementPatchVersion('rc1')
     }),
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->

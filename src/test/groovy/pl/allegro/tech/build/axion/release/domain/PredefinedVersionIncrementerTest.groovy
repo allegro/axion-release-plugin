@@ -41,13 +41,21 @@ class PredefinedVersionIncrementerTest extends Specification {
         expect:
         versionIncrementerFor('branchSpecific', ['release.*': 'incrementPatch', 'master': 'incrementMinor'])(context) == Version.valueOf('0.2.0')
     }
-    
+
     def "should increment prerelease version when incrementPrerelease rule used"() {
         given:
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), scmPosition('master'))
-        
+
         expect:
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc2')
+    }
+
+    def "should create prerelease version when incrementPrerelease rule used"() {
+        given:
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
+
+        expect:
+        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.1-rc1')
     }
 
     def "should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used"() {
