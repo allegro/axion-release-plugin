@@ -7,7 +7,7 @@ script: ./gradlew check
 after_success: ./gradlew jacocoTestReport coveralls
 
 jdk:
-  - oraclejdk8
+  - openjdk11
 
 services:
   - docker
