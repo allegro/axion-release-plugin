@@ -43,7 +43,12 @@ enum PredefinedVersionIncrementer {
                     .build()
             }
         }
-        return context.currentVersion.incrementPatchVersion('rc1')
+
+        if (config.initialPreReleaseIfNotOnPrerelease !=  null) {
+            return context.currentVersion.incrementPatchVersion(String.valueOf(config.initialPreReleaseIfNotOnPrerelease))
+        }
+
+        return context.currentVersion.incrementPatchVersion()
     }),
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->

@@ -50,12 +50,20 @@ class PredefinedVersionIncrementerTest extends Specification {
         versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc2')
     }
 
-    def "should create prerelease version when incrementPrerelease rule used"() {
+    def "should increment patch version when incrementPrerelease rule used and currentVersion is not rc"() {
         given:
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
 
         expect:
-        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.1-rc1')
+        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.1')
+    }
+
+    def "should create prerelease version when incrementPrerelease rule used with initialPreReleaseIfNotOnPrerelease"() {
+        given:
+        VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
+
+        expect:
+        versionIncrementerFor('incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1'])(context) == Version.valueOf('0.1.1-rc1')
     }
 
     def "should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used"() {
