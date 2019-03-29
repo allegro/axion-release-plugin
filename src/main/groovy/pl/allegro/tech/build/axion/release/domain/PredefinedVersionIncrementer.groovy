@@ -43,6 +43,11 @@ enum PredefinedVersionIncrementer {
                     .build()
             }
         }
+
+        if (config.initialPreReleaseIfNotOnPrerelease !=  null) {
+            return context.currentVersion.incrementPatchVersion(String.valueOf(config.initialPreReleaseIfNotOnPrerelease))
+        }
+
         return context.currentVersion.incrementPatchVersion()
     }),
 

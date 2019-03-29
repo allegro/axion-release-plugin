@@ -195,7 +195,7 @@ number is incremented. There are other predefined rules:
 -   *incrementMinorIfNotOnRelease* - increment patch number if on
     release branch. Increment minor otherwise
 -   *incrementPrerelease* - increment pre-release suffix if possible
-    (-rc1 to -rc2). Increment patch otherwise
+    (-rc1 to -rc2). Add `initialPreReleaseIfNotOnPrerelease` to increment patch with prerelase version. Increment patch otherwise
 
 You can set one of predefined rules via `scmVersion.versionIncrementer`
 method:
@@ -251,6 +251,15 @@ it's set to `release/.+`):
 
     scmVersion {
         versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+    }
+
+### incrementPrerelease
+
+This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease` (by default
+it's empty):
+
+    scmVersion {
+        versionIncrementer 'incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1']
     }
 
 ## Decorating
