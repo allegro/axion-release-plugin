@@ -176,6 +176,44 @@ class GitRepository implements ScmRepository {
             .call()
     }
 
+    @Override
+    ScmPosition currentPosition(String path) {
+        assertPathFormat(path)
+        assertPathExists(path)
+
+        ScmPosition currentPosition = currentPosition()
+
+        RevCommit lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call()[0]
+
+        if (lastCommit == null) {
+            return currentPosition
+        }
+
+        String revision = lastCommit.name
+        if (revision == currentPosition.revision) {
+            return currentPosition
+        } else {
+            return new ScmPosition(
+                revision,
+                revision[0..(7 - 1)],
+                currentPosition.branch
+            )
+        }
+    }
+
+    private void assertPathFormat(String path) {
+        if (path.contains('\\')) {
+            throw new ScmException("Only slashes are supported in path ('${path}')")
+        }
+    }
+
+    private void assertPathExists(String path) {
+        File subpath = new File(repositoryDir, path)
+        if (!subpath.exists()) {
+            throw new ScmException("Path '${path}' does not exist in repository '${repositoryDir.getAbsolutePath()}'.")
+        }
+    }
+
     ScmPosition currentPosition() {
         String revision = ''
         String shortRevision = ''

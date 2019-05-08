@@ -18,6 +18,8 @@ interface ScmRepository {
 
     ScmPosition currentPosition()
 
+    ScmPosition currentPosition(String path)
+
     TagsOnCommit latestTags(Pattern pattern)
 
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit)

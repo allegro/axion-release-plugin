@@ -31,6 +31,16 @@ class Context {
 
         instances[ScmRepository] = scmRepository
         instances[VersionService] = new VersionService(new VersionResolver(scmRepository))
+    }
+
+    public Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
+        this.rules = rules
+        this.scmRepository = scmRepository
+        this.scmProperties = scmProperties
+        this.localOnlyResolver = localOnlyResolver
+
+        instances[ScmRepository] = scmRepository
+        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()))
 
     }
 

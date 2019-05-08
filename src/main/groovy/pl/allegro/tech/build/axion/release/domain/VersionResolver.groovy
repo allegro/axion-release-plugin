@@ -24,22 +24,34 @@ class VersionResolver {
     private final ScmRepository repository
 
     private final VersionSorter sorter
+    // TODO Convert to Optional<String> ?!
+    private String projectRootRelativePath
 
     VersionResolver(ScmRepository repository) {
+        this(repository, null)
+    }
+
+    VersionResolver(ScmRepository repository, String projectRootRelativePath) {
         this.repository = repository
+        this.projectRootRelativePath = projectRootRelativePath
         this.sorter = new VersionSorter()
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        ScmPosition position = repository.currentPosition()
+        ScmPosition latestChangePosition
+        if (projectRootRelativePath) {
+            latestChangePosition = repository.currentPosition(projectRootRelativePath)
+        } else {
+            latestChangePosition = repository.currentPosition()
+        }
 
-        VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, position)
+        VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, latestChangePosition)
 
         Map versions
         if (versionFactory.versionProperties.useHighestVersion) {
-            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionRules)
+            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionRules, latestChangePosition)
         } else {
-            versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionRules)
+            versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionRules, latestChangePosition)
         }
 
         ScmState scmState = new ScmState(
@@ -51,13 +63,14 @@ class VersionResolver {
 
         Map finalVersion = versionFactory.createFinalVersion(scmState, versions.current)
 
-        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, position)
+        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition)
     }
 
     private Map readVersions(VersionFactory versionFactory,
                              TagProperties tagProperties,
                              NextVersionProperties nextVersionProperties,
-                             VersionProperties versionProperties) {
+                             VersionProperties versionProperties,
+                             ScmPosition latestChangePosition) {
 
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
@@ -67,6 +80,7 @@ class VersionResolver {
         TagsOnCommit latestTags = repository.latestTags(releaseTagPattern)
         currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
+        boolean onCommitWithLatestChange = currentVersionInfo.commit == latestChangePosition.revision
 
         TagsOnCommit previousTags = latestTags
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
@@ -80,7 +94,7 @@ class VersionResolver {
         return [
             current         : currentVersion,
             previous        : previousVersion,
-            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onReleaseTag    : onCommitWithLatestChange && !currentVersionInfo.isNextVersion,
             onNextVersionTag: currentVersionInfo.isNextVersion,
             noTagsFound     : currentVersionInfo.noTagsFound
         ]
@@ -89,7 +103,8 @@ class VersionResolver {
     private Map readVersionsByHighestVersion(VersionFactory versionFactory,
                                              TagProperties tagProperties,
                                              NextVersionProperties nextVersionProperties,
-                                             VersionProperties versionProperties) {
+                                             VersionProperties versionProperties,
+                                             ScmPosition latestChangePosition) {
 
         Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
@@ -108,7 +123,7 @@ class VersionResolver {
         return [
             current         : currentVersion,
             previous        : previousVersion,
-            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onReleaseTag    : (currentVersionInfo.commit == latestChangePosition.revision) && !currentVersionInfo.isNextVersion,
             onNextVersionTag: currentVersionInfo.isNextVersion,
             noTagsFound     : currentVersionInfo.noTagsFound
         ]

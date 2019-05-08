@@ -58,6 +58,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    ScmPosition currentPosition(String path) {
+        return delegateRepository.currentPosition(path)
+    }
+
+    @Override
     TagsOnCommit latestTags(Pattern pattern) {
         TagsOnCommit tags = delegateRepository.latestTags(pattern)
         log("Latest tags: ${tags.tags}")

@@ -58,6 +58,11 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    ScmPosition currentPosition(String path) {
+        return new ScmPosition('', '', 'master')
+    }
+
+    @Override
     TagsOnCommit latestTags(Pattern pattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return new TagsOnCommit(null, [], false)
