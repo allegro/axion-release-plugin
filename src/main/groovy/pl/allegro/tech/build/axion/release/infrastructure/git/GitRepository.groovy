@@ -285,7 +285,7 @@ class GitRepository implements ScmRepository {
         for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
             currentTagsList = allTags[currentCommit.id.name]
             if (currentTagsList) {
-                TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
+                TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList)
                 taggedCommits.add(taggedCommit)
                 if (stopOnFirstTag) {
                     break

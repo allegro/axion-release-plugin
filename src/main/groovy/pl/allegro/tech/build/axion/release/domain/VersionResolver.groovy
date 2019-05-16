@@ -6,6 +6,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
@@ -78,7 +79,8 @@ class VersionResolver {
 
         Map currentVersionInfo, previousVersionInfo
         TagsOnCommit latestTags = repository.latestTags(releaseTagPattern)
-        currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern,
+        TaggedCommits latestTaggedCommit = new TaggedCommits([latestTags], latestChangePosition.revision)
+        currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
         boolean onCommitWithLatestChange = currentVersionInfo.commit == latestChangePosition.revision
 
@@ -86,7 +88,8 @@ class VersionResolver {
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
             previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
         }
-        previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern,
+        TaggedCommits previousTaggedCommit = new TaggedCommits([previousTags], latestChangePosition.revision)
+        previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,
             versionFactory, forceSnapshot)
 
         Version currentVersion = currentVersionInfo.version
@@ -111,7 +114,7 @@ class VersionResolver {
         boolean forceSnapshot = versionProperties.forceSnapshot
 
         Map currentVersionInfo, previousVersionInfo
-        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
+        TaggedCommits allTaggedCommits = new TaggedCommits(repository.taggedCommits(releaseTagPattern), latestChangePosition.revision);
 
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
@@ -129,7 +132,7 @@ class VersionResolver {
         ]
     }
 
-    private Map versionFromTaggedCommits(List<TagsOnCommit> taggedCommits,
+    private Map versionFromTaggedCommits(TaggedCommits taggedCommits,
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory,

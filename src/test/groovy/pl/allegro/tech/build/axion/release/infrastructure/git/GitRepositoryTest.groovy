@@ -113,7 +113,6 @@ class GitRepositoryTest extends Specification {
 
         then:
         tags.tags == ['release-1']
-        !tags.isHead
     }
 
     def "should return no tags when no commit in repository"() {
@@ -125,7 +124,6 @@ class GitRepositoryTest extends Specification {
 
         then:
         tags.tags == []
-        !tags.isHead
     }
 
     def "should indicate that position is on tag when latest commit is tagged"() {
@@ -137,7 +135,6 @@ class GitRepositoryTest extends Specification {
 
         then:
         tags.tags == ['release-1']
-        tags.isHead
     }
 
     def "should track back to older tag when commit was made after checking out older version"() {
