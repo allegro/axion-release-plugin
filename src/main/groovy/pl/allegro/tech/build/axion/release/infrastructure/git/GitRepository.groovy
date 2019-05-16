@@ -177,7 +177,7 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String path) {
+    ScmPosition positionOfLastChangeIn(String path) {
         assertPathFormat(path)
         assertPathExists(path)
 

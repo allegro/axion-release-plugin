@@ -41,7 +41,7 @@ class VersionResolver {
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
         ScmPosition latestChangePosition
         if (projectRootRelativePath) {
-            latestChangePosition = repository.currentPosition(projectRootRelativePath)
+            latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath)
         } else {
             latestChangePosition = repository.currentPosition()
         }

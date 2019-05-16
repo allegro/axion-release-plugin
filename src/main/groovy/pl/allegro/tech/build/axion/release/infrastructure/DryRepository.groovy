@@ -58,8 +58,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String path) {
-        return delegateRepository.currentPosition(path)
+    ScmPosition positionOfLastChangeIn(String path) {
+        return delegateRepository.positionOfLastChangeIn(path)
     }
 
     @Override

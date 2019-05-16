@@ -58,7 +58,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition currentPosition(String path) {
+    ScmPosition positionOfLastChangeIn(String path) {
         return new ScmPosition('', '', 'master')
     }
 
