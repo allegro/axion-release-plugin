@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.eclipse.jgit.api.TransportConfigCallback
+import org.eclipse.jgit.transport.HttpTransport
+import org.eclipse.jgit.transport.NetRCCredentialsProvider
 import org.eclipse.jgit.transport.SshTransport
 import org.eclipse.jgit.transport.Transport
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
@@ -25,6 +27,8 @@ class TransportConfigFactory {
                 if(transport instanceof SshTransport) {
                     SshTransport sshTransport = (SshTransport) transport
                     sshTransport.setSshSessionFactory(new SshConnector(identity))
+                } else if(transport instanceof HttpTransport) {
+                    transport.setCredentialsProvider(new NetRCCredentialsProvider())
                 }
             }
         }
