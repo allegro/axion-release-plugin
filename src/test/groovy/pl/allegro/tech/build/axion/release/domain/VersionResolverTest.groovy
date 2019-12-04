@@ -24,7 +24,7 @@ class VersionResolverTest extends RepositoryBasedTest {
     TagProperties prefix1TagProperties = new TagProperties(
         serialize: TagNameSerializer.DEFAULT.serializer,
         deserialize: TagNameSerializer.DEFAULT.deserializer,
-        prefix: 'prefix1',
+        prefix: 'prefix',
         versionSeparator: '-',
         initialVersion: { r, p -> '0.1.0' }
     )
@@ -417,10 +417,10 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     def "should distinguish between prefixes with shared characters"(VersionProperties versionProps, TagProperties tagProps, String v, boolean isSnapshot) {
         given:
-        repository.tag('prefix1-1.0.0')
+        repository.tag('prefix-1.0.0')
         repository.tag('prefix2-1.1.0')
         repository.commit(['*'], 'some commit')
-        repository.tag('prefix1-1.1.0')
+        repository.tag('prefix-1.1.0')
         repository.tag('prefix2-1.2.0')
 
         when:
