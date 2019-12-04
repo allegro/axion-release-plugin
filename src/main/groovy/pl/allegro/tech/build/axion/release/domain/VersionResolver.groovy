@@ -59,7 +59,7 @@ class VersionResolver {
                              NextVersionProperties nextVersionProperties,
                              VersionProperties versionProperties) {
 
-        Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
+        Pattern releaseTagPattern = ~/^${tagProperties.prefix}${tagProperties.prefix != '' ? tagProperties.versionSeparator : ''}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
         boolean forceSnapshot = versionProperties.forceSnapshot
 
@@ -91,7 +91,7 @@ class VersionResolver {
                                              NextVersionProperties nextVersionProperties,
                                              VersionProperties versionProperties) {
 
-        Pattern releaseTagPattern = ~/^${tagProperties.prefix}.*/
+        Pattern releaseTagPattern = ~/^${tagProperties.prefix}${tagProperties.prefix != '' ? tagProperties.versionSeparator : ''}.*/
         Pattern nextVersionTagPattern = ~/.*${nextVersionProperties.suffix}$/
         boolean forceSnapshot = versionProperties.forceSnapshot
 

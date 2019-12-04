@@ -4,7 +4,7 @@ import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-import spock.lang.Ignore
+import spock.lang.Shared
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -19,6 +19,24 @@ class VersionResolverTest extends RepositoryBasedTest {
     NextVersionProperties nextVersionRules = nextVersionProperties().build()
 
     VersionProperties defaultVersionRules = versionProperties().build()
+
+    @Shared
+    TagProperties prefix1TagProperties = new TagProperties(
+        serialize: TagNameSerializer.DEFAULT.serializer,
+        deserialize: TagNameSerializer.DEFAULT.deserializer,
+        prefix: 'prefix1',
+        versionSeparator: '-',
+        initialVersion: { r, p -> '0.1.0' }
+    )
+
+    @Shared
+    TagProperties prefix2TagProperties = new TagProperties(
+        serialize: TagNameSerializer.DEFAULT.serializer,
+        deserialize: TagNameSerializer.DEFAULT.deserializer,
+        prefix: 'prefix2',
+        versionSeparator: '-',
+        initialVersion: { r, p -> '0.1.0' }
+    )
 
     def setup() {
         resolver = new VersionResolver(repository)
@@ -113,10 +131,10 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('release-1.0.0')
         repository.tag('release-1.1.0-alpha')
         VersionProperties versionRules = versionProperties().forceSnapshot().build()
-        
+
         when: "resolving version with property 'release.forceSnapshot'"
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
-        
+
         then: "the resolved version should be snapshot towards the next version"
         version.previousVersion.toString() == '1.0.0'
         version.version.toString() == '1.1.0'
@@ -397,4 +415,26 @@ class VersionResolverTest extends RepositoryBasedTest {
       ]
     }
 
+    def "should distinguish between prefixes with shared characters"(VersionProperties versionProps, TagProperties tagProps, String v, boolean isSnapshot) {
+        given:
+        repository.tag('prefix1-1.0.0')
+        repository.tag('prefix2-1.1.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('prefix1-1.1.0')
+        repository.tag('prefix2-1.2.0')
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagProps, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == v
+        version.version.toString() == v
+        version.snapshot == isSnapshot
+
+        where:
+
+        versionProps                | tagProps               | v         | isSnapshot
+        versionProperties().build() | prefix1TagProperties   | '1.1.0'   | false
+        versionProperties().build() | prefix2TagProperties   | '1.2.0'   | false
+    }
 }

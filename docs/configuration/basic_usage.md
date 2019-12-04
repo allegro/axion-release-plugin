@@ -83,8 +83,6 @@ Sometimes it might be desirable to release each module (or just some
 modules) of multi-module project separately. If so, please make sure
 that:
 
--   tag prefixes for each module do not overlap, i.e.
-    `!tagA.startsWith(tagB)` for each permutation of all tag prefixes
 -   keep in mind, that `scmVersion` must be initialized before
     `scmVersion.version` is accessed
 -   apply plugin on each module that should be released on it\'s own
