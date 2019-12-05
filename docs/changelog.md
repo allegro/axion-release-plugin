@@ -2,6 +2,10 @@
 
 ### 1.10.x
 
+* **1.10.2** (22.07.2019)
+    * adds `.netrc` file support when using HTTP transport - thanks to [Hugo Ares](https://github.com/hugares) for contribution
+* **1.10.1** (03.04.2019)
+    * adds option for `incrementPrerelease` to append `-rcX` when not found - thanks to [Krzysiek Bielicki](https://github.com/krzysiekbielicki) for contribution
 * **1.10.0** (22.11.2018)
     * reintroduces support for SSH agents: `ssh-agent` on Linux and `pageant` on Windows
 

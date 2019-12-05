@@ -3,7 +3,8 @@
 ## SSH Agent
 
 If no other options are used and repository requires authorization, `axion-release`
-will try to fetch authorization options from SSH agent (`ssh-agent` on Linux and `pageant` on Windows).
+will try to fetch authorization options from SSH agent (`ssh-agent` on Linux and `pageant` on Windows)
+or netrc for HTTP (`<user-home>/.netrc` on Linux and `<user-home>\_netrc>` on Windows).
 
 All interaction with SSH agent is logged on info and debug levels.
 
