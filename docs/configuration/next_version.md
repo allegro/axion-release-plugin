@@ -36,7 +36,7 @@ is not incremented:
     2.1.0-SNAPSHOT
 
 To create next version marker use `markNextVersion`. Without parameters next version will be created with default
-version incrementer - incrementMinor, which can be overwritten with release.incrementer` parameter.
+version incrementer - incrementMinor, which can be overwritten with `release.incrementer` parameter.
 Custom next version can be created along with command line option `release.version`.
 
 Default next version marker serializer/deserializer can be customized

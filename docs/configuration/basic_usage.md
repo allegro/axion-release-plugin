@@ -83,11 +83,39 @@ Sometimes it might be desirable to release each module (or just some
 modules) of multi-module project separately. If so, please make sure
 that:
 
--   tag prefixes for each module do not overlap, i.e.
-    `!tagA.startsWith(tagB)` for each permutation of all tag prefixes
 -   keep in mind, that `scmVersion` must be initialized before
     `scmVersion.version` is accessed
--   apply plugin on each module that should be released on it\'s own
+-   apply plugin on each module that should be released on its own
+
+The plugin ignores tags based on the prefix and version separator
+(i.e. `<prefix><separator>`).  If there is a prefix configured then
+tags that do not start with the configured `<prefix><separator>` are 
+all ignored. If there is no prefix configured then only tags matching
+the version are used for calculating the version (i.e. the version 
+separator is also ignored).
+
+This allows for using the name of the module with an appropriate version
+separator as a namespace in a multi-module project, as shown in the table
+below:
+
+| Module name | Version separator | Tags will appear as |
+|-------------|-------------------|---------------------|
+| `module`    | `-`               | `module-<maj>.<min>.<patch>` |
+| `moduleV2`    | `-`               | `moduleV2-<maj>.<min>.<patch>` |
+
+For example, within `module`, tags that do not start `module-` will be
+ignored. 
+
+**IMPORTANT:**  
+
+Note that if the version separator appears in the prefix then tag parsing
+will fail. For example, the two prefixes below will not work if the version
+separator is `-`:
+
+```
+my-service
+my-service-client
+```
 
 Use the `foldersToExclude` configuration parameter to identify submodules
 that should be excluded from consideration when calculating whether to increment
