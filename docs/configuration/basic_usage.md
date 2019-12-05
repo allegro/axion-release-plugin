@@ -89,6 +89,26 @@ that:
     `scmVersion.version` is accessed
 -   apply plugin on each module that should be released on it\'s own
 
+Use the `foldersToExclude` configuration parameter to identify submodules
+that should be excluded from consideration when calculating whether to increment
+the version of the parent project.  Typically, you would do this in the top level
+project, assuming that submodules are named after the directory they appear in:
+
+```
+scmVersion {
+    foldersToExclude = project.subprojects.collect({p -> p.name})
+}
+```
+
+Version calculation rules:
+1. Changes to files within a submodule increment that submodule's version only.
+2. Changes to a submodule do not cause a change to the parent project's version if
+the parent is set to ignore that submodule, via `foldersToExclude`.
+3. Changes to files in the parent project but which are not in a submodule identified via 
+`foldersToExclude` will cause the parent project's version to increment but not the 
+versions of any submodules.  If this is desired then consider wiring the `createRelease` or
+`release` tasks of the submodules to be dependencies of the tasks of the same name in the parent. 
+
 ## Releasing
 
 ```

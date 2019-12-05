@@ -26,20 +26,26 @@ class VersionResolver {
     private final VersionSorter sorter
     private ScmPosition latestChangePosition
     private String projectRootRelativePath
+    private List<String> foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit
 
     VersionResolver(ScmRepository repository) {
-        this(repository, null)
+        this(repository, null, Collections.emptyList())
     }
 
     VersionResolver(ScmRepository repository, String projectRootRelativePath) {
+        this(repository, projectRootRelativePath, Collections.emptyList())
+    }
+
+    VersionResolver(ScmRepository repository, String projectRootRelativePath, List<String> excludeFolders) {
         this.repository = repository
         this.projectRootRelativePath = projectRootRelativePath
         this.sorter = new VersionSorter()
+        this.foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit = excludeFolders
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        if (projectRootRelativePath != null) {
-            latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath);
+        if (projectRootRelativePath != null && !projectRootRelativePath.isEmpty()) {
+            latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath, foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit);
         } else {
             latestChangePosition = repository.currentPosition();
         }
@@ -79,6 +85,7 @@ class VersionResolver {
         currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
         boolean onCommitWithLatestChange = currentVersionInfo.commit == latestChangePosition.revision
+        println("currentVersion = ${currentVersionInfo.commit}, latestChangePosition=${latestChangePosition.revision}, onCommitWithLatestChange=${onCommitWithLatestChange}, currentVersionInfo.isNextVersion=${currentVersionInfo.isNextVersion}")
 
         TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition)
         previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,

@@ -7,7 +7,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import java.util.regex.Pattern
 
 /**
- * Contains logic of sorting out which version should be used when there are mutliple
+ * Contains logic of sorting out which version should be used when there are multiple
  * versions available.
  *
  * Precedence:
@@ -33,7 +33,7 @@ class VersionSorter {
         for (TagsOnCommit tagsEntry : taggedCommits.getCommits()) {
             List<String> tags = tagsEntry.tags
 
-            // next version should be igored when tag is on head
+            // next version should be ignored when tag is on head
             // and there are other, normal tags on it
             // because when on single commit on head - normal ones have precedence
             // however, we should take into account next version

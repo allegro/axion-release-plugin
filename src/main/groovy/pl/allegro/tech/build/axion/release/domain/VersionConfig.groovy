@@ -49,6 +49,8 @@ class VersionConfig {
 
     HooksConfig hooks = new HooksConfig()
 
+    List<String> foldersToExclude = []
+
     private Context context
 
     private VersionService.DecoratedVersion resolvedVersion = null

@@ -177,13 +177,28 @@ class GitRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition positionOfLastChangeIn(String path) {
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
         assertPathFormat(path)
-        assertPathExists(path)
+        RevCommit lastCommit
+
+        // if the path is empty ('') then it means we are at the root of the Git directory
+        // in which case, we should exclude changes that occurred in subdirectory projects when deciding on
+        // which is the latest change that is relevant to the root project
+        if (path.isEmpty()) {
+            LogCommand logCommand = jgitRepository.log().setMaxCount(1)
+            for (String excludedPath : excludeSubFolders) {
+                assertPathFormat(excludedPath)
+                assertPathExists(excludedPath)
+                logCommand.excludePath(excludedPath)
+            }
+            lastCommit = logCommand.call()[0]
+        }
+        else {
+            assertPathExists(path)
+            lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call()[0]
+        }
 
         ScmPosition currentPosition = currentPosition()
-
-        RevCommit lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call()[0]
 
         if (lastCommit == null) {
             return currentPosition

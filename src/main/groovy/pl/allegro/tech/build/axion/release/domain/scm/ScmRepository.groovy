@@ -18,7 +18,7 @@ interface ScmRepository {
 
     ScmPosition currentPosition()
 
-    ScmPosition positionOfLastChangeIn(String path)
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders)
 
     TagsOnCommit latestTags(Pattern pattern)
 

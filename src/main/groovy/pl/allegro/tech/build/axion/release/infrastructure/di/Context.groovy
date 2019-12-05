@@ -33,15 +33,18 @@ class Context {
         instances[VersionService] = new VersionService(new VersionResolver(scmRepository))
     }
 
-    public Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
+    public Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver, VersionConfig versionConfig) {
         this.rules = rules
         this.scmRepository = scmRepository
         this.scmProperties = scmProperties
         this.localOnlyResolver = localOnlyResolver
 
         instances[ScmRepository] = scmRepository
-        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()))
-
+        instances[VersionService] = new VersionService(
+            new VersionResolver(scmRepository,
+                scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString(),
+                versionConfig.foldersToExclude)
+        )
     }
 
     private <T> T get(Class<T> clazz) {
@@ -70,9 +73,9 @@ class Context {
 
     Releaser releaser() {
         return new Releaser(
-                versionService(),
-                scmService(),
-                new ReleaseHooksRunner(versionService(), scmService())
+            versionService(),
+            scmService(),
+            new ReleaseHooksRunner(versionService(), scmService())
         )
     }
 

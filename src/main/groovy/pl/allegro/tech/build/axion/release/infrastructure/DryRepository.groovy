@@ -58,7 +58,7 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition positionOfLastChangeIn(String path) {
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
         return delegateRepository.positionOfLastChangeIn(path)
     }
 

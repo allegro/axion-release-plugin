@@ -16,6 +16,13 @@ if (project.hasProperty('mavenCentral')) {
     apply from: 'gradle/mavenCentral.gradle'
 }
 
+sourceSets {
+    main {
+        java { srcDirs = [] }    // no source dirs for the java compiler
+        groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
+    }
+}
+
 scmVersion {
     tag {
         prefix = 'axion-release'
@@ -36,10 +43,11 @@ sourceCompatibility = '1.7'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 project.ext.versions = [
-        jgit: '4.11.0.201803080745-r',
+        jgit: '5.5.1.201910021850-r',
         jsch: '0.1.54',
         jschAgent: '0.0.9'
 ]
@@ -91,7 +99,7 @@ dependencies {
 
     compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile (group: 'org.ajoberstar', name: 'grgit', version: '1.7.2') {
+    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '3.1.1') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
@@ -190,7 +198,7 @@ gradlePlugin {
 }
 
 jacoco {
-    toolVersion = '0.8.1'
+    toolVersion = '0.8.2'
 }
 
 jacocoTestReport {

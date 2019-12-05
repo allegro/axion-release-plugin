@@ -14,6 +14,10 @@ public class TaggedCommits {
         this.latestCommitRevision = latestTagPosition.getRevision();
     }
 
+    public static TaggedCommits fromListOfCommits(ScmPosition latestTagPosition, List<TagsOnCommit> taggedCommits) {
+        return new TaggedCommits(latestTagPosition, taggedCommits);
+    }
+
     public static TaggedCommits fromLatestCommit(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
         TagsOnCommit latestTags = repository.latestTags(tagPattern);
         return new TaggedCommits(latestTagPosition, Arrays.asList(latestTags));

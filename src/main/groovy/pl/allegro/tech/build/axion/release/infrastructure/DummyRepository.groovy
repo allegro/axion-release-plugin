@@ -58,26 +58,26 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition positionOfLastChangeIn(String path) {
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
         return new ScmPosition('', '', 'master')
     }
 
     @Override
     TagsOnCommit latestTags(Pattern pattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
-        return new TagsOnCommit(null, [], false)
+        return new TagsOnCommit(null, [])
     }
 
     @Override
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
-        return new TagsOnCommit(null, [], false)
+        return new TagsOnCommit(null, [])
     }
 
     @Override
     List<TagsOnCommit> taggedCommits(Pattern pattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
-        return [new TagsOnCommit(null, [], false)]
+        return [new TagsOnCommit(null, [])]
     }
 
 
