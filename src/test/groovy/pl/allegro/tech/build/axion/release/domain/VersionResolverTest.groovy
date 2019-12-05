@@ -20,24 +20,6 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     VersionProperties defaultVersionRules = versionProperties().build()
 
-    @Shared
-    TagProperties prefix1TagProperties = new TagProperties(
-        serialize: TagNameSerializer.DEFAULT.serializer,
-        deserialize: TagNameSerializer.DEFAULT.deserializer,
-        prefix: 'prefix',
-        versionSeparator: '-',
-        initialVersion: { r, p -> '0.1.0' }
-    )
-
-    @Shared
-    TagProperties prefix2TagProperties = new TagProperties(
-        serialize: TagNameSerializer.DEFAULT.serializer,
-        deserialize: TagNameSerializer.DEFAULT.deserializer,
-        prefix: 'prefix2',
-        versionSeparator: '-',
-        initialVersion: { r, p -> '0.1.0' }
-    )
-
     def setup() {
         resolver = new VersionResolver(repository)
     }
@@ -415,7 +397,7 @@ class VersionResolverTest extends RepositoryBasedTest {
       ]
     }
 
-    def "should distinguish between prefixes with shared characters"(VersionProperties versionProps, TagProperties tagProps, String v, boolean isSnapshot) {
+    def "should distinguish between prefixes with shared characters"(VersionProperties versionProps, String tagPrefix, String v, boolean isSnapshot) {
         given:
         repository.tag('prefix-1.0.0')
         repository.tag('prefix2-1.1.0')
@@ -424,6 +406,13 @@ class VersionResolverTest extends RepositoryBasedTest {
         repository.tag('prefix2-1.2.0')
 
         when:
+        TagProperties tagProps = new TagProperties(
+            serialize: TagNameSerializer.DEFAULT.serializer,
+            deserialize: TagNameSerializer.DEFAULT.deserializer,
+            prefix: tagPrefix,
+            versionSeparator: '-',
+            initialVersion: { r, p -> '0.1.0' }
+        )
         VersionContext version = resolver.resolveVersion(versionProps, tagProps, nextVersionRules)
 
         then:
@@ -433,8 +422,8 @@ class VersionResolverTest extends RepositoryBasedTest {
 
         where:
 
-        versionProps                | tagProps               | v         | isSnapshot
-        versionProperties().build() | prefix1TagProperties   | '1.1.0'   | false
-        versionProperties().build() | prefix2TagProperties   | '1.2.0'   | false
+        versionProps                | tagPrefix   | v         | isSnapshot
+        versionProperties().build() | 'prefix'    | '1.1.0'   | false
+        versionProperties().build() | 'prefix2'   | '1.2.0'   | false
     }
 }
