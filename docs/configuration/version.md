@@ -21,7 +21,7 @@ Version is kept in repository in form of a tag:
     # git tag
     release-1.0.0 release-1.0.1 release-1.1.0
 
-Only tags which math predefined prefix are taken into a count when
+Only tags which match the predefined prefix are taken into account when
 calculating current version. Prefix can be set using
 `scmVersion.tag.prefix` property:
 
