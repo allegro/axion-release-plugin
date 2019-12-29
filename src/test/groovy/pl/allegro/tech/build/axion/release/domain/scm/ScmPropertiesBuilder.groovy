@@ -5,6 +5,7 @@ class ScmPropertiesBuilder {
     private final File directory
 
     private String type = 'git'
+    private String overriddenBranchName
 
     private ScmPropertiesBuilder(File directory) {
         this.directory = directory
@@ -12,6 +13,11 @@ class ScmPropertiesBuilder {
 
     static ScmPropertiesBuilder scmProperties(File directory) {
         return new ScmPropertiesBuilder(directory)
+    }
+
+    ScmPropertiesBuilder withOverriddenBranchName(String overriddenBranchName) {
+        this.overriddenBranchName = overriddenBranchName
+        return this
     }
 
     ScmProperties build() {
@@ -23,6 +29,7 @@ class ScmPropertiesBuilder {
                 false,
                 false,
                 null,
+                overriddenBranchName,
                 ScmIdentity.defaultIdentityWithoutAgents()
         )
     }
