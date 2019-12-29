@@ -188,7 +188,6 @@ class GitRepository implements ScmRepository {
             LogCommand logCommand = jgitRepository.log().setMaxCount(1)
             for (String excludedPath : excludeSubFolders) {
                 assertPathFormat(excludedPath)
-                assertPathExists(excludedPath)
                 logCommand.excludePath(excludedPath)
             }
             lastCommit = logCommand.call()[0]

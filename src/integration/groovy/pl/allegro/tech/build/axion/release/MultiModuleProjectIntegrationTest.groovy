@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release
 
 import org.gradle.testkit.runner.TaskOutcome
-import spock.lang.Ignore
 
 import java.util.stream.Collectors
 
@@ -79,7 +78,6 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
         }
     }
 
-    @Ignore
     def "plugin can distinguish between submodules versions"() {
         given:
         initialProjectConfiguration()
@@ -110,7 +108,6 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    @Ignore
     def "change to submodule should not change sibling project version"() {
         given:
         initialProjectConfiguration()
@@ -137,7 +134,6 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    @Ignore
     def "change to submodule should not change root project version"() {
         given:
         initialProjectConfiguration()

@@ -44,7 +44,7 @@ class VersionResolver {
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        if (projectRootRelativePath != null && !projectRootRelativePath.isEmpty()) {
+        if (projectRootRelativePath != null) {
             latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath, foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit);
         } else {
             latestChangePosition = repository.currentPosition();

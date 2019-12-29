@@ -47,7 +47,7 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '5.5.1.201910021850-r',
+        jgit: '5.6.0.201912101111-r',
         jsch: '0.1.54',
         jschAgent: '0.0.9'
 ]
@@ -99,7 +99,7 @@ dependencies {
 
     compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '3.1.1') {
+    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
