@@ -2,6 +2,8 @@
 
 ### 1.10.x
 
+* **1.10.3** (30.12.2019)
+    * support for Azure DevOps Pipelines by allowing to override branch name when in detached state - thanks to [Mariusz](https://github.com/maniekq) for contribution
 * **1.10.2** (22.07.2019)
     * adds `.netrc` file support when using HTTP transport - thanks to [Hugo Ares](https://github.com/hugares) for contribution
 * **1.10.1** (03.04.2019)
