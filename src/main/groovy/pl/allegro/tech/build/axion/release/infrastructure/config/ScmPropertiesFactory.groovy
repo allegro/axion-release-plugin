@@ -14,6 +14,8 @@ class ScmPropertiesFactory {
 
     private static final String DISABLE_SSH_AGENT = 'release.disableSshAgent'
 
+    private static final String OVERRIDDEN_BRANCH_NAME = 'release.overriddenBranchName'
+
     static ScmProperties create(Project project, VersionConfig config) {
         return new ScmProperties(
                 config.repository.type,
@@ -23,6 +25,7 @@ class ScmPropertiesFactory {
                 project.hasProperty(FETCH_TAGS_PROPERTY),
                 project.hasProperty(ATTACH_REMOTE_PROPERTY),
                 (String) (project.hasProperty(ATTACH_REMOTE_PROPERTY) ? project.property(ATTACH_REMOTE_PROPERTY) : null),
+                (String) (project.hasProperty(OVERRIDDEN_BRANCH_NAME) ? project.property(OVERRIDDEN_BRANCH_NAME) : null),
                 ScmIdentityFactory.create(config.repository, project.hasProperty(DISABLE_SSH_AGENT))
         )
     }

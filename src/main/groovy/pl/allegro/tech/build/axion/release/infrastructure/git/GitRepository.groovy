@@ -185,16 +185,22 @@ class GitRepository implements ScmRepository {
             shortRevision = revision[0..(7 - 1)]
         }
 
-        // this returns HEAD as branch name when in detached state
-        String branchName = Optional.of(jgitRepository.repository.exactRef(Constants.HEAD)?.target.name)
-            .map({s -> Repository.shortenRefName(s)})
-            .orElse(null)
-
         return new ScmPosition(
             revision,
             shortRevision,
-            branchName
+            branchName()
         )
+    }
+
+    /**
+     * @return branch name or 'HEAD' when in detached state, unless it is overridden by 'overriddenBranchName'
+     */
+    private String branchName() {
+        String currentBranch = Repository.shortenRefName(jgitRepository.repository.exactRef(Constants.HEAD)?.target.name)
+        if (currentBranch == 'HEAD' && properties.overriddenBranchName != null) {
+            return Repository.shortenRefName(properties.overriddenBranchName)
+        }
+        return currentBranch
     }
 
     @Override

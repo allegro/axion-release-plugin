@@ -1,10 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
-import org.ajoberstar.grgit.Branch
 import org.ajoberstar.grgit.Grgit
-import org.ajoberstar.grgit.exception.GrgitException
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.api.TagCommand
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.lib.Constants
@@ -244,7 +240,7 @@ class GitRepositoryTest extends Specification {
         position.revision == rawRepository.head().id
     }
 
-    def "should provide current branch name as HEAD when in detached state"() {
+    def "should provide current branch name as HEAD when in detached state and overriddenBranchName not set"() {
         given:
         String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
         rawRepository.repository.jgit.checkout().setName(headCommitId).call()
@@ -254,6 +250,47 @@ class GitRepositoryTest extends Specification {
 
         then:
         position.branch == 'HEAD'
+    }
+
+    def "should provide current branch name from overriddenBranchName when in detached state and overriddenBranchName is set"() {
+        given:
+        File repositoryDir = File.createTempDir('axion-release', 'tmp')
+        def scmProperties = scmProperties(repositoryDir)
+            .withOverriddenBranchName("refs/heads/feature/overridden-branch-name")
+            .build()
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).usingProperties(scmProperties).build()
+
+        Grgit rawRepository = repositories[Grgit]
+        GitRepository repository = repositories[GitRepository]
+
+        String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        rawRepository.repository.jgit.checkout().setName(headCommitId).call()
+
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'feature/overridden-branch-name'
+    }
+
+    def "should ignore overriddenBranchName when not in detached state"() {
+        given:
+        File repositoryDir = File.createTempDir('axion-release', 'tmp')
+        def scmProperties = scmProperties(repositoryDir)
+            .withOverriddenBranchName("refs/heads/feature/overridden-branch-name")
+            .build()
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).usingProperties(scmProperties).build()
+
+        Grgit rawRepository = repositories[Grgit]
+        GitRepository repository = repositories[GitRepository]
+
+        rawRepository.checkout(branch: 'some-branch', createBranch: true)
+
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'some-branch'
     }
 
     def "should push changes and tag to remote"() {

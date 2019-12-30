@@ -65,7 +65,29 @@ commit is ahead of remote.
 
 ## Bitbucket Pipelines
 
-Bitbucket Pipelines allow to commit to repository without any configuration. 
+Bitbucket Pipelines allow to commit to repository without any configuration.
 However it requires git client to use local proxy. It can be configured by passing following parameters:
 
     ./gradlew release -Dhttp.proxyHost=localhost -Dhttp.proxyPort=29418
+
+## Azure DevOps Pipelines
+
+Azure Pipelines will check out git repositories in a `detached head` state.
+That is why two flags should be set when running the release task:
+
+    ./gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly
+
+Disabling checks is necessary because `axion-release` is not able to
+verify if current commit is ahead of remote. Setting pushTagsOnly
+ensures that git will not throw an error by attempting to push commits
+while not working on a branch.
+
+To use features related to branches (like [versionWithBranch](version.md#versionwithbranch),
+[branchVersionIncrementer](version.md#incrementing) or [branchVersionCreator](version.md#decorating))
+you need to override branch name with `overriddenBranchName` flag and set it to
+`Build.SourceBranch` Azure Pipelines predefined variable:
+
+    ./gradlew release \
+        -Prelease.disableChecks \
+        -Prelease.pushTagsOnly \
+        -Prelease.overriddenBranchName=$(Build.SourceBranch)
