@@ -4,6 +4,7 @@
 
 * **1.10.3** (30.12.2019)
     * support for Azure DevOps Pipelines by allowing to override branch name when in detached state - thanks to [Mariusz](https://github.com/maniekq) for contribution
+    * less strict tag prefix checking logic by using version separator for check makes tag names like module and moduleV2 possible - thanks to [john-tipper](https://github.com/john-tipper) for contribution
 * **1.10.2** (22.07.2019)
     * adds `.netrc` file support when using HTTP transport - thanks to [Hugo Ares](https://github.com/hugares) for contribution
 * **1.10.1** (03.04.2019)
