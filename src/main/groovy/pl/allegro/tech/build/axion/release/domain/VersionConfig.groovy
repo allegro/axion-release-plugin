@@ -49,7 +49,7 @@ class VersionConfig {
 
     HooksConfig hooks = new HooksConfig()
 
-    List<String> foldersToExclude = []
+    MonorepoConfig monorepoConfig = new MonorepoConfig()
 
     private Context context
 
@@ -166,5 +166,9 @@ class VersionConfig {
         if (context == null) {
             this.context = GradleAwareContext.create(project, this)
         }
+    }
+
+    void monorepos(Closure c) {
+        project.configure(monorepoConfig, c)
     }
 }

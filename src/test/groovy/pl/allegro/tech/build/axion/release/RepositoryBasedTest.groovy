@@ -35,6 +35,7 @@ class RepositoryBasedTest extends Specification {
                 PropertiesBuilder.properties().build(),
                 scmRepository,
                 scmProperties,
+                directory,
                 new LocalOnlyResolver(true)
         )
 

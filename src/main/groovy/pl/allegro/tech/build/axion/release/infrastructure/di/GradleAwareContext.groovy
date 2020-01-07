@@ -19,8 +19,7 @@ class GradleAwareContext {
             scmRepository,
             scmProperties,
             project.projectDir,
-            LocalOnlyResolverFactory.create(project, versionConfig),
-            versionConfig
+            LocalOnlyResolverFactory.create(project, versionConfig)
         )
     }
 

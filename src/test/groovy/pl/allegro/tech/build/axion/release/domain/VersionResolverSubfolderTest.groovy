@@ -1,14 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain
 
-
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
-import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
-import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
-import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.*
+import pl.allegro.tech.build.axion.release.infrastructure.di.Context
+import spock.lang.Shared
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
-import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
+import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
@@ -18,7 +17,13 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
     NextVersionProperties nextVersionRules = nextVersionProperties().build()
 
-    VersionProperties defaultVersionRules = versionProperties().build()
+    @Shared
+    MonorepoProperties defaultMonorepoProperties = MonorepoPropertiesBuilder.monorepoProperties()
+        .build()
+
+    VersionProperties defaultMonorepoVersionRules = VersionPropertiesBuilder.versionProperties()
+        .supportMonorepos(defaultMonorepoProperties)
+        .build()
 
     String projectRootSubfolder
 
@@ -30,9 +35,10 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should return default previous and current version when no tag in repository"() {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
+        configureContextWithVersionRules(defaultMonorepoVersionRules)
 
         when:
-        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultMonorepoVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '0.1.0'
@@ -46,9 +52,10 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
         repository.tag('release-1.1.0')
         repository.commit(['*'], 'Commit without change in subfolder')
+        configureContextWithVersionRules(defaultMonorepoVersionRules)
 
         when:
-        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultMonorepoVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.1.0'
@@ -63,9 +70,10 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.tag('release-1.1.0')
         repository.tag('release-1.2.0')
         repository.commit(['*'], 'Commit without change in subfolder')
+        configureContextWithVersionRules(defaultMonorepoVersionRules)
 
         when:
-        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultMonorepoVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.2.0'
@@ -82,9 +90,10 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.tag('release-1.2.0')
         repository.tag('release-1.4.0-alpha')
         repository.commit(['*'], 'Commit without change in subfolder')
+        configureContextWithVersionRules(defaultMonorepoVersionRules)
 
         when:
-        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+        VersionContext version = resolver.resolveVersion(defaultMonorepoVersionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.2.0'
@@ -99,7 +108,12 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.tag('release-1.0.0')
         repository.tag('release-1.1.0-alpha')
         repository.commit(['*'], 'Commit without change in subfolder')
-        VersionProperties versionRules = versionProperties().forceSnapshot().build()
+
+        VersionProperties versionRules = VersionPropertiesBuilder.versionProperties()
+            .supportMonorepos(defaultMonorepoProperties)
+            .forceSnapshot()
+            .build()
+        configureContextWithVersionRules(versionRules)
 
         when: "resolving version with property 'release.forceSnapshot'"
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -117,6 +131,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar')
 
         when:
+        configureContextWithVersionRules(versionRules)
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
 
         then:
@@ -126,12 +141,12 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
         where:
         versionRules << [
-            versionProperties().build(),
-            versionProperties().forceSnapshot().build()
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).forceSnapshot().build()
         ]
     }
 
-    def "should return the highest version from the tagged versions, even if subfolder not changed in that commit"(VersionProperties versionProps) {
+    def "should return the highest version from the tagged versions, even if subfolder not changed in that commit"(VersionProperties versionRules) {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
         repository.tag('release-1.0.0')
@@ -143,7 +158,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.tag('release-1.3.0')
 
         when:
-        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        configureContextWithVersionRules(versionRules)
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
         println "Version Resolved: $version"
 
         then:
@@ -152,13 +168,13 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         version.snapshot
 
         where:
-        versionProps << [
-            versionProperties().useHighestVersion().build(),
-            versionProperties().useHighestVersion().forceSnapshot().build()
+        versionRules << [
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
         ]
     }
 
-    def "should return the highest version from the tagged versions, even if subfolder not changed in that commit, when not on release"(VersionProperties versionProps) {
+    def "should return the highest version from the tagged versions, even if subfolder not changed in that commit, when not on release"(VersionProperties versionRules) {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
         repository.tag('release-1.0.0')
@@ -171,8 +187,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.commit(['*'], 'Commit without change in subfolder')
 
         when:
-        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
-        println "Version Resolved: $version"
+        configureContextWithVersionRules(versionRules)
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
 
         then:
         version.previousVersion.toString() == '1.5.0'
@@ -180,13 +196,23 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         version.snapshot
 
         where:
-        versionProps << [
-            versionProperties().useHighestVersion().build(),
-            versionProperties().useHighestVersion().forceSnapshot().build()
+        versionRules << [
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
         ]
     }
 
-    // TODO add missing test cases (see VersionResolverTest as a reference for potential test cases)
+    private void configureContextWithVersionRules(VersionProperties versionRules) {
+        context = new Context(
+            PropertiesBuilder.properties().withVersionRules(versionRules).build(),
+            context.repository(),
+            scmProperties(directory).build(),
+            directory,
+            new LocalOnlyResolver(true)
+        )
+
+        repository = context.repository()
+    }
 
     private void createAndCommitFileInSubfolder(String path, String filename) {
         def subfolder = new File(directory, path)

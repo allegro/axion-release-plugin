@@ -25,30 +25,20 @@ class VersionResolver {
 
     private final VersionSorter sorter
     private ScmPosition latestChangePosition
+    /**
+     * This is the path of the project relative to the Git root.
+     * If this path is not empty then it means that the project is running as a submodule of a parent project.
+     */
     private String projectRootRelativePath
-    private List<String> foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit
-
-    VersionResolver(ScmRepository repository) {
-        this(repository, null, Collections.emptyList())
-    }
 
     VersionResolver(ScmRepository repository, String projectRootRelativePath) {
-        this(repository, projectRootRelativePath, Collections.emptyList())
-    }
-
-    VersionResolver(ScmRepository repository, String projectRootRelativePath, List<String> excludeFolders) {
         this.repository = repository
         this.projectRootRelativePath = projectRootRelativePath
         this.sorter = new VersionSorter()
-        this.foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit = excludeFolders
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        if (projectRootRelativePath != null) {
-            latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath, foldersToExcludeWhenResolvingLatestRelevantRootProjectCommit);
-        } else {
-            latestChangePosition = repository.currentPosition();
-        }
+        latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath, versionRules.monorepoProperties.dirsToExclude)
 
         VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, latestChangePosition)
 
@@ -85,7 +75,6 @@ class VersionResolver {
         currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
         boolean onCommitWithLatestChange = currentVersionInfo.commit == latestChangePosition.revision
-        println("currentVersion = ${currentVersionInfo.commit}, latestChangePosition=${latestChangePosition.revision}, onCommitWithLatestChange=${onCommitWithLatestChange}, currentVersionInfo.isNextVersion=${currentVersionInfo.isNextVersion}")
 
         TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition)
         previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,

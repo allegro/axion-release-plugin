@@ -77,7 +77,7 @@ allprojects {
 }
 ```
 
-### Multi-module with multiple versions
+### Multi-module project with multiple versions
 
 Sometimes it might be desirable to release each module (or just some
 modules) of multi-module project separately. If so, please make sure
@@ -117,14 +117,16 @@ my-service
 my-service-client
 ```
 
-Use the `foldersToExclude` configuration parameter to identify submodules
+Use the `projectDirs` configuration parameter within a `monorepos` block to identify submodules
 that should be excluded from consideration when calculating whether to increment
 the version of the parent project.  Typically, you would do this in the top level
 project, assuming that submodules are named after the directory they appear in:
 
 ```
 scmVersion {
-    foldersToExclude = project.subprojects.collect({p -> p.name})
+    monorepos {
+        projectDirs = project.subprojects.collect({p -> p.name})
+    }
 }
 ```
 

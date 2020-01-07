@@ -16,13 +16,6 @@ if (project.hasProperty('mavenCentral')) {
     apply from: 'gradle/mavenCentral.gradle'
 }
 
-sourceSets {
-    main {
-        java { srcDirs = [] }    // no source dirs for the java compiler
-        groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
-    }
-}
-
 scmVersion {
     tag {
         prefix = 'axion-release'
@@ -53,6 +46,11 @@ project.ext.versions = [
 ]
 
 sourceSets {
+    main {
+        java { srcDirs = [] }    // no source dirs for the java compiler
+        groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
+    }
+
     integration {
         java.srcDir project.file('src/integration/java')
         groovy.srcDir project.file('src/integration/groovy')

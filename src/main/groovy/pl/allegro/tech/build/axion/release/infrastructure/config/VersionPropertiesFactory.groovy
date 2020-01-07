@@ -3,7 +3,6 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
-import pl.allegro.tech.build.axion.release.domain.ProjectVersion
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
@@ -18,7 +17,7 @@ class VersionPropertiesFactory {
     private static final String IGNORE_UNCOMMITTED_CHANGES_PROPERTY = 'release.ignoreUncommittedChanges'
 
     private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
-    
+
     private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
 
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
@@ -33,7 +32,7 @@ class VersionPropertiesFactory {
 
         boolean ignoreUncommittedChanges = project.hasProperty(IGNORE_UNCOMMITTED_CHANGES_PROPERTY) ?: config.ignoreUncommittedChanges
         boolean forceSnapshot = project.hasProperty(FORCE_SNAPSHOT_PROPERTY)
-        
+
         boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
 
         return new VersionProperties(
@@ -43,7 +42,8 @@ class VersionPropertiesFactory {
                 versionCreator: findVersionCreator(project, config, currentBranch),
                 versionIncrementer: findVersionIncrementer(project, config, currentBranch),
                 sanitizeVersion: config.sanitizeVersion,
-                useHighestVersion: useHighestVersion
+                useHighestVersion: useHighestVersion,
+                monorepoProperties: MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
         )
     }
 
