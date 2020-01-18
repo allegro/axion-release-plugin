@@ -6,7 +6,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 
 import java.util.regex.Pattern
 
@@ -24,16 +24,23 @@ class VersionResolver {
     private final ScmRepository repository
 
     private final VersionSorter sorter
+    private ScmPosition latestChangePosition
+    /**
+     * This is the path of the project relative to the Git root.
+     * If this path is not empty then it means that the project is running as a submodule of a parent project.
+     */
+    private String projectRootRelativePath
 
-    VersionResolver(ScmRepository repository) {
+    VersionResolver(ScmRepository repository, String projectRootRelativePath) {
         this.repository = repository
+        this.projectRootRelativePath = projectRootRelativePath
         this.sorter = new VersionSorter()
     }
 
     VersionContext resolveVersion(VersionProperties versionRules, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
-        ScmPosition position = repository.currentPosition()
+        latestChangePosition = repository.positionOfLastChangeIn(projectRootRelativePath, versionRules.monorepoProperties.dirsToExclude)
 
-        VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, position)
+        VersionFactory versionFactory = new VersionFactory(versionRules, tagProperties, nextVersionProperties, latestChangePosition)
 
         Map versions
         if (versionFactory.versionProperties.useHighestVersion) {
@@ -51,7 +58,7 @@ class VersionResolver {
 
         Map finalVersion = versionFactory.createFinalVersion(scmState, versions.current)
 
-        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, position)
+        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition)
     }
 
     private Map readVersions(VersionFactory versionFactory,
@@ -64,15 +71,13 @@ class VersionResolver {
         boolean forceSnapshot = versionProperties.forceSnapshot
 
         Map currentVersionInfo, previousVersionInfo
-        TagsOnCommit latestTags = repository.latestTags(releaseTagPattern)
-        currentVersionInfo = versionFromTaggedCommits([latestTags], false, nextVersionTagPattern,
+        TaggedCommits latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition)
+        currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
+        boolean onCommitWithLatestChange = currentVersionInfo.commit == latestChangePosition.revision
 
-        TagsOnCommit previousTags = latestTags
-        while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
-            previousTags = repository.latestTags(releaseTagPattern, previousTags.commitId)
-        }
-        previousVersionInfo = versionFromTaggedCommits([previousTags], true, nextVersionTagPattern,
+        TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition)
+        previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,
             versionFactory, forceSnapshot)
 
         Version currentVersion = currentVersionInfo.version
@@ -80,7 +85,7 @@ class VersionResolver {
         return [
             current         : currentVersion,
             previous        : previousVersion,
-            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onReleaseTag    : onCommitWithLatestChange && !currentVersionInfo.isNextVersion,
             onNextVersionTag: currentVersionInfo.isNextVersion,
             noTagsFound     : currentVersionInfo.noTagsFound
         ]
@@ -96,7 +101,7 @@ class VersionResolver {
         boolean forceSnapshot = versionProperties.forceSnapshot
 
         Map currentVersionInfo, previousVersionInfo
-        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(releaseTagPattern)
+        TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition)
 
         currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern,
             versionFactory, forceSnapshot)
@@ -108,13 +113,13 @@ class VersionResolver {
         return [
             current         : currentVersion,
             previous        : previousVersion,
-            onReleaseTag    : currentVersionInfo.isHead && !currentVersionInfo.isNextVersion,
+            onReleaseTag    : (currentVersionInfo.commit == latestChangePosition.revision) && !currentVersionInfo.isNextVersion,
             onNextVersionTag: currentVersionInfo.isNextVersion,
             noTagsFound     : currentVersionInfo.noTagsFound
         ]
     }
 
-    private Map versionFromTaggedCommits(List<TagsOnCommit> taggedCommits,
+    private Map versionFromTaggedCommits(TaggedCommits taggedCommits,
                                          boolean ignoreNextVersionTags,
                                          Pattern nextVersionTagPattern,
                                          VersionFactory versionFactory,

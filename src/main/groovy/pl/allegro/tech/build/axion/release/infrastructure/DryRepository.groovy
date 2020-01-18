@@ -58,6 +58,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
+        return delegateRepository.positionOfLastChangeIn(path)
+    }
+
+    @Override
     TagsOnCommit latestTags(Pattern pattern) {
         TagsOnCommit tags = delegateRepository.latestTags(pattern)
         log("Latest tags: ${tags.tags}")

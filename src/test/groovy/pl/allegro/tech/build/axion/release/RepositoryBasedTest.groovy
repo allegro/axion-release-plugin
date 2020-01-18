@@ -4,7 +4,6 @@ import org.ajoberstar.grgit.Grgit
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
-import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.properties.PropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
@@ -36,6 +35,7 @@ class RepositoryBasedTest extends Specification {
                 PropertiesBuilder.properties().build(),
                 scmRepository,
                 scmProperties,
+                directory,
                 new LocalOnlyResolver(true)
         )
 

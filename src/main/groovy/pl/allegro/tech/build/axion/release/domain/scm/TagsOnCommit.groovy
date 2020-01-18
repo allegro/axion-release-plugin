@@ -8,16 +8,13 @@ class TagsOnCommit {
 
     final List<String> tags = new ArrayList<>()
 
-    final boolean isHead
-
-    TagsOnCommit(String commitId, List<String> tags, boolean isHead) {
+    TagsOnCommit(String commitId, List<String> tags) {
         this.commitId = commitId
         this.tags.addAll(tags)
-        this.isHead = isHead
     }
 
     static TagsOnCommit empty() {
-        return new TagsOnCommit(null, [], false)
+        return new TagsOnCommit(null, [])
     }
 
     boolean hasOnlyMatching(Pattern pattern) {

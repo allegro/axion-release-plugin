@@ -3,7 +3,9 @@ package pl.allegro.tech.build.axion.release.domain
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
+import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import spock.lang.Specification
 
@@ -29,7 +31,8 @@ class VersionSorterTest extends Specification {
     def "should return highest version of all when not on head"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('b', ['release-2.0.0'], false)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('b', ['release-2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -43,7 +46,8 @@ class VersionSorterTest extends Specification {
     def "should return highest version of all when not on head and versions on single commit"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0'], false)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -58,7 +62,8 @@ class VersionSorterTest extends Specification {
     def "should return highest version of all when alpha is on head"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('b', ['release-2.0.0-alpha'], true)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('b', ['release-2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -72,7 +77,8 @@ class VersionSorterTest extends Specification {
     def "should prefer normal version to alpha version when on head and versions on single commit"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], true)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -86,7 +92,8 @@ class VersionSorterTest extends Specification {
     def "should prefer alpha version to normal version when on head, versions on single commit and snapshot is forced"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], true)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
             false,
             true,
             ~/.*-alpha$/,
@@ -100,7 +107,8 @@ class VersionSorterTest extends Specification {
     def "should ignore any nextVersion commits when asked"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0'], false), new TagsOnCommit('a', ['release-2.0.0-alpha'], false)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('a', ['release-2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,
@@ -114,7 +122,8 @@ class VersionSorterTest extends Specification {
     def "should ignore any nextVersion commits when asked and versions on single commit"() {
         when:
         def versionData = sorter.pickTaggedCommit(
-            [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'], false)],
+            TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
+                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,

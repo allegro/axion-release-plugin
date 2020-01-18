@@ -176,6 +176,58 @@ class GitRepository implements ScmRepository {
             .call()
     }
 
+    @Override
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
+        assertPathFormat(path)
+        RevCommit lastCommit
+
+        // if the path is empty ('') then it means we are at the root of the Git directory
+        // in which case, we should exclude changes that occurred in subdirectory projects when deciding on
+        // which is the latest change that is relevant to the root project
+        if (path.isEmpty()) {
+            LogCommand logCommand = jgitRepository.log().setMaxCount(1)
+            for (String excludedPath : excludeSubFolders) {
+                assertPathFormat(excludedPath)
+                logCommand.excludePath(excludedPath)
+            }
+            lastCommit = logCommand.call()[0]
+        }
+        else {
+            assertPathExists(path)
+            lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call()[0]
+        }
+
+        ScmPosition currentPosition = currentPosition()
+
+        if (lastCommit == null) {
+            return currentPosition
+        }
+
+        String revision = lastCommit.name
+        if (revision == currentPosition.revision) {
+            return currentPosition
+        } else {
+            return new ScmPosition(
+                revision,
+                revision[0..(7 - 1)],
+                currentPosition.branch
+            )
+        }
+    }
+
+    private void assertPathFormat(String path) {
+        if (path.contains('\\')) {
+            throw new ScmException("Only slashes are supported in path ('${path}')")
+        }
+    }
+
+    private void assertPathExists(String path) {
+        File subpath = new File(repositoryDir, path)
+        if (!subpath.exists()) {
+            throw new ScmException("Path '${path}' does not exist in repository '${repositoryDir.getAbsolutePath()}'.")
+        }
+    }
+
     ScmPosition currentPosition() {
         String revision = ''
         String shortRevision = ''
@@ -253,7 +305,7 @@ class GitRepository implements ScmRepository {
         for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
             currentTagsList = allTags[currentCommit.id.name]
             if (currentTagsList) {
-                TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList, Objects.equals(currentCommit.id, headId))
+                TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.id.name(), currentTagsList)
                 taggedCommits.add(taggedCommit)
                 if (stopOnFirstTag) {
                     break

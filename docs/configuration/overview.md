@@ -28,6 +28,9 @@ All `axion-release-plugin` configuration options:
         // doc: Version / Sanitization
         sanitizeVersion = true // should created version be sanitized, true by default
 
+        // doc: Basic usage / Basic configuration
+        foldersToExclude = ['submodule1', 'submodule2'] // ignore changes in these subdirs when calculating changes to parent
+
         tag { // doc: Version / Parsing
             prefix = 'tag-prefix' // prefix to be used, 'release' by default
             branchPrefix = [ // set different prefix per branch

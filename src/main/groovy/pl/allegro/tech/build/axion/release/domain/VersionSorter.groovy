@@ -1,12 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 
 import java.util.regex.Pattern
 
 /**
- * Contains logic of sorting out which version should be used when there are mutliple
+ * Contains logic of sorting out which version should be used when there are multiple
  * versions available.
  *
  * Precedence:
@@ -20,24 +21,24 @@ import java.util.regex.Pattern
  */
 class VersionSorter {
 
-    Map pickTaggedCommit(List<TagsOnCommit> taggedCommits,
-                                  boolean ignoreNextVersionTags,
-                                  boolean forceSnapshot,
-                                  Pattern nextVersionTagPattern,
-                                  VersionFactory versionFactory) {
+    Map pickTaggedCommit(TaggedCommits taggedCommits,
+                         boolean ignoreNextVersionTags,
+                         boolean forceSnapshot,
+                         Pattern nextVersionTagPattern,
+                         VersionFactory versionFactory) {
         Set<Version> versions = []
         Map<Version, Boolean> isVersionNextVersion = [:]
         Map<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>()
 
-        for (TagsOnCommit tagsEntry : taggedCommits) {
+        for (TagsOnCommit tagsEntry : taggedCommits.getCommits()) {
             List<String> tags = tagsEntry.tags
 
-            // next version should be igored when tag is on head
+            // next version should be ignored when tag is on head
             // and there are other, normal tags on it
             // because when on single commit on head - normal ones have precedence
             // however, we should take into account next version
             // in case of forced snapshot
-            boolean ignoreNextVersionOnHead = tagsEntry.isHead &&
+            boolean ignoreNextVersionOnHead = taggedCommits.isLatestCommit(tagsEntry.commitId) &&
                 !tagsEntry.hasOnlyMatching(nextVersionTagPattern) &&
                 !forceSnapshot
 
@@ -75,8 +76,7 @@ class VersionSorter {
             version      : version,
             isNextVersion: isVersionNextVersion.containsKey(version) && isVersionNextVersion[version],
             noTagsFound  : versions.isEmpty(),
-            commit       : versionCommit?.commitId,
-            isHead       : versionCommit?.isHead
+            commit       : versionCommit?.commitId
         ]
     }
 

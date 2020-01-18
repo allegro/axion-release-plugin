@@ -17,8 +17,10 @@ class VersionProperties {
     final Closure<Version> versionIncrementer
 
     final boolean sanitizeVersion
-    
+
     final boolean useHighestVersion
+
+    final MonorepoProperties monorepoProperties
 
     boolean forceVersion() {
         return forcedVersion != null

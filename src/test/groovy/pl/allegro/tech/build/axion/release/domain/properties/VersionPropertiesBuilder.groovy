@@ -13,6 +13,8 @@ class VersionPropertiesBuilder {
 
     private boolean useHighestVersion = false
 
+    private MonorepoProperties monorepoProperties = new MonorepoProperties()
+
     private VersionPropertiesBuilder() {
     }
 
@@ -28,7 +30,8 @@ class VersionPropertiesBuilder {
                 versionCreator: PredefinedVersionCreator.SIMPLE.versionCreator,
                 versionIncrementer: PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
                 sanitizeVersion: true,
-                useHighestVersion: useHighestVersion)
+                useHighestVersion: useHighestVersion,
+                monorepoProperties: monorepoProperties)
     }
 
     VersionPropertiesBuilder forceVersion(String version) {
@@ -48,6 +51,11 @@ class VersionPropertiesBuilder {
 
     VersionPropertiesBuilder useHighestVersion() {
       this.useHighestVersion = true
+      return this
+    }
+
+    VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
+      this.monorepoProperties = monorepoProperties
       return this
     }
 }

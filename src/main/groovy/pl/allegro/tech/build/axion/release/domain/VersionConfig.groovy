@@ -49,6 +49,8 @@ class VersionConfig {
 
     HooksConfig hooks = new HooksConfig()
 
+    MonorepoConfig monorepoConfig = new MonorepoConfig()
+
     private Context context
 
     private VersionService.DecoratedVersion resolvedVersion = null
@@ -164,5 +166,9 @@ class VersionConfig {
         if (context == null) {
             this.context = GradleAwareContext.create(project, this)
         }
+    }
+
+    void monorepos(Closure c) {
+        project.configure(monorepoConfig, c)
     }
 }
