@@ -133,9 +133,9 @@ scmVersion {
 Version calculation rules:
 1. Changes to files within a submodule increment that submodule's version only.
 2. Changes to a submodule do not cause a change to the parent project's version if
-the parent is set to ignore that submodule, via `foldersToExclude`.
+the parent is set to ignore that submodule, via `projectDirs`.
 3. Changes to files in the parent project but which are not in a submodule identified via 
-`foldersToExclude` will cause the parent project's version to increment but not the 
+`projectDirs` will cause the parent project's version to increment but not the 
 versions of any submodules.  If this is desired then consider wiring the `createRelease` or
 `release` tasks of the submodules to be dependencies of the tasks of the same name in the parent. 
 
