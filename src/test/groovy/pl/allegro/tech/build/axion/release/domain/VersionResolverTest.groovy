@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -216,118 +217,118 @@ class VersionResolverTest extends RepositoryBasedTest {
     }
 
     def "should still return the same versions when the final tag is tagged as the release"() {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.1')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.1')
 
-      VersionProperties versionProps = versionProperties().useHighestVersion().build()
+        VersionProperties versionProps = versionProperties().useHighestVersion().build()
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.5.1'
-      version.version.toString() == '1.5.1'
-      !version.snapshot
+        then:
+        version.previousVersion.toString() == '1.5.1'
+        version.version.toString() == '1.5.1'
+        !version.snapshot
     }
 
     def "should still return the same versions when the final tag is tagged as the release with multi-tags"() {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.3.0')
-      repository.tag('release-1.5.1')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.3.0')
+        repository.tag('release-1.5.1')
 
-      VersionProperties versionProps = versionProperties().useHighestVersion().build()
+        VersionProperties versionProps = versionProperties().useHighestVersion().build()
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.5.1'
-      version.version.toString() == '1.5.1'
-      !version.snapshot
+        then:
+        version.previousVersion.toString() == '1.5.1'
+        version.version.toString() == '1.5.1'
+        !version.snapshot
     }
 
     def "should still return the same versions when the final tag is tagged as the release with multi-tags reversed"() {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.1')
-      repository.tag('release-1.3.0')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.1')
+        repository.tag('release-1.3.0')
 
-      VersionProperties versionProps = versionProperties().useHighestVersion().build()
+        VersionProperties versionProps = versionProperties().useHighestVersion().build()
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.5.1'
-      version.version.toString() == '1.5.1'
-      !version.snapshot
+        then:
+        version.previousVersion.toString() == '1.5.1'
+        version.version.toString() == '1.5.1'
+        !version.snapshot
     }
 
     def "should return the highest version from the tagged versions"(VersionProperties versionProps) {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.3.0')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.3.0')
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
-      println "Version Resolved: $version"
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        println "Version Resolved: $version"
 
-      then:
-      version.previousVersion.toString() == '1.5.0'
-      version.version.toString() == '1.5.1'
-      version.snapshot
+        then:
+        version.previousVersion.toString() == '1.5.0'
+        version.version.toString() == '1.5.1'
+        version.snapshot
 
-      where:
-      versionProps << [
-          versionProperties().useHighestVersion().build(),
-          versionProperties().useHighestVersion().forceSnapshot().build()
-      ]
+        where:
+        versionProps << [
+            versionProperties().useHighestVersion().build(),
+            versionProperties().useHighestVersion().forceSnapshot().build()
+        ]
     }
 
     def "should return the highest version from the tagged versions when not on release"(VersionProperties versionProps) {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.5.0'
-      version.version.toString() == '1.5.1'
-      version.snapshot
+        then:
+        version.previousVersion.toString() == '1.5.0'
+        version.version.toString() == '1.5.1'
+        version.snapshot
 
-      where:
-      versionProps << [
-          versionProperties().useHighestVersion().build(),
-          versionProperties().useHighestVersion().forceSnapshot().build()
-      ]
+        where:
+        versionProps << [
+            versionProperties().useHighestVersion().build(),
+            versionProperties().useHighestVersion().forceSnapshot().build()
+        ]
     }
 
     def "should return snapshot version of the more recent version when final and snapshot tags on the same commit in the past"(VersionProperties versionProps) {
@@ -353,46 +354,46 @@ class VersionResolverTest extends RepositoryBasedTest {
     }
 
     def "should return the last version as release from the tagged versions no highest version option selected"() {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
 
-      VersionProperties versionProps = versionProperties().build()
+        VersionProperties versionProps = versionProperties().build()
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.2.0'
-      version.version.toString() == '1.2.0'
-      !version.snapshot
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.0'
+        !version.snapshot
     }
 
     def "should return the last version from the tagged versions no highest version option selected"(VersionProperties versionProps) {
-      given:
-      repository.tag('release-1.0.0')
-      repository.commit(['*'], 'some commit')
-      repository.tag('release-1.5.0')
-      repository.commit(['*'], 'some merge from another branch...')
-      repository.tag('release-1.2.0')
-      repository.commit(['*'], 'some commit')
+        given:
+        repository.tag('release-1.0.0')
+        repository.commit(['*'], 'some commit')
+        repository.tag('release-1.5.0')
+        repository.commit(['*'], 'some merge from another branch...')
+        repository.tag('release-1.2.0')
+        repository.commit(['*'], 'some commit')
 
-      when:
-      VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
+        when:
+        VersionContext version = resolver.resolveVersion(versionProps, tagRules, nextVersionRules)
 
-      then:
-      version.previousVersion.toString() == '1.2.0'
-      version.version.toString() == '1.2.1'
-      version.snapshot
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.1'
+        version.snapshot
 
-      where:
-      versionProps << [
-          versionProperties().build(),
-          versionProperties().forceSnapshot().build()
-      ]
+        where:
+        versionProps << [
+            versionProperties().build(),
+            versionProperties().forceSnapshot().build()
+        ]
     }
 
     def "should distinguish between prefixes with shared characters"(VersionProperties versionProps, String tagPrefix, String v, boolean isSnapshot) {
@@ -414,8 +415,8 @@ class VersionResolverTest extends RepositoryBasedTest {
 
         where:
 
-        versionProps                | tagPrefix   | v         | isSnapshot
-        versionProperties().build() | 'prefix'    | '1.1.0'   | false
-        versionProperties().build() | 'prefix2'   | '1.2.0'   | false
+        versionProps                | tagPrefix | v       | isSnapshot
+        versionProperties().build() | 'prefix'  | '1.1.0' | false
+        versionProperties().build() | 'prefix2' | '1.2.0' | false
     }
 }

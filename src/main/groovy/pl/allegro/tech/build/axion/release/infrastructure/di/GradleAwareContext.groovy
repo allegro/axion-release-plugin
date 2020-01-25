@@ -3,7 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.config.LocalOnlyResolverFactory
 import pl.allegro.tech.build.axion.release.infrastructure.config.RulesFactory
 import pl.allegro.tech.build.axion.release.infrastructure.config.ScmPropertiesFactory

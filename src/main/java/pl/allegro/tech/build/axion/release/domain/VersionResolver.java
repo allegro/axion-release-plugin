@@ -7,10 +7,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -91,7 +88,7 @@ public class VersionResolver {
             forceSnapshot
         );
 
-        boolean onCommitWithLatestChange = currentVersionInfo.commit.equals(latestChangePosition.getRevision());
+        boolean onCommitWithLatestChange = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
 
         TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
         VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,
@@ -129,7 +126,7 @@ public class VersionResolver {
         Version currentVersion = currentVersionInfo.version;
         Version previousVersion = previousVersionInfo.version;
 
-        boolean onCommitWithLatestChange = currentVersionInfo.commit.equals(latestChangePosition.getRevision());
+        boolean onCommitWithLatestChange = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
 
         return new VersionInfo(
             currentVersion,

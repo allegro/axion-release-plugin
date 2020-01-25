@@ -100,5 +100,9 @@ class VersionSorter {
             this.noTagsFound = noTagsFound;
             this.commit = commit;
         }
+
+        boolean isSameCommit(String otherCommitId) {
+            return Objects.equals(commit, otherCommitId);
+        }
     }
 }

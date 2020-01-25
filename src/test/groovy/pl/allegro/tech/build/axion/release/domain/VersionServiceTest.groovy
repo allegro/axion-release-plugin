@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
-
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 

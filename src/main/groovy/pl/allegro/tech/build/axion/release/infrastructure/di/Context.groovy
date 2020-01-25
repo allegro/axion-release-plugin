@@ -5,10 +5,11 @@ import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitChangesPrinter
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 class Context {
 
@@ -22,7 +23,7 @@ class Context {
 
     private final LocalOnlyResolver localOnlyResolver
 
-    public Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
+    Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
         this.rules = rules
         this.scmRepository = scmRepository
         this.scmProperties = scmProperties

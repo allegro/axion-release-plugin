@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain;
 
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class VersionService {

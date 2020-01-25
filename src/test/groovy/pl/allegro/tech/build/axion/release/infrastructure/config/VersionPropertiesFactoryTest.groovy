@@ -4,7 +4,7 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
-
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder

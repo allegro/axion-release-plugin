@@ -58,8 +58,7 @@ class VersionPropertiesBuilder {
         this.useHighestVersion = true
         return this
     }
-
-
+    
     VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
         this.monorepoProperties = monorepoProperties
         return this
