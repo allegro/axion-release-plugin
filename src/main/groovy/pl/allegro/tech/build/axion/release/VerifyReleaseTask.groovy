@@ -8,7 +8,7 @@ import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.ChecksProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
-
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 

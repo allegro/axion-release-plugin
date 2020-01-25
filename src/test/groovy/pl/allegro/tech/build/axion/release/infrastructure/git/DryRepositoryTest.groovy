@@ -2,14 +2,14 @@ package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-
-
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
 import spock.lang.Specification
 
 class DryRepositoryTest extends Specification {
 
-    ScmRepository scm = Mock()
+    ScmRepository scm = Mock(ScmRepository)
 
     DryRepository dryRepository = new DryRepository(scm)
 

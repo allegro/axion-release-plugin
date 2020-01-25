@@ -6,7 +6,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
-
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties

@@ -8,7 +8,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
-
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Specification
 

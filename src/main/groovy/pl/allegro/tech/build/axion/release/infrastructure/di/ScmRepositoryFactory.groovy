@@ -2,9 +2,10 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 class ScmRepositoryFactory {
 

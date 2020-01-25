@@ -73,7 +73,7 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
             // generate the project files
             generateSubmoduleBuildFile(module)
             // add to repo
-            repository.commit(["${module}"], "commit submodule ${module}")
+            repository.commit(["${module}".toString()], "commit submodule ${module}".toString())
             // tag release for that project
             runGradle(":${module}:createRelease", "-Prelease.version=${versionCounter}.0.0", '-Prelease.disableChecks')
             versionCounter++
