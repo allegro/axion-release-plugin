@@ -211,7 +211,6 @@ public class GitRepository implements ScmRepository {
 
     @Override
     public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
-        assertPathFormat(path);
         RevCommit lastCommit;
 
         // if the path is empty ('') then it means we are at the root of the Git directory
@@ -221,7 +220,6 @@ public class GitRepository implements ScmRepository {
             if (path.isEmpty()) {
                 LogCommand logCommand = jgitRepository.log().setMaxCount(1);
                 for (String excludedPath : excludeSubFolders) {
-                    assertPathFormat(excludedPath);
                     logCommand.excludePath(excludedPath);
                 }
                 lastCommit = logCommand.call().iterator().next();
@@ -247,12 +245,6 @@ public class GitRepository implements ScmRepository {
                 revision,
                 currentPosition.getBranch()
             );
-        }
-    }
-
-    private void assertPathFormat(String path) {
-        if (path.contains("\\")) {
-            throw new ScmException("Only slashes are supported in path ('" + path + "')");
         }
     }
 
