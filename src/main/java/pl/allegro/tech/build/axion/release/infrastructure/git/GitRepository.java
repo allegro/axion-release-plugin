@@ -220,11 +220,11 @@ public class GitRepository implements ScmRepository {
             if (path.isEmpty()) {
                 LogCommand logCommand = jgitRepository.log().setMaxCount(1);
                 for (String excludedPath : excludeSubFolders) {
-                    logCommand.excludePath(excludedPath);
+                    logCommand.excludePath(asUnixPath(excludedPath));
                 }
                 lastCommit = logCommand.call().iterator().next();
             } else {
-                String unixStylePath = path.replaceAll("\\\\", "/");
+                String unixStylePath = asUnixPath(path);
                 assertPathExists(unixStylePath);
                 lastCommit = jgitRepository.log().setMaxCount(1).addPath(unixStylePath).call().iterator().next();
             }
@@ -247,6 +247,10 @@ public class GitRepository implements ScmRepository {
                 currentPosition.getBranch()
             );
         }
+    }
+
+    private String asUnixPath(String path) {
+        return path == null ? null : path.replaceAll("\\\\", "/");
     }
 
     private void assertPathExists(String path) {
