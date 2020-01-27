@@ -405,4 +405,26 @@ class GitRepositoryTest extends Specification {
         then:
         thrown(ScmException)
     }
+
+    def "last position with changes in subdir should work with backslashes"() {
+        given:
+        String subdirA = 'a/aa'
+        String fileInA = "${subdirA}/foo"
+        new File(repositoryDir, subdirA).mkdirs()
+        new File(repositoryDir, fileInA).createNewFile()
+        repository.commit([fileInA], 'Add file foo in subdirA')
+        String headSubDirAChanged = rawRepository.head().id
+
+        String subdirB = 'b/ba'
+        String fileInB = "${subdirB}/bar"
+        new File(repositoryDir, subdirB).mkdirs()
+        new File(repositoryDir, fileInB).createNewFile()
+        repository.commit([fileInB], 'Add file bar in subdirB')
+
+        when:
+        ScmPosition position = repository.positionOfLastChangeIn('a\\aa', [])
+
+        then:
+        position.revision == headSubDirAChanged
+    }
 }

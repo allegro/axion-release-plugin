@@ -224,8 +224,9 @@ public class GitRepository implements ScmRepository {
                 }
                 lastCommit = logCommand.call().iterator().next();
             } else {
-                assertPathExists(path);
-                lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call().iterator().next();
+                String unixStylePath = path.replaceAll("\\\\", "/");
+                assertPathExists(unixStylePath);
+                lastCommit = jgitRepository.log().setMaxCount(1).addPath(unixStylePath).call().iterator().next();
             }
         } catch (GitAPIException e) {
             throw new ScmException(e);
