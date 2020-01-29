@@ -11,11 +11,15 @@ import pl.allegro.tech.build.axion.release.infrastructure.config.ScmPropertiesFa
 class GradleAwareContext {
 
     static Context create(Project project, VersionConfig versionConfig) {
+        return create(project, versionConfig, false)
+    }
+
+    static Context create(Project project, VersionConfig versionConfig, boolean shouldForceIncrementVersion) {
         ScmProperties scmProperties = ScmPropertiesFactory.create(project, versionConfig)
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
 
         return new Context(
-            RulesFactory.create(project, versionConfig, scmRepository.currentPosition()),
+            RulesFactory.create(project, versionConfig, scmRepository.currentPosition(), shouldForceIncrementVersion),
             scmRepository,
             scmProperties,
             project.projectDir,

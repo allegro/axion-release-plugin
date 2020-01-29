@@ -13,6 +13,7 @@ public class VersionProperties {
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
     private final MonorepoProperties monorepoProperties;
+    private final boolean shouldForceIncrementVersion;
 
     public VersionProperties(
         String forcedVersion,
@@ -22,7 +23,8 @@ public class VersionProperties {
         Closure<Version> versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
-        MonorepoProperties monorepoProperties
+        MonorepoProperties monorepoProperties,
+        boolean shouldForceIncrementVersion
     ) {
         this.forcedVersion = forcedVersion;
         this.forceSnapshot = forceSnapshot;
@@ -32,6 +34,7 @@ public class VersionProperties {
         this.sanitizeVersion = sanitizeVersion;
         this.useHighestVersion = useHighestVersion;
         this.monorepoProperties = monorepoProperties;
+        this.shouldForceIncrementVersion = shouldForceIncrementVersion;
     }
 
     public boolean forceVersion() {
@@ -68,5 +71,9 @@ public class VersionProperties {
 
     public MonorepoProperties getMonorepoProperties() {
         return monorepoProperties;
+    }
+
+    public boolean isShouldForceIncrementVersion() {
+        return shouldForceIncrementVersion;
     }
 }

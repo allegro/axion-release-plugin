@@ -23,6 +23,10 @@ public class ScmService {
         repository.tag(tagName);
     }
 
+    public void tagOnCommit(String revision, String tagName) {
+        repository.tagOnCommit(revision, tagName);
+    }
+
     public void dropTag(String tagName) {
         try {
             repository.dropTag(tagName);
@@ -50,6 +54,16 @@ public class ScmService {
 
     public ScmPosition position() {
         return repository.currentPosition();
+    }
+
+    /**
+     * Find the last commit that occurred within a certain subdirectory of the project.
+     * @param path Path to look at for commits
+     * @param excludeSubFolders Subfolders within the search path to ignore, generally because they are subprojects themselves.
+     * @return ScmPosition representing the last commit in the given search path.
+     */
+    public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
+        return repository.positionOfLastChangeIn(path, excludeSubFolders);
     }
 
     public void commit(List patterns, String message) {

@@ -1,13 +1,17 @@
 # Tasks
 
-`axion-gradle-plugin` adds 6 new Gradle tasks:
+`axion-gradle-plugin` adds 8* new Gradle tasks:
 
 -   *verifyRelease*
 -   *release*
 -   *createRelease*
+-   *releaseDependents*
+-   *createReleaseDependents*
 -   *pushRelease*
 -   *currentVersion*
 -   *markNextVersion*
+
+*The plugin also creates a helper task called `configureReleaseDependentsTasks` that is called internally, but this is not designed to be called by users.
 
 ## verifyRelease
 
@@ -28,6 +32,14 @@ of these tasks running exactly one after another.
 ## createRelease
 
 Run pre-release actions ([Pre/post release hooks](hooks.md)) and create release tag.
+
+## releaseDependents
+
+Works as per `release`, except that releases are created on any submodules that depend on the project in which this task is called, including transitive dependencies (i.e. changes to `moduleA` will generate releases for `moduleB` and `moduleC`, assuming `moduleC` depends on `moduleB` depends on `moduleA`).  This is described in further detail in [Basic Usage](../basic_usage.md).
+
+## createReleaseDependents
+
+Works as per `createRelease`, except that releases are created on any submodules that depend on the project in which this task is called, including transitive dependencies (i.e. changes to `moduleA` will generate releases for `moduleB` and `moduleC`, assuming `moduleC` depends on `moduleB` depends on `moduleA`).  This is described in further detail in [Basic Usage](../basic_usage.md).
 
 ## pushRelease
 

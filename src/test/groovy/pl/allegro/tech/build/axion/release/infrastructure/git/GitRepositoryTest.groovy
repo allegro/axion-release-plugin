@@ -59,6 +59,33 @@ class GitRepositoryTest extends Specification {
         rawRepository.tag.list()*.fullName == ['refs/tags/release-1']
     }
 
+    def "should create new tag on non-head commit"() {
+        given:
+        String initialCommitRevision = rawRepository.log(maxCommits: 1)*.id.first()
+        println initialCommitRevision
+
+        when:
+        repository.commit(['*'], "2nd commit")
+        repository.tagOnCommit(initialCommitRevision, 'release-1')
+
+        then:
+        rawRepository.describe(commit: initialCommitRevision, tags: true) == 'release-1'
+    }
+
+    def "should not throw exception if attempting to recreate tag on non-head commit"() {
+        given:
+        String initialCommitRevision = rawRepository.log(maxCommits: 1)*.id.first()
+        println initialCommitRevision
+
+        when:
+        repository.commit(['*'], "2nd commit")
+        repository.tagOnCommit(initialCommitRevision, 'release-1')
+        repository.tagOnCommit(initialCommitRevision, 'release-1')
+
+        then:
+        rawRepository.describe(commit: initialCommitRevision, tags: true) == 'release-1'
+    }
+
     def "should create tag when on HEAD even if it already exists on the same commit"() {
         given:
         repository.tag('release-1')

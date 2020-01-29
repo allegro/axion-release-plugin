@@ -11,15 +11,17 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 class ReleaseTask extends DefaultTask {
 
+    boolean forceIncrementVersion = false
+
     @Optional
     VersionConfig versionConfig
 
     @TaskAction
     void release() {
         VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
-        Context context = GradleAwareContext.create(project, config)
+        Context context = GradleAwareContext.create(project, config, forceIncrementVersion)
         Releaser releaser = context.releaser()
-        ScmPushResult result = releaser.releaseAndPush(context.rules())
+        ScmPushResult result = releaser.releaseAndPush(context.projectRootRelativePath(), context.rules(), forceIncrementVersion)
 
         if(!result.success) {
             def message = result.remoteMessage.orElse("Unknown error during push")
@@ -30,5 +32,9 @@ class ReleaseTask extends DefaultTask {
 
     void setVersionConfig(VersionConfig versionConfig) {
         this.versionConfig = versionConfig
+    }
+
+    void setForceIncrementVersion(boolean forceIncrementVersion) {
+        this.forceIncrementVersion = forceIncrementVersion
     }
 }

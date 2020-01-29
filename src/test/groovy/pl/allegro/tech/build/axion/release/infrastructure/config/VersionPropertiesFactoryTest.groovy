@@ -27,7 +27,7 @@ class VersionPropertiesFactoryTest extends Specification {
         versionConfig.sanitizeVersion = false
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.versionIncrementer() == new Version.Builder('1.2.3').build()
@@ -36,7 +36,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should return forceVersion false when project has no 'release.version' property"() {
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         !rules.forceVersion()
@@ -47,7 +47,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.version', '')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         !rules.forceVersion()
@@ -58,7 +58,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.version', 'version')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.forceVersion()
@@ -70,7 +70,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.version', ' version ')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.forceVersion()
@@ -82,7 +82,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.forceVersion', 'version')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.forceVersion()
@@ -94,7 +94,7 @@ class VersionPropertiesFactoryTest extends Specification {
         versionConfig.ignoreUncommittedChanges = false
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         !rules.ignoreUncommittedChanges
@@ -106,7 +106,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.ignoreUncommittedChanges', true)
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.ignoreUncommittedChanges
@@ -120,7 +120,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.versionCreator(null, null) == 'default'
@@ -134,7 +134,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionCreator(null, null) == 'someBranch'
@@ -148,7 +148,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0-someBranch'
@@ -164,7 +164,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.versionCreator', 'simple')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0'
@@ -178,7 +178,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', false)
 
         then:
         rules.versionIncrementer(
@@ -194,7 +194,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionIncrementer(
@@ -210,7 +210,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionIncrementer(
@@ -226,7 +226,7 @@ class VersionPropertiesFactoryTest extends Specification {
         ]
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionIncrementer(
@@ -240,7 +240,7 @@ class VersionPropertiesFactoryTest extends Specification {
         project.extensions.extraProperties.set('release.versionIncrementer', 'incrementMajor')
 
         when:
-        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch', false)
 
         then:
         rules.versionIncrementer(
@@ -248,4 +248,17 @@ class VersionPropertiesFactoryTest extends Specification {
         ) == Version.forIntegers(2)
 
     }
+
+    def "should set shouldForceIncrement if set"() {
+        given:
+        versionConfig.versionIncrementer = { new Version.Builder('1.2.3').build() }
+        versionConfig.sanitizeVersion = false
+
+        when:
+        VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master', true)
+
+        then:
+        rules.isShouldForceIncrementVersion()
+    }
+
 }

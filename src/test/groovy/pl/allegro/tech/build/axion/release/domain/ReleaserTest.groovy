@@ -28,7 +28,7 @@ class ReleaserTest extends RepositoryBasedTest {
                 .build()
 
         when:
-        releaser.release(rules)
+        releaser.release(context.projectRootRelativePath(), rules, false)
 
         then:
         currentVersion() == '2.0.0'
@@ -39,7 +39,18 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag('release-1.0.0')
 
         when:
-        releaser.release(context.rules())
+        releaser.release(context.projectRootRelativePath(), context.rules(), false)
+
+        then:
+        currentVersion() == '1.0.0'
+    }
+
+   def "should release version when on tag and shouldForceIncrement"() {
+        given:
+        repository.tag('release-1.0.0')
+
+        when:
+        releaser.release(context.projectRootRelativePath(), context.rules(), true)
 
         then:
         currentVersion() == '1.0.0'
@@ -53,7 +64,7 @@ class ReleaserTest extends RepositoryBasedTest {
                 .build()
 
         when:
-        releaser.release(rules)
+        releaser.release(context.projectRootRelativePath(), rules, false)
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -64,7 +75,18 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag('release-3.0.0-rc4')
 
         when:
-        releaser.release(context.rules())
+        releaser.release(context.projectRootRelativePath(), context.rules(), false)
+
+        then:
+        currentVersion() == '3.0.0-rc4'
+    }
+
+    def "should release version when on pre-released version tag and shouldForceIncrement"() {
+        given:
+        repository.tag('release-3.0.0-rc4')
+
+        when:
+        releaser.release(context.projectRootRelativePath(), context.rules(), true)
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -76,7 +98,7 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.commit(['*'], 'make is snapshot')
 
         when:
-        releaser.release(context.rules())
+        releaser.release(context.projectRootRelativePath(), context.rules(), false)
 
         then:
         currentVersion() == '3.0.1'
@@ -90,7 +112,7 @@ class ReleaserTest extends RepositoryBasedTest {
                 .build()
 
         when:
-        releaser.release(rules)
+        releaser.release(context.projectRootRelativePath(), rules, false)
 
         then:
         currentVersion() == '3.0.0'
@@ -106,7 +128,7 @@ class ReleaserTest extends RepositoryBasedTest {
                 .build()
 
         when:
-        releaser.release(rules)
+        releaser.release(context.projectRootRelativePath(), rules, false)
 
         then:
         currentVersion() == '3.2.0'

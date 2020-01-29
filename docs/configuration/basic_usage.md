@@ -83,7 +83,7 @@ Sometimes it might be desirable to release each module (or just some
 modules) of multi-module project separately. If so, please make sure
 that:
 
--   keep in mind, that `scmVersion` must be initialized before
+-   you keep in mind that `scmVersion` must be initialized before
     `scmVersion.version` is accessed
 -   apply plugin on each module that should be released on its own
 
@@ -105,6 +105,16 @@ below:
 
 For example, within `module`, tags that do not start `module-` will be
 ignored. 
+
+Thus we can configure each subproject within such a multimodule project like this:
+
+```
+scmVersion {
+    tag {
+        prefix = "${project.name}"
+    }
+}
+```
 
 **IMPORTANT:**  
 
@@ -150,3 +160,5 @@ versions of any submodules.  If this is desired then consider wiring the `create
 # ./gradlew cV
 0.1.0
 ```
+
+For a multimodule project which has project lib dependencies (e.g. `moduleB` `dependsOn` `project(':moduleA')`), a change within `moduleA`'s code will result in the version of `moduleA` being incremented normally.  However, `moduleB`'s code may not have changed and thus it will not have its version incremented, which is usually not the desired behaviour.  This issue is rectified by the 2 tasks, `createReleaseDependents` and `releaseDependents`.  These tasks are analogous to `createRelease` and `release`, respectively, and traverse the inter-project dependency tree and cause the creation of releases for all projects that have a declared dependency on a project(s) whose code has changed.  Thus, for the example just cited, a new release would be created for `moduleB`.  This is modelled on how the Java plugin's `buildNeeded` and `buildDependents` tasks work (described [here](https://docs.gradle.org/current/userguide/multi_project_builds.html#sec:multiproject_build_and_test)).

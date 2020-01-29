@@ -32,6 +32,11 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    void tagOnCommit(String revision, String tagName) {
+        log("creating tag with name: $tagName on commit ${revision}")
+    }
+
+    @Override
     void dropTag(String tagName) {
         log("dropping tag with name: $tagName")
     }
