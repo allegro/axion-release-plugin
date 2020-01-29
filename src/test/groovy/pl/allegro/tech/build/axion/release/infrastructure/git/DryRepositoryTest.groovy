@@ -21,6 +21,14 @@ class DryRepositoryTest extends Specification {
         0 * scm.tag(_)
     }
 
+    def "should not create actual tags in scm on non-head"() {
+        when:
+        dryRepository.tagOnCommit("some-rev","dry_tag")
+
+        then:
+        0 * scm.tagOnCommit(_)
+    }
+
     def "should not push anything to scm"() {
         when:
         dryRepository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('dry-remote', false))
