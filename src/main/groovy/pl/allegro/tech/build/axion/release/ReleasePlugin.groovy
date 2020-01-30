@@ -68,6 +68,8 @@ class ReleasePlugin implements Plugin<Project> {
         registerReleaseDependentTasks(project)
 
         registerConfigureReleaseTasksTask(project)
+
+        configureReleaseOrder(project)
     }
 
     /**
@@ -147,6 +149,16 @@ class ReleasePlugin implements Plugin<Project> {
         if (configuration != null) {
             task.dependsOn(configuration.getTaskDependencyFromProjectDependency(useDependedOn, otherProjectTaskName))
         }
+    }
+
+    /**
+     * Configures a dummy output directory for the release task so that release tasks all share this and will not run in parallel.
+     * @param project project in which to configure the release task.
+     */
+    void configureReleaseOrder(Project project) {
+        Task release = project.getTasks().getByName(RELEASE_TASK)
+        release.outputs.dir "${project.rootProject.buildDir}/commonReleaseDummyOutput"
+        release.outputs.upToDateWhen {false}
     }
 
 }
