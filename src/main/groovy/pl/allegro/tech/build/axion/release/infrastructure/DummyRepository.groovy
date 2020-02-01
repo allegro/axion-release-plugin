@@ -28,11 +28,11 @@ class DummyRepository implements ScmRepository {
 
     @Override
     void tag(String tagName) {
-        log('create tag')
+        tag("HEAD", 'tag')
     }
 
     @Override
-    void tagOnCommit(String revision, String tagName) {
+    void tag(String revision, String tagName) {
         log('create tag')
     }
 

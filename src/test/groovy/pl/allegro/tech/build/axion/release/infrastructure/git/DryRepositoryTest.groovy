@@ -23,7 +23,7 @@ class DryRepositoryTest extends Specification {
 
     def "should not create actual tags in scm on non-head"() {
         when:
-        dryRepository.tagOnCommit("some-rev","dry_tag")
+        dryRepository.tag("some-rev","dry_tag")
 
         then:
         0 * scm.tagOnCommit(_)

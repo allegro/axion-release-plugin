@@ -23,8 +23,8 @@ public class ScmService {
         repository.tag(tagName);
     }
 
-    public void tagOnCommit(String revision, String tagName) {
-        repository.tagOnCommit(revision, tagName);
+    public void tag(String revision, String tagName) {
+        repository.tag(revision, tagName);
     }
 
     public void dropTag(String tagName) {

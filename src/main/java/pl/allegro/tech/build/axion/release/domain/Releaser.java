@@ -34,14 +34,9 @@ public class Releaser {
             hooksRunner.runPreReleaseHooks(properties.getHooks(), properties, versionContext, version);
 
             logger.quiet("Creating tag: " + tagName);
-            // if snapshot then release normally, otherwise release tag on last commit that is relevant to this project
-            if (versionContext.isSnapshot()) {
-                repository.tag(tagName);
-            } else {
-                repository.tagOnCommit(repository.positionOfLastChangeIn(projectRootRelativePath,
-                    properties.getVersion().getMonorepoProperties().getDirsToExclude()
-                ).getRevision(), tagName);
-            }
+            repository.tag(repository.positionOfLastChangeIn(projectRootRelativePath,
+                properties.getVersion().getMonorepoProperties().getDirsToExclude()
+            ).getRevision(), tagName);
 
             hooksRunner.runPostReleaseHooks(properties.getHooks(), properties, versionContext, version);
             return Optional.of(tagName);

@@ -74,8 +74,8 @@ class ReleasePlugin implements Plugin<Project> {
 
     /**
      * Create releaseDependents and createReleaseDependents tasks.
-     * The tasks should depend on the release task and be set as a dependency for all project tasks that
-     * depend on this project.
+     * The tasks should depend on the release task and the same task in all project tasks that
+     * depend this project depends on.
      * @param project the project in which to register the tasks.
      */
     void registerReleaseDependentTasks(Project project) {
@@ -85,7 +85,7 @@ class ReleasePlugin implements Plugin<Project> {
                 task.setDescription("Creates a release for this project and all dependent projects")
                 task.setGroup(RELEASE_GROUP)
                 task.dependsOn(CREATE_RELEASE_TASK)
-                addDependsOnTaskInOtherProjects(task, false,
+                addDependsOnTaskInOtherProjects(task, true,
                     CREATE_RELEASE_DEPENDENTS_TASK, TEST_RUNTIME_CLASSPATH_CONFIGURATION_NAME)
                 // configure this task to depend on configureReleaseDependentsTasks
                 task.dependsOn(CONFIGURE_RELEASE_DEPENDENTS_TASKS_TASK)
@@ -97,7 +97,7 @@ class ReleasePlugin implements Plugin<Project> {
                 task.setDescription("Creates and pushes a release for this project and all dependent projects")
                 task.setGroup(RELEASE_GROUP)
                 task.dependsOn(RELEASE_TASK)
-                addDependsOnTaskInOtherProjects(task, false,
+                addDependsOnTaskInOtherProjects(task, true,
                     RELEASE_DEPENDENTS_TASK, TEST_RUNTIME_CLASSPATH_CONFIGURATION_NAME)
                 // configure this task to depend on configureReleaseDependentsTasks
                 task.dependsOn(CONFIGURE_RELEASE_DEPENDENTS_TASKS_TASK)
@@ -125,7 +125,7 @@ class ReleasePlugin implements Plugin<Project> {
                 task.getProject().getTasks().findByName(RELEASE_TASK).configure {
                     mustRunAfter(task)
                 }
-                // configure this task to depend on all similar tasks in upstream projects
+                // configure this task to depend on all similar tasks in projects that depend on this one
                 addDependsOnTaskInOtherProjects(task, true,
                     CONFIGURE_RELEASE_DEPENDENTS_TASKS_TASK, TEST_RUNTIME_CLASSPATH_CONFIGURATION_NAME)
             }

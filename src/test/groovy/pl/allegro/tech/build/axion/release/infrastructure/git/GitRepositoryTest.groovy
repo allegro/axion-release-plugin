@@ -66,7 +66,7 @@ class GitRepositoryTest extends Specification {
 
         when:
         repository.commit(['*'], "2nd commit")
-        repository.tagOnCommit(initialCommitRevision, 'release-1')
+        repository.tag(initialCommitRevision, 'release-1')
 
         then:
         rawRepository.describe(commit: initialCommitRevision, tags: true) == 'release-1'
@@ -79,8 +79,8 @@ class GitRepositoryTest extends Specification {
 
         when:
         repository.commit(['*'], "2nd commit")
-        repository.tagOnCommit(initialCommitRevision, 'release-1')
-        repository.tagOnCommit(initialCommitRevision, 'release-1')
+        repository.tag(initialCommitRevision, 'release-1')
+        repository.tag(initialCommitRevision, 'release-1')
 
         then:
         rawRepository.describe(commit: initialCommitRevision, tags: true) == 'release-1'

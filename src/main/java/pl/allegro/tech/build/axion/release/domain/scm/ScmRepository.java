@@ -9,7 +9,7 @@ public interface ScmRepository {
 
     void tag(String tagName);
 
-    void tagOnCommit(String revision, String tagName);
+    void tag(String revision, String tagName);
 
     void dropTag(String tagName);
 

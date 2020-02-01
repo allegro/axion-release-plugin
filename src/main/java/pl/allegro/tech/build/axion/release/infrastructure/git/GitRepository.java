@@ -75,34 +75,14 @@ public class GitRepository implements ScmRepository {
     @Override
     public void tag(final String tagName) {
         try {
-            final String headId = head().name();
-            List<Ref> tags = jgitRepository.tagList().call();
-
-            boolean isOnExistingTag = tags.stream().anyMatch(ref -> {
-                boolean onTag = ref.getName().equals(GIT_TAG_PREFIX + tagName);
-                boolean onHead;
-                try {
-                    onHead = jgitRepository.getRepository().getRefDatabase()
-                        .peel(ref).getPeeledObjectId().getName().equals(headId);
-                } catch (IOException e) {
-                    throw new ScmException(e);
-                }
-
-                return onTag && onHead;
-            });
-
-            if (!isOnExistingTag) {
-                jgitRepository.tag().setName(tagName).call();
-            } else {
-                logger.debug("The head commit " + headId + " already has the tag " + tagName + ".");
-            }
-        } catch (GitAPIException | IOException e) {
+            tag(head().name(), tagName);
+        }  catch (IOException e) {
             throw new ScmException(e);
         }
     }
 
     @Override
-    public void tagOnCommit(final String revision, final String tagName) {
+    public void tag(final String revision, final String tagName) {
         try {
             ObjectId commitId = ObjectId.fromString(revision);
             RevWalk revWalk = new RevWalk(jgitRepository.getRepository());

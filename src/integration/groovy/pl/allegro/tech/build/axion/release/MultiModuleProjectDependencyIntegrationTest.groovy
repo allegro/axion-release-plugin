@@ -135,13 +135,14 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
 
     }
 
-    def "releaseDependents and change to dependent submodule should not change root or upstream submodule versions"() {
+    def "releaseDependents and change to submodule should change modules that depend on it but not root or upstream submodule versions"() {
         given:
         initialProjectConfiguration()
+        // change project 2, expect changes in project 2 but not root or project 1
         File dummy = new File(getSubmoduleDir("project2"), "dummy.txt")
         dummy.createNewFile()
         repository.commit(["project2"], "commit submodule project2")
-        runGradle(":project2:releaseDependents", "-Prelease.version=5.0.0", '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle(":project2:releaseDependents", '-Prelease.localOnly', '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
@@ -164,18 +165,28 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
         match = result.output =~ /(?m)^.*Project version: (.*)$/
 
         then:
-        match[0][1] == '5.0.0'
+        match[0][1] == '3.0.1'
         result.task(":project2:currentVersion").outcome == TaskOutcome.SUCCESS
+
+        when:
+        result = runGradle(':project3:currentVersion')
+        match = result.output =~ /(?m)^.*Project version: (.*)$/
+
+        then:
+        // although project 3 depends on project 2, we only called project 2, so project 3 should not increment
+        match[0][1] == '4.0.0'
+        result.task(":project3:currentVersion").outcome == TaskOutcome.SUCCESS
 
     }
 
    def "releaseDependents and change to upstream submodule should force increment dependent module version despite no changes there"() {
         given:
         initialProjectConfiguration()
+        // change project 1, so expect changes in projects 1, 2 & 3 but not root
         File dummy = new File(getSubmoduleDir("project1"), "dummy.txt")
         dummy.createNewFile()
         repository.commit(["project1"], "commit submodule project1")
-        runGradle(":project1:releaseDependents", '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle("releaseDependents", '-Prelease.localOnly', '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
@@ -214,10 +225,11 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
     def "releaseDependents and change to submodule should not change root project version"() {
         given:
         initialProjectConfiguration()
+        // change project 1 so expect no change in root module
         File dummy = new File(getSubmoduleDir("project1"), "dummy.txt")
         dummy.createNewFile()
         repository.commit(["project1"], "commit submodule project1")
-        runGradle(":project1:releaseDependents", "-Prelease.version=4.0.0", '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle("releaseDependents", '-Prelease.localOnly', '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
@@ -231,17 +243,18 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
     def "releaseDependents and change to root project should not change child project versions"() {
         given:
         initialProjectConfiguration()
+        // change root project so expect no change to any other project
         File dummy = new File(temporaryFolder.root, "dummy.txt")
         dummy.createNewFile()
         repository.commit(["dummy.txt"], "commit parent project")
-        runGradle(":releaseDependents", "-Prelease.version=4.0.0", '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle("releaseDependents", '-Prelease.localOnly', '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
         def match = result.output =~ /(?m)^.*Project version: (.*)$/
 
         then:
-        match[0][1] == '4.0.0'
+        match[0][1] == '1.0.1'
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
 
         when:
@@ -273,10 +286,11 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
     def "createReleaseDependents and change to dependent submodule should not change root or upstream submodule versions"() {
         given:
         initialProjectConfiguration()
+        // change project 2 so expect no change to root or project 1, but change projects 2 & 3
         File dummy = new File(getSubmoduleDir("project2"), "dummy.txt")
         dummy.createNewFile()
         repository.commit(["project2"], "commit submodule project2")
-        runGradle(":project2:createReleaseDependents", "-Prelease.version=5.0.0", '-Prelease.disableChecks')
+        runGradle("createReleaseDependents", '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
@@ -292,40 +306,6 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
 
         then:
         match[0][1] == '2.0.0'
-        result.task(":project1:currentVersion").outcome == TaskOutcome.SUCCESS
-
-        when:
-        result = runGradle(':project2:currentVersion')
-        match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '5.0.0'
-        result.task(":project2:currentVersion").outcome == TaskOutcome.SUCCESS
-
-    }
-
-    def "createReleaseDependents and change to upstream submodule should force increment dependent module version despite no changes there"() {
-        given:
-        initialProjectConfiguration()
-        File dummy = new File(getSubmoduleDir("project1"), "dummy.txt")
-        dummy.createNewFile()
-        repository.commit(["project1"], "commit submodule project1")
-        runGradle(":project1:createReleaseDependents", '-Prelease.disableChecks')
-
-        when:
-        def result = runGradle(':currentVersion')
-        def match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '1.0.0'
-        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
-
-        when:
-        result = runGradle(':project1:currentVersion')
-        match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '2.0.1'
         result.task(":project1:currentVersion").outcome == TaskOutcome.SUCCESS
 
         when:
@@ -343,7 +323,6 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
         then:
         match[0][1] == '4.0.1'
         result.task(":project3:currentVersion").outcome == TaskOutcome.SUCCESS
-
     }
 
     def "createReleaseDependents and change to submodule should not change root project version"() {
@@ -352,7 +331,7 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
         File dummy = new File(getSubmoduleDir("project1"), "dummy.txt")
         dummy.createNewFile()
         repository.commit(["project1"], "commit submodule project1")
-        runGradle(":project1:createReleaseDependents", "-Prelease.version=4.0.0", '-Prelease.disableChecks')
+        runGradle("createReleaseDependents", '-Prelease.disableChecks')
 
         when:
         def result = runGradle(':currentVersion')
@@ -361,47 +340,5 @@ class MultiModuleProjectDependencyIntegrationTest extends BaseIntegrationTest {
         then:
         match[0][1] == '1.0.0'
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
-    }
-
-    def "createReleaseDependents and change to root project should not change child project versions"() {
-        given:
-        initialProjectConfiguration()
-        File dummy = new File(temporaryFolder.root, "dummy.txt")
-        dummy.createNewFile()
-        repository.commit(["dummy.txt"], "commit parent project")
-        runGradle(":createReleaseDependents", "-Prelease.version=4.0.0", '-Prelease.disableChecks')
-
-        when:
-        def result = runGradle(':currentVersion')
-        def match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '4.0.0'
-        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
-
-        when:
-        result = runGradle(':project1:currentVersion')
-        match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '2.0.0'
-        result.task(":project1:currentVersion").outcome == TaskOutcome.SUCCESS
-
-        when:
-        result = runGradle(':project2:currentVersion')
-        match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '3.0.0'
-        result.task(":project2:currentVersion").outcome == TaskOutcome.SUCCESS
-
-        when:
-        result = runGradle(':project3:currentVersion')
-        match = result.output =~ /(?m)^.*Project version: (.*)$/
-
-        then:
-        match[0][1] == '4.0.0'
-        result.task(":project3:currentVersion").outcome == TaskOutcome.SUCCESS
-
     }
 }
