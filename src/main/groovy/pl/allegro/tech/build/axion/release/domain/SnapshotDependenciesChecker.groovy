@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.Dependency
 class SnapshotDependenciesChecker {
 
     Collection<String> snapshotVersions(Project project) {
-        Collection<String> projectVersions = project.allprojects.collect {toFullVersion(it)}
+        Collection<String> projectVersions = project.rootProject.allprojects.collect {toFullVersion(it)}
         Collection<String> allDependenciesVersions = project.allprojects.collect {
             it.configurations.collect { config ->
                 config.allDependencies.findAll {isSnapshot(it)}.collect {toFullVersion(it)}
