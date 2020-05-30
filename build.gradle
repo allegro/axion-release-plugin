@@ -40,7 +40,7 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '5.6.0.201912101111-r',
+        jgit: '5.7.0.202003110725-r',
         jsch: '0.1.54',
         jschAgent: '0.0.9'
 ]
