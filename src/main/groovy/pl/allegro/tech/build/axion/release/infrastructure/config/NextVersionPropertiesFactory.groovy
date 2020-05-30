@@ -13,6 +13,12 @@ class NextVersionPropertiesFactory {
     private static final String DEPRECATED_NEXT_VERSION_PROPERTY = "release.nextVersion"
 
     static NextVersionProperties create(Project project, NextVersionConfig config) {
+        if (config.suffix == null || config.suffix.isEmpty()) {
+            String message = "scmVersion.nextVersion.suffix can't be empty! Empty suffix will prevent axion-release from distinguishing nextVersion from regular versions";
+            project.logger.error(message)
+            throw new IllegalArgumentException(message)
+        }
+
         String nextVersion = project.hasProperty(NEXT_VERSION_PROPERTY) ? project.property(NEXT_VERSION_PROPERTY) : null
         String versionIncrementerName = project.hasProperty(NEXT_VERSION_INCREMENTER_PROPERTY) ? project.property(NEXT_VERSION_INCREMENTER_PROPERTY) : null
 
