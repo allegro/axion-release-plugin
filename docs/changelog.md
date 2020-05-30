@@ -1,5 +1,17 @@
 # Changelog
 
+### 1.12.x
+
+* **1.12.0** (30.05.2020)
+    * core logic mostly rewritten to Java - **plugin requires Java 8 to work!**
+    * moved to JGit 5.7.x (5.7.0.202003110725-r)
+    * fixed bug that made 1.11.0 fail on Windows - thanks to [sradi](https://github.com/sradi) for contribution
+
+### 1.11.x
+
+* **1.11.0** (24.01.2020)
+    * support for Monorepos! - thanks to [john-tipper](https://github.com/john-tipper) and [sradi](https://github.com/sradi) for contribution
+
 ### 1.10.x
 
 * **1.10.3** (30.12.2019)
