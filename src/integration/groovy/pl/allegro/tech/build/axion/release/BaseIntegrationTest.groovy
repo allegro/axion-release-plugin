@@ -39,4 +39,8 @@ class BaseIntegrationTest extends RepositoryBasedTest {
     BuildResult runGradle(String... arguments) {
         return gradle().withArguments(arguments).build()
     }
+
+    BuildResult runGradleAndFail(String... arguments) {
+        return gradle().withArguments(arguments).buildAndFail()
+    }
 }
