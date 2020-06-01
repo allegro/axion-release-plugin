@@ -30,7 +30,7 @@ is not incremented:
     # ./gradlew cV
     2.0.1-SNAPSHOT
 
-    # ./gradlew marNextVersion -Prelease.incrementer=incrementMinor
+    # ./gradlew markNextVersion -Prelease.incrementer=incrementMinor
 
     # ./gradlew cV
     2.1.0-SNAPSHOT
