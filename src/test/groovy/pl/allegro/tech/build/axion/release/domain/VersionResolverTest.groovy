@@ -4,6 +4,7 @@ import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -21,6 +22,34 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     def setup() {
         resolver = new VersionResolver(repository, "")
+    }
+
+    def "should resolve global relase when tagging on multiple branches"() {
+        given: 'a branch with a high release tag'
+        GitRepository gitRepository = (GitRepository) repository
+        gitRepository.branch('start')
+        gitRepository.checkout('start')
+        repository.commit(['*'], 'some commit  1')
+        gitRepository.tag('release-1.0.0')
+        gitRepository.branch('a')
+        gitRepository.checkout('a')
+        repository.commit(['*'], 'some commit 2')
+        gitRepository.tag('release-2.0.0')
+
+        and: 'a branch with a lower release tag'
+        gitRepository.checkout('start')
+        gitRepository.branch('b')
+        gitRepository.checkout('b')
+        repository.commit(['*'], 'some commit 3')
+        gitRepository.tag('release-1.0.1')
+
+        when: 'I resolve the version on the branch with the lower release tag'
+        def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
+        VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
+
+        then: 'the number from branch with the high release number is resolved'
+        version.previousVersion.toString() == '1.0.1'
+        version.version.toString() == '2.0.0'
     }
 
     def "should return default previous and current version when no tag in repository"() {

@@ -23,6 +23,8 @@ class VersionConfig {
 
     boolean useHighestVersion = false
 
+    boolean useGlobalVersion = false
+
     RepositoryConfig repository
 
     TagNameSerializationConfig tag = new TagNameSerializationConfig()

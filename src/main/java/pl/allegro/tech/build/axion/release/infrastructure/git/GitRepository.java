@@ -193,6 +193,26 @@ public class GitRepository implements ScmRepository {
         }
     }
 
+    void branch(String name) {
+        try {
+            jgitRepository.branchCreate()
+                .setName(name)
+                .call();
+        } catch (GitAPIException e) {
+            throw new ScmException(e);
+        }
+    }
+
+    void checkout(String name) {
+        try {
+            jgitRepository.checkout()
+                .setName(name)
+                .call();
+        } catch (GitAPIException e) {
+            throw new ScmException(e);
+        }
+    }
+
     @Override
     public void commit(List<String> patterns, String message) {
         try {

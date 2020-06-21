@@ -13,6 +13,8 @@ class VersionPropertiesBuilder {
 
     private boolean useHighestVersion = false
 
+    private boolean useGlobalVersion = false
+
     private MonorepoProperties monorepoProperties = new MonorepoProperties()
 
     private Closure<String> versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
@@ -35,6 +37,7 @@ class VersionPropertiesBuilder {
             PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
             sanitizeVersion,
             useHighestVersion,
+            useGlobalVersion,
             monorepoProperties
         )
     }
@@ -58,7 +61,12 @@ class VersionPropertiesBuilder {
         this.useHighestVersion = true
         return this
     }
-    
+
+    VersionPropertiesBuilder useGlobalVersion() {
+        this.useGlobalVersion = true
+        return this
+    }
+
     VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
         this.monorepoProperties = monorepoProperties
         return this
