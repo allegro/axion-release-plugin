@@ -325,8 +325,8 @@ public class GitRepository implements ScmRepository {
         return latestTagsInternal(pattern, sinceCommit, false);
     }
 
-    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true);
+    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusiveStartingCommit) {
+        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusiveStartingCommit, true);
         return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits.get(0);
     }
 
@@ -335,7 +335,7 @@ public class GitRepository implements ScmRepository {
         return taggedCommitsInternal(pattern, null, true, false);
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusiveStartingCommit, boolean stopOnFirstTag) {
         List<TagsOnCommit> taggedCommits = new ArrayList<>();
         if (!hasCommits()) {
             return taggedCommits;
@@ -353,7 +353,7 @@ public class GitRepository implements ScmRepository {
 
 
             RevWalk walk = walker(startingCommit);
-            if (!inclusive) {
+            if (!inclusiveStartingCommit) {
                 walk.next();
             }
 
