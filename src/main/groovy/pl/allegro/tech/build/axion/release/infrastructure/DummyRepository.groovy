@@ -80,6 +80,11 @@ class DummyRepository implements ScmRepository {
         return [new TagsOnCommit(null, [])]
     }
 
+    @Override
+    List<TagsOnCommit> taggedCommitsGlobally(Pattern pattern) {
+        logger.quiet("Could not resolve current position on uninitialized repository, returning default")
+        return [new TagsOnCommit(null, [])]
+    }
 
     @Override
     boolean remoteAttached(String remoteName) {

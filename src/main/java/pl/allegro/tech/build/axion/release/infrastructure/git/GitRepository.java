@@ -335,6 +335,38 @@ public class GitRepository implements ScmRepository {
         return taggedCommitsInternal(pattern, null, true, false);
     }
 
+    @Override
+    public List<TagsOnCommit> taggedCommitsGlobally(Pattern pattern) {
+        List<TagsOnCommit> taggedCommits = new ArrayList<>();
+        if (!hasCommits()) {
+            return taggedCommits;
+        }
+
+        try {
+            ObjectId headId = jgitRepository.getRepository().resolve(Constants.HEAD);
+            RevWalk walk = walker(headId);
+            Map<String, List<String>> allTags = tagsMatching(pattern, walk);
+
+            for (Map.Entry<String, List<String>> entry : allTags.entrySet()) {
+                String sha = entry.getKey();
+                List<String> currentTagsList = entry.getValue();
+
+                if (currentTagsList != null) {
+                    TagsOnCommit taggedCommit = new TagsOnCommit(
+                        sha,
+                        currentTagsList
+                    );
+                    taggedCommits.add(taggedCommit);
+                }
+            }
+            walk.dispose();
+        } catch (IOException | GitAPIException e) {
+            throw new ScmException(e);
+        }
+
+        return taggedCommits;
+    }
+
     private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusiveStartingCommit, boolean stopOnFirstTag) {
         List<TagsOnCommit> taggedCommits = new ArrayList<>();
         if (!hasCommits()) {

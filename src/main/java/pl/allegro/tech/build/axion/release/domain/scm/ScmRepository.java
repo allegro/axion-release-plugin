@@ -27,6 +27,8 @@ public interface ScmRepository {
 
     List<TagsOnCommit> taggedCommits(Pattern pattern);
 
+    List<TagsOnCommit> taggedCommitsGlobally(Pattern pattern);
+
     boolean remoteAttached(String remoteName);
 
     boolean checkUncommittedChanges();

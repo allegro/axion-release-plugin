@@ -20,6 +20,10 @@ import java.util.regex.Pattern;
  * * version read from last release tag when on tag
  */
 public class VersionResolver {
+    private enum VersionReadingStrategy {
+        HIGHEST_VERSION,
+        GLOBAL_VERSION
+    }
 
     private final ScmRepository repository;
     private final VersionSorter sorter;
@@ -44,8 +48,10 @@ public class VersionResolver {
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition);
 
         VersionInfo versions;
-        if (versionProperties.isUseHighestVersion()) {
-            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
+        if (versionProperties.isUseGlobalVersion()) {
+            versions = readVersionsByGlobalOrHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, VersionReadingStrategy.GLOBAL_VERSION);
+        } else if (versionProperties.isUseHighestVersion()) {
+            versions = readVersionsByGlobalOrHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, VersionReadingStrategy.HIGHEST_VERSION);
         } else {
             versions = readVersionsByFirstVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
         }
@@ -106,19 +112,24 @@ public class VersionResolver {
         );
     }
 
-    private VersionInfo readVersionsByHighestVersion(
+    private VersionInfo readVersionsByGlobalOrHighestVersion(
         VersionFactory versionFactory,
         final TagProperties tagProperties,
         final NextVersionProperties nextVersionProperties,
         VersionProperties versionProperties,
-        ScmPosition latestChangePosition
+        ScmPosition latestChangePosition,
+        VersionReadingStrategy versionReadingStrategy
     ) {
-
         Pattern releaseTagPattern = Pattern.compile("^" + tagProperties.getPrefix() + ".*");
         Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
 
-        TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
+        TaggedCommits allTaggedCommits;
+        if (versionReadingStrategy == VersionReadingStrategy.HIGHEST_VERSION) {
+            allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
+        } else {
+            allTaggedCommits = TaggedCommits.fromAllCommitsGlobally(repository, releaseTagPattern, latestChangePosition);
+        }
 
         VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory, forceSnapshot);
         VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory, forceSnapshot);

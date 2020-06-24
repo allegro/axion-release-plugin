@@ -4,7 +4,6 @@ import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -24,32 +23,54 @@ class VersionResolverTest extends RepositoryBasedTest {
         resolver = new VersionResolver(repository, "")
     }
 
-    def "should resolve global relase when tagging on multiple branches"() {
-        given: 'a branch with a high release tag'
-        GitRepository gitRepository = (GitRepository) repository
-        gitRepository.branch('start')
-        gitRepository.checkout('start')
-        repository.commit(['*'], 'some commit  1')
-        gitRepository.tag('release-1.0.0')
-        gitRepository.branch('a')
-        gitRepository.checkout('a')
-        repository.commit(['*'], 'some commit 2')
-        gitRepository.tag('release-2.0.0')
-
-        and: 'a branch with a lower release tag'
-        gitRepository.checkout('start')
-        gitRepository.branch('b')
-        gitRepository.checkout('b')
-        repository.commit(['*'], 'some commit 3')
-        gitRepository.tag('release-1.0.1')
+    def "should resolve higher global version when on branch with lower version"() {
+        given: 'I am on a branch with a low release tag'
+        setupABranchWithHighTagAndBBranchWithLowTag()
+        repository.checkout('low')
 
         when: 'I resolve the version on the branch with the lower release tag'
         def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
         VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
 
         then: 'the number from branch with the high release number is resolved'
-        version.previousVersion.toString() == '1.0.1'
+        version.previousVersion.toString() == '2.0.0'
+        version.version.toString() == '2.0.1'
+    }
+
+    def "should resolve higher global version when on branch with higher version"() {
+        given: 'I am on a branch with a high release tag'
+        setupABranchWithHighTagAndBBranchWithLowTag()
+        repository.checkout('high')
+
+        when: 'I resolve the version on the branch with the lower release tag'
+        def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
+        VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
+
+        then: 'the number from branch with the high release number is resolved'
+        version.previousVersion.toString() == '2.0.0'
         version.version.toString() == '2.0.0'
+    }
+
+    private void setupABranchWithHighTagAndBBranchWithLowTag() {
+        // * 49f4094 (tag: release-2.0.0, high) some commit 2
+        // | * 662c593 (HEAD -> low, tag: release-1.0.1) some commit 3
+        // |/
+        // * 4b76059 (tag: release-1.0.0, start) some commit  1
+        // * b21eb90 (master) initial commit
+        repository.branch('start')
+        repository.checkout('start')
+        repository.commit(['*'], 'some commit  1')
+        repository.tag('release-1.0.0')
+        repository.branch('high')
+        repository.checkout('high')
+        repository.commit(['*'], 'some commit 2')
+        repository.tag('release-2.0.0')
+
+        repository.checkout('start')
+        repository.branch('low')
+        repository.checkout('low')
+        repository.commit(['*'], 'some commit 3')
+        repository.tag('release-1.0.1')
     }
 
     def "should return default previous and current version when no tag in repository"() {
