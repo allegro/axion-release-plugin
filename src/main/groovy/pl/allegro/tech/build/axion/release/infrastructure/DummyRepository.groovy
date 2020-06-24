@@ -43,6 +43,16 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    void branch(String name) {
+        log("creating branch: ${name}")
+    }
+
+    @Override
+    void checkout(String name) {
+        log("switching to branch: ${name}")
+    }
+
+    @Override
     void commit(List patterns, String message) {
         log('commit')
     }

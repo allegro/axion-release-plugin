@@ -13,6 +13,10 @@ public interface ScmRepository {
 
     ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions);
 
+    void branch(String name);
+
+    void checkout(String name);
+
     void commit(List<String> patterns, String message);
 
     void attachRemote(String remoteName, String url);

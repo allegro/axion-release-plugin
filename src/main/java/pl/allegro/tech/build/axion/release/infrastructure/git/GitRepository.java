@@ -193,7 +193,8 @@ public class GitRepository implements ScmRepository {
         }
     }
 
-    void branch(String name) {
+    @Override
+    public void branch(String name) {
         try {
             jgitRepository.branchCreate()
                 .setName(name)
@@ -203,7 +204,8 @@ public class GitRepository implements ScmRepository {
         }
     }
 
-    void checkout(String name) {
+    @Override
+    public void checkout(String name) {
         try {
             jgitRepository.checkout()
                 .setName(name)
