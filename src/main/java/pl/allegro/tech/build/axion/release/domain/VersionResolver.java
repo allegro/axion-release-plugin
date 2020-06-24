@@ -47,7 +47,7 @@ public class VersionResolver {
         if (versionProperties.isUseHighestVersion()) {
             versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
         } else {
-            versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
+            versions = readVersionsByFirstVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
         }
 
 
@@ -63,7 +63,7 @@ public class VersionResolver {
         return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition);
     }
 
-    private VersionInfo readVersions(
+    private VersionInfo readVersionsByFirstVersion(
         VersionFactory versionFactory,
         TagProperties tagProperties,
         NextVersionProperties nextVersionProperties,
