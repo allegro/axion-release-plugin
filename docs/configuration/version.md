@@ -111,6 +111,16 @@ You can also active this option using command line:
     # ./gradlew currentVersion -Prelease.useHighestVersion
     1.5.0
 
+### Global tags
+Search all tags, in all branches.  
+
+In order to activate this feature:
+
+    scmVersion {
+        useGlobalVersion = true
+    }
+
+
 ## Parsing
 
 Having current tag name, we can deserialize it to extract raw version.
