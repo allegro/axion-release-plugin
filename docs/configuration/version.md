@@ -112,7 +112,7 @@ You can also active this option using command line:
     1.5.0
 
 ### Global tags
-Search all tags, in all branches.  
+Search all tags, in all branches.
 
 In order to activate this feature:
 
