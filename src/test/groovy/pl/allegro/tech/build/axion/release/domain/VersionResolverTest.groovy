@@ -25,7 +25,7 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     def "should resolve higher global version when on branch with lower version"() {
         given: 'I am on a branch with a low release tag'
-        setupABranchWithHighTagAndBBranchWithLowTag()
+        setupABranchWithHighTagAndBBranchWithLowTag(repository)
         repository.checkout('low')
 
         when: 'I resolve the version on the branch with the lower release tag'
@@ -39,7 +39,7 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     def "should resolve higher global version when on branch with higher version"() {
         given: 'I am on a branch with a high release tag'
-        setupABranchWithHighTagAndBBranchWithLowTag()
+        setupABranchWithHighTagAndBBranchWithLowTag(repository)
         repository.checkout('high')
 
         when: 'I resolve the version on the branch with the lower release tag'
@@ -49,28 +49,6 @@ class VersionResolverTest extends RepositoryBasedTest {
         then: 'the number from branch with the high release number is resolved'
         version.previousVersion.toString() == '2.0.0'
         version.version.toString() == '2.0.0'
-    }
-
-    private void setupABranchWithHighTagAndBBranchWithLowTag() {
-        // * 49f4094 (tag: release-2.0.0, high) some commit 2
-        // | * 662c593 (HEAD -> low, tag: release-1.0.1) some commit 3
-        // |/
-        // * 4b76059 (tag: release-1.0.0, start) some commit  1
-        // * b21eb90 (master) initial commit
-        repository.branch('start')
-        repository.checkout('start')
-        repository.commit(['*'], 'some commit  1')
-        repository.tag('release-1.0.0')
-        repository.branch('high')
-        repository.checkout('high')
-        repository.commit(['*'], 'some commit 2')
-        repository.tag('release-2.0.0')
-
-        repository.checkout('start')
-        repository.branch('low')
-        repository.checkout('low')
-        repository.commit(['*'], 'some commit 3')
-        repository.tag('release-1.0.1')
     }
 
     def "should return default previous and current version when no tag in repository"() {
