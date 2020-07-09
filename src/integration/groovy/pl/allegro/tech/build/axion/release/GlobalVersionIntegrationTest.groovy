@@ -25,7 +25,7 @@ class GlobalVersionIntegrationTest extends BaseIntegrationTest {
     def "should resolve higher global version when on branch with higher version"() {
         given:
         buildFile('')
-        setupABranchWithHighTagAndBBranchWithLowTag(repository)
+        Fixtures.FixtureUseGlobalVersion.setupABranchWithHighTagAndBBranchWithLowTag(repository)
         repository.checkout('high')
 
         when:
@@ -39,7 +39,7 @@ class GlobalVersionIntegrationTest extends BaseIntegrationTest {
     def "should resolve higher global version when on branch with lower version"() {
         given: 'I am on a branch with a low release tag'
         buildFile('')
-        setupABranchWithHighTagAndBBranchWithLowTag(repository)
+        Fixtures.FixtureUseGlobalVersion.setupABranchWithHighTagAndBBranchWithLowTag(repository)
         repository.checkout('low')
 
         when:
