@@ -111,8 +111,8 @@ You can also active this option using command line:
     # ./gradlew currentVersion -Prelease.useHighestVersion
     1.5.0
 
-### Global tags
-Search all tags, in all branches.
+### Search tags globally
+Search all tags, in all branches to find the next release number. Use this if you want incrementing numbers across branches.
 
 In order to activate this feature:
 
@@ -120,6 +120,31 @@ In order to activate this feature:
         useGlobalVersion = true
     }
 
+Take this tree as an example:
+
+```
+   [T1]
+    |
+ |      |
+[T2]   [T3]
+ |      |
+[C]    [_]
+```
+
+Let `T*` be a tagged commit and `C` the current commit. After releasing
+version with tag `T1`, we have been working on two separate branches.
+Then, branch on the right has been released and marked with `T3` tag, and the branch on the left has been released with `T2` tag.
+When traversing *all* tags in this tree, `T3` will be reported as the highest tag, and so reported version will come from parsing `T3` tag, even though tag `T2` is the highest number on the *current* branch. 
+
+If you had been using `useHighestVersion`, the reported version would have come from `T2`
+
+When using `useGlobalVersion`, the reported version will come from `T3`
+
+You can also activate this feature in command line form
+
+```
+# ./gradlew currentVersion -Prelease.useGlobalVersion
+```
 
 ## Parsing
 
