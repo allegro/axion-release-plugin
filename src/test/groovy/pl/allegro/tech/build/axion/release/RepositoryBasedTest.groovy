@@ -24,27 +24,6 @@ class RepositoryBasedTest extends Specification {
 
     ScmRepository repository
 
-    static void setupABranchWithHighTagAndBBranchWithLowTag(ScmRepository repository) {
-        // * 49f4094 (tag: release-2.0.0, high) some commit 2
-        // | * 662c593 (HEAD -> low, tag: release-1.0.1) some commit 3
-        // |/
-        // * 4b76059 (tag: release-1.0.0, start) some commit  1
-        // * b21eb90 (master) initial commit
-        repository.branch('start')
-        repository.checkout('start')
-        repository.commit(['*'], 'some commit  1')
-        repository.tag('release-1.0.0')
-        repository.branch('high')
-        repository.checkout('high')
-        repository.commit(['*'], 'some commit 2')
-        repository.tag('release-2.0.0')
-        repository.checkout('start')
-        repository.branch('low')
-        repository.checkout('low')
-        repository.commit(['*'], 'some commit 3')
-        repository.tag('release-1.0.1')
-    }
-
     void setup() {
         directory = temporaryFolder.root
         Grgit.init(dir: directory)
