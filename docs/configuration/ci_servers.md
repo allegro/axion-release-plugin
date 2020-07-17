@@ -91,3 +91,21 @@ you need to override branch name with `overriddenBranchName` flag and set it to
         -Prelease.disableChecks \
         -Prelease.pushTagsOnly \
         -Prelease.overriddenBranchName=$(Build.SourceBranch)
+
+## GitHub Actions
+
+Your workflow needs to use `actions/checkout@v2` with configuration to [fetch tags](https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches):
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+In order to push tags into the repository release step must use GitHub actor and token:
+
+      - name: Release
+        id: release
+        run: |
+          ./gradlew release \
+              -Prelease.customUsername=${{ github.actor }} \
+              -Prelease.customPassword=${{ github.token }}
