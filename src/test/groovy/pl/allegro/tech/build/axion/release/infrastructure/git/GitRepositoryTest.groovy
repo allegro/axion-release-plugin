@@ -169,7 +169,7 @@ class GitRepositoryTest extends Specification {
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(~/^release.*/)
 
         then:
-        allTaggedCommits.collect { c -> c.tags[0] } == ['release-3', 'release-4', 'release-2', 'release-1']
+        allTaggedCommits.collect { c -> c.tags[0] }.toSet() == ['release-3', 'release-4', 'release-2', 'release-1'].toSet()
     }
 
     def "should return only tags that match with prefix"() {

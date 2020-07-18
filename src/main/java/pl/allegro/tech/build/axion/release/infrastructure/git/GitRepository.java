@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
+import groovy.lang.Tuple2;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -9,6 +10,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.util.FS;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -16,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -33,7 +36,8 @@ public class GitRepository implements ScmRepository {
     public GitRepository(ScmProperties properties) {
         try {
             this.repositoryDir = properties.getDirectory();
-            this.jgitRepository = Git.open(repositoryDir);
+            RepositoryCache.FileKey key = RepositoryCache.FileKey.lenient(repositoryDir, FS.DETECTED);
+            this.jgitRepository = Git.wrap(RepositoryCache.open(key, true));
             this.properties = properties;
         } catch (RepositoryNotFoundException exception) {
             throw new ScmRepositoryUnavailableException(exception);
@@ -49,6 +53,11 @@ public class GitRepository implements ScmRepository {
             this.fetchTags(properties.getIdentity(), properties.getRemote());
         }
 
+    }
+
+    @Override
+    public String id() {
+        return repositoryDir.getAbsolutePath();
     }
 
     /**
@@ -93,6 +102,7 @@ public class GitRepository implements ScmRepository {
 
             if (!isOnExistingTag) {
                 jgitRepository.tag().setName(tagName).call();
+                ScmCache.getInstance().invalidate(this);
             } else {
                 logger.debug("The head commit " + headId + " already has the tag " + tagName + ".");
             }
@@ -109,6 +119,7 @@ public class GitRepository implements ScmRepository {
     public void dropTag(String tagName) {
         try {
             jgitRepository.tagDelete().setTags(GIT_TAG_PREFIX + tagName).call();
+            ScmCache.getInstance().invalidate(this);
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
@@ -139,7 +150,9 @@ public class GitRepository implements ScmRepository {
 
     private Iterable<PushResult> callPush(PushCommand pushCommand) {
         try {
-            return pushCommand.call();
+            Iterable<PushResult> result = pushCommand.call();
+            ScmCache.getInstance().invalidate(this);
+            return result;
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
@@ -204,6 +217,7 @@ public class GitRepository implements ScmRepository {
             }
 
             jgitRepository.commit().setMessage(message).call();
+            ScmCache.getInstance().invalidate(this);
         } catch (GitAPIException | IOException e) {
             throw new ScmException(e);
         }
@@ -331,39 +345,36 @@ public class GitRepository implements ScmRepository {
                 startingCommit = headId;
             }
 
-
             RevWalk walk = walker(startingCommit);
-            if (!inclusive) {
-                walk.next();
-            }
 
-            Map<String, List<String>> allTags = tagsMatching(pattern, walk);
-
-            RevCommit currentCommit;
-            List<String> currentTagsList;
-            for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-                currentTagsList = allTags.get(currentCommit.getId().getName());
-
-                if (currentTagsList != null) {
-                    TagsOnCommit taggedCommit = new TagsOnCommit(
-                        currentCommit.getId().name(),
-                        currentTagsList
-                    );
-                    taggedCommits.add(taggedCommit);
-
-                    if (stopOnFirstTag) {
-                        break;
-                    }
-
+            try {
+                if (!inclusive) {
+                    walk.next();
                 }
-
+                Map<String, List<String>> allTags = tagsMatching(pattern, walk);
+                if (stopOnFirstTag) {
+                    // stopOnFirstTag needs to get latest tag, therefore the order does matter
+                    // order is given by walking the repository commits. this can be slower in some
+                    // situations than returning all tagged commits
+                    RevCommit currentCommit;
+                    for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+                        List<String> tagList = allTags.get(currentCommit.getId().getName());
+                        if (tagList != null) {
+                            TagsOnCommit taggedCommit = new TagsOnCommit(currentCommit.getId().name(), tagList);
+                            taggedCommits.add(taggedCommit);
+                            break;
+                        }
+                    }
+                } else {
+                    // order not needed, we can just return all tagged commits
+                    allTags.forEach((key, value) -> taggedCommits.add(new TagsOnCommit(key, value)));
+                }
+            } finally {
+                walk.dispose();
             }
-
-            walk.dispose();
         } catch (IOException | GitAPIException e) {
             throw new ScmException(e);
         }
-
         return taggedCommits;
     }
 
@@ -380,27 +391,17 @@ public class GitRepository implements ScmRepository {
     }
 
     private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
-        List<Ref> tags = jgitRepository.tagList().call();
+        List<Tuple2<Ref, RevCommit>> parsedTagList = ScmCache.getInstance().parsedTagList(this, jgitRepository, walk);
 
-        return tags.stream()
-            .map(tag -> new TagNameAndId(
-                tag.getName().substring(GIT_TAG_PREFIX.length()),
-                parseCommitSafe(walk, tag.getObjectId())
-            ))
+        return parsedTagList.stream()
+            .map(pair -> new TagNameAndId(
+                pair.getFirst().getName().substring(GIT_TAG_PREFIX.length()),
+                pair.getSecond().getName()))
             .filter(t -> pattern.matcher(t.name).matches())
             .collect(
                 HashMap::new,
                 (m, t) -> m.computeIfAbsent(t.id, (s) -> new ArrayList<>()).add(t.name),
-                HashMap::putAll
-            );
-    }
-
-    private String parseCommitSafe(RevWalk walk, AnyObjectId commitId) {
-        try {
-            return walk.parseCommit(commitId).getName();
-        } catch (IOException e) {
-            throw new ScmException(e);
-        }
+                HashMap::putAll);
     }
 
     private final static class TagNameAndId {
