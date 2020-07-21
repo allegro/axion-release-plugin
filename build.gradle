@@ -40,7 +40,7 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '5.7.0.202003110725-r',
+        jgit: '5.8.1.202007141445-r',
         jsch: '0.1.54',
         jschAgent: '0.0.9'
 ]
@@ -85,6 +85,7 @@ dependencies {
     compile localGroovy()
 
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
 
     compile group: 'com.jcraft', name: 'jsch', version: versions.jsch
