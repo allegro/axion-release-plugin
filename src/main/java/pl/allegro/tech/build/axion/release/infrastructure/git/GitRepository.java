@@ -75,26 +75,38 @@ public class GitRepository implements ScmRepository {
     @Override
     public void tag(final String tagName) {
         try {
-            final String headId = head().name();
+            tag(head().name(), tagName);
+        }  catch (IOException e) {
+            throw new ScmException(e);
+        }
+    }
+
+    @Override
+    public void tag(final String revision, final String tagName) {
+        try {
+            ObjectId commitId = ObjectId.fromString(revision);
+            RevWalk revWalk = new RevWalk(jgitRepository.getRepository());
+            RevCommit commit = revWalk.parseCommit(commitId);
+
             List<Ref> tags = jgitRepository.tagList().call();
 
             boolean isOnExistingTag = tags.stream().anyMatch(ref -> {
                 boolean onTag = ref.getName().equals(GIT_TAG_PREFIX + tagName);
-                boolean onHead;
+                boolean onRef;
                 try {
-                    onHead = jgitRepository.getRepository().getRefDatabase()
-                        .peel(ref).getPeeledObjectId().getName().equals(headId);
+                    onRef = jgitRepository.getRepository().getRefDatabase()
+                        .peel(ref).getPeeledObjectId().getName().equals(revision);
                 } catch (IOException e) {
                     throw new ScmException(e);
                 }
 
-                return onTag && onHead;
+                return onTag && onRef;
             });
 
             if (!isOnExistingTag) {
-                jgitRepository.tag().setName(tagName).call();
+                jgitRepository.tag().setObjectId(commit).setName(tagName).call();
             } else {
-                logger.debug("The head commit " + headId + " already has the tag " + tagName + ".");
+                logger.debug("The commit " + revision + " already has the tag " + tagName + ".");
             }
         } catch (GitAPIException | IOException e) {
             throw new ScmException(e);

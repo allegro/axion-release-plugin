@@ -108,6 +108,18 @@ class VersionFactoryTest extends Specification {
         version.snapshot
     }
 
+    def "should increment patch version when on release tag if forceIncrementVersion is set"() {
+        given:
+        VersionFactory factory = versionFactory(versionProperties().forceIncrementVersion().build())
+
+        when:
+        VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onReleaseTag().build(), Version.valueOf('1.0.0'))
+
+        then:
+        version.version.toString() == '1.0.1'
+        !version.snapshot
+    }
+
     def "should not increment patch version when on tag and there are uncommitted changes but they are ignored (default)"() {
         when:
         VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onReleaseTag().hasUncomittedChanges().build(), Version.valueOf('1.0.0'))

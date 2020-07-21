@@ -19,10 +19,10 @@ class MarkNextVersionTask extends DefaultTask {
         VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
         Context context = GradleAwareContext.create(project, config)
 
-        NextVersionMarker marker = new NextVersionMarker(context.scmService())
-
         Properties rules = context.rules()
-        marker.markNextVersion(rules.nextVersion, rules.tag, config)
+        NextVersionMarker marker = new NextVersionMarker(context.scmService(), rules.getVersion().getMonorepoProperties().getDirsToExclude())
+
+        marker.markNextVersion(context.projectRootRelativePath(), rules.nextVersion, rules.tag, config)
     }
 
 }

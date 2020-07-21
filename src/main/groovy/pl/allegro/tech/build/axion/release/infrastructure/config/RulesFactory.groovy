@@ -8,10 +8,10 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class RulesFactory {
 
-    static Properties create(Project project, VersionConfig versionConfig, ScmPosition position) {
+    static Properties create(Project project, VersionConfig versionConfig, ScmPosition position, boolean shouldForceIncrementVersion) {
         return new Properties(
             project.hasProperty(ReleasePlugin.DRY_RUN_FLAG),
-            VersionPropertiesFactory.create(project, versionConfig, position.branch),
+            VersionPropertiesFactory.create(project, versionConfig, position.branch, shouldForceIncrementVersion),
             TagPropertiesFactory.create(versionConfig.tag, position.branch),
             ChecksPropertiesFactory.create(project, versionConfig.checks),
             NextVersionPropertiesFactory.create(project, versionConfig.nextVersion),

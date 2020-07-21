@@ -23,14 +23,17 @@ class Context {
 
     private final LocalOnlyResolver localOnlyResolver
 
+    private final String projectRootRelativePath
+
     Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
         this.rules = rules
         this.scmRepository = scmRepository
         this.scmProperties = scmProperties
         this.localOnlyResolver = localOnlyResolver
+        this.projectRootRelativePath = scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()
 
         instances[ScmRepository] = scmRepository
-        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()))
+        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, projectRootRelativePath))
     }
 
     private <T> T get(Class<T> clazz) {
@@ -67,5 +70,9 @@ class Context {
 
     ScmChangesPrinter changesPrinter() {
         return new GitChangesPrinter(get(ScmRepository) as GitRepository)
+    }
+
+    String projectRootRelativePath() {
+        return projectRootRelativePath
     }
 }

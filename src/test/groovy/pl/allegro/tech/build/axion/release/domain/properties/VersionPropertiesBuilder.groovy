@@ -19,6 +19,8 @@ class VersionPropertiesBuilder {
 
     private boolean sanitizeVersion = true
 
+    private boolean shouldForceIncrement = false;
+
     private VersionPropertiesBuilder() {
     }
 
@@ -35,7 +37,8 @@ class VersionPropertiesBuilder {
             PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
             sanitizeVersion,
             useHighestVersion,
-            monorepoProperties
+            monorepoProperties,
+            shouldForceIncrement
         )
     }
 
@@ -58,7 +61,7 @@ class VersionPropertiesBuilder {
         this.useHighestVersion = true
         return this
     }
-    
+
     VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
         this.monorepoProperties = monorepoProperties
         return this
@@ -71,6 +74,11 @@ class VersionPropertiesBuilder {
 
     VersionPropertiesBuilder dontSanitizeVersion() {
         this.sanitizeVersion = false
+        return this
+    }
+
+    VersionPropertiesBuilder forceIncrementVersion()  {
+        this.shouldForceIncrement = true
         return this
     }
 }

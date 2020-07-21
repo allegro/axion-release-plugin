@@ -28,7 +28,12 @@ class DryRepository implements ScmRepository {
 
     @Override
     void tag(String tagName) {
-        log("creating tag with name: $tagName")
+        tag("HEAD", tagName)
+    }
+
+    @Override
+    void tag(String revision, String tagName) {
+        log("creating tag with name: $tagName on commit ${revision}")
     }
 
     @Override
@@ -59,7 +64,7 @@ class DryRepository implements ScmRepository {
 
     @Override
     ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
-        return delegateRepository.positionOfLastChangeIn(path)
+        return delegateRepository.positionOfLastChangeIn(path, excludeSubFolders)
     }
 
     @Override

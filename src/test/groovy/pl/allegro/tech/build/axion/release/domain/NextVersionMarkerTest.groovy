@@ -40,7 +40,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         NextVersionProperties rules = nextVersionProperties().withNextVersion('2.0.0').build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules, config)
+        nextVersionMarker.markNextVersion("", rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-2.0.0-alpha']
@@ -52,7 +52,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         NextVersionProperties rules = nextVersionProperties().build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules, config)
+        nextVersionMarker.markNextVersion("", rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-0.1.1-alpha']
@@ -66,7 +66,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
             .build()
 
         when:
-        nextVersionMarker.markNextVersion(rules, tagRules, config)
+        nextVersionMarker.markNextVersion("", rules, tagRules, config)
 
         then:
         repository.latestTags(~/.*/).tags == ['release-1.0.0-alpha']

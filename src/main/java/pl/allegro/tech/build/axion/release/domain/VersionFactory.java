@@ -59,7 +59,7 @@ public class VersionFactory {
 
         boolean isSnapshot = forceVersionShouldForceSnapshot || versionProperties.isForceSnapshot() || hasChanges || scmState.isOnNextVersionTag() || scmState.isNoReleaseTagsFound();
         boolean proposedVersionIsAlreadySnapshot = scmState.isOnNextVersionTag() || scmState.isNoReleaseTagsFound();
-        boolean incrementVersion = ((versionProperties.isForceSnapshot() || hasChanges) && !proposedVersionIsAlreadySnapshot);
+        boolean incrementVersion = ((versionProperties.isForceSnapshot() || hasChanges || versionProperties.isShouldForceIncrementVersion()) && !proposedVersionIsAlreadySnapshot);
 
         Version finalVersion = version;
         if (StringGroovyMethods.asBoolean(versionProperties.getForcedVersion())) {

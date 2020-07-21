@@ -11,12 +11,18 @@ class NextVersionMarker {
     private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(NextVersionMarker)
 
     private final ScmService repositoryService
+    private final List<String> dirsToExclude;
 
     NextVersionMarker(ScmService repositoryService) {
-        this.repositoryService = repositoryService
+        this(repositoryService, Collections.emptyList());
     }
 
-    void markNextVersion(NextVersionProperties nextVersionRules, TagProperties tagRules, VersionConfig versionConfig) {
+    NextVersionMarker(ScmService repositoryService, List<String> dirsToExclude) {
+        this.repositoryService = repositoryService
+        this.dirsToExclude = dirsToExclude;
+    }
+
+    void markNextVersion(String projectRootRelativePath, NextVersionProperties nextVersionRules, TagProperties tagRules, VersionConfig versionConfig) {
 
         String nextVersion = null
         if (nextVersionRules.nextVersion) {
@@ -34,7 +40,7 @@ class NextVersionMarker {
         String nextVersionTag = nextVersionRules.serializer(nextVersionRules, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
-        repositoryService.tag(nextVersionTag)
+        repositoryService.tag(repositoryService.positionOfLastChangeIn(projectRootRelativePath, dirsToExclude).getRevision(), nextVersionTag)
         repositoryService.push()
     }
 }

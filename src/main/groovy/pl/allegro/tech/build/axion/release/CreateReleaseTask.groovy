@@ -10,15 +10,21 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 
 class CreateReleaseTask extends DefaultTask {
 
+    boolean forceIncrementVersion = false
+
     @Optional
     VersionConfig versionConfig
 
     @TaskAction
     void release() {
         VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
-        Context context = GradleAwareContext.create(project, config)
+        Context context = GradleAwareContext.create(project, config, forceIncrementVersion)
         Releaser releaser = context.releaser()
-        releaser.release(context.rules())
+        println "forceIncrementVersion " + forceIncrementVersion
+        releaser.release(context.projectRootRelativePath(), context.rules(), forceIncrementVersion)
     }
 
+    void setForceIncrementVersion(boolean forceIncrementVersion) {
+        this.forceIncrementVersion = forceIncrementVersion
+    }
 }

@@ -24,7 +24,7 @@ class VersionPropertiesFactory {
 
     private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
 
-    static VersionProperties create(Project project, VersionConfig config, String currentBranch) {
+    static VersionProperties create(Project project, VersionConfig config, String currentBranch, boolean shouldForceIncrementVersion) {
         String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
         if (forceVersionValue == null) {
             forceVersionValue = project.hasProperty(DEPRECATED_FORCE_VERSION_PROPERTY) ? project.property(DEPRECATED_FORCE_VERSION_PROPERTY) : null
@@ -43,7 +43,8 @@ class VersionPropertiesFactory {
             findVersionIncrementer(project, config, currentBranch),
             config.sanitizeVersion,
             useHighestVersion,
-            MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
+            MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch),
+            shouldForceIncrementVersion
         )
     }
 

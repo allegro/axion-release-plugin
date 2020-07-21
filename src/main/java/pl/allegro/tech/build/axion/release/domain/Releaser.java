@@ -22,19 +22,21 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties) {
+    public Optional<String> release(String projectRootRelativePath, Properties properties, boolean shouldForceIncrement) {
         VersionContext versionContext = versionService.currentVersion(
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
         );
         Version version = versionContext.getVersion();
 
-        if (versionContext.isSnapshot()) {
+        if (versionContext.isSnapshot() || shouldForceIncrement) {
             String tagName = properties.getTag().getSerialize().call(properties.getTag(), version.toString());
 
             hooksRunner.runPreReleaseHooks(properties.getHooks(), properties, versionContext, version);
 
             logger.quiet("Creating tag: " + tagName);
-            repository.tag(tagName);
+            repository.tag(repository.positionOfLastChangeIn(projectRootRelativePath,
+                properties.getVersion().getMonorepoProperties().getDirsToExclude()
+            ).getRevision(), tagName);
 
             hooksRunner.runPostReleaseHooks(properties.getHooks(), properties, versionContext, version);
             return Optional.of(tagName);
@@ -42,11 +44,10 @@ public class Releaser {
             logger.quiet("Working on released version " + version + ", nothing to release");
             return Optional.empty();
         }
-
     }
 
-    public ScmPushResult releaseAndPush(Properties rules) {
-        Optional<String> releasedTagName = release(rules);
+    public ScmPushResult releaseAndPush(String projectRootRelativePath, Properties rules, boolean shouldForceIncrementVersion) {
+        Optional<String> releasedTagName = release(projectRootRelativePath, rules, shouldForceIncrementVersion);
 
         ScmPushResult result = pushRelease();
 
