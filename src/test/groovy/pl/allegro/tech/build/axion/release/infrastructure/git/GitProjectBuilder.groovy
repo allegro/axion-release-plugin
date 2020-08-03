@@ -49,6 +49,11 @@ class GitProjectBuilder {
         return this
     }
 
+    GitProjectBuilder withLightweightTag(String name) {
+        rawRepository.tag.add(name: name, annotate: false)
+        return this
+    }
+
     GitProjectBuilder usingProperties(ScmProperties scmProperties) {
         this.scmProperties = scmProperties
         return this

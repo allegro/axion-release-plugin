@@ -82,8 +82,14 @@ public class GitRepository implements ScmRepository {
                 boolean onTag = ref.getName().equals(GIT_TAG_PREFIX + tagName);
                 boolean onHead;
                 try {
-                    onHead = jgitRepository.getRepository().getRefDatabase()
-                        .peel(ref).getPeeledObjectId().getName().equals(headId);
+                    ObjectId peeledObjectId = jgitRepository.getRepository().getRefDatabase()
+                        .peel(ref).getPeeledObjectId();
+                    if (peeledObjectId != null) {
+                        onHead = peeledObjectId.getName().equals(headId);
+                    } else {
+                        onHead = ref.getName().equals(headId);
+                        logger.debug("Using lightweight (not annotated) tag " + ref.getName() + ".");
+                    }
                 } catch (IOException e) {
                     throw new ScmException(e);
                 }

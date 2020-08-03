@@ -51,6 +51,24 @@ class GitRepositoryTest extends Specification {
         thrown(ScmRepositoryUnavailableException)
     }
 
+    def "should not peel lightweight tags"() {
+        given:
+        File lightweightTagRepositoryDir = File.createTempDir('axion-release', 'tmp')
+        Map repositories = GitProjectBuilder.gitProject(lightweightTagRepositoryDir)
+            .withInitialCommit()
+            .withLightweightTag('release-1')
+            .build()
+
+        GitRepository lightweightTagRepository = repositories[GitRepository] as GitRepository
+
+        when:
+        lightweightTagRepository.tag('release-2')
+        TagsOnCommit tags = lightweightTagRepository.latestTags(~/^release.*/)
+
+        then:
+        tags.tags == ['release-1', 'release-2']
+    }
+
     def "should create new tag on current commit"() {
         when:
         repository.tag('release-1')
