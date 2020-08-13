@@ -5,7 +5,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 enum PredefinedReleaseCommitMessageCreator {
 
     DEFAULT('default', { String version, ScmPosition position ->
-        return "release version: $version"
+        return "release version: $version".toString()
     });
 
     private final String type

@@ -22,6 +22,6 @@ class SnapshotDependenciesChecker {
     }
 
     String toFullVersion(it) {
-        "${it.group}:${it.name}:${it.version}"
+        "${it.group}:${it.name}:${it.version}".toString()
     }
 }
