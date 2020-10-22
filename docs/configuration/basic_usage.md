@@ -72,8 +72,10 @@ scmVersion {
     // ...
 }
 
-allprojects {
-    project.version = scmVersion.version
+project.version = scmVersion.version
+subprojects {
+  project.version = parent.project.version
+  // ...
 }
 ```
 
