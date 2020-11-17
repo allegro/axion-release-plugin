@@ -22,7 +22,9 @@ class HooksPropertiesBuilder {
     }
 
     HooksPropertiesBuilder withCommitHook() {
-        pre.add(PredefinedReleaseHookAction.factoryFor('commit').create(PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator))
+        pre.add(PredefinedReleaseHookAction.factoryFor('commit').create(
+            { hookContext -> PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator(hookContext.currentVersion, hookContext.position) }
+        ))
         return this
     }
 }
