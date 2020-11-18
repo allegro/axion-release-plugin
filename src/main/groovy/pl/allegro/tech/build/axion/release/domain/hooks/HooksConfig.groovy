@@ -40,8 +40,8 @@ class HooksConfig {
         postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(safeCastToCustomAction(c)))
     }
 
-    private static CustomAction safeCastToCustomAction(Closure closure) {
-        return closure.parameterTypes.length == 1 && closure.parameterTypes[0] == HookContext.class
+    static CustomAction safeCastToCustomAction(Closure closure) {
+        return closure.parameterTypes.length == 1 && closure.parameterTypes[0].isAssignableFrom(HookContext.class)
             ? closure
             : { HookContext hookContext -> closure(hookContext.currentVersion, hookContext.position)}
     }
