@@ -30,8 +30,8 @@ class NextVersionMarker {
             logger.info("Next Version not specified. Creating next version with default incrementer: $nextVersion")
         }
 
-        String tagName = tagRules.serialize(tagRules, nextVersion.toString())
-        String nextVersionTag = nextVersionRules.serializer(nextVersionRules, tagName)
+        String tagName = tagRules.serialize.apply(tagRules, nextVersion.toString())
+        String nextVersionTag = nextVersionRules.serializer.apply(nextVersionRules, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
         repositoryService.tag(nextVersionTag)

@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.NextVersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
 import static org.gradle.testfixtures.ProjectBuilder.builder
@@ -21,8 +22,8 @@ class NextVersionPropertiesFactoryTest extends Specification {
         given:
         project.extensions.extraProperties.set('release.version', '1.0.0')
 
-        config.serializer = {'serialize'}
-        config.deserializer = {'deserialize'}
+        config.serializer = { config, version -> 'serialize'}
+        config.deserializer = { config, position, tagName -> 'deserialize'}
         config.suffix = 'something'
         config.separator = '='
 
@@ -30,8 +31,8 @@ class NextVersionPropertiesFactoryTest extends Specification {
         NextVersionProperties properties = NextVersionPropertiesFactory.create(project, config)
 
         then:
-        properties.serializer() == 'serialize'
-        properties.deserializer() == 'deserialize'
+        properties.serializer.apply(properties, "any") == 'serialize'
+        properties.deserializer.apply(properties, new ScmPosition("shortsha", "longsha", "master"), "any") == 'deserialize'
         properties.suffix == 'something'
         properties.separator == '='
     }
