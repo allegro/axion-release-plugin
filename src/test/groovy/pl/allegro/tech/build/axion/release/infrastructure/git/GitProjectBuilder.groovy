@@ -21,6 +21,9 @@ class GitProjectBuilder {
         this.rawRepository = Grgit.init(dir: repositoryDir)
         this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         this.identity = ScmIdentity.defaultIdentityWithoutAgents()
+
+        // let's make sure, not to use system wide user settings in tests
+        this.rawRepository.repository.jgit.repository.config.baseConfig.clear()
     }
 
     private GitProjectBuilder(File project, File cloneFrom) {
@@ -29,6 +32,9 @@ class GitProjectBuilder {
         this.rawRepository = Grgit.clone(dir: repositoryDir, uri: "file://${cloneFrom.canonicalPath}")
         this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         this.identity = ScmIdentity.defaultIdentityWithoutAgents()
+
+        // let's make sure, not to use system wide user settings in tests
+        this.rawRepository.repository.jgit.repository.config.baseConfig.clear()
     }
 
     static GitProjectBuilder gitProject(File project) {
