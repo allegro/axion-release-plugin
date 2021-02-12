@@ -32,7 +32,7 @@ scmVersion {
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
-sourceCompatibility = '1.8'
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
@@ -40,8 +40,8 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '5.7.0.202003110725-r',
-        jsch: '0.1.54',
+        jgit: '5.10.0.202012080955-r',
+        jsch: '0.1.55',
         jschAgent: '0.0.9'
 ]
 
@@ -86,6 +86,8 @@ dependencies {
 
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
     compile group: 'com.jcraft', name: 'jsch', version: versions.jsch
     compile group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
