@@ -8,6 +8,8 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'com.bmuschko.nexus' version '2.3.1' apply false
     id 'io.codearte.nexus-staging' version '0.11.0' apply false
+    id 'com.coditory.integration-test' version "1.0.5"
+    id 'com.adarshr.test-logger' version '2.1.1'
 
     id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
@@ -49,20 +51,6 @@ sourceSets {
     main {
         java { srcDirs = [] }    // no source dirs for the java compiler
         groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
-    }
-
-    integration {
-        java.srcDir project.file('src/integration/java')
-        groovy.srcDir project.file('src/integration/groovy')
-
-        resources.srcDir project.file('src/integration/resources')
-        resources.srcDir project.sourceSets.test.resources
-        resources.srcDir project.sourceSets.main.resources
-
-        compileClasspath = project.sourceSets.main.output +
-                project.sourceSets.test.output +
-                project.configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
     }
 
     remoteTest {
@@ -112,44 +100,15 @@ dependencies {
     testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
     testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
 
-    testCompile gradleTestKit()
-}
-
-test {
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        exceptionFormat = 'full'
-    }
+    testImplementation gradleTestKit()
 }
 
 project.configurations {
-    integration {
-        extendsFrom project.configurations.testRuntime
-        description = 'Dependencies for integration tests'
-        transitive = true
-        visible = true
-    }
-
     remoteTest {
         extendsFrom project.configurations.testRuntime
         description = 'Dependencies for tests with Docker'
         transitive = true
         visible = true
-    }
-}
-
-task integrationTest(type: Test) {
-    testClassesDirs = project.sourceSets.integration.output.classesDirs
-    classpath = project.sourceSets.main.output +
-            project.sourceSets.test.output +
-            project.sourceSets.integration.runtimeClasspath +
-            project.configurations.testRuntime +
-            project.configurations.integrationRuntime
-
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        showStandardStreams = true
-        exceptionFormat = 'full'
     }
 }
 
@@ -181,11 +140,6 @@ task remoteTest(type: Test) {
         project.sourceSets.remoteTest.runtimeClasspath +
         project.configurations.testRuntime +
         project.configurations.remoteTestRuntime
-
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        exceptionFormat = 'full'
-    }
 
     dependsOn startDockerContainer
     finalizedBy stopDockerContainer

@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain;
 
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.Nested;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
@@ -51,14 +53,17 @@ public class VersionService {
             this.position = position;
         }
 
+        @Input
         public final String getUndecoratedVersion() {
             return undecoratedVersion;
         }
 
+        @Input
         public final String getDecoratedVersion() {
             return decoratedVersion;
         }
 
+        @Nested
         public final ScmPosition getPosition() {
             return position;
         }
