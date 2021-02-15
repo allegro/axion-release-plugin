@@ -10,7 +10,7 @@ plugins {
     id 'io.codearte.nexus-staging' version '0.11.0' apply false
     id 'com.coditory.integration-test' version "1.0.5"
     id 'com.adarshr.test-logger' version '2.1.1'
-
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
 
@@ -69,39 +69,47 @@ sourceSets {
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+    shadow gradleApi()
+    shadow localGroovy()
 
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
-    compile group: 'com.jcraft', name: 'jsch', version: versions.jsch
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch', version: versions.jsch
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: versions.jschAgent
 
-    compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
+    implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
     testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testCompile(group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-    }
+    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.3-groovy-2.5'
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
     testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
     testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
     testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
 
-    testImplementation gradleTestKit()
+    testCompile gradleTestKit()
 }
+
+shadowJar {
+    minimize()
+}
+
+task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+}
+
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
 project.configurations {
     remoteTest {
@@ -131,7 +139,6 @@ task startDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.Docke
 task stopDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStopContainer) {
     targetContainerId { createDockerContainer.getContainerId() }
 }
-
 
 task remoteTest(type: Test) {
     testClassesDirs = project.sourceSets.remoteTest.output.classesDirs
