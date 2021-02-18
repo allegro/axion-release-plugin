@@ -85,7 +85,7 @@ Of course nothing can stop you from implementing own action. It can be
 any closure that accepts `HookContext` object:
 
     scmVersion {
-        hook {
+        hooks {
             pre {context -> /* do something important */}
         }
     }
