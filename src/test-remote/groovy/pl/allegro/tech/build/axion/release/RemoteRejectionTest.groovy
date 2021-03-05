@@ -36,8 +36,8 @@ class RemoteRejectionTest extends Specification {
         GitRepository repository = new GitRepository(ScmPropertiesBuilder.scmProperties(repoDir).build())
 
         repository.commit(['*'], 'initial commit')
-        repository.tag('release-custom')
-        repository.commit(['*'], 'commit after release-custom')
+        repository.tag('vcustom')
+        repository.commit(['*'], 'commit after vcustom')
 
         when:
         ScmPushResult result = repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('origin', false), true)

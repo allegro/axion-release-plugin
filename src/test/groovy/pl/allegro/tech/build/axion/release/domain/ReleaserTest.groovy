@@ -36,7 +36,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should not release version when on tag"() {
         given:
-        repository.tag('release-1.0.0')
+        repository.tag('v1.0.0')
 
         when:
         releaser.release(context.rules())
@@ -61,7 +61,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should not release version when on pre-released version tag"() {
         given:
-        repository.tag('release-3.0.0-rc4')
+        repository.tag('v3.0.0-rc4')
 
         when:
         releaser.release(context.rules())
@@ -72,7 +72,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should increment pre-released version correctly"() {
         given:
-        repository.tag('release-3.0.0-rc4')
+        repository.tag('v3.0.0-rc4')
         repository.commit(['*'], 'make is snapshot')
 
         when:
@@ -99,7 +99,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should create release commit when on tag but forced"() {
         given:
-        repository.tag('release-3.1.0')
+        repository.tag('v3.1.0')
         Properties rules = properties()
                 .withVersionRules(versionProperties().forceVersion('3.2.0').build())
                 .withHooksRules(hooksProperties().withCommitHook().build())

@@ -13,7 +13,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().build()
 
         expect:
-        TagNameSerializer.DEFAULT.serializer(properties, '0.1.0') == 'release-0.1.0'
+        TagNameSerializer.DEFAULT.serializer(properties, '0.1.0') == 'v0.1.0'
     }
 
     def "default deserializer should read version by stripping off prefix and version separator"() {
@@ -21,7 +21,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().build()
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(properties, scmPosition('master'), 'release-0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer(properties, scmPosition('master'), 'v0.1.0') == '0.1.0'
     }
 
     def "default serializer should use empty version separator when prefix is empty"() {
