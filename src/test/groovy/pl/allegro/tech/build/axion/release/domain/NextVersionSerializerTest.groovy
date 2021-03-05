@@ -14,17 +14,17 @@ class NextVersionSerializerTest extends Specification {
 
     def "default serializer should append separator and suffix"() {
         when:
-        String version = NextVersionSerializer.DEFAULT.serializer(rules, 'release-1.0.0')
-        
-        then:
-        version == 'release-1.0.0-beta'
-    }
-    
-    def "default deserializer should trim separator and suffix"() {
-        when:
-        String version = NextVersionSerializer.DEFAULT.deserializer(rules, scmPosition('master'), 'release-1.0.0-beta')
+        String version = NextVersionSerializer.DEFAULT.serializer(rules, 'v1.0.0')
 
         then:
-        version == 'release-1.0.0'
+        version == 'v1.0.0-beta'
+    }
+
+    def "default deserializer should trim separator and suffix"() {
+        when:
+        String version = NextVersionSerializer.DEFAULT.deserializer(rules, scmPosition('master'), 'v1.0.0-beta')
+
+        then:
+        version == 'v1.0.0'
     }
 }

@@ -43,7 +43,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
-        repository.latestTags(~/.*/).tags == ['release-2.0.0-alpha']
+        repository.latestTags(~/.*/).tags == ['v2.0.0-alpha']
     }
 
     def "should create next version with default incrementer"() {
@@ -55,7 +55,7 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
-        repository.latestTags(~/.*/).tags == ['release-0.1.1-alpha']
+        repository.latestTags(~/.*/).tags == ['v0.1.1-alpha']
     }
 
     def "should create next version with major incrementer"() {
@@ -69,6 +69,6 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
         nextVersionMarker.markNextVersion(rules, tagRules, config)
 
         then:
-        repository.latestTags(~/.*/).tags == ['release-1.0.0-alpha']
+        repository.latestTags(~/.*/).tags == ['v1.0.0-alpha']
     }
 }

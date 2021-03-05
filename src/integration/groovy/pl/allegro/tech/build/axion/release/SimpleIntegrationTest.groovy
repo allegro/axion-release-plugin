@@ -38,7 +38,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Creating tag: release-1.0.0')
+        releaseResult.output.contains('Creating tag: v1.0.0')
 
         when:
         def result = runGradle('cV')
@@ -84,13 +84,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should fail gracefuly when failed to parse tag"() {
         given:
         buildFile('')
-        repository.tag('release-blabla-1.0.0')
+        repository.tag('vblabla-1.0.0')
 
         when:
         def result = gradle().withArguments('cV').buildAndFail()
 
         then:
-        result.output.contains('release-blabla')
+        result.output.contains('vblabla')
     }
 
     def "should use initial verison setting"() {

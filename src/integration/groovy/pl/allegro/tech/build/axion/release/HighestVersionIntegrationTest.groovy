@@ -58,7 +58,7 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
         runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
-        repository.commit(['*'], "commit after release-2.0.0-alpha")
+        repository.commit(['*'], "commit after v2.0.0-alpha")
 
         when:
         def result = runGradle('currentVersion')
@@ -75,7 +75,7 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
         runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
-        repository.commit(['*'], "commit after release-1.5.0")
+        repository.commit(['*'], "commit after v1.5.0")
 
         runGradle('release', '-Prelease.version=1.2.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
@@ -94,7 +94,7 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
         runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
-        repository.commit(['*'], "commit after release-1.5.0")
+        repository.commit(['*'], "commit after v1.5.0")
 
         runGradle('release', '-Prelease.version=1.2.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
@@ -113,11 +113,11 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
         runGradle('release', '-Prelease.version=1.5.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
-        repository.commit(['*'], "commit after release-1.5.0")
+        repository.commit(['*'], "commit after v1.5.0")
 
         runGradle('release', '-Prelease.version=1.2.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
-        repository.commit(['*'], "commit after release-1.5.0")
+        repository.commit(['*'], "commit after v1.5.0")
 
         runGradle('release', '-Prelease.localOnly', '-Prelease.disableChecks', '-Prelease.useHighestVersion')
 
@@ -135,7 +135,7 @@ class HighestVersionIntegrationTest extends BaseIntegrationTest {
         buildFile('')
 
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
-        repository.commit(['*'], "commit after release-1.0.0")
+        repository.commit(['*'], "commit after v1.0.0")
         runGradle('markNextVersion', '-Prelease.version=2.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         when:

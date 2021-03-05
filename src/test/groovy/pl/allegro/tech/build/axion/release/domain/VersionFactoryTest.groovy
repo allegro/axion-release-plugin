@@ -24,7 +24,7 @@ class VersionFactoryTest extends Specification {
 
     def "should return current version read from tag"() {
         when:
-        Version version = factory.versionFromTag('release-1.0.0')
+        Version version = factory.versionFromTag('v1.0.0')
 
         then:
         version.toString() == '1.0.0'
@@ -32,7 +32,7 @@ class VersionFactoryTest extends Specification {
 
     def "should deserialize nextVersion before deserializing version when on nextVersion tag"() {
         when:
-        Version version = factory.versionFromTag('release-2.0.0-alpha')
+        Version version = factory.versionFromTag('V2.0.0-alpha')
 
         then:
         version.toString() == '2.0.0'
@@ -40,7 +40,7 @@ class VersionFactoryTest extends Specification {
 
     def "should capture parse exception and output meaningful message"() {
         when:
-        Version version = factory.versionFromTag('release-blabla-1.0.0')
+        Version version = factory.versionFromTag('vblabla-1.0.0')
 
         then:
         thrown(VersionFactory.TagParseException)
@@ -159,7 +159,7 @@ class VersionFactoryTest extends Specification {
         VersionFactory factory = versionFactory(versionProperties().forceSnapshot().build())
 
         when:
-        // This simulates nextVersionTag == 'release-1.0.0-alpha'
+        // This simulates nextVersionTag == 'v1.0.0-alpha'
         VersionFactory.FinalVersion version = factory.createFinalVersion(scmState().onNextVersionTag().build(), Version.valueOf('1.0.0'))
 
         then:

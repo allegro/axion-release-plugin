@@ -32,7 +32,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('b', ['release-2.0.0'])]),
+                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('b', ['v2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -47,7 +47,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0'])]),
+                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -63,7 +63,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('b', ['release-2.0.0-alpha'])]),
+                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('b', ['v2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -78,7 +78,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
+                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -93,7 +93,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
+                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
             false,
             true,
             ~/.*-alpha$/,
@@ -108,7 +108,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0']), new TagsOnCommit('a', ['release-2.0.0-alpha'])]),
+                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('a', ['v2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,
@@ -123,7 +123,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['release-1.0.0', 'release-2.0.0-alpha'])]),
+                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,

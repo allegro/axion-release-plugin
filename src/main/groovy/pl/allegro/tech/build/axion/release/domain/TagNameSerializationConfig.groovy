@@ -7,9 +7,9 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class TagNameSerializationConfig {
 
-    static final String DEFAULT_VERSION_SEPARATOR = '-'
+    static final String DEFAULT_VERSION_SEPARATOR = ''
 
-    static final String DEFAULT_PREFIX = 'release'
+    static final String DEFAULT_PREFIX = 'v'
 
     @Input
     String prefix = DEFAULT_PREFIX
