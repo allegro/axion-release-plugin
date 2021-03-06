@@ -12,6 +12,8 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Specification
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+
 class RemoteRejectionTest extends Specification {
 
     // defined in Docker run script in build.gradle
@@ -24,20 +26,20 @@ class RemoteRejectionTest extends Specification {
         Git.cloneRepository()
             .setDirectory(repoDir)
             .setTransportConfigCallback(new TransportConfigCallback() {
-            @Override
-            void configure(Transport transport) {
-                SshTransport sshTransport = (SshTransport) transport
-                sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
-            }
-        })
+                @Override
+                void configure(Transport transport) {
+                    SshTransport sshTransport = (SshTransport) transport
+                    sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
+                }
+            })
             .setURI("ssh://git@localhost:${SSH_PORT}/git-server/repos/rejecting-repo")
             .call()
 
         GitRepository repository = new GitRepository(ScmPropertiesBuilder.scmProperties(repoDir).build())
 
         repository.commit(['*'], 'initial commit')
-        repository.tag('vcustom')
-        repository.commit(['*'], 'commit after vcustom')
+        repository.tag(fullPrefix() + 'custom')
+        repository.commit(['*'], 'commit after ' + fullPrefix() + 'custom')
 
         when:
         ScmPushResult result = repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('origin', false), true)

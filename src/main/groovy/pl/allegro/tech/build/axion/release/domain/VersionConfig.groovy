@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import pl.allegro.tech.build.axion.release.ReleasePlugin
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
@@ -12,6 +13,8 @@ import pl.allegro.tech.build.axion.release.util.FileLoader
 
 import javax.inject.Inject
 import java.util.regex.Pattern
+
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
 
 class VersionConfig {
 
@@ -48,7 +51,7 @@ class VersionConfig {
     Map<String, Object> branchVersionIncrementer = [:]
 
     @Input
-    Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
+    Pattern releaseBranchPattern = Pattern.compile('^'+ prefix() + '(/.*)?$')
 
     @Nested
     ChecksConfig checks = new ChecksConfig()
