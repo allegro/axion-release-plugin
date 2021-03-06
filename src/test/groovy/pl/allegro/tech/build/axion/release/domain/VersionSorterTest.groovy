@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder
@@ -8,6 +9,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import spock.lang.Specification
+
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
 
 /**
  *  Variant matrix that has to be tested:
@@ -32,7 +35,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
-                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('b', ['v2.0.0'])]),
+                [new TagsOnCommit('a', [fullPrefix() + '1.0.0']), new TagsOnCommit('b', [fullPrefix() +'2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -47,7 +50,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0'])]),
+                [new TagsOnCommit('a', [fullPrefix() +'1.0.0', fullPrefix() +'2.0.0'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -63,7 +66,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("b", "b", "master"),
-                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('b', ['v2.0.0-alpha'])]),
+                [new TagsOnCommit('a', [fullPrefix() +'1.0.0']), new TagsOnCommit('b', [fullPrefix() +'2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -78,7 +81,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
+                [new TagsOnCommit('a', [fullPrefix() + '1.0.0', fullPrefix() +'2.0.0-alpha'])]),
             false,
             false,
             ~/.*-alpha$/,
@@ -93,7 +96,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
+                [new TagsOnCommit('a', [fullPrefix() +'1.0.0', fullPrefix() + '2.0.0-alpha'])]),
             false,
             true,
             ~/.*-alpha$/,
@@ -108,7 +111,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['v1.0.0']), new TagsOnCommit('a', ['v2.0.0-alpha'])]),
+                [new TagsOnCommit('a', [fullPrefix() +'1.0.0']), new TagsOnCommit('a', [fullPrefix() +'2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,
@@ -123,7 +126,7 @@ class VersionSorterTest extends Specification {
         when:
         def versionData = sorter.pickTaggedCommit(
             TaggedCommits.fromListOfCommits(new ScmPosition("a", "a", "master"),
-                [new TagsOnCommit('a', ['v1.0.0', 'v2.0.0-alpha'])]),
+                [new TagsOnCommit('a', [fullPrefix() +'1.0.0', fullPrefix() +'2.0.0-alpha'])]),
             true,
             false,
             ~/.*-alpha$/,

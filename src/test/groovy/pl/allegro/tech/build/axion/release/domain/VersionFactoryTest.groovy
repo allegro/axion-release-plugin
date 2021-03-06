@@ -1,11 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import spock.lang.Specification
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
 import static pl.allegro.tech.build.axion.release.domain.ScmStateBuilder.scmState
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
@@ -13,7 +15,6 @@ import static pl.allegro.tech.build.axion.release.domain.properties.VersionPrope
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
 class VersionFactoryTest extends Specification {
-
     VersionProperties versionProperties = versionProperties().build()
 
     TagProperties tagProperties = tagProperties().build()
@@ -24,7 +25,7 @@ class VersionFactoryTest extends Specification {
 
     def "should return current version read from tag"() {
         when:
-        Version version = factory.versionFromTag('v1.0.0')
+        Version version = factory.versionFromTag(fullPrefix() + '1.0.0')
 
         then:
         version.toString() == '1.0.0'
@@ -32,7 +33,7 @@ class VersionFactoryTest extends Specification {
 
     def "should deserialize nextVersion before deserializing version when on nextVersion tag"() {
         when:
-        Version version = factory.versionFromTag('V2.0.0-alpha')
+        Version version = factory.versionFromTag(fullPrefix() + '2.0.0-alpha')
 
         then:
         version.toString() == '2.0.0'
@@ -40,7 +41,7 @@ class VersionFactoryTest extends Specification {
 
     def "should capture parse exception and output meaningful message"() {
         when:
-        Version version = factory.versionFromTag('vblabla-1.0.0')
+        Version version = factory.versionFromTag(fullPrefix() + 'blabla-1.0.0')
 
         then:
         thrown(VersionFactory.TagParseException)

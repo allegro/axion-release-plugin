@@ -1,10 +1,11 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.TagNameSerializer
 
 class TagPropertiesBuilder {
 
-    private String prefix = 'v'
+    private String prefix = TagPrefixConf.prefix()
 
     private TagPropertiesBuilder() {
     }
@@ -16,7 +17,7 @@ class TagPropertiesBuilder {
     TagProperties build() {
         return new TagProperties(
             prefix,
-            '',
+            TagPrefixConf.separator(),
             TagNameSerializer.DEFAULT.serializer,
             TagNameSerializer.DEFAULT.deserializer,
             { r, p -> '0.1.0' }

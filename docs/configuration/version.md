@@ -123,7 +123,7 @@ Default deserialization function is a simple closure that strips tag
 name off prefix and separator between prefix and version. It ignores
 separator when prefix is an empty string:
 
-    deserialize(prefix: 'release', separator: '-', tag: 'v1.0.0') == 1.0.0
+    deserialize(prefix: 'v', separator: '', tag: 'v1.0.0') == 1.0.0
     deserialize(prefix: '', separator: '-', tag: '1.0.0') == 1.0.0
 
 You can implement own deserializer by setting closure that would accept
@@ -154,7 +154,7 @@ version tag with additional suffix.
 Default serializer prepends prefix and separator to version number.
 Separator is ignored if prefix is an empty string:
 
-    serialize(prefix: 'release', separator: '-', version: '1.0.0') == v1.0.0
+    serialize(prefix: 'v', separator: '', version: '1.0.0') == v1.0.0
     serialize(prefix: '', separator: '-', version: '1.0.0') == 1.0.0
 
 You can implement own serializer by setting closure that would accept
@@ -247,10 +247,10 @@ field is used.
 ### incrementMinorIfNotOnRelease
 
 This rule uses additional parameter `releaseBranchPattern` (by default
-it's set to `release/.+`):
+it's set to `v/.+`):
 
     scmVersion {
-        versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+        versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'v.*']
     }
 
 ### incrementPrerelease

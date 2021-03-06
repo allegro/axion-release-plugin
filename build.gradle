@@ -182,7 +182,7 @@ pluginBundle {
     website = 'https://github.com/allegro/axion-release-plugin'
     vcsUrl = 'https://github.com/allegro/axion-release-plugin'
     description = 'Release and version management plugin.'
-    tags = ['v', 'version']
+    tags = ['release', 'version']
 
     plugins {
         release {
