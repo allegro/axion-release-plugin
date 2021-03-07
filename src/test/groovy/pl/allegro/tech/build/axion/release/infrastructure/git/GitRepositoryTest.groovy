@@ -429,6 +429,62 @@ class GitRepositoryTest extends Specification {
         thrown(ScmException)
     }
 
+    def "existing legacy default tagname repo should return true on all matches"() {
+        given:
+        repository.tag("release-1")
+        repository.tag("release-9")
+
+        when:
+        boolean isLegacyNamed = repository.isLegacyDefTagnameRepo()
+
+        then:
+        isLegacyNamed
+    }
+
+        def "existing legacy default tagname repo should return false on partially matches"() {
+        given:
+        repository.tag("release-1")
+        repository.tag("bla1")
+
+        when:
+        boolean isLegacyNamed = repository.isLegacyDefTagnameRepo()
+
+        then:
+        !isLegacyNamed
+    }
+
+    def "existing legacy default tagname repo should return false on other matches"() {
+        given:
+        repository.tag("bla1")
+
+        when:
+        boolean isLegacyNamed = repository.isLegacyDefTagnameRepo()
+
+        then:
+        !isLegacyNamed
+    }
+
+    def "existing legacy default tagname repo should return false on empty matches"() {
+
+        when:
+        boolean isLegacyNamed = repository.isLegacyDefTagnameRepo()
+
+        then:
+        !isLegacyNamed
+    }
+
+    def "existing legacy default tagname repo should return false on current default tag matches"() {
+
+        given:
+        repository.tag(fullPrefix() + "1")
+
+        when:
+        boolean isLegacyNamed = repository.isLegacyDefTagnameRepo()
+
+        then:
+        !isLegacyNamed
+    }
+
     def "last position with changes in subdir should work with backslashes"() {
         given:
         String subdirA = 'a/aa'

@@ -7,6 +7,9 @@ public final class TagPrefixConf {
     private static String defaultPrefix = "v";
     private static String defaultSeparator = "";
 
+    public final static String DEFAULT_LEGACY_PREFIX = "release";
+    public final static String DEFAULT_LEGACY_SEP = "-";
+
     public static String prefix() {
         return defaultPrefix;
     }
@@ -23,5 +26,9 @@ public final class TagPrefixConf {
 
     public static String fullPrefix() {
         return defaultPrefix + defaultSeparator;
+    }
+
+    public static String fullLegacyPrefix() {
+        return DEFAULT_LEGACY_PREFIX + DEFAULT_LEGACY_SEP;
     }
 }
