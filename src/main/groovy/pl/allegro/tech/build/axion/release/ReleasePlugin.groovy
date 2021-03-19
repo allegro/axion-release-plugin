@@ -27,30 +27,36 @@ class ReleasePlugin implements Plugin<Project> {
     void apply(Project project) {
         project.extensions.create(VERSION_EXTENSION, VersionConfig, project)
 
-        Task verifyReleaseTask = project.tasks.create(VERIFY_RELEASE_TASK, VerifyReleaseTask)
-        verifyReleaseTask.group = 'Release'
-        verifyReleaseTask.description = 'Verifies code is ready for release.'
+        project.tasks.register(VERIFY_RELEASE_TASK, VerifyReleaseTask) {
+            group = 'Release'
+            description = 'Verifies code is ready for release.'
+        }
 
-        Task releaseTask = project.tasks.create(RELEASE_TASK, ReleaseTask)
-        releaseTask.group = 'Release'
-        releaseTask.description = 'Performs release - creates tag and pushes it to remote.'
-        releaseTask.dependsOn(VERIFY_RELEASE_TASK)
+        project.tasks.register(RELEASE_TASK, ReleaseTask) {
+            group = 'Release'
+            description = 'Performs release - creates tag and pushes it to remote.'
+            dependsOn(VERIFY_RELEASE_TASK)
+        }
 
-        Task createReleaseTask = project.tasks.create(CREATE_RELEASE_TASK, CreateReleaseTask)
-        createReleaseTask.group = 'Release'
-        createReleaseTask.description = 'Performs first stage of release - creates tag.'
-        createReleaseTask.dependsOn(VERIFY_RELEASE_TASK)
+        project.tasks.register(CREATE_RELEASE_TASK, CreateReleaseTask) {
+            group = 'Release'
+            description = 'Performs first stage of release - creates tag.'
+            dependsOn(VERIFY_RELEASE_TASK)
+        }
 
-        Task pushReleaseTask = project.tasks.create(PUSH_RELEASE_TASK, PushReleaseTask)
-        pushReleaseTask.group = 'Release'
-        pushReleaseTask.description = 'Performs second stage of release - pushes tag to remote.'
+        project.tasks.register(PUSH_RELEASE_TASK, PushReleaseTask) {
+            group = 'Release'
+            description = 'Performs second stage of release - pushes tag to remote.'
+        }
 
-        Task nextVersionTask = project.tasks.create(MARK_NEXT_VERSION_TASK, MarkNextVersionTask)
-        nextVersionTask.group = 'Release'
-        nextVersionTask.description = 'Creates next version marker tag and pushes it to remote.'
+        project.tasks.register(MARK_NEXT_VERSION_TASK, MarkNextVersionTask) {
+            group = 'Release'
+            description = 'Creates next version marker tag and pushes it to remote.'
+        }
 
-        Task currentVersionTask = project.tasks.create(CURRENT_VERSION_TASK, OutputCurrentVersionTask)
-        currentVersionTask.group = 'Help'
-        currentVersionTask.description = 'Prints current project version extracted from SCM.'
+        project.tasks.register(CURRENT_VERSION_TASK, OutputCurrentVersionTask) {
+            group = 'Help'
+            description = 'Prints current project version extracted from SCM.'
+        }
     }
 }
