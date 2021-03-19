@@ -18,7 +18,7 @@ class ExtendingTasksIntegrationTest extends BaseIntegrationTest {
             task customTask(type: ${task}) {
                 versionConfig = new VersionConfig(project)
             }
-            
+
             customTask.doFirst {
                 println "Check for this message"
             }
@@ -37,7 +37,8 @@ class ExtendingTasksIntegrationTest extends BaseIntegrationTest {
             'OutputCurrentVersionTask',
             'PushReleaseTask',
             'ReleaseTask',
-            'VerifyReleaseTask'
+            'VerifyReleaseTask',
+            'PinVersionTask'
         ]
     }
 

@@ -21,6 +21,8 @@ class ReleasePlugin implements Plugin<Project> {
 
     public static final String CURRENT_VERSION_TASK = 'currentVersion'
 
+    public static final String PIN_VERSION_TASK = 'pinVersion'
+
     public static final String DRY_RUN_FLAG = 'release.dryRun'
 
     @Override
@@ -52,5 +54,14 @@ class ReleasePlugin implements Plugin<Project> {
         Task currentVersionTask = project.tasks.create(CURRENT_VERSION_TASK, OutputCurrentVersionTask)
         currentVersionTask.group = 'Help'
         currentVersionTask.description = 'Prints current project version extracted from SCM.'
+
+        project.afterEvaluate {
+            VersionConfig versionConfig = project.extensions.getByType(VersionConfig)
+            if (versionConfig.pinning.enabled) {
+                Task pinVersionTask = project.tasks.create(PIN_VERSION_TASK, PinVersionTask)
+                pinVersionTask.group = 'Release'
+                pinVersionTask.description = 'Writes the current release version into a file, for later usage by the plugin'
+            }
+        }
     }
 }

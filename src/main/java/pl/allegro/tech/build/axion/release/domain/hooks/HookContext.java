@@ -54,7 +54,7 @@ public class HookContext {
 
     public String readVersion() {
         String version = versionService.currentDecoratedVersion(
-            rules.getVersion(), rules.getTag(), rules.getNextVersion()
+            rules.getVersion(), rules.getTag(), rules.getNextVersion(), rules.getPinning()
         ).getDecoratedVersion();
 
         logger.info("Read version " + version + " from repository without using cache");

@@ -3,7 +3,7 @@ package pl.allegro.tech.build.axion.release
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 
-class BaseIntegrationTest extends RepositoryBasedTest {
+abstract class BaseIntegrationTest extends RepositoryBasedTest {
 
     File buildFile() {
         return temporaryFolder.newFile('build.gradle')

@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release.infrastructure.di
 
-import pl.allegro.tech.build.axion.release.domain.*
+import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
+import pl.allegro.tech.build.axion.release.domain.Releaser
+import pl.allegro.tech.build.axion.release.domain.VersionResolver
+import pl.allegro.tech.build.axion.release.domain.VersionService
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
@@ -23,14 +26,21 @@ class Context {
 
     private final LocalOnlyResolver localOnlyResolver
 
-    Context(Properties rules, ScmRepository scmRepository, ScmProperties scmProperties, File projectRoot, LocalOnlyResolver localOnlyResolver) {
+    Context(
+        Properties rules,
+        ScmRepository scmRepository,
+        ScmProperties scmProperties,
+        File projectRoot,
+        LocalOnlyResolver localOnlyResolver
+    ) {
         this.rules = rules
         this.scmRepository = scmRepository
         this.scmProperties = scmProperties
         this.localOnlyResolver = localOnlyResolver
 
+        String projectRelativeRootPath = scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()
         instances[ScmRepository] = scmRepository
-        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()))
+        instances[VersionService] = new VersionService(new VersionResolver(scmRepository, projectRelativeRootPath))
     }
 
     private <T> T get(Class<T> clazz) {

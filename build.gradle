@@ -87,6 +87,8 @@ dependencies {
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
+    implementation group: 'com.squareup.moshi', name: 'moshi', version: '1.11.0'
+
     testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'

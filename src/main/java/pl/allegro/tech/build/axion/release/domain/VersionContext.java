@@ -1,8 +1,10 @@
 package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.Version;
+import com.squareup.moshi.JsonClass;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
+@JsonClass(generateAdapter = false)
 public class VersionContext {
 
     private final Version version;
