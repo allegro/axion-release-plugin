@@ -15,6 +15,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
     public static final String PUSH_RELEASE_TASK = 'pushRelease'
     public static final String MARK_NEXT_VERSION_TASK = 'markNextVersion'
     public static final String CURRENT_VERSION_TASK = 'currentVersion'
+    public static final String PIN_VERSION_TASK = 'pinVersion'
 
     @Override
     void apply(Project project) {
@@ -22,7 +23,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
 
         def versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
 
-        project.tasks.withType(BaseAxionTask).configureEach( {
+        project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
         })
 
@@ -62,6 +63,15 @@ abstract class ReleasePlugin implements Plugin<Project> {
         project.tasks.register(CURRENT_VERSION_TASK, OutputCurrentVersionTask) {
             group = 'Help'
             description = 'Prints current project version extracted from SCM.'
+        }
+
+        project.afterEvaluate {
+            if (versionConfig.pinConfig.enabled.get()) {
+                project.tasks.register(PIN_VERSION_TASK, PinVersionTask) {
+                    group = 'Release'
+                    description = 'Writes the current release version into a file, for later usage by the plugin'
+                }
+            }
         }
     }
 }

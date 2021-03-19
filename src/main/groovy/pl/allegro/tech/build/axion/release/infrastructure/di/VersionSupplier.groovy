@@ -10,7 +10,7 @@ class VersionSupplier {
         def context = VersionResolutionContext.create(config, projectDirectory)
         Properties rules = context.rules()
         def versionService = context.versionService()
-        return versionService.currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
+        return versionService.currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion, rules.pinning)
     }
 }
 
@@ -19,7 +19,7 @@ class MemoizedVersionSupplier {
     private final VersionSupplier versionSupplier = new VersionSupplier()
 
     VersionService.DecoratedVersion resolve(VersionConfig config, Directory projectDirectory) {
-        if(version != null) {
+        if (version != null) {
             return version
         }
         version = versionSupplier.resolve(config, projectDirectory)

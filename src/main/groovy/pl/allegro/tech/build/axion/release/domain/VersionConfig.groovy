@@ -67,6 +67,9 @@ abstract class VersionConfig extends BaseExtension {
     @Nested
     final MonorepoConfig monorepoConfig = objects.newInstance(MonorepoConfig)
 
+    @Nested
+    final PinConfig pinConfig = objects.newInstance(PinConfig)
+
     @Input
     @Optional
     abstract Property<Boolean> getLocalOnly()
@@ -168,6 +171,10 @@ abstract class VersionConfig extends BaseExtension {
 
     void monorepos(Action<MonorepoConfig> action) {
         action.execute(monorepoConfig)
+    }
+
+    void pinning(Action<PinConfig> action) {
+        action.execute(pinConfig)
     }
 
     void versionCreator(String type) {

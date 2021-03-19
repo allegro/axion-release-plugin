@@ -21,7 +21,8 @@ class RulesFactory {
             TagPropertiesFactory.create(versionConfig.tag, position.branch),
             versionConfig.checks,
             versionConfig.nextVersion.nextVersionProperties(),
-            HooksPropertiesFactory.create(versionConfig, versionConfig.hooks)
+            HooksPropertiesFactory.create(versionConfig, versionConfig.hooks),
+            PinPropertiesFactory.create(versionConfig.pinConfig)
         )
     }
 

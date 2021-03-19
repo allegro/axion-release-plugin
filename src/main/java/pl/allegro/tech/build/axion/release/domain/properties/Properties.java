@@ -10,6 +10,7 @@ public class Properties {
     private final ChecksConfig checks;
     private final NextVersionProperties nextVersion;
     private final HooksProperties hooks;
+    private final PinProperties pinning;
 
     public Properties(
         boolean dryRun,
@@ -17,7 +18,8 @@ public class Properties {
         TagProperties tag,
         ChecksConfig checks,
         NextVersionProperties nextVersion,
-        HooksProperties hooks
+        HooksProperties hooks,
+        PinProperties pinning
     ) {
         this.dryRun = dryRun;
         this.version = version;
@@ -25,6 +27,7 @@ public class Properties {
         this.checks = checks;
         this.nextVersion = nextVersion;
         this.hooks = hooks;
+        this.pinning = pinning;
     }
 
     public final boolean isDryRun() {
@@ -49,5 +52,9 @@ public class Properties {
 
     public final HooksProperties getHooks() {
         return hooks;
+    }
+
+    public final PinProperties getPinning() {
+        return pinning;
     }
 }

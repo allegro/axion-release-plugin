@@ -25,7 +25,7 @@ public class Releaser {
 
     public Optional<String> release(Properties properties) {
         VersionContext versionContext = versionService.currentVersion(
-            properties.getVersion(), properties.getTag(), properties.getNextVersion()
+            properties.getVersion(), properties.getTag(), properties.getNextVersion(), properties.getPinning()
         );
         Version version = versionContext.getVersion();
 

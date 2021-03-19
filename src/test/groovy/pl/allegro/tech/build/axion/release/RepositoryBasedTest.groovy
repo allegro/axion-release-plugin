@@ -46,7 +46,8 @@ class RepositoryBasedTest extends Specification {
         return context.versionService().currentDecoratedVersion(
                 context.rules().version,
                 context.rules().tag,
-                context.rules().nextVersion
+                context.rules().nextVersion,
+                context.rules().pinning
         ).decoratedVersion
     }
 }

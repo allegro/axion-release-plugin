@@ -1,7 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
+import com.squareup.moshi.JsonClass;
 import org.gradle.api.tasks.Input;
 
+@JsonClass(generateAdapter = false)
 public class ScmPosition {
 
     private final String revision;

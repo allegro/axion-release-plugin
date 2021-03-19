@@ -71,6 +71,7 @@ dependencies {
     implementation("com.jcraft:jsch.agentproxy.usocket-jna:${Versions.jschAgent}")
     implementation("com.jcraft:jsch.agentproxy.usocket-nc:${Versions.jschAgent}")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    implementation("com.squareup.moshi:moshi:1.12.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")

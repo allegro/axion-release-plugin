@@ -79,6 +79,7 @@ class ReleaseHooksBuilder(private val hooksConfig: HooksConfig, private val preR
     }
 }
 
+@Suppress("UNUSED_ANONYMOUS_PARAMETER")
 class FileUpdateSpec {
     internal var filesToUpdate = mutableListOf<Any>()
     fun file(file: String) {
