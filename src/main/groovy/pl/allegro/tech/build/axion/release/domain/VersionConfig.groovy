@@ -85,7 +85,7 @@ class VersionConfig {
 
         this.repository = RepositoryConfigFactory.create(project)
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
-        this.pinning = new PinConfig(project)
+        this.pinning = new PinConfig(project.objects, project.layout)
     }
 
     void repository(Closure c) {
