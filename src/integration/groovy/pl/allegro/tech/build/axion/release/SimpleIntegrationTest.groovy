@@ -93,7 +93,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains('release-blabla')
     }
 
-    def "should use initial verison setting"() {
+    def "should use initial version setting"() {
         given:
         buildFile("""
             scmVersion {

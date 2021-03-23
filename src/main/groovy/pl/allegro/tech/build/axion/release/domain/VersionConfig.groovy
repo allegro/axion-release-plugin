@@ -71,6 +71,9 @@ class VersionConfig {
     @Nested
     MonorepoConfig monorepoConfig = new MonorepoConfig()
 
+    @Nested
+    PinConfig pinning
+
     private Context context
 
     private VersionService.DecoratedVersion resolvedVersion = null
@@ -82,6 +85,7 @@ class VersionConfig {
 
         this.repository = RepositoryConfigFactory.create(project)
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
+        this.pinning = new PinConfig(project.objects, project.layout)
     }
 
     void repository(Closure c) {
@@ -102,6 +106,10 @@ class VersionConfig {
 
     void hooks(Closure c) {
         project.configure(hooks, c)
+    }
+
+    void pinning(Closure c) {
+        project.configure(pinning, c)
     }
 
     void versionCreator(String type) {
@@ -178,7 +186,7 @@ class VersionConfig {
     VersionService.DecoratedVersion getUncachedVersion() {
         ensureContextExists()
         Properties rules = context.rules()
-        return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
+        return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion, rules.pinning)
     }
 
     @Nested

@@ -12,7 +12,11 @@ public interface ReleaseLogger {
 
     void warn(String message);
 
+    void warn(String message, Throwable e);
+
     void error(String message);
+
+    void error(String message, Throwable e);
 
     void quiet(String message);
 

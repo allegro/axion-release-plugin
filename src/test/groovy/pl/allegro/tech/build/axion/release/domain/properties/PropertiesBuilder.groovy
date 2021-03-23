@@ -12,6 +12,8 @@ class PropertiesBuilder {
 
     private HooksProperties hooksProperties = new HooksProperties([], [])
 
+    private PinProperties pinProperties = PinPropertiesBuilder.pinProperties().build()
+
     private PropertiesBuilder() {
     }
 
@@ -21,12 +23,13 @@ class PropertiesBuilder {
 
     Properties build() {
         return new Properties(
-                false,
-                versionProperties,
-                tagProperties,
-                checksProperties,
-                nextVersionProperties,
-                hooksProperties
+            false,
+            versionProperties,
+            tagProperties,
+            checksProperties,
+            nextVersionProperties,
+            hooksProperties,
+            pinProperties
         )
     }
 

@@ -4,12 +4,14 @@ import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
+import pl.allegro.tech.build.axion.release.domain.properties.PinProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
+import static pl.allegro.tech.build.axion.release.domain.properties.PinPropertiesBuilder.pinProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
 
@@ -24,6 +26,8 @@ class VersionServiceTest extends Specification {
     TagProperties tagProperties = tagProperties().build()
 
     NextVersionProperties nextVersionProperties = nextVersionProperties().build()
+
+    PinProperties pinning = pinProperties().build()
 
     def setup() {
         Project project = ProjectBuilder.builder().build()
@@ -43,7 +47,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties)
+        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties, pinning)
 
         then:
         version.version.toString() == '1.0.0'
@@ -61,7 +65,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties)
+        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties, pinning)
 
         then:
         version.version.toString() == '1.0.1'
@@ -79,7 +83,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties)
+        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties, pinning)
 
         then:
         version.version.toString() == '1.0.1'
@@ -97,7 +101,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties)
+        VersionContext version = service.currentVersion(properties, tagProperties, nextVersionProperties, pinning)
 
         then:
         version.version.toString() == '1.0.1'
@@ -115,7 +119,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        VersionService.DecoratedVersion version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties)
+        VersionService.DecoratedVersion version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties, pinning)
 
         then:
         version.undecoratedVersion == '1.0.1'
@@ -134,7 +138,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties).decoratedVersion
+        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties, pinning).decoratedVersion
 
         then:
         version == '1.0.1-feature-hello-SNAPSHOT'
@@ -155,7 +159,7 @@ class VersionServiceTest extends Specification {
         )
 
         when:
-        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties).decoratedVersion
+        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties, pinning).decoratedVersion
 
         then:
         version == '1.0.1-feature/hello-SNAPSHOT'

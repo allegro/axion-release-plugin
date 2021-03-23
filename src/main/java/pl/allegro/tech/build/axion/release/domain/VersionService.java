@@ -1,15 +1,28 @@
 package pl.allegro.tech.build.axion.release.domain;
 
+import com.github.zafarkhaja.semver.Version;
+import com.squareup.moshi.FromJson;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.ToJson;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Nested;
+import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
+import pl.allegro.tech.build.axion.release.domain.properties.PinProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
 public class VersionService {
 
     public static final String SNAPSHOT = "SNAPSHOT";
+    private final ReleaseLogger logger = ReleaseLogger.Factory.logger(VersionService.class);
     private final VersionResolver versionResolver;
     private final VersionSanitizer sanitizer;
 
@@ -19,26 +32,67 @@ public class VersionService {
         this.sanitizer = new VersionSanitizer();
     }
 
-    public VersionContext currentVersion(VersionProperties versionRules, TagProperties tagRules, NextVersionProperties nextVersionRules) {
-        return versionResolver.resolveVersion(versionRules, tagRules, nextVersionRules);
+    public DecoratedVersion pinCurrentVersion(VersionProperties versionProperties, TagProperties tagRules, NextVersionProperties nextVersionRules, PinProperties pinning) {
+        VersionContext versionContext = versionResolver.resolveVersion(versionProperties, tagRules, nextVersionRules);
+        writeVersionToPin(pinning.getPinFile(), versionContext);
+        return decorateVersion(versionContext, versionProperties);
     }
 
-    public DecoratedVersion currentDecoratedVersion(VersionProperties versionProperties, TagProperties tagRules, NextVersionProperties nextVersionRules) {
-        VersionContext versionContext = versionResolver.resolveVersion(versionProperties, tagRules, nextVersionRules);
+    public VersionContext currentVersion(VersionProperties versionProperties, TagProperties tagRules, NextVersionProperties nextVersionRules, PinProperties pinning) {
+        return getVersionFromPinOrResolveFrom(versionProperties, tagRules, nextVersionRules, pinning);
+    }
+
+    public DecoratedVersion currentDecoratedVersion(VersionProperties versionProperties, TagProperties tagRules, NextVersionProperties nextVersionRules, PinProperties pinning) {
+        VersionContext versionContext = getVersionFromPinOrResolveFrom(versionProperties, tagRules, nextVersionRules, pinning);
+        return decorateVersion(versionContext, versionProperties);
+    }
+
+    private DecoratedVersion decorateVersion(VersionContext versionContext, VersionProperties versionProperties) {
         String version = versionProperties.getVersionCreator().call(versionContext.getVersion().toString(), versionContext.getPosition());
 
         if (versionProperties.isSanitizeVersion()) {
             version = sanitizer.sanitize(version);
         }
 
-
         String finalVersion = version;
         if (versionContext.isSnapshot()) {
             finalVersion = finalVersion + "-" + SNAPSHOT;
         }
 
-
         return new DecoratedVersion(versionContext.getVersion().toString(), finalVersion, versionContext.getPosition());
+    }
+
+    private VersionContext getVersionFromPinOrResolveFrom(VersionProperties versionRules, TagProperties tagRules, NextVersionProperties nextVersionRules, PinProperties pinning) {
+        VersionContext version = null;
+        if (pinning.isEnabled()) {
+            version = readVersionFromPin(pinning.getPinFile());
+        }
+        if (version == null) {
+            version = versionResolver.resolveVersion(versionRules, tagRules, nextVersionRules);
+        }
+        return version;
+    }
+
+    private VersionContext readVersionFromPin(File pinFile) {
+        if (!pinFile.isFile()) {
+            return null;
+        }
+        try {
+            byte[] bytes = Files.readAllBytes(pinFile.toPath());
+            return VersionContextSerializer.fromJson(new String(bytes, StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.warn("Cannot read / deserialize version from pinfile, falling back to resolved version", e);
+            return null;
+        }
+    }
+
+    private void writeVersionToPin(File pinFile, VersionContext version) {
+        try {
+            String json = VersionContextSerializer.toJson(version);
+            Files.write(pinFile.toPath(), json.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.error("Cannot serialize / write version to pinfile", e);
+        }
     }
 
     public static class DecoratedVersion {
@@ -66,6 +120,42 @@ public class VersionService {
         @Nested
         public final ScmPosition getPosition() {
             return position;
+        }
+    }
+
+    static class VersionContextSerializer {
+        private static JsonAdapter<VersionContext> jsonAdapter;
+
+        public static String toJson(VersionContext version) {
+            return jsonAdapter().toJson(version);
+        }
+
+        public static VersionContext fromJson(String json) {
+            try {
+                return jsonAdapter().fromJson(json);
+            } catch (IOException e) {
+                return null;
+            }
+        }
+
+        private static JsonAdapter<VersionContext> jsonAdapter() {
+            if (jsonAdapter == null) {
+                Moshi moshi = new Moshi.Builder().add(new VersionAdapter()).build();
+                jsonAdapter = moshi.adapter(VersionContext.class);
+            }
+            return jsonAdapter;
+        }
+    }
+
+    static class VersionAdapter {
+        @ToJson
+        String toJson(Version version) {
+            return version.toString();
+        }
+
+        @FromJson
+        Version fromJson(String version) {
+            return Version.valueOf(version);
         }
     }
 }
