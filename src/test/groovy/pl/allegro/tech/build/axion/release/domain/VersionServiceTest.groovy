@@ -104,13 +104,13 @@ class VersionServiceTest extends Specification {
         version.snapshot
     }
 
-    def "should return both decorated and undecorated version"() {
+    def "should return version information"() {
         given:
         VersionProperties properties = versionProperties().withVersionCreator({ v, t -> v }).build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
             true,
-            Version.valueOf("1.0.1"),
+            Version.valueOf("1.0.0"),
             new ScmPosition('', '', 'master')
         )
 
@@ -120,6 +120,7 @@ class VersionServiceTest extends Specification {
         then:
         version.undecoratedVersion == '1.0.1'
         version.decoratedVersion == '1.0.1-SNAPSHOT'
+        version.previousVersion == '1.0.0'
     }
 
     def "should sanitize version if flag is set to true"() {

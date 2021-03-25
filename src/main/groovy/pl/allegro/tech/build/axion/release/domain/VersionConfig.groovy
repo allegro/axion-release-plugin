@@ -152,7 +152,7 @@ class VersionConfig {
         return resolvedVersion.decoratedVersion
     }
 
-    @Nested
+    @Input
     String getPreviousVersion() {
         ensureVersionExists()
         return resolvedVersion.previousVersion
