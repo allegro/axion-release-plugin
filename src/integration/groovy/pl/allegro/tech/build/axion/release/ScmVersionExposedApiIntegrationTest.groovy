@@ -5,11 +5,12 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
 
-    def "should return final version scmVersion.version"() {
+    def "should return version information"() {
         given:
         buildFile("""
         task outputDecorated { doLast {
             println "Version: \${scmVersion.version}"
+            println "Previous: \${scmVersion.previousVersion}" //'previousVersion' property smoke test
         } }
         """)
 
@@ -18,6 +19,7 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
 
         then:
         result.output.contains('Version: 0.1.0-SNAPSHOT')
+        result.output.contains('Previous: 0.1.0')
         result.task(":outputDecorated").outcome == TaskOutcome.SUCCESS
     }
 
@@ -40,7 +42,7 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
     def "should return scm position from which version was read at scmVersion.scmPosition"() {
         given:
         buildFile("""
-        task outputPosition { doLast { 
+        task outputPosition { doLast {
             println "Revision: \${scmVersion.scmPosition.revision}"
             println "Short revision: \${scmVersion.scmPosition.shortRevision}"
             println "Branch: \${scmVersion.scmPosition.branch}"

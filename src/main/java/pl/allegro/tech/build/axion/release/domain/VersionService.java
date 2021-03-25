@@ -72,7 +72,7 @@ public class VersionService {
             return position;
         }
 
-        @Nested
+        @Input
         public final String getPreviousVersion() {
             return previousVersion;
         }
