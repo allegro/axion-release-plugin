@@ -22,6 +22,11 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    String id() {
+        return "DummyRepository"
+    }
+
+    @Override
     void fetchTags(ScmIdentity identity, String remoteName) {
         log('fetch tags')
     }
