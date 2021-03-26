@@ -1,10 +1,12 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.*
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import spock.lang.Shared
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
@@ -50,7 +52,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should return same previous and current version when no change in subfolder since release tag"() {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.1.0')
+        repository.tag(fullPrefix() + '1.1.0')
         repository.commit(['*'], 'Commit without change in subfolder')
         configureContextWithVersionRules(defaultMonorepoVersionRules)
 
@@ -66,9 +68,9 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should pick tag with highest version when multiple tags on last commit with changes in subfolder"() {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.0.0')
-        repository.tag('release-1.1.0')
-        repository.tag('release-1.2.0')
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.tag(fullPrefix() +'1.1.0')
+        repository.tag(fullPrefix() +'1.2.0')
         repository.commit(['*'], 'Commit without change in subfolder')
         configureContextWithVersionRules(defaultMonorepoVersionRules)
 
@@ -84,11 +86,11 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should pick tag with highest version when multiple release and non-release tags on last commit with changes in subfolder"() {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.0.0')
-        repository.tag('release-1.1.0')
-        repository.tag('release-1.1.5-alpha')
-        repository.tag('release-1.2.0')
-        repository.tag('release-1.4.0-alpha')
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.tag(fullPrefix() +'1.1.0')
+        repository.tag(fullPrefix() +'1.1.5-alpha')
+        repository.tag(fullPrefix() +'1.2.0')
+        repository.tag(fullPrefix() +'1.4.0-alpha')
         repository.commit(['*'], 'Commit without change in subfolder')
         configureContextWithVersionRules(defaultMonorepoVersionRules)
 
@@ -105,8 +107,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
         given: "there is releaseTag and nextVersionTag on current commit"
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.0.0')
-        repository.tag('release-1.1.0-alpha')
+        repository.tag(fullPrefix() +'1.0.0')
+        repository.tag(fullPrefix() +'1.1.0-alpha')
         repository.commit(['*'], 'Commit without change in subfolder')
 
         VersionProperties versionRules = VersionPropertiesBuilder.versionProperties()
@@ -127,7 +129,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should return unmodified previous and incremented current version when changes in subfolder since tag"(VersionProperties versionRules) {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.1.0')
+        repository.tag(fullPrefix() +'1.1.0')
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar')
 
         when:
@@ -149,13 +151,13 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should return the highest version from the tagged versions, even if subfolder not changed in that commit"(VersionProperties versionRules) {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.0.0')
+        repository.tag(fullPrefix() +'1.0.0')
         repository.commit(['*'], 'Commit without change in subfolder')
-        repository.tag('release-1.5.0')
+        repository.tag(fullPrefix() +'1.5.0')
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar')
-        repository.tag('release-1.2.0')
+        repository.tag(fullPrefix() +'1.2.0')
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar2')
-        repository.tag('release-1.3.0')
+        repository.tag(fullPrefix() +'1.3.0')
 
         when:
         configureContextWithVersionRules(versionRules)
@@ -177,13 +179,13 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     def "should return the highest version from the tagged versions, even if subfolder not changed in that commit, when not on release"(VersionProperties versionRules) {
         given:
         createAndCommitFileInSubfolder(projectRootSubfolder, 'foo')
-        repository.tag('release-1.0.0')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], 'Commit without change in subfolder')
-        repository.tag('release-1.5.0')
+        repository.tag(fullPrefix() +'1.5.0')
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar')
-        repository.tag('release-1.2.0')
+        repository.tag(fullPrefix() + '1.2.0')
         createAndCommitFileInSubfolder(projectRootSubfolder, 'bar2')
-        repository.tag('release-1.3.0')
+        repository.tag(fullPrefix() + '1.3.0')
         repository.commit(['*'], 'Commit without change in subfolder')
 
         when:

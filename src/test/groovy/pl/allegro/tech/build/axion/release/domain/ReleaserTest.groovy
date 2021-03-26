@@ -1,10 +1,12 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
 import static pl.allegro.tech.build.axion.release.domain.properties.HooksPropertiesBuilder.hooksProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.PropertiesBuilder.properties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
@@ -36,7 +38,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should not release version when on tag"() {
         given:
-        repository.tag('release-1.0.0')
+        repository.tag(fullPrefix() + '1.0.0')
 
         when:
         releaser.release(context.rules())
@@ -61,7 +63,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should not release version when on pre-released version tag"() {
         given:
-        repository.tag('release-3.0.0-rc4')
+        repository.tag(fullPrefix() + '3.0.0-rc4')
 
         when:
         releaser.release(context.rules())
@@ -72,7 +74,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should increment pre-released version correctly"() {
         given:
-        repository.tag('release-3.0.0-rc4')
+        repository.tag(fullPrefix() +'3.0.0-rc4')
         repository.commit(['*'], 'make is snapshot')
 
         when:
@@ -99,7 +101,7 @@ class ReleaserTest extends RepositoryBasedTest {
 
     def "should create release commit when on tag but forced"() {
         given:
-        repository.tag('release-3.1.0')
+        repository.tag(fullPrefix() +'3.1.0')
         Properties rules = properties()
                 .withVersionRules(versionProperties().forceVersion('3.2.0').build())
                 .withHooksRules(hooksProperties().withCommitHook().build())

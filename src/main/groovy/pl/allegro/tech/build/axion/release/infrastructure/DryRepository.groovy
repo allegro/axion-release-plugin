@@ -101,6 +101,13 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    boolean isLegacyDefTagnameRepo() {
+        boolean  isLegacyDefTagnameRepo = delegateRepository.isLegacyDefTagnameRepo()
+        log('is legacy named repository')
+        return isLegacyDefTagnameRepo
+    }
+
+    @Override
     List<String> lastLogMessages(int messageCount) {
         return delegateRepository.lastLogMessages(messageCount)
     }
