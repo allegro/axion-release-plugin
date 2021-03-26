@@ -32,12 +32,12 @@ All `axion-release-plugin` configuration options:
         foldersToExclude = ['submodule1', 'submodule2'] // ignore changes in these subdirs when calculating changes to parent
 
         tag { // doc: Version / Parsing
-            prefix = 'tag-prefix' // prefix to be used, 'v' by default
+            prefix = 'tag-prefix' // prefix to be used, 'v' by default, empty String means no prefix
             branchPrefix = [ // set different prefix per branch
                 'legacy/.*' : 'legacy'
             ]
 
-            versionSeparator = '-' // separator between prefix and version number, '' by default
+            versionSeparator = '-' // separator between prefix and version number, '' by default, empty String means no separator
             serialize = { tag, version -> ... } // creates tag name from raw version
             deserialize = { tag, position, tagName -> ... } // reads raw version from tag
             initialVersion = { tag, position -> ... } // returns initial version if none found, 0.1.0 by default
