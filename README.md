@@ -41,7 +41,7 @@ $ ./gradlew currentVersion
 $ ./gradlew release
 
 $ git tag
-release-0.1.0
+v0.1.0
 
 $ ./gradlew cV
 0.1.0
@@ -49,8 +49,8 @@ $ ./gradlew cV
 $ git add -A && git commit -m "Updates something" && ./gradlew release
 
 $ git tag
-release-0.1.0
-release-0.1.1
+v0.1.0
+v0.1.1
 
 $ ./gradlew cV
 0.1.1
