@@ -202,7 +202,7 @@ pluginBundle {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        sonatype(MavenPublication) {
             from components.java
             pom {
                 name = project.name
@@ -232,27 +232,21 @@ publishing {
 }
 
 nexusPublishing {
-    connectTimeout = Duration.ofMinutes(1)
-    clientTimeout = Duration.ofMinutes(1)
-
     repositories {
         sonatype {
             username = System.getenv("SONATYPE_USERNAME")
             password = System.getenv("SONATYPE_PASSWORD")
         }
     }
-
-    transitionCheckOptions {
-        maxRetries.set(10)
-        delayBetween.set(Duration.ofSeconds(45))
-    }
 }
 
-signing {
-    useInMemoryPgpKeys(
-        System.getenv("GPG_KEY_ID"),
-        System.getenv("GPG_PRIVATE_KEY"),
-        System.getenv("GPG_PRIVATE_KEY_PASSWORD")
-    )
-    sign publishing.publications.mavenJava
+if (System.getenv("GPG_KEY_ID")) {
+    signing {
+        useInMemoryPgpKeys(
+            System.getenv("GPG_KEY_ID"),
+            System.getenv("GPG_PRIVATE_KEY"),
+            System.getenv("GPG_PRIVATE_KEY_PASSWORD")
+        )
+        sign publishing.publications.sonatype
+    }
 }
