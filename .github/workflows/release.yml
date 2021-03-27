@@ -20,10 +20,10 @@ jobs:
       - name: Release
         run: gradle release
       - name: Publish to gradle
-        run: gradle publishPlugin -Dgradle.publish.key=${GRADLE_KEY} -Dgradle.publish.secret=${GRADLE_SECRET}
+        run: gradle publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}
         env:
-          GRADLE_KEY: ${{ secrets.GRADLE_KEY }}
-          GRADLE_SECRET: ${{ secrets.GRADLE_SECRET }}
+          GRADLE_PORTAL_KEY: ${{ secrets.GRADLE_PORTAL_KEY }}
+          GRADLE_PORTAL_SECRET: ${{ secrets.GRADLE_PORTAL_SECRET }}
       - name: Publish to maven central
         run: gradle publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:  
