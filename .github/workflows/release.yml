@@ -1,8 +1,6 @@
-name: Publish
+name: Release
 
-on:
-  release:
-    types: [ created ]
+on: workflow_dispatch
 
 jobs:
   publish:
@@ -19,16 +17,3 @@ jobs:
           java-version: 1.8
       - name: Release
         run: gradle release
-      - name: Publish to gradle
-        run: gradle publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}
-        env:
-          GRADLE_PORTAL_KEY: ${{ secrets.GRADLE_PORTAL_KEY }}
-          GRADLE_PORTAL_SECRET: ${{ secrets.GRADLE_PORTAL_SECRET }}
-      - name: Publish to maven central
-        run: gradle publishToSonatype closeAndReleaseSonatypeStagingRepository
-        env:  
-          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
-          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          GPG_PRIVATE_KEY_PASSWORD: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
