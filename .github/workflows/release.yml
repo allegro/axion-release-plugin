@@ -18,4 +18,6 @@ jobs:
         with:
           java-version: 1.8
       - name: Release
-        run: gradle release
+        run: gradle release -Prelease.customPassword=${GITHUB_TOKEN}
+        env:  
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
