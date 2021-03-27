@@ -25,7 +25,7 @@ project versions along SCM tag versions.
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.12.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.12.2'
 }
 
 project.version = scmVersion.version
