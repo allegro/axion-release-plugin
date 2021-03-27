@@ -13,7 +13,7 @@ markdown_extensions:
       anchorlink: true
 
 extra:
-  version: '1.12.3'
+  version: '1.12.4'
 
 pages:
   - Home: 'index.md'
