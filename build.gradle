@@ -1,21 +1,24 @@
+import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
+import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven'
+    id 'maven-publish'
+    id 'signing'
     id 'jacoco'
     id 'pl.allegro.tech.build.axion-release' version '1.10.3'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.gradle.plugin-publish' version '0.12.0'
-    id 'com.bmuschko.nexus' version '2.3.1' apply false
-    id 'io.codearte.nexus-staging' version '0.11.0' apply false
+    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
     id 'com.coditory.integration-test' version "1.0.5"
     id 'com.adarshr.test-logger' version '2.1.1'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'com.bmuschko.docker-remote-api' version '3.2.1'
-}
-
-if (project.hasProperty('mavenCentral')) {
-    apply from: 'gradle/mavenCentral.gradle'
 }
 
 scmVersion {
@@ -105,7 +108,7 @@ shadowJar {
     minimize()
 }
 
-task relocateShadowJar(type: com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation) {
+task relocateShadowJar(type: ConfigureShadowRelocation) {
     target = tasks.shadowJar
 }
 
@@ -129,23 +132,23 @@ project.configurations {
     }
 }
 
-task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
+task buildDockerImage(type: DockerBuildImage) {
     inputDir = file('docker')
     tag = 'test/axion-release-remote:latest'
 }
 
-task createDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer) {
+task createDockerContainer(type: DockerCreateContainer) {
     dependsOn buildDockerImage
     targetImageId { buildDockerImage.getImageId() }
     portBindings = ['2222:22']
 }
 
-task startDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStartContainer) {
+task startDockerContainer(type: DockerStartContainer) {
     dependsOn createDockerContainer
     targetContainerId { createDockerContainer.getContainerId() }
 }
 
-task stopDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStopContainer) {
+task stopDockerContainer(type: DockerStopContainer) {
     targetContainerId { createDockerContainer.getContainerId() }
 }
 
@@ -195,4 +198,61 @@ pluginBundle {
         groupId = 'pl.allegro.tech.build'
         artifactId = 'axion-release-plugin'
     }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            pom {
+                name = project.name
+                description = 'Gradle release and version management plugin'
+                url = 'https://github.com/allegro/axion-release-plugin'
+                inceptionYear = '2014'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adamdubiel'
+                        name = 'Adam Dubiel'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/allegro/axion-release-plugin'
+                    connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                }
+            }
+        }
+    }
+}
+
+nexusPublishing {
+    connectTimeout = Duration.ofMinutes(1)
+    clientTimeout = Duration.ofMinutes(1)
+
+    repositories {
+        sonatype {
+            username = System.getenv("SONATYPE_USERNAME")
+            password = System.getenv("SONATYPE_PASSWORD")
+        }
+    }
+
+    transitionCheckOptions {
+        maxRetries.set(10)
+        delayBetween.set(Duration.ofSeconds(45))
+    }
+}
+
+signing {
+    useInMemoryPgpKeys(
+        System.getenv("GPG_KEY_ID"),
+        System.getenv("GPG_PRIVATE_KEY"),
+        System.getenv("GPG_PRIVATE_KEY_PASSWORD")
+    )
+    sign publishing.publications.mavenJava
 }
