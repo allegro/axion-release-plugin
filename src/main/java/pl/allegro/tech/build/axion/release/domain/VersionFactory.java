@@ -16,6 +16,21 @@ public class VersionFactory {
     private final TagProperties tagProperties;
     private final NextVersionProperties nextVersionProperties;
     private final ScmPosition position;
+    private final boolean isLegacyDefTagnameRepo;
+
+    public VersionFactory(
+        VersionProperties versionProperties,
+        TagProperties tagProperties,
+        NextVersionProperties nextVersionProperties,
+        ScmPosition position,
+        boolean isLegacyDefTagnameRepo
+    ) {
+        this.tagProperties = tagProperties;
+        this.nextVersionProperties = nextVersionProperties;
+        this.versionProperties = versionProperties;
+        this.position = position;
+        this.isLegacyDefTagnameRepo = isLegacyDefTagnameRepo;
+    }
 
     public VersionFactory(
         VersionProperties versionProperties,
@@ -23,10 +38,7 @@ public class VersionFactory {
         NextVersionProperties nextVersionProperties,
         ScmPosition position
     ) {
-        this.tagProperties = tagProperties;
-        this.nextVersionProperties = nextVersionProperties;
-        this.versionProperties = versionProperties;
-        this.position = position;
+        this(versionProperties, tagProperties, nextVersionProperties, position, false);
     }
 
     public Version versionFromTag(String tag) {
@@ -65,9 +77,7 @@ public class VersionFactory {
         if (StringGroovyMethods.asBoolean(versionProperties.getForcedVersion())) {
             finalVersion = Version.valueOf(versionProperties.getForcedVersion());
         } else if (incrementVersion) {
-            finalVersion = versionProperties.getVersionIncrementer().call(new VersionIncrementerContext(
-                version, position
-            ));
+            finalVersion = versionProperties.getVersionIncrementer().call(new VersionIncrementerContext(version, position, isLegacyDefTagnameRepo));
         }
 
         return new FinalVersion(
