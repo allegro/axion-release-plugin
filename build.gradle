@@ -38,7 +38,10 @@ group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
 java {
+    withSourcesJar()
+    withJavadocJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 repositories {
@@ -47,9 +50,9 @@ repositories {
 }
 
 project.ext.versions = [
-        jgit: '5.10.0.202012080955-r',
-        jsch: '0.1.55',
-        jschAgent: '0.0.9'
+    jgit     : '5.10.0.202012080955-r',
+    jsch     : '0.1.55',
+    jschAgent: '0.0.9'
 ]
 
 sourceSets {
@@ -92,7 +95,7 @@ dependencies {
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
+    testCompile(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
@@ -106,19 +109,15 @@ dependencies {
     testCompile gradleTestKit()
 }
 
-shadowJar {
-    minimize()
-}
-
 task relocateShadowJar(type: ConfigureShadowRelocation) {
     target = tasks.shadowJar
 }
 
 tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
-
 shadowJar {
     archiveClassifier.set('')
+    minimize()
 }
 
 project.configurations {
@@ -179,22 +178,24 @@ jacocoTestReport {
     }
 }
 
-pluginBundle {
-    website = 'https://github.com/allegro/axion-release-plugin'
-    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
-    description = 'Release and version management plugin.'
-    tags = ['release', 'version']
+if (System.getenv("GRADLE_PORTAL_KEY")) {
+    pluginBundle {
+        website = 'https://github.com/allegro/axion-release-plugin'
+        vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+        description = 'Release and version management plugin.'
+        tags = ['release', 'version']
 
-    plugins {
-        release {
-            id = 'pl.allegro.tech.build.axion-release'
-            displayName = 'axion-release-plugin'
+        plugins {
+            release {
+                id = 'pl.allegro.tech.build.axion-release'
+                displayName = 'axion-release-plugin'
+            }
         }
-    }
 
-    mavenCoordinates {
-        groupId = 'pl.allegro.tech.build'
-        artifactId = 'axion-release-plugin'
+        mavenCoordinates {
+            groupId = 'pl.allegro.tech.build'
+            artifactId = 'axion-release-plugin'
+        }
     }
 }
 
@@ -202,6 +203,8 @@ publishing {
     publications {
         sonatype(MavenPublication) { publication ->
             from project.shadow.component(publication)
+            artifact sourcesJar
+            artifact javadocJar
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
@@ -245,6 +248,6 @@ if (System.getenv("GPG_KEY_ID")) {
             System.getenv("GPG_PRIVATE_KEY"),
             System.getenv("GPG_PRIVATE_KEY_PASSWORD")
         )
-        sign publishing.publications.sonatype
+        sign publishing.publications
     }
 }
