@@ -11,7 +11,7 @@ plugins {
     id 'maven-publish'
     id 'signing'
     id 'jacoco'
-    id 'pl.allegro.tech.build.axion-release' version '1.10.3'
+    id 'pl.allegro.tech.build.axion-release' version '1.13.0'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
@@ -23,7 +23,7 @@ plugins {
 
 scmVersion {
     tag {
-        prefix = 'axion-release'
+        prefix = 'axion-release-'
     }
 
     hooks {
@@ -37,7 +37,9 @@ scmVersion {
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
 
 repositories {
     mavenCentral()
@@ -114,13 +116,9 @@ task relocateShadowJar(type: ConfigureShadowRelocation) {
 
 tasks.shadowJar.dependsOn tasks.relocateShadowJar
 
-tasks.jar {
-    enabled = false
-    dependsOn(shadowJar)
-}
 
-tasks.shadowJar.configure {
-    classifier = null
+shadowJar {
+    archiveClassifier.set('')
 }
 
 project.configurations {
@@ -202,8 +200,8 @@ pluginBundle {
 
 publishing {
     publications {
-        sonatype(MavenPublication) {
-            from components.java
+        sonatype(MavenPublication) { publication ->
+            from project.shadow.component(publication)
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
