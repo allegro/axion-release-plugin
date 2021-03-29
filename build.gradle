@@ -50,7 +50,7 @@ repositories {
 }
 
 project.ext.versions = [
-    jgit     : '5.10.0.202012080955-r',
+    jgit     : '5.11.0.202103091610-r',
     jsch     : '0.1.55',
     jschAgent: '0.0.9'
 ]
@@ -220,6 +220,10 @@ publishing {
                     developer {
                         id = 'adamdubiel'
                         name = 'Adam Dubiel'
+                    }
+                    developer {
+                        id = 'bgalek'
+                        name = 'Bartosz Gałek'
                     }
                 }
                 scm {
