@@ -6,12 +6,14 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 public class VersionContext {
 
     private final Version version;
+    private final String previousTag;
     private final boolean snapshot;
     private final Version previousVersion;
     private final ScmPosition position;
 
-    public VersionContext(Version version, boolean snapshot, Version previousVersion, ScmPosition position) {
+    public VersionContext(Version version, String previousTag, boolean snapshot, Version previousVersion, ScmPosition position) {
         this.version = version;
+        this.previousTag = previousTag;
         this.snapshot = snapshot;
         this.previousVersion = previousVersion;
         this.position = position;
@@ -31,6 +33,10 @@ public class VersionContext {
 
     public final ScmPosition getPosition() {
         return position;
+    }
+
+    public String getPreviousTag() {
+        return previousTag;
     }
 
     @Override

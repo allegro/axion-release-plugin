@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain;
 
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.Optional;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
@@ -37,9 +38,8 @@ public class VersionService {
             finalVersion = finalVersion + "-" + SNAPSHOT;
         }
 
-
         return new DecoratedVersion(versionContext.getVersion().toString(), finalVersion, versionContext.getPosition(),
-            versionContext.getPreviousVersion().toString());
+            versionContext.getPreviousVersion().toString(), versionContext.getPreviousTag());
     }
 
     public static class DecoratedVersion {
@@ -48,13 +48,15 @@ public class VersionService {
         private final String decoratedVersion;
         private final ScmPosition position;
         private final String previousVersion;
+        private final String previousTag;
 
         public DecoratedVersion(String undecoratedVersion, String decoratedVersion, ScmPosition position,
-                                String previousVersion) {
+                                String previousVersion, String previousTag) {
             this.undecoratedVersion = undecoratedVersion;
             this.decoratedVersion = decoratedVersion;
             this.position = position;
             this.previousVersion = previousVersion;
+            this.previousTag = previousTag;
         }
 
         @Input
@@ -73,8 +75,15 @@ public class VersionService {
         }
 
         @Input
+        @Optional
         public final String getPreviousVersion() {
             return previousVersion;
+        }
+
+        @Input
+        @Optional
+        public final String getPreviousTag() {
+            return previousTag;
         }
     }
 }
