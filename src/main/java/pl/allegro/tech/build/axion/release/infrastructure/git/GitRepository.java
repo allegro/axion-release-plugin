@@ -20,6 +20,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*;
+
 public class GitRepository implements ScmRepository {
 
     private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(GitRepository.class);
@@ -521,6 +523,18 @@ public class GitRepository implements ScmRepository {
     public Status listChanges() {
         try {
             return jgitRepository.status().call();
+        } catch (GitAPIException e) {
+            throw new ScmException(e);
+        }
+    }
+
+    @Override
+    public boolean isLegacyDefTagnameRepo() {
+        try {
+            List<Ref> call = jgitRepository.tagList().call();
+            if(call.isEmpty()) return false;
+
+            return call.stream().allMatch(ref-> ref.getName().startsWith("refs/tags/"+fullLegacyPrefix()));
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }

@@ -115,6 +115,12 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    boolean isLegacyDefTagnameRepo() {
+        log('is legacy DefTagname Repository')
+        return false
+    }
+
+    @Override
     List<String> lastLogMessages(int messageCount) {
         log('last log messages')
         return null

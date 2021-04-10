@@ -12,7 +12,7 @@ tag is next version marker, version is treated as SNAPSHOT, but version
 is not incremented:
 
     # git tag
-    release-1.5.0
+    v1.5.0
 
     # ./gradlew cV
     1.5.1-SNAPSHOT
@@ -20,7 +20,7 @@ is not incremented:
     # ./gradlew markNextVersion -Prelease.version=2.0.0
 
     # git tag
-    release-1.5.0 release-2.0.0-alpha
+    v1.5.0 v2.0.0-alpha
 
     # ./gradlew cV
     2.0.0-SNAPSHOT
@@ -30,7 +30,7 @@ is not incremented:
     # ./gradlew cV
     2.0.1-SNAPSHOT
 
-    # ./gradlew marNextVersion -Prelease.incrementer=incrementMinor
+    # ./gradlew markNextVersion -Prelease.incrementer=incrementMinor
 
     # ./gradlew cV
     2.1.0-SNAPSHOT

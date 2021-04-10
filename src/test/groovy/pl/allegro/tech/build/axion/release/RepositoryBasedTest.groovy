@@ -26,7 +26,10 @@ class RepositoryBasedTest extends Specification {
 
     void setup() {
         directory = temporaryFolder.root
-        Grgit.init(dir: directory)
+        def rawRepository = Grgit.init(dir: directory)
+
+        // let's make sure, not to use system wide user settings in tests
+        rawRepository.repository.jgit.repository.config.baseConfig.clear()
 
         ScmProperties scmProperties = scmProperties(directory).build()
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)

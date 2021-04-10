@@ -45,7 +45,7 @@ public class VersionResolver {
             projectRootRelativePath, versionProperties.getMonorepoProperties().getDirsToExclude()
         );
 
-        VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition);
+        VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
         VersionInfo versions;
         if (versionProperties.isUseGlobalVersion()) {

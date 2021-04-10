@@ -39,5 +39,7 @@ public interface ScmRepository {
 
     boolean checkAheadOfRemote();
 
+    boolean isLegacyDefTagnameRepo();
+
     List<String> lastLogMessages(int messageCount);
 }

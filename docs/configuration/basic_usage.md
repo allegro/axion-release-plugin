@@ -89,9 +89,9 @@ that:
 
 The plugin ignores tags based on the prefix and version separator
 (i.e. `<prefix><separator>`).  If there is a prefix configured then
-tags that do not start with the configured `<prefix><separator>` are 
+tags that do not start with the configured `<prefix><separator>` are
 all ignored. If there is no prefix configured then only tags matching
-the version are used for calculating the version (i.e. the version 
+the version are used for calculating the version (i.e. the version
 separator is also ignored).
 
 This allows for using the name of the module with an appropriate version
@@ -104,9 +104,9 @@ below:
 | `moduleV2`    | `-`               | `moduleV2-<maj>.<min>.<patch>` |
 
 For example, within `module`, tags that do not start `module-` will be
-ignored. 
+ignored.
 
-**IMPORTANT:**  
+**IMPORTANT:**
 
 Note that if the version separator appears in the prefix then tag parsing
 will fail. For example, the two prefixes below will not work if the version
@@ -134,10 +134,10 @@ Version calculation rules:
 1. Changes to files within a submodule increment that submodule's version only.
 2. Changes to a submodule do not cause a change to the parent project's version if
 the parent is set to ignore that submodule, via `projectDirs`.
-3. Changes to files in the parent project but which are not in a submodule identified via 
-`projectDirs` will cause the parent project's version to increment but not the 
+3. Changes to files in the parent project but which are not in a submodule identified via
+`projectDirs` will cause the parent project's version to increment but not the
 versions of any submodules.  If this is desired then consider wiring the `createRelease` or
-`release` tasks of the submodules to be dependencies of the tasks of the same name in the parent. 
+`release` tasks of the submodules to be dependencies of the tasks of the same name in the parent.
 
 ## Releasing
 
@@ -149,4 +149,20 @@ versions of any submodules.  If this is desired then consider wiring the `create
 
 # ./gradlew cV
 0.1.0
+```
+
+## Accessing previous version
+
+Property `scmVersion.previousVersion` contains the previous version String.
+This property is never null.
+If there are no previous tags `previousVersion` will be the same as undecorated current version.
+This property is useful for scenarios like automated changelog generation between previous and current version
+([#138](https://github.com/allegro/axion-release-plugin/issues/138)).
+Example usage:
+
+```
+tasks.named("myChangelogGenerator") {
+    previousRevision = "release-" + scmVersion.previousVersion
+    // ...
+}
 ```

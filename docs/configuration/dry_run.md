@@ -19,8 +19,8 @@ run mode:
     DRY-RUN: ahead of remote: true
     Checking if branch is ahead of remote.. FAILED
     :release
-    Creating tag: release-0.8.2
-    DRY-RUN: creating tag with name: release-0.8.2
+    Creating tag: v0.8.2
+    DRY-RUN: creating tag with name: v0.8.2
     Pushing all to remote: origin
     DRY-RUN: pushing to remote: origin
 

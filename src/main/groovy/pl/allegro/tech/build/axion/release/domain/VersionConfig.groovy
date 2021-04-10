@@ -1,7 +1,10 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Nested
 import pl.allegro.tech.build.axion.release.ReleasePlugin
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
@@ -11,46 +14,66 @@ import pl.allegro.tech.build.axion.release.util.FileLoader
 import javax.inject.Inject
 import java.util.regex.Pattern
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+
 class VersionConfig {
 
     private final Project project
 
+    @Input
     boolean localOnly = false
 
+    @Input
     boolean dryRun
 
+    @Input
     boolean ignoreUncommittedChanges = true
 
+    @Input
     boolean useHighestVersion = false
 
     boolean useGlobalVersion = false
 
+    @Nested
     RepositoryConfig repository
 
+    @Nested
     TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
+    @Nested
     Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
+    @Input
     Map<String, Object> branchVersionCreator = [:]
 
+    @Nested
     Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
 
+    @Input
     Map<String, Object> branchVersionIncrementer = [:]
 
-    Pattern releaseBranchPattern = Pattern.compile('^release(/.*)?$')
+    @Input
+    Pattern releaseBranchPattern = Pattern.compile('^'+ prefix() + '(/.*)?$')
 
+    @Nested
     ChecksConfig checks = new ChecksConfig()
 
+    @Input
     boolean sanitizeVersion = true
 
+    @Input
     boolean createReleaseCommit = false
 
+    @Nested
     Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
 
+    @Nested
     NextVersionConfig nextVersion = new NextVersionConfig()
 
+    @Nested
     HooksConfig hooks = new HooksConfig()
 
+    @Nested
     MonorepoConfig monorepoConfig = new MonorepoConfig()
 
     private Context context
@@ -128,16 +151,25 @@ class VersionConfig {
         this.branchVersionIncrementer = creators
     }
 
+    @Input
     String getVersion() {
         ensureVersionExists()
         return resolvedVersion.decoratedVersion
     }
 
+    @Input
+    String getPreviousVersion() {
+        ensureVersionExists()
+        return resolvedVersion.previousVersion
+    }
+
+    @Input
     String getUndecoratedVersion() {
         ensureVersionExists()
         return resolvedVersion.undecoratedVersion
     }
 
+    @Nested
     VersionScmPosition getScmPosition() {
         ensureVersionExists()
         return new VersionScmPosition(
@@ -153,12 +185,14 @@ class VersionConfig {
         }
     }
 
+    @Nested
     VersionService.DecoratedVersion getUncachedVersion() {
         ensureContextExists()
         Properties rules = context.rules()
         return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
     }
 
+    @Nested
     VersionService getVersionService() {
         ensureContextExists()
         return context.versionService()

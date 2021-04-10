@@ -23,7 +23,7 @@ class NextVersionMarker {
             nextVersion = nextVersionRules.nextVersion
         } else {
             Version currentVersion = Version.valueOf(versionConfig.undecoratedVersion)
-            VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position())
+            VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position(), repositoryService.isLegacyDefTagnameRepo())
             nextVersion = nextVersionRules.versionIncrementer ?
                 PredefinedVersionIncrementer.versionIncrementerFor(nextVersionRules.versionIncrementer)(context) :
                 versionConfig.versionIncrementer(context)
