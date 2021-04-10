@@ -32,6 +32,7 @@ class VersionConfig {
     @Input
     boolean useHighestVersion = false
 
+    @Input
     boolean useGlobalVersion = false
 
     @Nested
