@@ -34,9 +34,14 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew --no-daemon --continue check
         
+      - name: Jacoco
+        run: ./gradlew jacocoTestReport
+     
       - name: Coveralls
-        run: ./gradlew jacocoTestReport coveralls
-        
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+  
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
