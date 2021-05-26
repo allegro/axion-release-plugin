@@ -34,6 +34,9 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew --no-daemon --info --continue check
         
+      - name: Coveralls
+        run: ./gradlew jacocoTestReport coveralls
+        
       - name: Cleanup Gradle Cache
         run: |
           rm -f ~/.gradle/caches/modules-2/modules-2.lock
