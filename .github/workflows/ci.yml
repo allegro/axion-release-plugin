@@ -32,7 +32,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Test with Gradle
-        run: ./gradlew --no-daemon --info --continue check
+        run: ./gradlew --no-daemon --continue check
         
       - name: Coveralls
         run: ./gradlew jacocoTestReport coveralls
