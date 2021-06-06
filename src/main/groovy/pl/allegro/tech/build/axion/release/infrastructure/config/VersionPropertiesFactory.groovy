@@ -40,6 +40,7 @@ class VersionPropertiesFactory {
             forceSnapshot,
             ignoreUncommittedChanges,
             findVersionCreator(project, config, currentBranch),
+            config.snapshotCreator,
             findVersionIncrementer(project, config, currentBranch),
             config.sanitizeVersion,
             useHighestVersion,

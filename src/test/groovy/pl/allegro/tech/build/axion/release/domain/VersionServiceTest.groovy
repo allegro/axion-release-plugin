@@ -161,4 +161,24 @@ class VersionServiceTest extends Specification {
         then:
         version == '1.0.1-feature/hello-SNAPSHOT'
     }
+
+    def "should allow for customizing snapshot"() {
+        given:
+        VersionProperties properties = versionProperties()
+            .withSnapshotCreator({ v, t -> return ".dirty" } )
+            .build()
+
+        resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
+            Version.valueOf("1.0.1"),
+            true,
+            Version.valueOf("1.0.1"),
+            new ScmPosition('', '', 'master')
+        )
+
+        when:
+        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties).decoratedVersion
+
+        then:
+        version == '1.0.1.dirty'
+    }
 }
