@@ -57,6 +57,9 @@ All `axion-release-plugin` configuration options:
             'feature/.*': 'default'
         ]
 
+        // doc: Version / Snapshot
+        snapshotCreator { version, position -> ... } // customize 'snapshot' suffix for version not on tag
+
         // doc: Version / Incrementing
         versionIncrementer {context, config -> ...} // closure that increments a version from the raw version, current position in scm and config
         versionIncrementer 'incrementPatch' // use one of predefined version incrementing rules
