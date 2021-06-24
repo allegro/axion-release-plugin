@@ -202,6 +202,28 @@ public class GitRepository implements ScmRepository {
     }
 
     @Override
+    public void branch(String name) {
+        try {
+            jgitRepository.branchCreate()
+                .setName(name)
+                .call();
+        } catch (GitAPIException e) {
+            throw new ScmException(e);
+        }
+    }
+
+    @Override
+    public void checkout(String name) {
+        try {
+            jgitRepository.checkout()
+                .setName(name)
+                .call();
+        } catch (GitAPIException e) {
+            throw new ScmException(e);
+        }
+    }
+
+    @Override
     public void commit(List<String> patterns, String message) {
         try {
             if (!patterns.isEmpty()) {
@@ -313,8 +335,8 @@ public class GitRepository implements ScmRepository {
         return latestTagsInternal(pattern, sinceCommit, false);
     }
 
-    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true);
+    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusiveStartingCommit) {
+        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusiveStartingCommit, true);
         return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits.get(0);
     }
 
@@ -323,7 +345,39 @@ public class GitRepository implements ScmRepository {
         return taggedCommitsInternal(pattern, null, true, false);
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+    @Override
+    public List<TagsOnCommit> taggedCommitsGlobally(Pattern pattern) {
+        List<TagsOnCommit> taggedCommits = new ArrayList<>();
+        if (!hasCommits()) {
+            return taggedCommits;
+        }
+
+        try {
+            ObjectId headId = jgitRepository.getRepository().resolve(Constants.HEAD);
+            RevWalk walk = walker(headId);
+            Map<String, List<String>> allTags = tagsMatching(pattern, walk);
+
+            for (Map.Entry<String, List<String>> entry : allTags.entrySet()) {
+                String sha = entry.getKey();
+                List<String> currentTagsList = entry.getValue();
+
+                if (currentTagsList != null) {
+                    TagsOnCommit taggedCommit = new TagsOnCommit(
+                        sha,
+                        currentTagsList
+                    );
+                    taggedCommits.add(taggedCommit);
+                }
+            }
+            walk.dispose();
+        } catch (IOException | GitAPIException e) {
+            throw new ScmException(e);
+        }
+
+        return taggedCommits;
+    }
+
+    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusiveStartingCommit, boolean stopOnFirstTag) {
         List<TagsOnCommit> taggedCommits = new ArrayList<>();
         if (!hasCommits()) {
             return taggedCommits;
@@ -341,7 +395,7 @@ public class GitRepository implements ScmRepository {
 
 
             RevWalk walk = walker(startingCommit);
-            if (!inclusive) {
+            if (!inclusiveStartingCommit) {
                 walk.next();
             }
 

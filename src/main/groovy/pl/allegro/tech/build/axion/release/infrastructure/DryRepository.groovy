@@ -43,6 +43,16 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
+    void branch(String name) {
+        log("creating branch: ${name}")
+    }
+
+    @Override
+    void checkout(String name) {
+        log("switching to branch: ${name}")
+    }
+
+    @Override
     void commit(List patterns, String message) {
         log("commiting files matching $patterns with message: $message")
     }
@@ -79,6 +89,11 @@ class DryRepository implements ScmRepository {
     @Override
     List<TagsOnCommit> taggedCommits(Pattern pattern) {
         return delegateRepository.taggedCommits(pattern)
+    }
+
+    @Override
+    List<TagsOnCommit> taggedCommitsGlobally(Pattern pattern) {
+        return delegateRepository.taggedCommitsGlobally(pattern)
     }
 
     @Override

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
@@ -24,6 +25,48 @@ class VersionResolverTest extends RepositoryBasedTest {
 
     def setup() {
         resolver = new VersionResolver(repository, "")
+    }
+
+    def "should resolve higher global version with useHighestVersion when on branch with lower version"() {
+        given: 'I am on a branch with a low release tag'
+        Fixtures.FixtureUseGlobalVersion.setupABranchWithHighTagAndBBranchWithLowTag(repository)
+        repository.checkout('low')
+
+        when: 'I resolve the version on the branch with the lower release tag'
+        def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
+        VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
+
+        then: 'the number from branch with the high release number is resolved'
+        version.previousVersion.toString() == '2.0.0'
+        version.version.toString() == '2.0.1'
+    }
+
+    def "should resolve higher global version with useHighestVersion when on branch with higher version"() {
+        given: 'I am on a branch with a high release tag'
+        Fixtures.FixtureUseGlobalVersion.setupABranchWithHighTagAndBBranchWithLowTag(repository)
+        repository.checkout('high')
+
+        when: 'I resolve the version on the branch with the lower release tag'
+        def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
+        VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
+
+        then: 'the number from branch with the high release number is resolved'
+        version.previousVersion.toString() == '2.0.0'
+        version.version.toString() == '2.0.0'
+    }
+
+    def "should resolve higher global version with useHighestVersion when there are out of order tags"() {
+        given: 'I am on a branch with a high release tag'
+        Fixtures.FixtureUseGlobalVersion.setupABranchWithHighTagsOutOfOrderAndBBranchWithLowTag(repository)
+        repository.checkout('high')
+
+        when: 'I resolve the version on the branch with the lower release tag'
+        def versionRulesUseGlobalVersion = versionProperties().useGlobalVersion().useHighestVersion().build()
+        VersionContext version = resolver.resolveVersion(versionRulesUseGlobalVersion, tagRules, nextVersionRules)
+
+        then: 'the number from branch with the high release number is resolved'
+        version.previousVersion.toString() == '3.0.0'
+        version.version.toString() == '3.0.1'
     }
 
     def "should return default previous and current version when no tag in repository"() {

@@ -20,6 +20,8 @@ class VersionPropertiesFactory {
 
     private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
 
+    private static final String USE_GLOBAL_VERSION_PROPERTY = 'release.useGlobalVersion'
+
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
 
     private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
@@ -35,6 +37,8 @@ class VersionPropertiesFactory {
 
         boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
 
+        boolean useGlobalVersion = project.hasProperty(USE_GLOBAL_VERSION_PROPERTY) ?: config.useGlobalVersion
+
         return new VersionProperties(
             forceVersionValue?.trim() ? forceVersionValue.trim() : null,
             forceSnapshot,
@@ -43,6 +47,7 @@ class VersionPropertiesFactory {
             findVersionIncrementer(project, config, currentBranch),
             config.sanitizeVersion,
             useHighestVersion,
+            useGlobalVersion,
             MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
         )
     }

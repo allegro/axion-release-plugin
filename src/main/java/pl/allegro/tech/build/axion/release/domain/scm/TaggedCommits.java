@@ -28,6 +28,11 @@ public class TaggedCommits {
         return new TaggedCommits(latestTagPosition, taggedCommits);
     }
 
+    public static TaggedCommits fromAllCommitsGlobally(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
+        List<TagsOnCommit> taggedCommits = repository.taggedCommitsGlobally(tagPattern);
+        return new TaggedCommits(latestTagPosition, taggedCommits);
+    }
+
     public static TaggedCommits fromLatestCommitBeforeNextVersion(ScmRepository repository, Pattern releaseTagPattern, Pattern nextVersionTagPattern, ScmPosition latestTagPosition) {
         TagsOnCommit previousTags = repository.latestTags(releaseTagPattern);
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {

@@ -12,6 +12,7 @@ public class VersionProperties {
     private final Closure<Version> versionIncrementer;
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
+    private final boolean useGlobalVersion;
     private final MonorepoProperties monorepoProperties;
 
     public VersionProperties(
@@ -22,6 +23,7 @@ public class VersionProperties {
         Closure<Version> versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
+        boolean useGlobalVersion,
         MonorepoProperties monorepoProperties
     ) {
         this.forcedVersion = forcedVersion;
@@ -31,6 +33,7 @@ public class VersionProperties {
         this.versionIncrementer = versionIncrementer;
         this.sanitizeVersion = sanitizeVersion;
         this.useHighestVersion = useHighestVersion;
+        this.useGlobalVersion = useGlobalVersion;
         this.monorepoProperties = monorepoProperties;
     }
 
@@ -65,6 +68,8 @@ public class VersionProperties {
     public final boolean isUseHighestVersion() {
         return useHighestVersion;
     }
+
+    public final boolean isUseGlobalVersion() { return useGlobalVersion; }
 
     public MonorepoProperties getMonorepoProperties() {
         return monorepoProperties;
