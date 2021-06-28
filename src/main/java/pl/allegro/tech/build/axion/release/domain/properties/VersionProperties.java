@@ -9,6 +9,7 @@ public class VersionProperties {
     private final boolean forceSnapshot;
     private final boolean ignoreUncommittedChanges;
     private final Closure<String> versionCreator;
+    private final Closure<String> snapshotCreator;
     private final Closure<Version> versionIncrementer;
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
@@ -19,6 +20,7 @@ public class VersionProperties {
         boolean forceSnapshot,
         boolean ignoreUncommittedChanges,
         Closure<String> versionCreator,
+        Closure<String> snapshotCreator,
         Closure<Version> versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
@@ -28,6 +30,7 @@ public class VersionProperties {
         this.forceSnapshot = forceSnapshot;
         this.ignoreUncommittedChanges = ignoreUncommittedChanges;
         this.versionCreator = versionCreator;
+        this.snapshotCreator = snapshotCreator;
         this.versionIncrementer = versionIncrementer;
         this.sanitizeVersion = sanitizeVersion;
         this.useHighestVersion = useHighestVersion;
@@ -52,6 +55,10 @@ public class VersionProperties {
 
     public final Closure<String> getVersionCreator() {
         return versionCreator;
+    }
+
+    public final Closure<String> getSnapshotCreator() {
+        return snapshotCreator;
     }
 
     public final Closure<Version> getVersionIncrementer() {

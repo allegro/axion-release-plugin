@@ -6,11 +6,11 @@ can be split in six phases:
 
 -   reading - read tags from repository
 -   parsing - extracting version from tag (serializing version to tag)
--   incrementing - when not on tag, version patch (leas significant)
+-   incrementing - when not on tag, version patch (least significant)
     number is incremented
 -   decorating - adding additional transformations to create final
     version
--   appending snapshot - when not on tag, SNAPSHOT suffix is appended
+-   appending snapshot - when not on tag, -SNAPSHOT suffix is appended (can be customized)
 -   sanitization - making sure there are no unwanted characters in
     version
 
@@ -330,6 +330,24 @@ Custom version creators can be implemented by creating closure:
 
 -   version - string version resolved by previous steps
 -   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+
+### Snapshot
+
+By default, when not on tag, `-SNAPSHOT` suffix is appended
+
+It can be customized by
+
+    scmVersion {
+       snapshotCreator: { version, position -> ...}
+    }
+
+Snapshot creator can be implemented by creating closure:
+
+    {version, position -> ...}
+
+-   version - string version resolved by previous steps
+-   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+
 
 ## Sanitization
 

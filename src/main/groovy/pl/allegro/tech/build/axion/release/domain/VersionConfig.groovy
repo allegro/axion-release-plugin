@@ -41,6 +41,9 @@ class VersionConfig {
     @Nested
     Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
+    @Nested
+    Closure snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
+
     @Input
     Map<String, Object> branchVersionCreator = [:]
 
@@ -123,6 +126,10 @@ class VersionConfig {
 
     void versionCreator(Closure c) {
         this.versionCreator = c
+    }
+
+    void snapshotCreator(Closure c) {
+        this.snapshotCreator = c
     }
 
     void branchVersionCreator(Map<String, Object> creators) {

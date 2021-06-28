@@ -9,7 +9,6 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class VersionService {
 
-    public static final String SNAPSHOT = "SNAPSHOT";
     private final VersionResolver versionResolver;
     private final VersionSanitizer sanitizer;
 
@@ -34,7 +33,7 @@ public class VersionService {
 
         String finalVersion = version;
         if (versionContext.isSnapshot()) {
-            finalVersion = finalVersion + "-" + SNAPSHOT;
+            finalVersion = finalVersion + versionProperties.getSnapshotCreator().call(version,  versionContext.getPosition());
         }
 
 
