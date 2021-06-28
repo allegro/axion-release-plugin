@@ -7,7 +7,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocatio
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'maven'
     id 'maven-publish'
     id 'signing'
     id 'jacoco'
