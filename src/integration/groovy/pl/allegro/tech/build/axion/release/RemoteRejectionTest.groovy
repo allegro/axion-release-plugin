@@ -16,7 +16,7 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Shared
 import spock.lang.Specification
 
-import java.nio.file.Path
+import java.nio.file.Paths
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
@@ -26,7 +26,7 @@ class RemoteRejectionTest extends Specification {
     @Shared
     GenericContainer gitServerContainer = new GenericContainer(
         new ImageFromDockerfile("test/axion-release-remote:latest", true)
-            .withDockerfile(Path.of("docker/Dockerfile")))
+            .withDockerfile(Paths.get("docker/Dockerfile")))
         .withExposedPorts(22)
 
 
