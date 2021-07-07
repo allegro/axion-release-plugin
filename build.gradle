@@ -1,7 +1,3 @@
-import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
 import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
 
 plugins {
@@ -14,10 +10,9 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
-    id 'com.coditory.integration-test' version "1.0.5"
-    id 'com.adarshr.test-logger' version '2.1.1'
+    id 'com.coditory.integration-test' version "1.2.1"
+    id 'com.adarshr.test-logger' version '3.0.0'
     id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'com.bmuschko.docker-remote-api' version '3.2.1'
 }
 
 scmVersion {
@@ -62,28 +57,14 @@ sourceSets {
         java { srcDirs = [] }    // no source dirs for the java compiler
         groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
     }
-
-    remoteTest {
-        java.srcDir project.file('src/test-remote/java')
-        groovy.srcDir project.file('src/test-remote/groovy')
-
-        resources.srcDir project.file('src/test-remote/resources')
-        resources.srcDir project.sourceSets.test.resources
-        resources.srcDir project.sourceSets.main.resources
-
-        compileClasspath = project.sourceSets.main.output +
-            project.sourceSets.test.output +
-            project.configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
-    }
 }
 
 dependencies {
     shadow gradleApi()
     shadow localGroovy()
 
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
@@ -97,18 +78,29 @@ dependencies {
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.1.0') {
+    testImplementation(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.1.0') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.3-groovy-2.5'
-    testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
-    testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
-    testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
-    testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
+    testImplementation group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.7'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+    testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.1'
+    testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
 
-    testCompile gradleTestKit()
+    testImplementation gradleTestKit()
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
+wrapper {
+    gradleVersion = '7.1.1'
+    distributionType = Wrapper.DistributionType.BIN
 }
 
 task relocateShadowJar(type: ConfigureShadowRelocation) {
@@ -121,48 +113,7 @@ shadowJar {
     archiveClassifier.set('')
 }
 
-project.configurations {
-    remoteTest {
-        extendsFrom project.configurations.testRuntime
-        description = 'Dependencies for tests with Docker'
-        transitive = true
-        visible = true
-    }
-}
-
-task buildDockerImage(type: DockerBuildImage) {
-    inputDir = file('docker')
-    tag = 'test/axion-release-remote:latest'
-}
-
-task createDockerContainer(type: DockerCreateContainer) {
-    dependsOn buildDockerImage
-    targetImageId { buildDockerImage.getImageId() }
-    portBindings = ['2222:22']
-}
-
-task startDockerContainer(type: DockerStartContainer) {
-    dependsOn createDockerContainer
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-task stopDockerContainer(type: DockerStopContainer) {
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-task remoteTest(type: Test) {
-    testClassesDirs = project.sourceSets.remoteTest.output.classesDirs
-    classpath = project.sourceSets.main.output +
-        project.sourceSets.test.output +
-        project.sourceSets.remoteTest.runtimeClasspath +
-        project.configurations.testRuntime +
-        project.configurations.remoteTestRuntime
-
-    dependsOn startDockerContainer
-    finalizedBy stopDockerContainer
-}
-
-tasks.check.dependsOn integrationTest, remoteTest
+tasks.check.dependsOn test, integrationTest
 
 gradlePlugin {
     testSourceSets project.sourceSets.integration
