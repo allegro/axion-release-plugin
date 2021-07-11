@@ -8,6 +8,8 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -60,7 +62,7 @@ public class VersionResolver {
 
         VersionFactory.FinalVersion finalVersion = versionFactory.createFinalVersion(scmState, versions.current);
 
-        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition);
+        return new VersionContext(finalVersion.version, versions.previousTag, finalVersion.snapshot, versions.previous, latestChangePosition);
     }
 
     private VersionInfo readVersions(
@@ -80,7 +82,8 @@ public class VersionResolver {
         Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
 
-        TaggedCommits latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition);
+        List<String> previousTag = new LinkedList<>();
+        TaggedCommits latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition, previousTag);
         VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(
             latestTaggedCommit, false,
             nextVersionTagPattern,
@@ -99,6 +102,7 @@ public class VersionResolver {
 
         return new VersionInfo(
             currentVersion,
+            (!previousTag.isEmpty())? previousTag.iterator().next() : null,
             previousVersion,
             (onCommitWithLatestChange && !currentVersionInfo.isNextVersion),
             currentVersionInfo.isNextVersion,
@@ -130,6 +134,7 @@ public class VersionResolver {
 
         return new VersionInfo(
             currentVersion,
+            null,
             previousVersion,
             (onCommitWithLatestChange && !currentVersionInfo.isNextVersion),
             currentVersionInfo.isNextVersion,
@@ -143,13 +148,23 @@ public class VersionResolver {
 
     private static final class VersionInfo {
         final Version current;
+
+        //previous tag inferred from the current tag
+        //if current is '1.2.3', previous tag could be '1.2.2'
+        final String previousTag;
+
+        //previous version in the context of the 'next version marker' mechanism
+        //Caveat: if 'next version marker' tag was not found then 'previous' will be equal to 'current' *and*
+        //  'previous' will not be the same as 'previousTag'.
         final Version previous;
+
         final boolean onReleaseTag;
         final boolean onNextVersionTag;
         final boolean noTagsFound;
 
-        VersionInfo(Version current, Version previous, boolean onReleaseTag, boolean onNextVersionTag, boolean noTagsFound) {
+        VersionInfo(Version current, String previousTag, Version previous, boolean onReleaseTag, boolean onNextVersionTag, boolean noTagsFound) {
             this.current = current;
+            this.previousTag = previousTag;
             this.previous = previous;
             this.onReleaseTag = onReleaseTag;
             this.onNextVersionTag = onNextVersionTag;

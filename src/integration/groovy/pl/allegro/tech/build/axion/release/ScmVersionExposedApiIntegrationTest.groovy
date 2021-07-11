@@ -11,6 +11,7 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
         task outputDecorated { doLast {
             println "Version: \${scmVersion.version}"
             println "Previous: \${scmVersion.previousVersion}" //'previousVersion' property smoke test
+            println "Previous tag: \${scmVersion.previousTag}" //'previousVersion' property smoke test
         } }
         """)
 
@@ -20,6 +21,7 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
         then:
         result.output.contains('Version: 0.1.0-SNAPSHOT')
         result.output.contains('Previous: 0.1.0')
+        result.output.contains('Previous tag: null')
         result.task(":outputDecorated").outcome == TaskOutcome.SUCCESS
     }
 

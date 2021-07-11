@@ -37,6 +37,7 @@ class VersionServiceTest extends Specification {
         VersionProperties properties = versionProperties().build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf('1.0.0'),
+            null,
             false,
             Version.valueOf('1.0.0'),
             new ScmPosition('', '', 'master')
@@ -55,6 +56,7 @@ class VersionServiceTest extends Specification {
         VersionProperties properties = versionProperties().forceSnapshot().build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf('1.0.1'),
+            null,
             true,
             Version.valueOf('1.0.1'),
             new ScmPosition('', '', 'master')
@@ -73,6 +75,7 @@ class VersionServiceTest extends Specification {
         VersionProperties properties = versionProperties().build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
+            null,
             true,
             Version.valueOf("1.0.1"),
             new ScmPosition('', '', 'master')
@@ -91,6 +94,7 @@ class VersionServiceTest extends Specification {
         VersionProperties properties = versionProperties().dontIgnoreUncommittedChanges().build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
+            null,
             true,
             Version.valueOf("1.0.1"),
             new ScmPosition('', '', 'master')
@@ -109,6 +113,7 @@ class VersionServiceTest extends Specification {
         VersionProperties properties = versionProperties().withVersionCreator({ v, t -> v }).build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
+            "v1.0.0",
             true,
             Version.valueOf("1.0.0"),
             new ScmPosition('', '', 'master')
@@ -121,6 +126,7 @@ class VersionServiceTest extends Specification {
         version.undecoratedVersion == '1.0.1'
         version.decoratedVersion == '1.0.1-SNAPSHOT'
         version.previousVersion == '1.0.0'
+        version.previousTag == 'v1.0.0'
     }
 
     def "should sanitize version if flag is set to true"() {
@@ -129,6 +135,7 @@ class VersionServiceTest extends Specification {
 
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
+            null,
             true,
             Version.valueOf("1.0.1"),
             new ScmPosition('', '', 'master')
@@ -150,6 +157,7 @@ class VersionServiceTest extends Specification {
 
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
+            null,
             true,
             Version.valueOf("1.0.1"),
             new ScmPosition('', '', 'master')

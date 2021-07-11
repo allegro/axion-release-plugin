@@ -18,9 +18,13 @@ public class TaggedCommits {
         return new TaggedCommits(latestTagPosition, taggedCommits);
     }
 
-    public static TaggedCommits fromLatestCommit(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
-        TagsOnCommit latestTags = repository.latestTags(tagPattern);
-        return new TaggedCommits(latestTagPosition, Arrays.asList(latestTags));
+    public static TaggedCommits fromLatestCommit(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition, List<String> previousTag) {
+        List<TagsOnCommit> tagsOnCommits = repository.taggedCommits(tagPattern);
+        TagsOnCommit latest = tagsOnCommits.isEmpty() ? TagsOnCommit.empty() : tagsOnCommits.iterator().next();
+        if (tagsOnCommits.size() > 1) {
+            previousTag.add(tagsOnCommits.get(1).getTags().iterator().next());
+        }
+        return new TaggedCommits(latestTagPosition, Arrays.asList(latest));
     }
 
     public static TaggedCommits fromAllCommits(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
