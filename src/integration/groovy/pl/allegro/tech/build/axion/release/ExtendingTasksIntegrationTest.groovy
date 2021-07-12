@@ -34,7 +34,7 @@ class ExtendingTasksIntegrationTest extends BaseIntegrationTest {
         task << [
             'CreateReleaseTask',
             'MarkNextVersionTask',
-            // 'OutputCurrentVersionTask', FIXME causes test to fail - Type 'pl.allegro.tech.build.axion.release.OutputCurrentVersionTask' property 'versionConfig.versionIncrementer.creator' is missing an input or output annotation
+            'OutputCurrentVersionTask',
             'PushReleaseTask',
             'ReleaseTask',
             'VerifyReleaseTask'
