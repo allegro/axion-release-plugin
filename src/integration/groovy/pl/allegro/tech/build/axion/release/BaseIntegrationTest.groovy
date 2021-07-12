@@ -6,15 +6,15 @@ import org.gradle.testkit.runner.GradleRunner
 class BaseIntegrationTest extends RepositoryBasedTest {
 
     File buildFile() {
-        return temporaryFolder.newFile('build.gradle')
+        return new FileTreeBuilder(temporaryFolder).file("build.gradle","")
     }
 
     File newFile(String name) {
-        return temporaryFolder.newFile(name)
+        return new FileTreeBuilder(temporaryFolder).file(name,"")
     }
 
     void buildFile(String contents) {
-        buildFile() << """
+        new FileTreeBuilder(temporaryFolder).file("build.gradle", """
         plugins {
             id 'pl.allegro.tech.build.axion-release'
         }
@@ -23,16 +23,16 @@ class BaseIntegrationTest extends RepositoryBasedTest {
             """
 
         project.version = scmVersion.version
-        """
+        """)
     }
 
     void vanillaBuildFile(String contents) {
-        buildFile() << contents
+        new FileTreeBuilder(temporaryFolder).file("build.gradle", contents)
     }
 
     GradleRunner gradle() {
         return GradleRunner.create()
-            .withProjectDir(directory)
+            .withProjectDir(temporaryFolder)
             .withPluginClasspath()
     }
 

@@ -7,7 +7,7 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
     def "should print changes in Git as seen by axion-release"() {
         given:
         buildFile('')
-        temporaryFolder.newFile('my-uncommitted-file') <<  "hello"
+        new FileTreeBuilder(temporaryFolder).file('my-uncommitted-file', "hello")
 
         when:
         def result = runGradle('verifyRelease', '-Prelease.dryRun', '-Prelease.localOnly')

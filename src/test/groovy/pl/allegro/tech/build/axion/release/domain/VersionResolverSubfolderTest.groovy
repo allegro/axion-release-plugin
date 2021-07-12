@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.*
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import spock.lang.Shared
@@ -208,8 +207,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         context = new Context(
             PropertiesBuilder.properties().withVersionRules(versionRules).build(),
             context.repository(),
-            scmProperties(directory).build(),
-            directory,
+            scmProperties(temporaryFolder).build(),
+            temporaryFolder,
             new LocalOnlyResolver(true)
         )
 
@@ -217,8 +216,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     }
 
     private void createAndCommitFileInSubfolder(String path, String filename) {
-        def subfolder = new File(directory, path)
-        def dummyFile = new File(directory, "${path}/${filename}")
+        def subfolder = new File(temporaryFolder, path)
+        def dummyFile = new File(temporaryFolder, "${path}/${filename}")
         subfolder.mkdirs()
         dummyFile.createNewFile()
         repository.commit(['.'], "create file ${path}/${filename}")

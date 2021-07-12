@@ -24,7 +24,7 @@ public class CommitHookAction implements ReleaseHookAction {
 
     @Override
     public void act(HookContext hookContext) {
-        String message = (customAction.call(hookContext.getCurrentVersion(), hookContext.getPosition())).toString();
+        String message = (customAction.call(hookContext.getReleaseVersion(), hookContext.getPosition())).toString();
         hookContext.commit(hookContext.getPatternsToCommit(), message);
     }
 

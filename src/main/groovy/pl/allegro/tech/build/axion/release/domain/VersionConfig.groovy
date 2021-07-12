@@ -48,7 +48,7 @@ class VersionConfig {
     Map<String, Object> branchVersionCreator = [:]
 
     @Nested
-    Closure versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch')
+    Closure versionIncrementer = { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() }
 
     @Input
     Map<String, Object> branchVersionIncrementer = [:]
