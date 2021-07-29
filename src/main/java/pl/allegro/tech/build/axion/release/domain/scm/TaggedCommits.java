@@ -28,12 +28,12 @@ public class TaggedCommits {
         return new TaggedCommits(latestTagPosition, taggedCommits);
     }
 
-    public static TaggedCommits fromLatestCommitBeforeNextVersion(ScmRepository repository, Pattern releaseTagPattern, Pattern nextVersionTagPattern, ScmPosition latestTagPosition) {
-        TagsOnCommit previousTags = repository.latestTags(releaseTagPattern);
+    public static TaggedCommits fromPreviousCommitBeforeNextVersion(ScmRepository repository, Pattern releaseTagPattern, Pattern nextVersionTagPattern, ScmPosition latestChangePosition) {
+        TagsOnCommit previousTags = repository.latestTags(releaseTagPattern, latestChangePosition.getRevision());
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
             previousTags = repository.latestTags(releaseTagPattern, previousTags.getCommitId());
         }
-        return new TaggedCommits(latestTagPosition, Arrays.asList(previousTags));
+        return new TaggedCommits(latestChangePosition, Arrays.asList(previousTags));
     }
 
     public List<TagsOnCommit> getCommits() {
