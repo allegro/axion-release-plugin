@@ -65,6 +65,7 @@ dependencies {
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
