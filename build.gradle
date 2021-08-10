@@ -10,9 +10,9 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.gradle.plugin-publish' version '0.12.0'
     id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
-    id 'com.coditory.integration-test' version "1.0.5"
+    id 'com.coditory.integration-test' version "1.2.3"
     id 'com.adarshr.test-logger' version '3.0.0'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 scmVersion {
@@ -34,8 +34,9 @@ version = scmVersion.version
 java {
     withSourcesJar()
     withJavadocJar()
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 repositories {
@@ -83,8 +84,7 @@ dependencies {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
-    testImplementation group: 'org.codehaus.groovy', name: 'groovy-all', version: '3.0.7'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.16.0'
     testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
     testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.1'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
@@ -126,8 +126,8 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
