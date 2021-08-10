@@ -114,6 +114,10 @@ shadowJar {
     archiveClassifier.set('')
 }
 
+components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
+    skip()
+}
+
 tasks.check.dependsOn test, integrationTest
 
 gradlePlugin {
