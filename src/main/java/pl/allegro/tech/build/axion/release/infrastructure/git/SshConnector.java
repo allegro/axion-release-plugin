@@ -1,56 +1,48 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
-import org.eclipse.jgit.transport.OpenSshConfig;
-import org.eclipse.jgit.util.FS;
+import org.apache.sshd.client.SshClient;
+import org.apache.sshd.git.transport.GitSshdSessionFactory;
+import org.eclipse.jgit.transport.SshSessionFactory;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
 
-class SshConnector extends JschConfigSessionFactory {
+class SshConnector {
 
-    private final ScmIdentity identity;
+    static SshSessionFactory from(ScmIdentity identity) {
+        JSch.setConfig("StrictHostKeyChecking", "no");
+        SshClient client = SshClient.setUpDefaultClient();
 
-    private JSch jsch;
-
-    SshConnector(ScmIdentity identity) {
-        this.identity = identity;
-    }
-
-    @Override
-    protected void configure(OpenSshConfig.Host hc, Session session) {
-        session.setConfig("StrictHostKeyChecking", "no");
-    }
-
-    @Override
-    protected JSch getJSch(OpenSshConfig.Host hc, FS fs) throws JSchException {
-        if (this.jsch == null) {
-            this.jsch = (!identity.isUseDefault()) ? createKeyBasedJSch() : createSshAgentBasedJSch(hc, fs);
+        if (identity.isDisableAgentSupport()) {
+            System.out.println("how to disable ssh-agent here?");
         }
 
-        return this.jsch;
-    }
-
-    private JSch createKeyBasedJSch() throws JSchException {
-        JSch jsch = new JSch();
-        byte[] passPhrase = identity.getPassPhrase() != null ? identity.getPassPhrase().getBytes(UTF_8) : null;
-        jsch.addIdentity("key", identity.getPrivateKey().getBytes(UTF_8), null, passPhrase);
-        return jsch;
-    }
-
-    private JSch createSshAgentBasedJSch(OpenSshConfig.Host hc, FS fs) throws JSchException {
-        JSch ljsch = super.getJSch(hc, fs);
-
-        boolean sshAgentEnabled = !identity.isDisableAgentSupport();
-        if (sshAgentEnabled) {
-            SshAgentIdentityRepositoryFactory.tryToCreateIdentityRepository().ifPresent(
-                r -> ljsch.setIdentityRepository(r)
-            );
+        if (identity.isUsernameBased()) {
+            client.addPasswordIdentity(identity.getPassword());
+        } else if (identity.isPrivateKeyBased()) {
+            client.addPublicKeyIdentity(getKeyPair(identity.getPrivateKey()));
         }
 
-        return ljsch;
+        return new GitSshdSessionFactory(client);
+    }
+
+    private static KeyPair getKeyPair(String privateKey) {
+        try {
+            String key = privateKey
+                .replaceAll("\\n", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "");
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(key));
+            return new KeyPair(keyFactory.generatePublic(keySpecPKCS8), keyFactory.generatePrivate(keySpecPKCS8));
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Could not parse private key", e);
+        }
     }
 }

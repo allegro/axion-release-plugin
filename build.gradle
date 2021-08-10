@@ -64,7 +64,8 @@ dependencies {
     shadow localGroovy()
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    implementation group: 'org.apache.sshd', name: 'sshd-git', version: '2.7.0'
+
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit

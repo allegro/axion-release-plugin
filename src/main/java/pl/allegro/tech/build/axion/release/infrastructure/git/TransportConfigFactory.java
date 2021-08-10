@@ -10,12 +10,10 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity;
 class TransportConfigFactory {
 
     TransportConfigCallback create(ScmIdentity identity) {
-        if (identity.isPrivateKeyBased()) {
+        if (identity.isPrivateKeyBased() || identity.isUseDefault()) {
             return createForSsh(identity);
         } else if (identity.isUsernameBased()) {
             return createForUsername(identity);
-        } else if (identity.isUseDefault()) {
-            return createForDefault(identity);
         }
 
         throw new IllegalArgumentException(
@@ -23,21 +21,14 @@ class TransportConfigFactory {
         );
     }
 
-    private TransportConfigCallback createForDefault(ScmIdentity identity) {
+    private TransportConfigCallback createForSsh(ScmIdentity identity) {
         return transport -> {
             if (transport instanceof SshTransport) {
                 SshTransport sshTransport = (SshTransport) transport;
-                sshTransport.setSshSessionFactory(new SshConnector(identity));
+                sshTransport.setSshSessionFactory(SshConnector.from(identity));
             } else if (transport instanceof HttpTransport) {
                 transport.setCredentialsProvider(new NetRCCredentialsProvider());
             }
-        };
-    }
-
-    private TransportConfigCallback createForSsh(ScmIdentity identity) {
-        return transport -> {
-            SshTransport sshTransport = (SshTransport) transport;
-            sshTransport.setSshSessionFactory(new SshConnector(identity));
         };
     }
 

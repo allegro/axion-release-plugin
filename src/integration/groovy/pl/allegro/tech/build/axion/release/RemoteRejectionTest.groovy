@@ -40,7 +40,7 @@ class RemoteRejectionTest extends Specification {
                 @Override
                 void configure(Transport transport) {
                     SshTransport sshTransport = (SshTransport) transport
-                    sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
+                    sshTransport.setSshSessionFactory(SshConnector.from(ScmIdentity.defaultIdentityWithoutAgents()))
                 }
             })
             .setURI("ssh://git@localhost:${gitServerContainer.firstMappedPort}/git-server/repos/rejecting-repo")
