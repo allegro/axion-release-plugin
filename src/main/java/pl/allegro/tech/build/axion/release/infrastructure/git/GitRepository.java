@@ -3,12 +3,17 @@ package pl.allegro.tech.build.axion.release.infrastructure.git;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -217,6 +222,40 @@ public class GitRepository implements ScmRepository {
         }
     }
 
+    private RevCommit getLastCommitWithPath(String path) throws GitAPIException, IOException {
+        // This function is needed because jgit log() with addPath() simplifies the TREE while searching,
+        // this can cause the latest commit found to not be actually the latest one (where the git tag was pointing to)
+        // Causing the version to always be snapshot
+        // This won't be needed when `git log --show-pulls -n 1 path` is implemented in jgit. as of now, it isn't.
+        RevCommit lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call().iterator().next();
+
+        // Calculate nearest merge.
+        Iterator<RevCommit> mergesIterator = jgitRepository.log().setRevFilter(RevFilter.ONLY_MERGES).addRange(lastCommit, head()).call().iterator();
+        if (!mergesIterator.hasNext()) {
+            return lastCommit;
+        }
+        RevCommit nearestMerge = mergesIterator.next();
+        while (mergesIterator.hasNext()) {
+            nearestMerge = mergesIterator.next();
+        }
+
+        for (RevCommit parentCommit: nearestMerge.getParents()) {
+            // Find out if lastCommit a direct parent of the nearest merge
+            if (jgitRepository.getRepository().resolve(parentCommit.getName()).equals(lastCommit)) {
+                DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+                diffFormatter.setPathFilter(PathFilter.create(path));
+                diffFormatter.setRepository(jgitRepository.getRepository());
+                if (diffFormatter.scan(lastCommit, nearestMerge).isEmpty()) {
+                    // If they are identical the nearest commit is actually the merge
+                    // It wasn't detected because jgit log with addPath simplifies the tree.
+                    return nearestMerge;
+                }
+                break;
+            }
+        }
+        return lastCommit;
+    }
+
     @Override
     public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
         RevCommit lastCommit;
@@ -234,9 +273,9 @@ public class GitRepository implements ScmRepository {
             } else {
                 String unixStylePath = asUnixPath(path);
                 assertPathExists(unixStylePath);
-                lastCommit = jgitRepository.log().setMaxCount(1).addPath(unixStylePath).call().iterator().next();
+                lastCommit = getLastCommitWithPath(unixStylePath);
             }
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | IOException e) {
             throw new ScmException(e);
         }
 
