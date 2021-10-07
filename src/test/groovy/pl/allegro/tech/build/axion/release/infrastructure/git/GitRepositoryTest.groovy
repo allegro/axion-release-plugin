@@ -1,9 +1,15 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.MergeCommand
+import org.eclipse.jgit.api.MergeResult
+import org.eclipse.jgit.api.ResetCommand
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.ObjectId
+import org.eclipse.jgit.lib.Ref
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
@@ -19,6 +25,7 @@ import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilde
 
 class GitRepositoryTest extends Specification {
 
+    public static final String MASTER_BRANCH = "master"
     File repositoryDir
 
     File remoteRepositoryDir
@@ -506,4 +513,74 @@ class GitRepositoryTest extends Specification {
         then:
         position.revision == headSubDirAChanged
     }
+
+    def "last position with monorepo paths case: merge after squash"() {
+        given:
+        Git git = repository.getJgitRepository();
+        commit_file('b4/aa', 'b4')
+        commit_file('b4/ab', 'b4b')
+
+        String importantDir = 'a/aa'
+
+        commit_file(importantDir, 'foo')
+        String headSubDirAChanged = rawRepository.head().id
+
+        String secondBranchName = "feature/unintresting_changes";
+        git.branchCreate().setName(secondBranchName).call()
+        git.checkout().setName(secondBranchName).call()
+        commit_file('second/aa', 'foo')
+        commit_file('b/ba', 'bar')
+        git.checkout().setName(MASTER_BRANCH).call()
+        git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+
+        commit_file('after/aa', 'after')
+
+        when:
+        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [])
+
+        then:
+        position.revision == headSubDirAChanged
+    }
+
+    def "last position with monorepo paths case: merge after merge"() {
+        given:
+        Git git = repository.getJgitRepository();
+        commit_file('b4/aa', 'b4')
+        commit_file('b4/ab', 'b4b')
+
+        String importantDir = 'a/aa'
+
+        String branchName = "feature/important_changes";
+        git.branchCreate().setName(branchName).call()
+        git.checkout().setName(branchName).call()
+        commit_file(importantDir, 'foo')
+        commit_file('b/ba', 'bar')
+        git.checkout().setName(MASTER_BRANCH).call()
+        git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+        String headSubDirAChanged = rawRepository.head().id
+
+        String secondBranchName = "feature/unintresting_changes";
+        git.branchCreate().setName(secondBranchName).call()
+        git.checkout().setName(secondBranchName).call()
+        commit_file('second/aa', 'foo')
+        commit_file('b/ba', 'bar')
+        git.checkout().setName(MASTER_BRANCH).call()
+        git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+
+        commit_file('after/aa', 'after')
+
+        when:
+        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [])
+
+        then:
+        position.revision == headSubDirAChanged
+    }
+
+    private void commit_file(String subDir, String fileName) {
+        String fileInA = "${subDir}/${fileName}"
+        new File(repositoryDir, subDir).mkdirs()
+        new File(repositoryDir, fileInA).createNewFile()
+        repository.commit([fileInA], "Add file ${fileName} in ${subDir}")
+    }
+
 }

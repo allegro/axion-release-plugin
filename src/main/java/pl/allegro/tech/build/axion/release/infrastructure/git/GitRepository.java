@@ -3,8 +3,6 @@ package pl.allegro.tech.build.axion.release.infrastructure.git;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -12,8 +10,6 @@ import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.transport.*;
-import org.eclipse.jgit.treewalk.filter.PathFilter;
-import org.eclipse.jgit.util.io.DisabledOutputStream;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -239,21 +235,23 @@ public class GitRepository implements ScmRepository {
             nearestMerge = mergesIterator.next();
         }
 
-        for (RevCommit parentCommit: nearestMerge.getParents()) {
-            // Find out if lastCommit a direct parent of the nearest merge
-            if (jgitRepository.getRepository().resolve(parentCommit.getName()).equals(lastCommit)) {
-                DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-                diffFormatter.setPathFilter(PathFilter.create(path));
-                diffFormatter.setRepository(jgitRepository.getRepository());
-                if (diffFormatter.scan(lastCommit, nearestMerge).isEmpty()) {
-                    // If they are identical the nearest commit is actually the merge
-                    // It wasn't detected because jgit log with addPath simplifies the tree.
-                    return nearestMerge;
+        // Now we need to choose nearestMerge vs lastCommit, the way we do so is by walking on from nearestMerge until lastCommit+1
+        // while setting setFirstParent to true, if we see lastCommit there, it is a commit to the master branch (squash/direct commit) and it is the most recent change
+        // If we don't see it, the first time the change was introduced to the branch was in nearestMerge and it is actually the lastCommit
+        // And we would have found it if we would run `git log --show-pulls -n 1 path`
+        try (RevWalk revWalk = new RevWalk(jgitRepository.getRepository())) {
+            revWalk.setFirstParent(true);
+            RevCommit nearestMergeHead = revWalk.parseCommit(jgitRepository.getRepository().resolve(nearestMerge.getName()));
+            RevCommit lastCommitHead = revWalk.parseCommit(jgitRepository.getRepository().resolve(lastCommit.getName()));
+            revWalk.markStart(nearestMergeHead);
+            revWalk.markUninteresting(lastCommitHead.getParent(0));
+            for (RevCommit c : revWalk) {
+                if (c == lastCommitHead) {
+                    return lastCommitHead;
                 }
-                break;
             }
+            return nearestMerge;
         }
-        return lastCommit;
     }
 
     @Override
@@ -534,5 +532,8 @@ public class GitRepository implements ScmRepository {
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
+    }
+    public Git getJgitRepository(){
+        return jgitRepository;
     }
 }
