@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.git;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
+import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -10,6 +11,8 @@ import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -218,7 +221,7 @@ public class GitRepository implements ScmRepository {
         }
     }
 
-    private RevCommit getLastCommitWithPath(String path) throws GitAPIException, IOException {
+    private RevCommit UnusedgetLastCommitWithPath(String path) throws GitAPIException, IOException {
         // This function is needed because jgit log() with addPath() simplifies the TREE while searching,
         // this can cause the latest commit found to not be actually the latest one (where the git tag was pointing to)
         // Causing the version to always be snapshot
@@ -271,9 +274,9 @@ public class GitRepository implements ScmRepository {
             } else {
                 String unixStylePath = asUnixPath(path);
                 assertPathExists(unixStylePath);
-                lastCommit = getLastCommitWithPath(unixStylePath);
+                lastCommit = jgitRepository.log().setMaxCount(1).addPath(unixStylePath).call().iterator().next();
             }
-        } catch (GitAPIException | IOException e) {
+        } catch (GitAPIException e) {
             throw new ScmException(e);
         }
 
@@ -283,14 +286,33 @@ public class GitRepository implements ScmRepository {
             return currentPosition;
         }
 
-        String revision = lastCommit.getName();
-        if (revision.equals(currentPosition.getRevision())) {
-            return currentPosition;
-        } else {
-            return new ScmPosition(
-                revision,
-                currentPosition.getBranch()
-            );
+        return new ScmPosition(
+            lastCommit.getName(),
+            currentPosition.getBranch()
+        );
+    }
+
+    private Boolean isChangedFilesInPath(String path, ObjectId a, ObjectId b) throws IOException {
+        DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+        diffFormatter.setPathFilter(PathFilter.create(path));
+        diffFormatter.setRepository(jgitRepository.getRepository());
+        return diffFormatter.scan(a, b).isEmpty();
+    }
+
+    @Override
+    public Boolean isTagOnLatestChangeForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+        if (latestChangeRevision.isEmpty() || tagCommitRevision.isEmpty()) {
+            return false;
+        }
+        if (latestChangeRevision.equals(tagCommitRevision)) {
+            return true;
+        }
+        try {
+            ObjectId lastChange = jgitRepository.getRepository().resolve(latestChangeRevision);
+            ObjectId taggedCommit = jgitRepository.getRepository().resolve(tagCommitRevision);
+            return isChangedFilesInPath(path, lastChange, taggedCommit);
+        } catch (IOException e) {
+            throw new ScmException(e);
         }
     }
 

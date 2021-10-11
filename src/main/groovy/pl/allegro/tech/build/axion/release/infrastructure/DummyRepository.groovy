@@ -63,6 +63,11 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
+    Boolean isTagOnLatestChangeForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+        return false
+    }
+
+    @Override
     TagsOnCommit latestTags(Pattern pattern) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return new TagsOnCommit(null, [])
