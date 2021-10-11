@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.MergeCommand
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
@@ -22,6 +24,7 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
 
     String subDir = "subProjectMain"
     String secondaryDir = "subProjectSecondary"
+    public static final String MASTER_BRANCH = "master"
 
     def setup() {
         resolver = new VersionResolver(repository, subDir)
@@ -125,4 +128,63 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
         version.version.toString() == '1.1.1'
         version.snapshot
     }
+
+    def "test merged changes type: commit to master right before merge"() {
+        given:
+        VersionProperties versionRules = versionProperties().build()
+        repository.tag(fullPrefix() +'1.1.0')
+        commit_secondary('1')
+
+        Git git = repository.getJgitRepository();
+        String branchName = "feature/important_changes";
+        git.branchCreate().setName(branchName).call()
+        commit_primary('4') // Commit to master b4 branch commit
+        git.checkout().setName(branchName).call()
+        commit_primary('2')
+        commit_secondary('3')
+        git.checkout().setName(MASTER_BRANCH).call()
+
+        git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+        commit_secondary('5')
+        repository.tag(fullPrefix() +'1.2.0')
+        commit_secondary('6')
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.0'
+        !version.snapshot
+    }
+
+    def "test merged changes type: commit after branch creation"() {
+        given:
+        VersionProperties versionRules = versionProperties().build()
+        repository.tag(fullPrefix() +'1.1.0')
+        commit_secondary('1')
+
+        Git git = repository.getJgitRepository();
+        String branchName = "feature/important_changes";
+        git.branchCreate().setName(branchName).call()
+        git.checkout().setName(branchName).call()
+        commit_primary('2')
+        commit_secondary('3')
+        git.checkout().setName(MASTER_BRANCH).call()
+
+        commit_primary('4') // Commit to
+        git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+        commit_secondary('5')
+        repository.tag(fullPrefix() +'1.2.0')
+        commit_secondary('6')
+
+        when:
+        VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.2.0'
+        version.version.toString() == '1.2.0'
+        !version.snapshot
+    }
+
 }
