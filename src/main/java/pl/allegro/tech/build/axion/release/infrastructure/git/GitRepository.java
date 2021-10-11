@@ -3,16 +3,15 @@ package pl.allegro.tech.build.axion.release.infrastructure.git;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
+import org.eclipse.jgit.diff.DiffFormatter;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -257,8 +256,9 @@ public class GitRepository implements ScmRepository {
     }
 
     private Boolean isChangedFilesInPath(String path, ObjectId a, ObjectId b) throws IOException {
+        String unixStylePath = asUnixPath(path);
         DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-        diffFormatter.setPathFilter(PathFilter.create(path));
+        diffFormatter.setPathFilter(PathFilter.create(unixStylePath));
         diffFormatter.setRepository(jgitRepository.getRepository());
         return diffFormatter.scan(a, b).isEmpty();
     }
