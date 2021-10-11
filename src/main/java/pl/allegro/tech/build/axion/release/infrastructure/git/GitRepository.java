@@ -221,42 +221,6 @@ public class GitRepository implements ScmRepository {
         }
     }
 
-    private RevCommit UnusedgetLastCommitWithPath(String path) throws GitAPIException, IOException {
-        // This function is needed because jgit log() with addPath() simplifies the TREE while searching,
-        // this can cause the latest commit found to not be actually the latest one (where the git tag was pointing to)
-        // Causing the version to always be snapshot
-        // This won't be needed when `git log --show-pulls -n 1 path` is implemented in jgit. as of now, it isn't.
-        RevCommit lastCommit = jgitRepository.log().setMaxCount(1).addPath(path).call().iterator().next();
-
-        // Calculate nearest merge.
-        Iterator<RevCommit> mergesIterator = jgitRepository.log().setRevFilter(RevFilter.ONLY_MERGES).addRange(lastCommit, head()).call().iterator();
-        if (!mergesIterator.hasNext()) {
-            return lastCommit;
-        }
-        RevCommit nearestMerge = mergesIterator.next();
-        while (mergesIterator.hasNext()) {
-            nearestMerge = mergesIterator.next();
-        }
-
-        // Now we need to choose nearestMerge vs lastCommit, the way we do so is by walking on from nearestMerge until lastCommit+1
-        // while setting setFirstParent to true, if we see lastCommit there, it is a commit to the master branch (squash/direct commit) and it is the most recent change
-        // If we don't see it, the first time the change was introduced to the branch was in nearestMerge and it is actually the lastCommit
-        // And we would have found it if we would run `git log --show-pulls -n 1 path`
-        try (RevWalk revWalk = new RevWalk(jgitRepository.getRepository())) {
-            revWalk.setFirstParent(true);
-            RevCommit nearestMergeHead = revWalk.parseCommit(jgitRepository.getRepository().resolve(nearestMerge.getName()));
-            RevCommit lastCommitHead = revWalk.parseCommit(jgitRepository.getRepository().resolve(lastCommit.getName()));
-            revWalk.markStart(nearestMergeHead);
-            revWalk.markUninteresting(lastCommitHead.getParent(0));
-            for (RevCommit c : revWalk) {
-                if (c == lastCommitHead) {
-                    return lastCommitHead;
-                }
-            }
-            return nearestMerge;
-        }
-    }
-
     @Override
     public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
         RevCommit lastCommit;
