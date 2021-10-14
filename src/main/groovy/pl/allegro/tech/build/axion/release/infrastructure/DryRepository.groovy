@@ -63,8 +63,8 @@ class DryRepository implements ScmRepository {
     }
 
     @Override
-    Boolean isTagOnLatestChangeForPath(String path, String latestChangeRevision, String tagCommitRevision) {
-        return delegateRepository.isTagOnLatestChangeForPath(path, latestChangeRevision, tagCommitRevision)
+    Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+        return delegateRepository.isIdenticalForPath(path, latestChangeRevision, tagCommitRevision)
     }
 
     @Override

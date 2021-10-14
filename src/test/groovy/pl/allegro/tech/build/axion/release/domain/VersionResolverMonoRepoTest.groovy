@@ -12,7 +12,7 @@ import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionP
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
 
-class VersionResolverTestMonoRepo extends RepositoryBasedTest {
+class VersionResolverMonoRepoTest extends RepositoryBasedTest {
 
     VersionResolver resolver
 
@@ -28,18 +28,18 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
 
     def setup() {
         resolver = new VersionResolver(repository, subDir)
-        commit_primary("init_file")
+        commitPrimaryDir("init_file")
     }
 
-    private void commit_primary(String fileName) {
-        commit_file(subDir, fileName);
+    private void commitPrimaryDir(String fileName) {
+        commitFile(subDir, fileName);
     }
 
-    private void commit_secondary(String fileName) {
-        commit_file(secondaryDir, fileName);
+    private void commitNonPrimaryDir(String fileName) {
+        commitFile(secondaryDir, fileName);
     }
 
-    private void commit_file(String subDir, String fileName) {
+    private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(temporaryFolder, subDir).mkdirs()
         new File(temporaryFolder, fileInA).createNewFile()
@@ -49,9 +49,9 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
     def "Should detect change and mark as snapshot"() {
         given:
         VersionProperties versionRules = versionProperties().build()
-        commit_primary("1")
+        commitPrimaryDir("1")
         repository.tag(fullPrefix() +'1.1.0')
-        commit_primary("2")
+        commitPrimaryDir("2")
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -65,10 +65,10 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
     def "should not detect change for different directories"() {
         given:
         VersionProperties versionRules = versionProperties().build()
-        commit_primary("1")
-        commit_secondary("2")
+        commitPrimaryDir("1")
+        commitNonPrimaryDir("2")
         repository.tag(fullPrefix() +'1.1.0')
-        commit_secondary("3")
+        commitNonPrimaryDir("3")
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -84,7 +84,7 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
     def "Tag and change same commit"() {
         given:
         VersionProperties versionRules = versionProperties().build()
-        commit_primary("1")
+        commitPrimaryDir("1")
         repository.tag(fullPrefix() +'1.1.0')
 
         when:
@@ -99,11 +99,11 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
     def "Commits outside subDir shouldnt affect version"() {
         given:
         VersionProperties versionRules = versionProperties().build()
-        commit_primary("1")
+        commitPrimaryDir("1")
         repository.tag(fullPrefix() +'1.1.0')
-        commit_secondary("2")
-        commit_secondary("3")
-        commit_secondary("4")
+        commitNonPrimaryDir("2")
+        commitNonPrimaryDir("3")
+        commitNonPrimaryDir("4")
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -118,7 +118,7 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
         given:
         VersionProperties versionRules = versionProperties().forceSnapshot().build()
         repository.tag(fullPrefix() +'1.1.0')
-        commit_secondary('2')
+        commitNonPrimaryDir('2')
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -133,21 +133,21 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
         given:
         VersionProperties versionRules = versionProperties().build()
         repository.tag(fullPrefix() +'1.1.0')
-        commit_secondary('1')
+        commitNonPrimaryDir('1')
 
         Git git = repository.getJgitRepository();
         String branchName = "feature/important_changes";
         git.branchCreate().setName(branchName).call()
-        commit_primary('4') // Commit to master b4 branch commit
+        commitPrimaryDir('4') // Commit to master b4 branch commit
         git.checkout().setName(branchName).call()
-        commit_primary('2')
-        commit_secondary('3')
+        commitPrimaryDir('2')
+        commitNonPrimaryDir('3')
         git.checkout().setName(MASTER_BRANCH).call()
 
         git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
-        commit_secondary('5')
+        commitNonPrimaryDir('5')
         repository.tag(fullPrefix() +'1.2.0')
-        commit_secondary('6')
+        commitNonPrimaryDir('6')
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
@@ -162,21 +162,21 @@ class VersionResolverTestMonoRepo extends RepositoryBasedTest {
         given:
         VersionProperties versionRules = versionProperties().build()
         repository.tag(fullPrefix() +'1.1.0')
-        commit_secondary('1')
+        commitNonPrimaryDir('1')
 
         Git git = repository.getJgitRepository();
         String branchName = "feature/important_changes";
         git.branchCreate().setName(branchName).call()
         git.checkout().setName(branchName).call()
-        commit_primary('2')
-        commit_secondary('3')
+        commitPrimaryDir('2')
+        commitNonPrimaryDir('3')
         git.checkout().setName(MASTER_BRANCH).call()
 
-        commit_primary('4') // Commit to
+        commitPrimaryDir('4') // Commit to
         git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
-        commit_secondary('5')
+        commitNonPrimaryDir('5')
         repository.tag(fullPrefix() +'1.2.0')
-        commit_secondary('6')
+        commitNonPrimaryDir('6')
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)

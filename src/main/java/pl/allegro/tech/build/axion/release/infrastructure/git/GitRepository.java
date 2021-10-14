@@ -255,16 +255,8 @@ public class GitRepository implements ScmRepository {
         );
     }
 
-    private Boolean isChangedFilesInPath(String path, ObjectId a, ObjectId b) throws IOException {
-        String unixStylePath = asUnixPath(path);
-        DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
-        diffFormatter.setPathFilter(PathFilter.create(unixStylePath));
-        diffFormatter.setRepository(jgitRepository.getRepository());
-        return diffFormatter.scan(a, b).isEmpty();
-    }
-
     @Override
-    public Boolean isTagOnLatestChangeForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+    public Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision) {
         if (latestChangeRevision.isEmpty() || tagCommitRevision.isEmpty()) {
             return false;
         }
@@ -274,7 +266,10 @@ public class GitRepository implements ScmRepository {
         try {
             ObjectId lastChange = jgitRepository.getRepository().resolve(latestChangeRevision);
             ObjectId taggedCommit = jgitRepository.getRepository().resolve(tagCommitRevision);
-            return isChangedFilesInPath(path, lastChange, taggedCommit);
+            DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+            diffFormatter.setPathFilter(PathFilter.create(asUnixPath(path)));
+            diffFormatter.setRepository(jgitRepository.getRepository());
+            return diffFormatter.scan(lastChange, taggedCommit).isEmpty();
         } catch (IOException e) {
             throw new ScmException(e);
         }

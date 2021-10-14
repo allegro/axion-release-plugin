@@ -513,23 +513,23 @@ class GitRepositoryTest extends Specification {
     def "last position with monorepo paths case: merge after squash"() {
         given:
         Git git = repository.getJgitRepository();
-        commit_file('b4/aa', 'b4')
-        commit_file('b4/ab', 'b4b')
+        commitFile('b4/aa', 'b4')
+        commitFile('b4/ab', 'b4b')
 
         String importantDir = 'a/aa'
 
-        commit_file(importantDir, 'foo')
+        commitFile(importantDir, 'foo')
         String headSubDirAChanged = rawRepository.head().id
 
         String secondBranchName = "feature/unintresting_changes";
         git.branchCreate().setName(secondBranchName).call()
         git.checkout().setName(secondBranchName).call()
-        commit_file('second/aa', 'foo')
-        commit_file('b/ba', 'bar')
+        commitFile('second/aa', 'foo')
+        commitFile('b/ba', 'bar')
         git.checkout().setName(MASTER_BRANCH).call()
         git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
 
-        commit_file('after/aa', 'after')
+        commitFile('after/aa', 'after')
 
         when:
         ScmPosition position = repository.positionOfLastChangeIn(importantDir, [])
@@ -538,7 +538,7 @@ class GitRepositoryTest extends Specification {
         position.revision == headSubDirAChanged
     }
 
-    private void commit_file(String subDir, String fileName) {
+    private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
         new File(repositoryDir, fileInA).createNewFile()

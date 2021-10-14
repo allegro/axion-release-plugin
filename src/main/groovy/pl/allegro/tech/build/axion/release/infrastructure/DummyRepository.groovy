@@ -63,7 +63,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    Boolean isTagOnLatestChangeForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+    Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision) {
         return false
     }
 

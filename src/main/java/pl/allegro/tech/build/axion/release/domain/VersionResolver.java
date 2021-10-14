@@ -43,7 +43,7 @@ public class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
-        VersionInfo versions = readVersionsNew(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion());
+        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion());
 
         ScmState scmState = new ScmState(
             versions.onReleaseTag,
@@ -57,7 +57,7 @@ public class VersionResolver {
         return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition);
     }
 
-    private VersionInfo readVersionsNew(
+    private VersionInfo readVersions(
         VersionFactory versionFactory,
         TagProperties tagProperties,
         NextVersionProperties nextVersionProperties,
@@ -101,7 +101,7 @@ public class VersionResolver {
             // A(last changes in subProj1) -> B -> C(tag 1.3.0) -> D -> E(head)
             // Now if we test for anywhere from C to E we should get 1.3.0
             String tagCommitRevision = currentVersionInfo.commit != null ? currentVersionInfo.commit : "";
-            onLatestVersion = repository.isTagOnLatestChangeForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
+            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
         }
 
 
