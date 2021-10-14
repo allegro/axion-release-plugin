@@ -43,7 +43,7 @@ class RemoteRejectionTest extends Specification {
                     sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
                 }
             })
-            .setURI("ssh://git@localhost:${gitServerContainer.firstMappedPort}/git-server/repos/rejecting-repo")
+            .setURI("ssh://git@${gitServerContainer.getContainerIpAddress()}:${gitServerContainer.firstMappedPort}/git-server/repos/rejecting-repo")
             .call()
 
         GitRepository repository = new GitRepository(ScmPropertiesBuilder.scmProperties(repoDir).build())
