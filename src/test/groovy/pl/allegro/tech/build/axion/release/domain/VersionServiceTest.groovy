@@ -104,13 +104,13 @@ class VersionServiceTest extends Specification {
         version.snapshot
     }
 
-    def "should return both decorated and undecorated version"() {
+    def "should return version information"() {
         given:
         VersionProperties properties = versionProperties().withVersionCreator({ v, t -> v }).build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
             true,
-            Version.valueOf("1.0.1"),
+            Version.valueOf("1.0.0"),
             new ScmPosition('', '', 'master')
         )
 
@@ -120,6 +120,7 @@ class VersionServiceTest extends Specification {
         then:
         version.undecoratedVersion == '1.0.1'
         version.decoratedVersion == '1.0.1-SNAPSHOT'
+        version.previousVersion == '1.0.0'
     }
 
     def "should sanitize version if flag is set to true"() {
@@ -159,5 +160,25 @@ class VersionServiceTest extends Specification {
 
         then:
         version == '1.0.1-feature/hello-SNAPSHOT'
+    }
+
+    def "should allow for customizing snapshot"() {
+        given:
+        VersionProperties properties = versionProperties()
+            .withSnapshotCreator({ v, t -> return ".dirty" } )
+            .build()
+
+        resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
+            Version.valueOf("1.0.1"),
+            true,
+            Version.valueOf("1.0.1"),
+            new ScmPosition('', '', 'master')
+        )
+
+        when:
+        String version = service.currentDecoratedVersion(properties, tagProperties, nextVersionProperties).decoratedVersion
+
+        then:
+        version == '1.0.1.dirty'
     }
 }

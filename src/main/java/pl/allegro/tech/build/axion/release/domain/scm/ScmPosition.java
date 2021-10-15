@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
+import org.gradle.api.tasks.Input;
+
 public class ScmPosition {
 
     private final String revision;
@@ -29,14 +31,17 @@ public class ScmPosition {
             + ", branch = " + branch + "]";
     }
 
+    @Input
     public String getRevision() {
         return revision;
     }
 
+    @Input
     public String getShortRevision() {
         return shortRevision;
     }
 
+    @Input
     public String getBranch() {
         return branch;
     }

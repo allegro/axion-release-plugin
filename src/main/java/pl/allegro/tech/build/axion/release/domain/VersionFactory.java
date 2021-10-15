@@ -16,6 +16,21 @@ public class VersionFactory {
     private final TagProperties tagProperties;
     private final NextVersionProperties nextVersionProperties;
     private final ScmPosition position;
+    private final boolean isLegacyDefTagnameRepo;
+
+    public VersionFactory(
+        VersionProperties versionProperties,
+        TagProperties tagProperties,
+        NextVersionProperties nextVersionProperties,
+        ScmPosition position,
+        boolean isLegacyDefTagnameRepo
+    ) {
+        this.tagProperties = tagProperties;
+        this.nextVersionProperties = nextVersionProperties;
+        this.versionProperties = versionProperties;
+        this.position = position;
+        this.isLegacyDefTagnameRepo = isLegacyDefTagnameRepo;
+    }
 
     public VersionFactory(
         VersionProperties versionProperties,
@@ -23,10 +38,7 @@ public class VersionFactory {
         NextVersionProperties nextVersionProperties,
         ScmPosition position
     ) {
-        this.tagProperties = tagProperties;
-        this.nextVersionProperties = nextVersionProperties;
-        this.versionProperties = versionProperties;
-        this.position = position;
+        this(versionProperties, tagProperties, nextVersionProperties, position, false);
     }
 
     public Version versionFromTag(String tag) {
@@ -64,7 +76,7 @@ public class VersionFactory {
         Version finalVersion = Optional.ofNullable(versionProperties.getForcedVersion())
             .filter(s -> !s.isEmpty()).map(Version::valueOf)
             .orElseGet(() -> incrementVersion
-                ? versionProperties.getVersionIncrementer().apply(new VersionIncrementerContext(version, position))
+                ? versionProperties.getVersionIncrementer().apply(new VersionIncrementerContext(version, position, isLegacyDefTagnameRepo))
                 : version);
 
         return new FinalVersion(

@@ -1,11 +1,16 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import org.gradle.api.tasks.Input
+
 class VersionScmPosition {
 
+    @Input
     final String revision
 
+    @Input
     final String shortRevision
 
+    @Input
     final String branch
 
     VersionScmPosition(String revision, String shortRevision, String branch) {

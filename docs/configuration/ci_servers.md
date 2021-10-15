@@ -29,7 +29,7 @@ To use the [versionWithBranch](version.md#versionwithbranch) version creator fro
 you need to override the default behavior of the Jenkins git plugin to
 avoid the `detached-head` state. In the Git section of the job
 configuration page, add the `Additional Behaviour` called `Check out
-to specific local branch` and enter your branch name.
+to matching local branch`.
 
 Jenkins pipeline now defaults to clone with a narrow refspec, and
 without tags (as of git plugin 3.4.0). That saves network bandwidth,

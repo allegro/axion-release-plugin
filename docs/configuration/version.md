@@ -6,11 +6,11 @@ can be split in six phases:
 
 -   reading - read tags from repository
 -   parsing - extracting version from tag (serializing version to tag)
--   incrementing - when not on tag, version patch (leas significant)
+-   incrementing - when not on tag, version patch (least significant)
     number is incremented
 -   decorating - adding additional transformations to create final
     version
--   appending snapshot - when not on tag, SNAPSHOT suffix is appended
+-   appending snapshot - when not on tag, -SNAPSHOT suffix is appended (can be customized)
 -   sanitization - making sure there are no unwanted characters in
     version
 
@@ -19,7 +19,7 @@ can be split in six phases:
 Version is kept in repository in form of a tag:
 
     # git tag
-    release-1.0.0 release-1.0.1 release-1.1.0
+    v1.0.0 v1.0.1 v1.1.0
 
 Only tags which match the predefined prefix are taken into account when
 calculating current version. Prefix can be set using
@@ -123,7 +123,7 @@ Default deserialization function is a simple closure that strips tag
 name off prefix and separator between prefix and version. It ignores
 separator when prefix is an empty string:
 
-    deserialize(prefix: 'release', separator: '-', tag: 'release-1.0.0') == 1.0.0
+    deserialize(prefix: 'v', separator: '', tag: 'v1.0.0') == 1.0.0
     deserialize(prefix: '', separator: '-', tag: '1.0.0') == 1.0.0
 
 You can implement own deserializer by setting closure that would accept
@@ -154,7 +154,7 @@ version tag with additional suffix.
 Default serializer prepends prefix and separator to version number.
 Separator is ignored if prefix is an empty string:
 
-    serialize(prefix: 'release', separator: '-', version: '1.0.0') == release-1.0.0
+    serialize(prefix: 'v', separator: '', version: '1.0.0') == v1.0.0
     serialize(prefix: '', separator: '-', version: '1.0.0') == 1.0.0
 
 You can implement own serializer by setting closure that would accept
@@ -247,10 +247,10 @@ field is used.
 ### incrementMinorIfNotOnRelease
 
 This rule uses additional parameter `releaseBranchPattern` (by default
-it's set to `release/.+`):
+it's set to `v/.+`):
 
     scmVersion {
-        versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'release.*']
+        versionIncrementer 'incrementMinorIfNotOnRelease', [releaseBranchPattern: 'v.*']
     }
 
 ### incrementPrerelease
@@ -330,6 +330,24 @@ Custom version creators can be implemented by creating closure:
 
 -   version - string version resolved by previous steps
 -   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+
+### Snapshot
+
+By default, when not on tag, `-SNAPSHOT` suffix is appended
+
+It can be customized by
+
+    scmVersion {
+       snapshotCreator: { version, position -> ...}
+    }
+
+Snapshot creator can be implemented by creating closure:
+
+    {version, position -> ...}
+
+-   version - string version resolved by previous steps
+-   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+
 
 ## Sanitization
 

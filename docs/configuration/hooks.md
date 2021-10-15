@@ -85,7 +85,7 @@ Of course nothing can stop you from implementing own action. It can be
 any closure that accepts `HookContext` object:
 
     scmVersion {
-        hook {
+        hooks {
             pre {context -> /* do something important */}
         }
     }
@@ -93,7 +93,7 @@ any closure that accepts `HookContext` object:
 `HookContext` object fields and methods:
 
 -   *logger* - instance of Gradle project logger
--   *position* - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy)
+-   *position* - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
 -   *previousVersion* - version before release
 -   *currentVersion* - released version
 -   *readVersion()* - force reevaluation of version, returns fresh

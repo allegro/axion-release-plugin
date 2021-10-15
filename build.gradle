@@ -1,19 +1,18 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+
 plugins {
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'maven'
+    id 'maven-publish'
+    id 'signing'
     id 'jacoco'
-    id 'pl.allegro.tech.build.axion-release' version '1.10.3'
+    id 'pl.allegro.tech.build.axion-release' version '1.12.1'
     id 'com.github.kt3k.coveralls' version '2.8.2'
     id 'com.gradle.plugin-publish' version '0.12.0'
-    id 'com.bmuschko.nexus' version '2.3.1' apply false
-    id 'io.codearte.nexus-staging' version '0.11.0' apply false
-
-    id 'com.bmuschko.docker-remote-api' version '3.2.1'
-}
-
-if (project.hasProperty('mavenCentral')) {
-    apply from: 'gradle/mavenCentral.gradle'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
+    id 'com.coditory.integration-test' version "1.2.3"
+    id 'com.adarshr.test-logger' version '3.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 scmVersion {
@@ -32,17 +31,26 @@ scmVersion {
 group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
-sourceCompatibility = '1.8'
+java {
+    withSourcesJar()
+    withJavadocJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        name = 'ajoberstar-backup'
+        url = 'https://ajoberstar.org/bintray-backup/'
+    }
 }
 
 project.ext.versions = [
-        jgit: '5.7.0.202003110725-r',
-        jsch: '0.1.54',
-        jschAgent: '0.0.9'
+    jgit     : '5.12.0.202106070339-r',
+    jsch     : '0.1.55',
+    jschAgent: '0.0.9'
 ]
 
 sourceSets {
@@ -50,146 +58,68 @@ sourceSets {
         java { srcDirs = [] }    // no source dirs for the java compiler
         groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
     }
-
-    integration {
-        java.srcDir project.file('src/integration/java')
-        groovy.srcDir project.file('src/integration/groovy')
-
-        resources.srcDir project.file('src/integration/resources')
-        resources.srcDir project.sourceSets.test.resources
-        resources.srcDir project.sourceSets.main.resources
-
-        compileClasspath = project.sourceSets.main.output +
-                project.sourceSets.test.output +
-                project.configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
-    }
-
-    remoteTest {
-        java.srcDir project.file('src/test-remote/java')
-        groovy.srcDir project.file('src/test-remote/groovy')
-
-        resources.srcDir project.file('src/test-remote/resources')
-        resources.srcDir project.sourceSets.test.resources
-        resources.srcDir project.sourceSets.main.resources
-
-        compileClasspath = project.sourceSets.main.output +
-            project.sourceSets.test.output +
-            project.configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
-    }
 }
 
 dependencies {
-    compile gradleApi()
-    compile localGroovy()
+    shadow gradleApi()
+    shadow localGroovy()
 
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
-    compile group: 'com.jcraft', name: 'jsch', version: versions.jsch
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: versions.jschAgent
-    compile group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch', version: versions.jsch
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: versions.jschAgent
 
-    compile group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
+    implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
+    testImplementation(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.1.0') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testCompile(group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4') {
-        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
-    }
-    testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
-    testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
-    testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
-    testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.16.0'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+    testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.1'
+    testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
 
-    testCompile gradleTestKit()
+    testImplementation gradleTestKit()
 }
 
-test {
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        exceptionFormat = 'full'
-    }
+tasks.withType(Test) {
+    useJUnitPlatform()
 }
 
-project.configurations {
-    integration {
-        extendsFrom project.configurations.testRuntime
-        description = 'Dependencies for integration tests'
-        transitive = true
-        visible = true
-    }
-
-    remoteTest {
-        extendsFrom project.configurations.testRuntime
-        description = 'Dependencies for tests with Docker'
-        transitive = true
-        visible = true
-    }
+wrapper {
+    gradleVersion = '7.1.1'
+    distributionType = Wrapper.DistributionType.BIN
 }
 
-task integrationTest(type: Test) {
-    testClassesDirs = project.sourceSets.integration.output.classesDirs
-    classpath = project.sourceSets.main.output +
-            project.sourceSets.test.output +
-            project.sourceSets.integration.runtimeClasspath +
-            project.configurations.testRuntime +
-            project.configurations.integrationRuntime
-
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        showStandardStreams = true
-        exceptionFormat = 'full'
-    }
+task relocateShadowJar(type: ConfigureShadowRelocation) {
+    target = tasks.shadowJar
+    prefix = "axion"
 }
 
-task buildDockerImage(type: com.bmuschko.gradle.docker.tasks.image.DockerBuildImage) {
-    inputDir = file('docker')
-    tag = 'test/axion-release-remote:latest'
+tasks.shadowJar.dependsOn tasks.relocateShadowJar
+
+shadowJar {
+    archiveClassifier.set('')
 }
 
-task createDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer) {
-    dependsOn buildDockerImage
-    targetImageId { buildDockerImage.getImageId() }
-    portBindings = ['2222:22']
+components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
+    skip()
 }
 
-task startDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStartContainer) {
-    dependsOn createDockerContainer
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-task stopDockerContainer(type: com.bmuschko.gradle.docker.tasks.container.DockerStopContainer) {
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-
-task remoteTest(type: Test) {
-    testClassesDirs = project.sourceSets.remoteTest.output.classesDirs
-    classpath = project.sourceSets.main.output +
-        project.sourceSets.test.output +
-        project.sourceSets.remoteTest.runtimeClasspath +
-        project.configurations.testRuntime +
-        project.configurations.remoteTestRuntime
-
-    testLogging {
-        events 'passed', 'skipped', 'failed'
-        exceptionFormat = 'full'
-    }
-
-    dependsOn startDockerContainer
-    finalizedBy stopDockerContainer
-}
-
-tasks.check.dependsOn integrationTest, remoteTest
+tasks.check.dependsOn test, integrationTest
 
 gradlePlugin {
     testSourceSets project.sourceSets.integration
@@ -201,26 +131,85 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
-pluginBundle {
-    website = 'https://github.com/allegro/axion-release-plugin'
-    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
-    description = 'Release and version management plugin.'
-    tags = ['release', 'version']
+if (System.getenv("GRADLE_PORTAL_KEY")) {
+    pluginBundle {
+        website = 'https://github.com/allegro/axion-release-plugin'
+        vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+        description = 'Release and version management plugin.'
+        tags = ['release', 'version']
 
-    plugins {
-        release {
-            id = 'pl.allegro.tech.build.axion-release'
-            displayName = 'axion-release-plugin'
+        plugins {
+            release {
+                id = 'pl.allegro.tech.build.axion-release'
+                displayName = 'axion-release-plugin'
+            }
+        }
+
+        mavenCoordinates {
+            groupId = 'pl.allegro.tech.build'
+            artifactId = 'axion-release-plugin'
         }
     }
+}
 
-    mavenCoordinates {
-        groupId = 'pl.allegro.tech.build'
-        artifactId = 'axion-release-plugin'
+publishing {
+    publications {
+        sonatype(MavenPublication) { publication ->
+            from project.shadow.component(publication)
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                name = project.name
+                description = 'Gradle release and version management plugin'
+                url = 'https://github.com/allegro/axion-release-plugin'
+                inceptionYear = '2014'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'adamdubiel'
+                        name = 'Adam Dubiel'
+                    }
+                    developer {
+                        id = 'bgalek'
+                        name = 'Bartosz Gałek'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/allegro/axion-release-plugin'
+                    connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                }
+            }
+        }
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            username = System.getenv("SONATYPE_USERNAME")
+            password = System.getenv("SONATYPE_PASSWORD")
+        }
+    }
+}
+
+if (System.getenv("GPG_KEY_ID")) {
+    signing {
+        useInMemoryPgpKeys(
+            System.getenv("GPG_KEY_ID"),
+            System.getenv("GPG_PRIVATE_KEY"),
+            System.getenv("GPG_PRIVATE_KEY_PASSWORD")
+        )
+        sign publishing.publications
     }
 }

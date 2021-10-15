@@ -32,12 +32,12 @@ All `axion-release-plugin` configuration options:
         foldersToExclude = ['submodule1', 'submodule2'] // ignore changes in these subdirs when calculating changes to parent
 
         tag { // doc: Version / Parsing
-            prefix = 'tag-prefix' // prefix to be used, 'release' by default
+            prefix = 'tag-prefix' // prefix to be used, 'v' by default, empty String means no prefix
             branchPrefix = [ // set different prefix per branch
                 'legacy/.*' : 'legacy'
             ]
 
-            versionSeparator = '-' // separator between prefix and version number, '-' by default
+            versionSeparator = '-' // separator between prefix and version number, '' by default, empty String means no separator
             serialize = { tag, version -> ... } // creates tag name from raw version
             deserialize = { tag, position, tagName -> ... } // reads raw version from tag
             initialVersion = { tag, position -> ... } // returns initial version if none found, 0.1.0 by default
@@ -56,6 +56,9 @@ All `axion-release-plugin` configuration options:
         branchVersionCreator = [ // use different creator per branch
             'feature/.*': 'default'
         ]
+
+        // doc: Version / Snapshot
+        snapshotCreator { version, position -> ... } // customize 'snapshot' suffix for version not on tag
 
         // doc: Version / Incrementing
         versionIncrementer {context, config -> ...} // closure that increments a version from the raw version, current position in scm and config

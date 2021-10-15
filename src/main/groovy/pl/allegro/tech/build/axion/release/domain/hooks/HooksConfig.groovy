@@ -2,10 +2,14 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHookFactory.CustomAction
 
+import org.gradle.api.tasks.Input
+
 class HooksConfig {
 
+    @Input
     List<ReleaseHookAction> preReleaseHooks = []
 
+    @Input
     List<ReleaseHookAction> postReleaseHooks = []
 
     void pre(Closure c) {
@@ -43,6 +47,6 @@ class HooksConfig {
     static CustomAction safeCastToCustomAction(Closure closure) {
         return closure.parameterTypes.length == 1 && closure.parameterTypes[0].isAssignableFrom(HookContext.class)
             ? closure
-            : { HookContext hookContext -> closure(hookContext.currentVersion, hookContext.position)}
+            : { HookContext hookContext -> closure(hookContext.releaseVersion, hookContext.position)}
     }
 }

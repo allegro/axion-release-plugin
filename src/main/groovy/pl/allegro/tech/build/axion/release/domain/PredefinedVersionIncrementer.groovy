@@ -1,8 +1,10 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 
 import java.util.regex.Matcher
+
 import static java.lang.String.format
 
 enum PredefinedVersionIncrementer {
@@ -20,10 +22,10 @@ enum PredefinedVersionIncrementer {
     }),
 
     INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
-        if(!config.releaseBranchPattern) {
-            config.releaseBranchPattern = 'release/.+'
+        if (!config.releaseBranchPattern) {
+            config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.prefix() + '/.+'
         }
-        if(context.scmPosition.branch ==~ config.releaseBranchPattern) {
+        if (context.scmPosition.branch ==~ config.releaseBranchPattern) {
             return context.currentVersion.incrementPatchVersion()
         }
         return context.currentVersion.incrementMinorVersion()
@@ -44,7 +46,7 @@ enum PredefinedVersionIncrementer {
             }
         }
 
-        if (config.initialPreReleaseIfNotOnPrerelease !=  null) {
+        if (config.initialPreReleaseIfNotOnPrerelease != null) {
             return context.currentVersion.incrementPatchVersion(String.valueOf(config.initialPreReleaseIfNotOnPrerelease))
         }
 

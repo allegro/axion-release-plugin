@@ -4,7 +4,7 @@ axion-release-plugin
 *gradle release and version management plugin*
 
 [![Join the chat at https://gitter.im/allegro/axion-release-plugin](https://badges.gitter.im/allegro/axion-release-plugin.svg)](https://gitter.im/allegro/axion-release-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
+[![Build Status](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/allegro/axion-release-plugin/badge.svg?branch=development)](https://coveralls.io/r/allegro/axion-release-plugin)
 [![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ](http://axion-release-plugin.readthedocs.org/en/latest/)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin)
@@ -25,7 +25,7 @@ project versions along SCM tag versions.
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.12.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.13.3'
 }
 
 project.version = scmVersion.version
@@ -41,7 +41,7 @@ $ ./gradlew currentVersion
 $ ./gradlew release
 
 $ git tag
-release-0.1.0
+v0.1.0
 
 $ ./gradlew cV
 0.1.0
@@ -49,8 +49,8 @@ $ ./gradlew cV
 $ git add -A && git commit -m "Updates something" && ./gradlew release
 
 $ git tag
-release-0.1.0
-release-0.1.1
+v0.1.0
+v0.1.1
 
 $ ./gradlew cV
 0.1.1

@@ -4,6 +4,7 @@ import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.transport.HttpTransport;
 import org.eclipse.jgit.transport.NetRCCredentialsProvider;
 import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity;
 
 class TransportConfigFactory {
@@ -42,7 +43,7 @@ class TransportConfigFactory {
 
     private TransportConfigCallback createForUsername(ScmIdentity identity) {
         return transport -> {
-            transport.setCredentialsProvider(new SimpleCredentialsProvider(identity.getUsername(), identity.getPassword()));
+            transport.setCredentialsProvider(new UsernamePasswordCredentialsProvider(identity.getUsername(), identity.getPassword()));
         };
     }
 }

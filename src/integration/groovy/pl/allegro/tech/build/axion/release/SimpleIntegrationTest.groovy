@@ -2,6 +2,8 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.testkit.runner.TaskOutcome
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
+
 class SimpleIntegrationTest extends BaseIntegrationTest {
 
     def "should return default version on calling currentVersion task on vanilla repo"() {
@@ -38,7 +40,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Creating tag: release-1.0.0')
+        releaseResult.output.contains('Creating tag: ' + fullPrefix() + '1.0.0')
 
         when:
         def result = runGradle('cV')
@@ -84,13 +86,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should fail gracefuly when failed to parse tag"() {
         given:
         buildFile('')
-        repository.tag('release-blabla-1.0.0')
+        repository.tag(fullPrefix() + 'blabla-1.0.0')
 
         when:
         def result = gradle().withArguments('cV').buildAndFail()
 
         then:
-        result.output.contains('release-blabla')
+        result.output.contains(fullPrefix() +'blabla')
     }
 
     def "should use initial verison setting"() {

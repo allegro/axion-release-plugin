@@ -18,6 +18,7 @@ public class VersionProperties {
     private final boolean forceSnapshot;
     private final boolean ignoreUncommittedChanges;
     private final Creator versionCreator;
+    private final Creator snapshotCreator;
     private final Incrementer versionIncrementer;
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
@@ -28,6 +29,7 @@ public class VersionProperties {
         boolean forceSnapshot,
         boolean ignoreUncommittedChanges,
         Creator versionCreator,
+        Creator snapshotCreator,
         Incrementer versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
@@ -37,6 +39,7 @@ public class VersionProperties {
         this.forceSnapshot = forceSnapshot;
         this.ignoreUncommittedChanges = ignoreUncommittedChanges;
         this.versionCreator = versionCreator;
+        this.snapshotCreator = snapshotCreator;
         this.versionIncrementer = versionIncrementer;
         this.sanitizeVersion = sanitizeVersion;
         this.useHighestVersion = useHighestVersion;
@@ -61,6 +64,10 @@ public class VersionProperties {
 
     public final Creator getVersionCreator() {
         return versionCreator;
+    }
+
+    public final Creator getSnapshotCreator() {
+        return snapshotCreator;
     }
 
     public final Incrementer getVersionIncrementer() {
