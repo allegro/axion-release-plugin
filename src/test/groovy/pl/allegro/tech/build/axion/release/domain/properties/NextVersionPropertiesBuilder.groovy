@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain.properties
 
 import pl.allegro.tech.build.axion.release.domain.NextVersionSerializer
 
+
 class NextVersionPropertiesBuilder {
 
     private String nextVersion

@@ -6,6 +6,6 @@ import pl.allegro.tech.build.axion.release.domain.properties.MonorepoProperties;
 
 public class MonorepoPropertiesFactory {
     public static MonorepoProperties create(Project project, MonorepoConfig config, String currentBranch) {
-        return new MonorepoProperties(config.projectDirs);
+        return new MonorepoProperties(config.getProjectDirs());
     }
 }

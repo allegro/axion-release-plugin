@@ -1,6 +1,5 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder
