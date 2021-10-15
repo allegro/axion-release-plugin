@@ -95,6 +95,11 @@ dependencies {
     testImplementation gradleTestKit()
 }
 
+// Exclude transitive slf4j-api dependency from being embedded into the shadow jar
+configurations.runtimeClasspath {
+    exclude group: 'org.slf4j', module: 'slf4j-api'
+}
+
 tasks.withType(Test) {
     useJUnitPlatform()
 }
