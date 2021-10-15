@@ -29,7 +29,7 @@ public class Releaser {
         Version version = versionContext.getVersion();
 
         if (versionContext.isSnapshot()) {
-            String tagName = properties.getTag().getSerialize().call(properties.getTag(), version.toString());
+            String tagName = properties.getTag().getSerialize().apply(properties.getTag(), version.toString());
 
             hooksRunner.runPreReleaseHooks(properties.getHooks(), properties, versionContext, version);
 

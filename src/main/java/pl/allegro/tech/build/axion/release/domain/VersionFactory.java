@@ -2,12 +2,12 @@ package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
-import org.codehaus.groovy.runtime.StringGroovyMethods;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class VersionFactory {
@@ -44,12 +44,12 @@ public class VersionFactory {
     public Version versionFromTag(String tag) {
         String tagWithoutNextVersion = tag;
         if (Pattern.matches(".*" + nextVersionProperties.getSuffix() + "$", tag)) {
-            tagWithoutNextVersion = nextVersionProperties.getDeserializer().call(nextVersionProperties, position, tag);
+            tagWithoutNextVersion = nextVersionProperties.getDeserializer().apply(nextVersionProperties, position, tag);
         }
 
         try {
             return Version.valueOf(
-                tagProperties.getDeserialize().call(tagProperties, position, tagWithoutNextVersion)
+                tagProperties.getDeserialize().apply(tagProperties, position, tagWithoutNextVersion)
             );
         } catch (ParseException parseException) {
             throw new TagParseException(tagProperties.getPrefix(), tagWithoutNextVersion, parseException);
@@ -58,7 +58,7 @@ public class VersionFactory {
     }
 
     public Version initialVersion() {
-        return Version.valueOf(tagProperties.getInitialVersion().call(tagProperties, position));
+        return Version.valueOf(tagProperties.getInitialVersion().apply(tagProperties, position));
     }
 
     public FinalVersion createFinalVersion(ScmState scmState, Version version) {
@@ -73,12 +73,11 @@ public class VersionFactory {
         boolean proposedVersionIsAlreadySnapshot = scmState.isOnNextVersionTag() || scmState.isNoReleaseTagsFound();
         boolean incrementVersion = ((versionProperties.isForceSnapshot() || hasChanges) && !proposedVersionIsAlreadySnapshot);
 
-        Version finalVersion = version;
-        if (StringGroovyMethods.asBoolean(versionProperties.getForcedVersion())) {
-            finalVersion = Version.valueOf(versionProperties.getForcedVersion());
-        } else if (incrementVersion) {
-            finalVersion = versionProperties.getVersionIncrementer().call(new VersionIncrementerContext(version, position, isLegacyDefTagnameRepo));
-        }
+        Version finalVersion = Optional.ofNullable(versionProperties.getForcedVersion())
+            .filter(s -> !s.isEmpty()).map(Version::valueOf)
+            .orElseGet(() -> incrementVersion
+                ? versionProperties.getVersionIncrementer().apply(new VersionIncrementerContext(version, position, isLegacyDefTagnameRepo))
+                : version);
 
         return new FinalVersion(
             finalVersion,

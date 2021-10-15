@@ -1,21 +1,33 @@
 package pl.allegro.tech.build.axion.release.domain.properties;
 
-import groovy.lang.Closure;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class TagProperties {
 
+    public interface Serializer {
+        String apply(TagProperties tagProperties, String version);
+    }
+
+    public interface Deserializer {
+        String apply(TagProperties tagProperties, ScmPosition position, String tag);
+    }
+
+    public interface InitialVersionSupplier {
+        String apply(TagProperties tagProperties, ScmPosition position);
+    }
+
     private final String prefix;
     private final String versionSeparator;
-    private final Closure<String> serialize;
-    private final Closure<String> deserialize;
-    private final Closure<String> initialVersion;
+    private final Serializer serialize;
+    private final Deserializer deserialize;
+    private final InitialVersionSupplier initialVersion;
 
     public TagProperties(
         String prefix,
         String versionSeparator,
-        Closure<String> serialize,
-        Closure<String> deserialize,
-        Closure<String> initialVersion
+        Serializer serialize,
+        Deserializer deserialize,
+        InitialVersionSupplier initialVersion
     ) {
         this.prefix = prefix;
         this.versionSeparator = versionSeparator;
@@ -32,15 +44,15 @@ public class TagProperties {
         return versionSeparator;
     }
 
-    public final Closure<String> getSerialize() {
+    public final Serializer getSerialize() {
         return serialize;
     }
 
-    public final Closure<String> getDeserialize() {
+    public final Deserializer getDeserialize() {
         return deserialize;
     }
 
-    public final Closure<String> getInitialVersion() {
+    public final InitialVersionSupplier getInitialVersion() {
         return initialVersion;
     }
 }

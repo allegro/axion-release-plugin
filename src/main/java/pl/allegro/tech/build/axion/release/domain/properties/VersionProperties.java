@@ -1,16 +1,25 @@
 package pl.allegro.tech.build.axion.release.domain.properties;
 
 import com.github.zafarkhaja.semver.Version;
-import groovy.lang.Closure;
+import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class VersionProperties {
+
+    public interface Creator {
+        String apply(String versionFromTag, ScmPosition position);
+    }
+
+    public interface Incrementer {
+        Version apply(VersionIncrementerContext versionIncrementerContext);
+    }
 
     private final String forcedVersion;
     private final boolean forceSnapshot;
     private final boolean ignoreUncommittedChanges;
-    private final Closure<String> versionCreator;
-    private final Closure<String> snapshotCreator;
-    private final Closure<Version> versionIncrementer;
+    private final Creator versionCreator;
+    private final Creator snapshotCreator;
+    private final Incrementer versionIncrementer;
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
     private final MonorepoProperties monorepoProperties;
@@ -19,9 +28,9 @@ public class VersionProperties {
         String forcedVersion,
         boolean forceSnapshot,
         boolean ignoreUncommittedChanges,
-        Closure<String> versionCreator,
-        Closure<String> snapshotCreator,
-        Closure<Version> versionIncrementer,
+        Creator versionCreator,
+        Creator snapshotCreator,
+        Incrementer versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
         MonorepoProperties monorepoProperties
@@ -53,15 +62,15 @@ public class VersionProperties {
         return ignoreUncommittedChanges;
     }
 
-    public final Closure<String> getVersionCreator() {
+    public final Creator getVersionCreator() {
         return versionCreator;
     }
 
-    public final Closure<String> getSnapshotCreator() {
+    public final Creator getSnapshotCreator() {
         return snapshotCreator;
     }
 
-    public final Closure<Version> getVersionIncrementer() {
+    public final Incrementer getVersionIncrementer() {
         return versionIncrementer;
     }
 

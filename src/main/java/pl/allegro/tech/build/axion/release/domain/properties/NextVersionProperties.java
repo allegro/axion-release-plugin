@@ -1,23 +1,31 @@
 package pl.allegro.tech.build.axion.release.domain.properties;
 
-import groovy.lang.Closure;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class NextVersionProperties {
+
+    public interface Serializer {
+        String apply(NextVersionProperties nextVersionProperties, String version);
+    }
+
+    public interface Deserializer {
+        String apply(NextVersionProperties nextVersionProperties, ScmPosition position, String tag);
+    }
 
     private final String nextVersion;
     private final String suffix;
     private final String separator;
     private final String versionIncrementer;
-    private final Closure<String> serializer;
-    private final Closure<String> deserializer;
+    private final Serializer serializer;
+    private final Deserializer deserializer;
 
     public NextVersionProperties(
         String nextVersion,
         String suffix,
         String separator,
         String versionIncrementer,
-        Closure<String> serializer,
-        Closure<String> deserializer
+        Serializer serializer,
+        Deserializer deserializer
     ) {
         this.nextVersion = nextVersion;
         this.suffix = suffix;
@@ -43,11 +51,11 @@ public class NextVersionProperties {
         return versionIncrementer;
     }
 
-    public final Closure<String> getSerializer() {
+    public final Serializer getSerializer() {
         return serializer;
     }
 
-    public final Closure<String> getDeserializer() {
+    public final Deserializer getDeserializer() {
         return deserializer;
     }
 }
