@@ -33,7 +33,7 @@ public class VersionService {
 
         String finalVersion = version;
         if (versionContext.isSnapshot()) {
-            finalVersion = finalVersion + versionProperties.getSnapshotCreator().call(version,  versionContext.getPosition());
+            finalVersion = finalVersion + versionProperties.getSnapshotCreator().apply(version,  versionContext.getPosition());
         }
 
 
