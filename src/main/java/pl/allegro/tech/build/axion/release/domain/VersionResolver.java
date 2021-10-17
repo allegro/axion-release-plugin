@@ -90,7 +90,7 @@ public class VersionResolver {
 
         boolean onCommitWithLatestChange = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
 
-        TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
+        TaggedCommits previousTaggedCommit = TaggedCommits.fromPreviousCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
         VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,
             versionFactory, forceSnapshot);
 
