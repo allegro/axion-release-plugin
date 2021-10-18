@@ -16,10 +16,6 @@ plugins {
 }
 
 scmVersion {
-    tag {
-        prefix = 'axion-release-'
-    }
-
     hooks {
         pre 'fileUpdate', [files: ['README.md', 'mkdocs.yml'], pattern: { v, p -> /'$v'/ }, replacement: { v, p -> "'$v'" }]
         pre 'commit'
