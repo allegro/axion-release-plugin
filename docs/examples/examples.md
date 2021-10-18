@@ -7,9 +7,6 @@ and each version has branch name appended (unless on master). This allows us on 
 of branches that are ready for testing:
 
     scmVersion {
-        tag {
-            prefix = 'my-project-name'
-        }
         versionCreator 'versionWithBranch'
     }
 
@@ -19,9 +16,6 @@ of branches that are ready for testing:
 This replacement pattern will update any `version* x.x.x` occurrences in README.md and create release commit:
 
     scmVersion {
-        tag {
-            prefix = 'my-project-name'
-        }
         versionCreator 'versionWithBranch'
 
         hooks {
