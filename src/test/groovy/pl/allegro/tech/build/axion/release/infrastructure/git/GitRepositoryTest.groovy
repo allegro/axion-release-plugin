@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git
 
 import org.ajoberstar.grgit.Grgit
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.MergeCommand
 import org.eclipse.jgit.api.errors.RefAlreadyExistsException
 import org.eclipse.jgit.lib.Config
 import org.eclipse.jgit.lib.Constants
@@ -19,6 +21,7 @@ import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilde
 
 class GitRepositoryTest extends Specification {
 
+    public static final String MASTER_BRANCH = "master"
     File repositoryDir
 
     File remoteRepositoryDir
@@ -506,4 +509,40 @@ class GitRepositoryTest extends Specification {
         then:
         position.revision == headSubDirAChanged
     }
+
+    def "last position with monorepo paths case: merge after squash"() {
+        given:
+        Git git = repository.getJgitRepository();
+        commitFile('b4/aa', 'b4')
+        commitFile('b4/ab', 'b4b')
+
+        String importantDir = 'a/aa'
+
+        commitFile(importantDir, 'foo')
+        String headSubDirAChanged = rawRepository.head().id
+
+        String secondBranchName = "feature/unintresting_changes";
+        git.branchCreate().setName(secondBranchName).call()
+        git.checkout().setName(secondBranchName).call()
+        commitFile('second/aa', 'foo')
+        commitFile('b/ba', 'bar')
+        git.checkout().setName(MASTER_BRANCH).call()
+        git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
+
+        commitFile('after/aa', 'after')
+
+        when:
+        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [])
+
+        then:
+        position.revision == headSubDirAChanged
+    }
+
+    private void commitFile(String subDir, String fileName) {
+        String fileInA = "${subDir}/${fileName}"
+        new File(repositoryDir, subDir).mkdirs()
+        new File(repositoryDir, fileInA).createNewFile()
+        repository.commit([fileInA], "Add file ${fileName} in ${subDir}")
+    }
+
 }
