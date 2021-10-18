@@ -72,7 +72,6 @@ class VersionResolverMonoRepoTest extends RepositoryBasedTest {
 
         when:
         VersionContext version = resolver.resolveVersion(versionRules, tagRules, nextVersionRules)
-        System.out.println("asdf")
 
         then:
         version.previousVersion.toString() == '1.1.0'
