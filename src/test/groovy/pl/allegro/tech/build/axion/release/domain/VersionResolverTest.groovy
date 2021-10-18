@@ -372,6 +372,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         then:
         version.previousVersion.toString() == '1.2.0'
         version.version.toString() == '1.2.0'
+        version.previousTag == 'v1.5.0'
         !version.snapshot
     }
 

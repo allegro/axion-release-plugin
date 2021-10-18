@@ -3,8 +3,8 @@ package pl.allegro.tech.build.axion.release.domain
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
+import org.gradle.api.tasks.Optional
 import pl.allegro.tech.build.axion.release.ReleasePlugin
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
@@ -162,10 +162,27 @@ class VersionConfig {
         return resolvedVersion.decoratedVersion
     }
 
+    /**
+     * Previous version in the context of the 'next version marker' mechanism.
+     * Caveat: if 'next version marker' tag was not found then {@link #getPreviousVersion()} will be equal to {@link #getVersion()}
+     * and potentially <em>different</em> than {@link #getPreviousTag()}.
+     */
     @Input
+    @Optional
     String getPreviousVersion() {
         ensureVersionExists()
         return resolvedVersion.previousVersion
+    }
+
+    /**
+     * Previous release tag. Simplified example assuming a typical configuration:
+     * given tags are 'v1.2.0', 'v1.1.0', 'v1.0.0', and we checked out 'v1.2.0', previous tag will be 'v1.1.0'.
+     */
+    @Input
+    @Optional
+    String getPreviousTag() {
+        ensureVersionExists()
+        return resolvedVersion.previousTag
     }
 
     @Input
