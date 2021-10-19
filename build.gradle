@@ -12,7 +12,7 @@ plugins {
     id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
     id 'com.coditory.integration-test' version "1.2.3"
     id 'com.adarshr.test-logger' version '3.0.0'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 scmVersion {
@@ -81,8 +81,8 @@ dependencies {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.16.0'
-    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-3.0'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-2.5'
     testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.1'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '2.4'
     testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
@@ -98,11 +98,6 @@ configurations.runtimeClasspath {
 
 tasks.withType(Test) {
     useJUnitPlatform()
-}
-
-wrapper {
-    gradleVersion = '7.1.1'
-    distributionType = Wrapper.DistributionType.BIN
 }
 
 task relocateShadowJar(type: ConfigureShadowRelocation) {
