@@ -190,11 +190,34 @@ class VersionConfig {
         }
     }
 
+    /**
+     * @deprecated Due to the fact it uses the cached context, which results in returning the same
+     * version even though project properties got changed. Use {@link #getUncached()} instead.
+     * @return uncached version, but based on a cached context
+     */
+    @Deprecated
     @Nested
     VersionService.DecoratedVersion getUncachedVersion() {
         ensureContextExists()
+        return getVersionFromContext(context)
+    }
+
+    /**
+     * Allows to calculate and get the version, omitting caching mechanisms.
+     * May be slower for large projects, use then {@link #getVersion()} instead.
+     * @since 1.13.4
+     * @return uncached version
+     */
+    @Nested
+    VersionService.DecoratedVersion getUncached() {
+        def context = GradleAwareContext.create(project, this)
+        return getVersionFromContext(context)
+    }
+
+    private static VersionService.DecoratedVersion getVersionFromContext(Context context) {
         Properties rules = context.rules()
-        return context.versionService().currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
+        def versionService = context.versionService()
+        return versionService.currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
     }
 
     @Nested

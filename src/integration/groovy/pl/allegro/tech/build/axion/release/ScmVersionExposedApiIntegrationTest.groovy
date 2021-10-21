@@ -60,4 +60,53 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
         result.output.contains("Branch: ${position.branch}")
         result.task(":outputPosition").outcome == TaskOutcome.SUCCESS
     }
+
+    def "getUncached should respect changing prefix"() {
+        given:
+        repository.tag("v1.2.3")
+        repository.tag("prefix4.5.6")
+        repository.tag("another7.8.9")
+        buildFile("""
+        task uncachedVersion { doLast {
+            println "Default prefix: \${scmVersion.uncached.decoratedVersion}"
+            scmVersion.tag.prefix = "prefix"
+            println "Custom prefix 1: \${scmVersion.uncached.decoratedVersion}"
+            scmVersion.tag.prefix = "another"
+            println "Custom prefix 2: \${scmVersion.uncached.decoratedVersion}"
+        } }
+        """)
+
+        when:
+        def result = runGradle('uncachedVersion')
+
+        then:
+        result.output.contains('Default prefix: 1.2.3')
+        result.output.contains('Custom prefix 1: 4.5.6')
+        result.output.contains('Custom prefix 2: 7.8.9')
+        result.task(":uncachedVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "getUncached should not modify cached version"() {
+        given:
+        repository.tag("v1.2.3")
+        repository.tag("prefix4.5.6")
+        buildFile("""
+        task uncachedVersion { doLast {
+            println "Default prefix: \${scmVersion.version}"
+            scmVersion.tag.prefix = "prefix"
+            println "Custom prefix: \${scmVersion.uncached.decoratedVersion}"
+            scmVersion.tag.prefix = "another"
+            println "Cached version: \${scmVersion.version}"
+        } }
+        """)
+
+        when:
+        def result = runGradle('uncachedVersion')
+
+        then:
+        result.output.contains('Default prefix: 1.2.3')
+        result.output.contains('Custom prefix: 4.5.6')
+        result.output.contains('Cached version: 1.2.3')
+        result.task(":uncachedVersion").outcome == TaskOutcome.SUCCESS
+    }
 }
