@@ -109,3 +109,24 @@ In order to push tags into the repository release step must use GitHub actor and
           ./gradlew release \
               -Prelease.customUsername=${{ github.actor }} \
               -Prelease.customPassword=${{ github.token }}
+
+
+## GitLab CI
+
+If you set up a [project token](https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html) you can easily add a non user dependent tag stage. Add the project token and token user bot name as CI-variables, accessible to the build script. 
+
+Example:
+
+
+    tagging:
+      stage: tag
+      image: ....
+      script: 
+       - git remote set-url origin ${CI_SERVER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}.git
+       - ./gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly -Prelease.customUsername=${PROJECT_ACCESS_TOKEN_BOT_NAME} -Prelease.customPassword=${PROJECT_ACCESS_TOKEN}
+
+NOTE: You need to set the git remote url first, as GitLab's default cloned project url will have added the non repo-write permision [gitlab-ci-token](https://docs.gitlab.com/ee/ci/jobs/ci_job_token.html) to the origin url.
+
+
+Disabling checks is necessary because `axion-release` is not able to verify if current commit is ahead of remote. 
+Setting pushTagsOnly ensures that git will not throw an error by attempting to push commits while not working on a branch.
