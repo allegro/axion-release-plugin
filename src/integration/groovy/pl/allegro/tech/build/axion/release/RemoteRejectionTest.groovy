@@ -13,6 +13,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -21,6 +22,7 @@ import java.nio.file.Paths
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 @Testcontainers
+@Ignore
 class RemoteRejectionTest extends Specification {
 
     @Shared
