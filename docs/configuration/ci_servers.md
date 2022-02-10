@@ -8,10 +8,6 @@ CI servers is treated as *trusted* environment, thus there is no harm in
 disabling checks that need to interact with git (like uncommitted files
 check or ahead of remote check).
 
-## Travis CI
-
-TBD
-
 ## Jenkins
 
 Jenkins and `axion-release` cooperate nicely. However, because Jenkins
@@ -100,6 +96,17 @@ Your workflow needs to use `actions/checkout@v2` with configuration to [fetch ta
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
+When you have a lot of tags/commit you can speed up your build - plugin successfully works using local git shallow repository but you must run `git fetch --tags --unshallow` before running `./gradlew release` - that will ensure the plugin has all the info it needs to run. 
+
+    steps:
+        - uses: actions/checkout@v2
+        - name: Publish using Axion
+          run: |
+              # Fetch a full copy of the repo, as required by release plugin:
+              git fetch --tags --unshallow
+              # Run release:
+              ./gradlew release
 
 In order to push tags into the repository release step must use GitHub actor and token:
 
