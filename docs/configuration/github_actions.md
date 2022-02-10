@@ -11,36 +11,13 @@ The following example build file will use the quicker shallow fetch for pull-req
 Whereas successful push builds will fetch the full repo history before running the release plugin:
 
 ```yaml
-name: Build
-
-on:
-    push:
-        branches: [ main ]
-    pull_request:
-        branches: [ main ]
-
-jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: Set up JDK 11
-              uses: actions/setup-java@v2
-              with:
-                  java-version: '11'
-                  distribution: 'adopt'
-                  cache: gradle
-            - name: Grant execute permission for gradlew
-              run: chmod +x gradlew
-            - name: Build using Gradle
-              env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: ./gradlew check
-            - name: Publish using Axion releade plugin
-              if: github.event_name == 'push'
-              run: |
-                  # Fetch a full copy of the repo, as required by release plugin:
-                  git fetch --tags --unshallow
-                  # Run release:
-                  ./gradlew release
+steps:
+    - uses: actions/checkout@v2
+    ...
+    - name: Publish using Axion
+      run: |
+          # Fetch a full copy of the repo, as required by release plugin:
+          git fetch --tags --unshallow
+          # Run release:
+          ./gradlew release
 ```
