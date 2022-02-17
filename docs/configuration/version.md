@@ -227,7 +227,7 @@ The context object passed to closure contains the following:
 -   *currentVersion* - current `Version` object that should be used to
     calculate next version ([Version
     API](https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java))
--   *position* - widely used position object, for more see [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy)
+-   *position* - widely used position object, for more see [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
 
 You can also specify different incrementers per branch. They can be
 either closure, name of predefined incrementer or name and list of
@@ -329,7 +329,7 @@ Custom version creators can be implemented by creating closure:
     {version, position -> ...}
 
 -   version - string version resolved by previous steps
--   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+-   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 ### Snapshot
 
@@ -346,7 +346,7 @@ Snapshot creator can be implemented by creating closure:
     {version, position -> ...}
 
 -   version - string version resolved by previous steps
--   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/groovy/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.groovy) object
+-   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 
 ## Sanitization
