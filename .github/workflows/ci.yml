@@ -23,5 +23,13 @@ jobs:
       - name: Jacoco
         run: ./gradlew jacocoTestReport
 
+      - name: Archive report results
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+            name: test-report
+            path: build/reports
+            retention-days: 3
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
