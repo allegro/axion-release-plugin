@@ -54,8 +54,7 @@ sourceSets {
 }
 
 dependencies {
-    implementation gradleApi()
-    implementation localGroovy()
+    api localGroovy()
 
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
     implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
@@ -90,10 +89,6 @@ dependencies {
 
 tasks.withType(Test) {
     useJUnitPlatform()
-}
-
-components.java.withVariantsFromConfiguration(configurations.runtimeElements) {
-    skip()
 }
 
 tasks.check.dependsOn test, integrationTest
