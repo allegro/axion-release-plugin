@@ -9,7 +9,7 @@ enum PredefinedVersionCreator {
     }),
 
     VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
-        if (position.branch != 'master' && position.branch != 'HEAD') {
+        if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD') {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag

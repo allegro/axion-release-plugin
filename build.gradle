@@ -17,8 +17,6 @@ scmVersion {
         pre 'fileUpdate', [files: ['README.md', 'mkdocs.yml'], pattern: { v, p -> /'$v'/ }, replacement: { v, p -> "'$v'" }]
         pre 'commit'
     }
-
-    versionCreator 'versionWithBranch'
 }
 
 group = 'pl.allegro.tech.build'
@@ -133,8 +131,6 @@ publishing {
     publications {
         sonatype(MavenPublication) {
             from components.java
-            artifact sourcesJar
-            artifact javadocJar
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
@@ -143,7 +139,7 @@ publishing {
                 licenses {
                     license {
                         name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
                     }
                 }
                 developers {
