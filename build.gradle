@@ -82,7 +82,7 @@ dependencies {
     testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.3.0'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
     testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '2.8.0'
-    testImplementation group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-git', version: '2.8.0'
 
     testImplementation gradleTestKit()
 }
