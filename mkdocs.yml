@@ -38,4 +38,5 @@ nav:
     - Publishing: 'configuration/publishing.md'
     - Dry run: 'configuration/dry_run.md'
     - CI Servers: 'configuration/ci_servers.md'
+    - Resolving dependency conflicts: 'configuration/resolving_dependency_conflicts.md'
     - Extensions: 'configuration/extensions.md'
