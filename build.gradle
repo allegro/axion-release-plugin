@@ -72,7 +72,7 @@ dependencies {
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testImplementation(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.1.0') {
+    testImplementation(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '5.0.0') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
