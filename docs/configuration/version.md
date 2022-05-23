@@ -31,7 +31,7 @@ calculating current version. Prefix can be set using
         }
     }
 
-Default prefix is `release`.
+Default prefix is `v`.
 
 There is also an option to set prefix per-branch (i.e. to use different
 version prefix on `legacy-` branches):
