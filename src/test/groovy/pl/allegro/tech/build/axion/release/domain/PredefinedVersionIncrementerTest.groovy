@@ -16,32 +16,32 @@ class PredefinedVersionIncrementerTest extends Specification {
 
     def "should increment patch when incrementPatch rule used"() {
         expect:
-        versionIncrementerFor('incrementPatch')(context) == Version.valueOf('0.1.1')
+        versionIncrementerFor('incrementPatch').apply(context) == Version.valueOf('0.1.1')
     }
 
     def "should increment minor when incrementMinor rule used"() {
         expect:
-        versionIncrementerFor('incrementMinor')(context) == Version.valueOf('0.2.0')
+        versionIncrementerFor('incrementMinor').apply(context) == Version.valueOf('0.2.0')
     }
 
     def "should increment major when incrementMajor rule used"() {
         expect:
-        versionIncrementerFor('incrementMajor')(context) == Version.valueOf('1.0.0')
+        versionIncrementerFor('incrementMajor').apply(context) == Version.valueOf('1.0.0')
     }
 
     def "should increment minor if not on release branch and incrementMinorIfNotOnRelease used"() {
         expect:
-        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: (prefix() +'.*')])(context) == Version.valueOf('0.2.0')
+        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: (prefix() +'.*')]).apply(context) == Version.valueOf('0.2.0')
     }
 
     def "should increment patch if on release branch and incrementMinorIfNotOnRelease used"() {
         expect:
-        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: 'master'])(context) == Version.valueOf('0.1.1')
+        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: 'master']).apply(context) == Version.valueOf('0.1.1')
     }
 
     def "should delegate to first matching incrementer when branchSpecific rule used"() {
         expect:
-        versionIncrementerFor('branchSpecific', [(prefix() + '.*'): 'incrementPatch', 'master': 'incrementMinor'])(context) == Version.valueOf('0.2.0')
+        versionIncrementerFor('branchSpecific', [(prefix() + '.*'): 'incrementPatch', 'master': 'incrementMinor']).apply(context) == Version.valueOf('0.2.0')
     }
 
     def "should increment prerelease version when incrementPrerelease rule used"() {
@@ -49,7 +49,7 @@ class PredefinedVersionIncrementerTest extends Specification {
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc1'), scmPosition('master'))
 
         expect:
-        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc2')
+        versionIncrementerFor('incrementPrerelease').apply(context) == Version.valueOf('0.1.0-rc2')
     }
 
     def "should increment patch version when incrementPrerelease rule used and currentVersion is not rc"() {
@@ -57,7 +57,7 @@ class PredefinedVersionIncrementerTest extends Specification {
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
 
         expect:
-        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.1')
+        versionIncrementerFor('incrementPrerelease').apply(context) == Version.valueOf('0.1.1')
     }
 
     def "should create prerelease version when incrementPrerelease rule used with initialPreReleaseIfNotOnPrerelease"() {
@@ -65,7 +65,7 @@ class PredefinedVersionIncrementerTest extends Specification {
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0'), scmPosition('master'))
 
         expect:
-        versionIncrementerFor('incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1'])(context) == Version.valueOf('0.1.1-rc1')
+        versionIncrementerFor('incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1']).apply(context) == Version.valueOf('0.1.1-rc1')
     }
 
     def "should increment prerelease version even when it has leading zeroes when incrementPrerelease rule used"() {
@@ -73,7 +73,7 @@ class PredefinedVersionIncrementerTest extends Specification {
         VersionIncrementerContext context = new VersionIncrementerContext(Version.valueOf('0.1.0-rc01'), scmPosition('master'))
 
         expect:
-        versionIncrementerFor('incrementPrerelease')(context) == Version.valueOf('0.1.0-rc02')
+        versionIncrementerFor('incrementPrerelease').apply(context) == Version.valueOf('0.1.0-rc02')
     }
 
     def "should throw exception when unknown incrementer used"() {

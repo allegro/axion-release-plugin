@@ -23,7 +23,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should copy non-project properties from VersionConfig object"() {
         given:
-        versionConfig.versionIncrementer = { new Version.Builder('1.2.3').build() }
+        versionConfig.versionIncrementer = {VersionIncrementerContext c -> new Version.Builder('1.2.3').build() }
         versionConfig.sanitizeVersion = false
 
         when:
@@ -172,7 +172,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should pick default version incrementer if none branch incrementers match"() {
         given:
-        versionConfig.versionIncrementer = { c -> c.currentVersion }
+        versionConfig.versionIncrementer = {VersionIncrementerContext c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
             'some.*': { c -> c.currentVersion.incrementMajorVersion() }
         ]

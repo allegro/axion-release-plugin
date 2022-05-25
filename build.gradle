@@ -1,4 +1,5 @@
 plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
     id 'groovy'
     id 'java-gradle-plugin'
     id 'maven-publish'
@@ -93,8 +94,27 @@ tasks.withType(Test) {
 
 tasks.check.dependsOn test, integrationTest
 
+
+// for adding Kotlin extension functions
+
+// set kotlin to depend on groovy
+tasks.named("compileKotlin") {
+    classpath += files(sourceSets.main.groovy.classesDirectory)
+}
+
+// set groovy to not depend on Kotlin
+tasks.named("compileGroovy") {
+    classpath = sourceSets.main.compileClasspath
+}
+
 gradlePlugin {
     testSourceSets project.sourceSets.integration
+    plugins {
+        simplePlugin {
+            id = 'pl.allegro.tech.build.axion-release'
+            implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
+        }
+    }
 }
 
 jacoco {

@@ -2,6 +2,8 @@ package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
+import java.util.function.BiFunction
+
 enum PredefinedReleaseCommitMessageCreator {
 
     DEFAULT('default', { String version, ScmPosition position ->
@@ -10,14 +12,14 @@ enum PredefinedReleaseCommitMessageCreator {
 
     private final String type
 
-    final Closure commitMessageCreator
+    final CommitMessageCreator commitMessageCreator
 
     private PredefinedReleaseCommitMessageCreator(String type, Closure c) {
         this.type = type
         this.commitMessageCreator = c
     }
 
-    static Closure commitMessageCreatorFor(String type) {
+    static CommitMessageCreator commitMessageCreatorFor(String type) {
         PredefinedReleaseCommitMessageCreator creator = PredefinedReleaseCommitMessageCreator.values().find { it.type == type }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined commit message creator with $type type. " +
@@ -26,4 +28,5 @@ enum PredefinedReleaseCommitMessageCreator {
         return creator.commitMessageCreator
     }
 
+    interface CommitMessageCreator extends BiFunction<String,ScmPosition,String> {}
 }
