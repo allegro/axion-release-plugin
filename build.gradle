@@ -94,9 +94,6 @@ tasks.withType(Test) {
 
 tasks.check.dependsOn test, integrationTest
 
-
-// for adding Kotlin extension functions
-
 // set kotlin to depend on groovy
 tasks.named("compileKotlin") {
     classpath += files(sourceSets.main.groovy.classesDirectory)
@@ -105,16 +102,6 @@ tasks.named("compileKotlin") {
 // set groovy to not depend on Kotlin
 tasks.named("compileGroovy") {
     classpath = sourceSets.main.compileClasspath
-}
-
-gradlePlugin {
-    testSourceSets project.sourceSets.integration
-    plugins {
-        simplePlugin {
-            id = 'pl.allegro.tech.build.axion-release'
-            implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
-        }
-    }
 }
 
 jacoco {
@@ -135,10 +122,14 @@ if (System.getenv("GRADLE_PORTAL_KEY")) {
         description = 'Release and version management plugin.'
         tags = ['release', 'version']
 
-        plugins {
-            release {
-                id = 'pl.allegro.tech.build.axion-release'
-                displayName = 'axion-release-plugin'
+        gradlePlugin {
+            testSourceSets project.sourceSets.integration
+            plugins {
+                release {
+                    id = 'pl.allegro.tech.build.axion-release'
+                    displayName = 'axion-release-plugin'
+                    implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
+                }
             }
         }
 
