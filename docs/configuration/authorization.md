@@ -35,15 +35,15 @@ from or key in form of String.
 
     scmVersion {
         repository {
-            customKey = project.file('keys/my_secret_key')
+            customKeyFile.set(project.file('keys/my_secret_key'))
         }
     }
 
 
     task loadKeyPassword << {
-        scmVersion.repository.customKeyPassword = loadPasswordFromSecureStorageOrSomething()
+        scmVersion.repository.customKeyPassword.set( loadPasswordFromSecureStorageOrSomething())
         // you can load the key from secure storage as well!
-        scmVersion.repository.customKey = loadKeyFromSecureStorageOrSomething()
+        scmVersion.repository.customKey.set( loadKeyFromSecureStorageOrSomething())
     }
 
     task release {
@@ -70,5 +70,5 @@ made via `scmVersion.repository.customUsername` and
 `scmVersion.repository.customPassword` properties:
 
     task loadGitHubToken << {
-        scmVersion.repository.customUsername = loadGitHubTokenFromSomewhere()
+        scmVersion.repository.customUsername.set(loadGitHubTokenFromSomewhere())
     }

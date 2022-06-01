@@ -34,7 +34,7 @@ Local only mode can be switch on either using command line flag:
 or by altering configuration:
 
     scmVersion {
-        localOnly = true
+        localOnly.set(true)
     }
 
 Flag has precedence over configuration. Local only mode is evaluated

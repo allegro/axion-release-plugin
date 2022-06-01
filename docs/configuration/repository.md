@@ -9,7 +9,7 @@ property:
 
     scmVersion {
         repository {
-            directory = project.rootProject.file('../')
+            directory.set(project.rootProject.file('../'))
         }
     }
 
@@ -17,7 +17,7 @@ You can also change remote used to push changes:
 
     scmVersion {
         repository {
-            remote = 'myRemote'
+            remote.set("myRemote")
         }
     }
 
@@ -32,7 +32,7 @@ allowed even when a local branch is not checked out:
 
     scmVersion {
         repository {
-            pushTagsOnly = true
+            pushTagsOnly.set(true)
         }
     }
 

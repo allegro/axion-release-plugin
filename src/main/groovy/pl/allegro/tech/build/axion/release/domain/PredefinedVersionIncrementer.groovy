@@ -25,7 +25,7 @@ enum PredefinedVersionIncrementer {
 
     INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
         if (!config.releaseBranchPattern) {
-            config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.prefix() + '/.+'
+            config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.defaultPrefix() + '/.+'
         }
         if (context.scmPosition.branch ==~ config.releaseBranchPattern) {
             return context.currentVersion.incrementPatchVersion()

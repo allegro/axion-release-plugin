@@ -1,16 +1,14 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.prefix
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 
@@ -22,9 +20,9 @@ class NextVersionMarkerTest extends RepositoryBasedTest {
 
     private Releaser releaser
 
-    Project project = ProjectBuilder.builder().build()
+    Project project = Fixtures.project()
 
-    VersionConfig config = new VersionConfig(project)
+    VersionConfig config = Fixtures.versionConfig(project)
 
     def setup() {
         repository = context.repository()

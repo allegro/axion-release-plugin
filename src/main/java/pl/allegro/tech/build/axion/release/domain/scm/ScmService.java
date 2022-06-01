@@ -1,14 +1,15 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver;
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 
 import java.util.List;
 import java.util.Optional;
 
 public class ScmService {
+    private static final Logger logger = Logging.getLogger(ScmService.class);
 
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(ScmService.class);
     private final LocalOnlyResolver localOnlyResolver;
     private final ScmProperties scmProperties;
     private ScmRepository repository;

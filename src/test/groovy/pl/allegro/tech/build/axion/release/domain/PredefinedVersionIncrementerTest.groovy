@@ -1,9 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
-import pl.allegro.tech.build.axion.release.TagPrefixConf
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
@@ -31,7 +28,7 @@ class PredefinedVersionIncrementerTest extends Specification {
 
     def "should increment minor if not on release branch and incrementMinorIfNotOnRelease used"() {
         expect:
-        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: (prefix() +'.*')]).apply(context) == Version.valueOf('0.2.0')
+        versionIncrementerFor('incrementMinorIfNotOnRelease', [releaseBranchPattern: (defaultPrefix() +'.*')]).apply(context) == Version.valueOf('0.2.0')
     }
 
     def "should increment patch if on release branch and incrementMinorIfNotOnRelease used"() {
@@ -41,7 +38,7 @@ class PredefinedVersionIncrementerTest extends Specification {
 
     def "should delegate to first matching incrementer when branchSpecific rule used"() {
         expect:
-        versionIncrementerFor('branchSpecific', [(prefix() + '.*'): 'incrementPatch', 'master': 'incrementMinor']).apply(context) == Version.valueOf('0.2.0')
+        versionIncrementerFor('branchSpecific', [(defaultPrefix() + '.*'): 'incrementPatch', 'master': 'incrementMinor']).apply(context) == Version.valueOf('0.2.0')
     }
 
     def "should increment prerelease version when incrementPrerelease rule used"() {

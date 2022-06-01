@@ -1,22 +1,18 @@
 package pl.allegro.tech.build.axion.release.infrastructure
 
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
+import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 
-class DryRepository implements ScmRepository {
+class NoOpRepository implements ScmRepository {
 
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(DryRepository)
+    private static final Logger logger = Logging.getLogger(NoOpRepository.class);
 
     private final ScmRepository delegateRepository
 
-    DryRepository(ScmRepository delegateRepository) {
+    NoOpRepository(ScmRepository delegateRepository) {
         this.delegateRepository = delegateRepository
     }
 

@@ -1,59 +1,87 @@
 package pl.allegro.tech.build.axion.release.domain;
 
+import org.gradle.api.provider.Property;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.Internal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties.*;
 
-public class NextVersionConfig {
+import javax.inject.Inject;
+
+@SuppressWarnings("UnstableApiUsage")
+public abstract class NextVersionConfig extends BaseExtension {
+    private static final Logger logger = LoggerFactory.getLogger(NextVersionConfig.class);
+
+    private static final String NEXT_VERSION_INCREMENTER_PROPERTY = "release.incrementer";
+    private static final String NEXT_VERSION_PROPERTY = "release.version";
+    private static final String DEPRECATED_NEXT_VERSION_PROPERTY = "release.nextVersion";
+
+    @Inject
+    public NextVersionConfig() {
+        getSuffix().convention("alpha");
+        getSeparator().convention("-");
+        getSerializer().convention(NextVersionSerializer.DEFAULT.serializer);
+        getDeserializer().convention(NextVersionSerializer.DEFAULT.deserializer);
+    }
+
     @Input
-    private String suffix = "alpha";
+    public abstract Property<String> getSuffix();
 
     @Input
-    private String separator = "-";
+    public abstract Property<String> getSeparator();
 
-    @Nested
-    private Serializer serializer = NextVersionSerializer.DEFAULT.serializer;
+    @Internal
+    public abstract Property<Serializer> getSerializer();
 
-    @Nested
-    private Deserializer deserializer = NextVersionSerializer.DEFAULT.deserializer;
+    @Internal
+    public abstract Property<Deserializer> getDeserializer();
 
-    public void setSerializer(String type) {
-        this.serializer = NextVersionSerializer.find(type).serializer;
+    public void serializer(String type) {
+        getSerializer().set(NextVersionSerializer.find(type).serializer);
     }
 
-    public void setSerializer(Serializer c) {
-        this.serializer = c;
+    public void deserializer(String type) {
+        getDeserializer().set(NextVersionSerializer.valueOf(type).deserializer);
     }
 
-    public void setDeserializer(String type) {
-        this.deserializer = NextVersionSerializer.valueOf(type).deserializer;
+    public void serializer(Serializer serializer) {
+        getSerializer().set(serializer);
     }
 
-    public void setDeserializer(Deserializer c) {
-        this.deserializer = c;
+    public void deserializer(Deserializer deserializer) {
+        getDeserializer().set(deserializer);
     }
 
-    public String getSuffix() {
-        return suffix;
+    public NextVersionProperties nextVersionProperties() {
+
+        if (getSuffix().get().isEmpty()) {
+            String message = "scmVersion.nextVersion.suffix can't be empty! Empty suffix will prevent axion-release from distinguishing nextVersion from regular versions";
+            throw new IllegalArgumentException(message);
+        }
+
+        return new NextVersionProperties(nextVersion().getOrNull(),
+            getSuffix().get(),
+            getSeparator().get(),
+            versionIncrementerName().getOrNull(),
+            getSerializer().get(),
+            getDeserializer().get()
+        );
     }
 
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
+    private Provider<String> versionIncrementerName() {
+        return gradleProperty(NEXT_VERSION_INCREMENTER_PROPERTY);
     }
 
-    public String getSeparator() {
-        return separator;
-    }
-
-    public void setSeparator(String separator) {
-        this.separator = separator;
-    }
-
-    public Serializer getSerializer() {
-        return serializer;
-    }
-
-    public Deserializer getDeserializer() {
-        return deserializer;
+    private Provider<String> nextVersion() {
+        return gradleProperty(NEXT_VERSION_PROPERTY)
+            .orElse(gradleProperty(DEPRECATED_NEXT_VERSION_PROPERTY)
+                .map(it -> {
+                    logger.warn("Using deprecated property: " + DEPRECATED_NEXT_VERSION_PROPERTY + "! Use " + NEXT_VERSION_PROPERTY + " instead.");
+                    return it;
+                }));
     }
 }

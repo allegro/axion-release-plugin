@@ -1,13 +1,11 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.prefix
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties
@@ -419,7 +417,7 @@ class VersionResolverTest extends RepositoryBasedTest {
         where:
 
         versionProps                | tagPrefix | v       | isSnapshot
-        versionProperties().build() | prefix()  | '1.1.0' | false
-        versionProperties().build() | 'B'+prefix() | '1.2.0' | false
+        versionProperties().build() | defaultPrefix()     | '1.1.0' | false
+        versionProperties().build() | 'B'+defaultPrefix() | '1.2.0' | false
     }
 }

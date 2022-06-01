@@ -18,7 +18,7 @@ will print additional message:
     import pl.allegro.tech.build.axion.release.OutputCurrentVersionTask
 
     task customTask(type: OutputCurrentVersionTask) {
-        versionConfig = new VersionConfig(project)
+        versionConfig = project.objects.newInstance(VersionConfig,project.rootProject.layout.projectDirectory)
     }
 
     customTask.doFirst {

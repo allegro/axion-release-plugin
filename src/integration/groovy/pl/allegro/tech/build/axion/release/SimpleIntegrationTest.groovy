@@ -95,12 +95,12 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains(fullPrefix() +'blabla')
     }
 
-    def "should use initial verison setting"() {
+    def "should use initial version setting"() {
         given:
         buildFile("""
             scmVersion {
                 tag {
-                    initialVersion = { t, p -> '0.0.1' }
+                    initialVersion({ t, p -> '0.0.1' })
                 }
             }
         """)

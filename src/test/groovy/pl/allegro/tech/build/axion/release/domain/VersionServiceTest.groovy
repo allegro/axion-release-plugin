@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import com.github.zafarkhaja.semver.Version
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
@@ -26,8 +27,8 @@ class VersionServiceTest extends Specification {
     NextVersionProperties nextVersionProperties = nextVersionProperties().build()
 
     def setup() {
-        Project project = ProjectBuilder.builder().build()
-        versionConfig = project.extensions.create('versionConfig', VersionConfig, project)
+        Project project = Fixtures.project()
+        versionConfig = Fixtures.versionConfig(project)
 
         service = new VersionService(resolver)
     }

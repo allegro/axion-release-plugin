@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.properties;
 
 import com.github.zafarkhaja.semver.Version;
+import pl.allegro.tech.build.axion.release.domain.MonorepoConfig;
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
@@ -22,7 +23,7 @@ public class VersionProperties {
     private final Incrementer versionIncrementer;
     private final boolean sanitizeVersion;
     private final boolean useHighestVersion;
-    private final MonorepoProperties monorepoProperties;
+    private final MonorepoConfig monorepoConfig;
 
     public VersionProperties(
         String forcedVersion,
@@ -33,7 +34,7 @@ public class VersionProperties {
         Incrementer versionIncrementer,
         boolean sanitizeVersion,
         boolean useHighestVersion,
-        MonorepoProperties monorepoProperties
+        MonorepoConfig monorepoConfig
     ) {
         this.forcedVersion = forcedVersion;
         this.forceSnapshot = forceSnapshot;
@@ -43,7 +44,7 @@ public class VersionProperties {
         this.versionIncrementer = versionIncrementer;
         this.sanitizeVersion = sanitizeVersion;
         this.useHighestVersion = useHighestVersion;
-        this.monorepoProperties = monorepoProperties;
+        this.monorepoConfig = monorepoConfig;
     }
 
     public boolean forceVersion() {
@@ -82,7 +83,7 @@ public class VersionProperties {
         return useHighestVersion;
     }
 
-    public MonorepoProperties getMonorepoProperties() {
-        return monorepoProperties;
+    public MonorepoConfig getMonorepoConfig() {
+        return monorepoConfig;
     }
 }

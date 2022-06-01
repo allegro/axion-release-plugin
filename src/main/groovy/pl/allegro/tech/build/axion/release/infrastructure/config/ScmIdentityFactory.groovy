@@ -7,16 +7,22 @@ import pl.allegro.tech.build.axion.release.util.FileLoader
 class ScmIdentityFactory {
 
     static ScmIdentity create(RepositoryConfig config, boolean disableSshAgent) {
-        ScmIdentity identity
-        if (config.customKey) {
-            identity = ScmIdentity.keyIdentity(FileLoader.readIfFile(config.customKey), config.customKeyPassword)
-        } else if (config.customUsername) {
-            identity = ScmIdentity.usernameIdentity(config.customUsername, config.customPassword)
-        } else if (disableSshAgent) {
-            identity = ScmIdentity.defaultIdentityWithoutAgents()
-        } else {
-            identity = ScmIdentity.defaultIdentity()
+        if (config.customKey.isPresent()) {
+            return ScmIdentity.keyIdentity(config.customKey.get(), config.customKeyPassword.get())
         }
-        return identity
+
+        if (config.customKeyFile.isPresent()) {
+            return ScmIdentity.keyIdentity(FileLoader.readFrom(config.customKeyFile.get().asFile), config.customKeyPassword.get())
+        }
+
+        if (config.customUsername.isPresent()) {
+            return ScmIdentity.usernameIdentity(config.customUsername.get(), config.customPassword.get())
+        }
+
+        if (disableSshAgent) {
+            return ScmIdentity.defaultIdentityWithoutAgents()
+        }
+
+        return ScmIdentity.defaultIdentity()
     }
 }

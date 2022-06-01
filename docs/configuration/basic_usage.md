@@ -47,7 +47,7 @@ apply plugin: 'pl.allegro.tech.build.axion-release'
 ```
 scmVersion {
     tag {
-        prefix = 'my-project-name'
+        prefix.set("my-project-name")
     }
 }
 
@@ -117,7 +117,7 @@ my-service
 my-service-client
 ```
 
-Use the `projectDirs` configuration parameter within a `monorepos` block to identify submodules
+Use the `exclude()` configuration parameter within a `monorepos` block to identify submodules
 that should be excluded from consideration when calculating whether to increment
 the version of the parent project.  Typically, you would do this in the top level
 project, assuming that submodules are named after the directory they appear in:
@@ -125,7 +125,7 @@ project, assuming that submodules are named after the directory they appear in:
 ```
 scmVersion {
     monorepos {
-        projectDirs = project.subprojects.collect({p -> p.name})
+        exclude(project.subprojects.collect({p -> p.name}))
     }
 }
 ```
@@ -133,9 +133,9 @@ scmVersion {
 Version calculation rules:
 1. Changes to files within a submodule increment that submodule's version only.
 2. Changes to a submodule do not cause a change to the parent project's version if
-the parent is set to ignore that submodule, via `projectDirs`.
+the parent is set to ignore that submodule, via `exclude()`.
 3. Changes to files in the parent project but which are not in a submodule identified via
-`projectDirs` will cause the parent project's version to increment but not the
+`exclude()` will cause the parent project's version to increment but not the
 versions of any submodules.  If this is desired then consider wiring the `createRelease` or
 `release` tasks of the submodules to be dependencies of the tasks of the same name in the parent.
 
