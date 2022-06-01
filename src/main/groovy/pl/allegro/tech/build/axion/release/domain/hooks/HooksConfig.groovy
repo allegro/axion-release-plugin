@@ -12,6 +12,10 @@ class HooksConfig {
     @Input
     List<ReleaseHookAction> postReleaseHooks = []
 
+    void pre(ReleaseHookAction action) {
+        pre({HookContext c -> action.act(c)})
+    }
+
     void pre(Closure c) {
         preReleaseHooks.add(PredefinedReleaseHookAction.DEFAULT.factory.create(safeCastToCustomAction(c)))
     }
@@ -24,6 +28,10 @@ class HooksConfig {
         preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(arguments))
     }
 
+    void pre(String type, ReleaseHookAction action) {
+        pre(type, {HookContext c -> action.act(c)})
+    }
+
     void pre(String type, Closure c) {
         preReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(safeCastToCustomAction(c)))
     }
@@ -32,12 +40,20 @@ class HooksConfig {
         postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create())
     }
 
+    void post(ReleaseHookAction action) {
+        post({HookContext c -> action.act(c)})
+    }
+
     void post(Closure c) {
         postReleaseHooks.add(PredefinedReleaseHookAction.DEFAULT.factory.create(safeCastToCustomAction(c)))
     }
 
     void post(String type, Map arguments) {
         postReleaseHooks.add(PredefinedReleaseHookAction.factoryFor(type).create(arguments))
+    }
+
+    void post(String type, ReleaseHookAction action) {
+        post(type, {HookContext c -> action.act(c)})
     }
 
     void post(String type, Closure c) {

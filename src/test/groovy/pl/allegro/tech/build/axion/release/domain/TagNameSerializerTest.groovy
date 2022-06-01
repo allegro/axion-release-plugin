@@ -15,7 +15,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().build()
 
         expect:
-        TagNameSerializer.DEFAULT.serializer(properties, '0.1.0') == fullPrefix() + '0.1.0'
+        TagNameSerializer.DEFAULT.serializer.apply(properties, '0.1.0') == fullPrefix() + '0.1.0'
     }
 
     def "default deserializer should read version by stripping off prefix and version separator"() {
@@ -23,7 +23,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().build()
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(properties, scmPosition('master'), fullPrefix() + '0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer.apply(properties, scmPosition('master'), fullPrefix() + '0.1.0') == '0.1.0'
     }
 
     def "default serializer should use empty version separator when prefix is empty"() {
@@ -31,7 +31,7 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().withPrefix('').build()
 
         expect:
-        TagNameSerializer.DEFAULT.serializer(properties, '0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.serializer.apply(properties, '0.1.0') == '0.1.0'
     }
 
     def "default deserializer should use empty version separator when prefix is empty"() {
@@ -39,6 +39,6 @@ class TagNameSerializerTest extends Specification {
         TagProperties properties = tagProperties().withPrefix('').build()
 
         expect:
-        TagNameSerializer.DEFAULT.deserializer(properties, scmPosition('master'), '0.1.0') == '0.1.0'
+        TagNameSerializer.DEFAULT.deserializer.apply(properties, scmPosition('master'), '0.1.0') == '0.1.0'
     }
 }

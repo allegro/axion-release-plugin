@@ -16,9 +16,9 @@ class VersionPropertiesBuilder {
 
     private MonorepoProperties monorepoProperties = new MonorepoProperties()
 
-    private Closure<String> versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+    private VersionProperties.Creator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
-    private Closure<String> snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
+    private VersionProperties.Creator snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
 
     private boolean sanitizeVersion = true
 

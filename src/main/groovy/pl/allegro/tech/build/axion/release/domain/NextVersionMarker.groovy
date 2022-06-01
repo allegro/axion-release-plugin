@@ -25,8 +25,8 @@ class NextVersionMarker {
             Version currentVersion = Version.valueOf(versionConfig.undecoratedVersion)
             VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position(), repositoryService.isLegacyDefTagnameRepo())
             nextVersion = nextVersionRules.versionIncrementer ?
-                PredefinedVersionIncrementer.versionIncrementerFor(nextVersionRules.versionIncrementer)(context) :
-                versionConfig.versionIncrementer(context)
+                PredefinedVersionIncrementer.versionIncrementerFor(nextVersionRules.versionIncrementer).apply(context) :
+                versionConfig.versionIncrementer.apply(context)
             logger.info("Next Version not specified. Creating next version with default incrementer: $nextVersion")
         }
 

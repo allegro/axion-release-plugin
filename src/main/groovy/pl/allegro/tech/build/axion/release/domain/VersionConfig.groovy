@@ -1,12 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import pl.allegro.tech.build.axion.release.ReleasePlugin
-import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.infrastructure.di.Context
 import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 import pl.allegro.tech.build.axion.release.util.FileLoader
@@ -39,16 +40,16 @@ class VersionConfig {
     TagNameSerializationConfig tag = new TagNameSerializationConfig()
 
     @Nested
-    Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+    VersionProperties.Creator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
     @Nested
-    Closure snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
+    VersionProperties.Creator snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
 
     @Input
     Map<String, Object> branchVersionCreator = [:]
 
     @Nested
-    Closure versionIncrementer = { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() }
+    VersionProperties.Incrementer versionIncrementer = { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() }
 
     @Input
     Map<String, Object> branchVersionIncrementer = [:]
@@ -66,7 +67,7 @@ class VersionConfig {
     boolean createReleaseCommit = false
 
     @Nested
-    Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
+    PredefinedReleaseCommitMessageCreator.CommitMessageCreator releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
 
     @Nested
     NextVersionConfig nextVersion = new NextVersionConfig()
@@ -90,24 +91,24 @@ class VersionConfig {
         this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
     }
 
-    void repository(Closure c) {
-        project.configure(repository, c)
+    void repository(Action<RepositoryConfig> action) {
+        action.execute(repository)
     }
 
-    void tag(Closure c) {
-        project.configure(tag, c)
+    void tag(Action<TagNameSerializationConfig> action) {
+        action.execute(tag)
     }
 
-    void checks(Closure c) {
-        project.configure(checks, c)
+    void checks(Action<ChecksConfig> action) {
+        action.execute(checks)
     }
 
-    void nextVersion(Closure c) {
-        project.configure(nextVersion, c)
+    void nextVersion(Action<NextVersionConfig> action) {
+        action.execute(nextVersion)
     }
 
-    void hooks(Closure c) {
-        project.configure(hooks, c)
+    void hooks(Action<HooksConfig> action) {
+        action.execute(hooks)
     }
 
     void versionCreator(String type) {
@@ -115,8 +116,8 @@ class VersionConfig {
     }
 
     @Deprecated
-    void releaseCommitMessage(Closure c) {
-        releaseCommitMessage = c
+    void releaseCommitMessage(PredefinedReleaseCommitMessageCreator.CommitMessageCreator commitMessageCreator) {
+        this.releaseCommitMessage = commitMessageCreator
     }
 
     @Deprecated
@@ -124,12 +125,12 @@ class VersionConfig {
         this.createReleaseCommit = createReleaseCommit
     }
 
-    void versionCreator(Closure c) {
-        this.versionCreator = c
+    void versionCreator(VersionProperties.Creator versionCreator) {
+        this.versionCreator = versionCreator
     }
 
-    void snapshotCreator(Closure c) {
-        this.snapshotCreator = c
+    void snapshotCreator(VersionProperties.Creator snapshotCreator) {
+        this.snapshotCreator = snapshotCreator
     }
 
     void branchVersionCreator(Map<String, Object> creators) {
@@ -148,8 +149,8 @@ class VersionConfig {
         this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration)
     }
 
-    void versionIncrementer(Closure c) {
-        this.versionIncrementer = c
+    void versionIncrementer(VersionProperties.Incrementer versionIncrementer) {
+        this.versionIncrementer = versionIncrementer
     }
 
     void branchVersionIncrementer(Map<String, Object> creators) {
@@ -232,7 +233,7 @@ class VersionConfig {
         }
     }
 
-    void monorepos(Closure c) {
-        project.configure(monorepoConfig, c)
+    void monorepos(Action<MonorepoConfig> action) {
+        action.execute(monorepoConfig)
     }
 }
