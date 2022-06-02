@@ -118,6 +118,7 @@ pluginBundle {
 
     gradlePlugin {
         testSourceSets project.sourceSets.integration
+        setAutomatedPublishing(false)
         plugins {
             release {
                 id = 'pl.allegro.tech.build.axion-release'
@@ -125,11 +126,6 @@ pluginBundle {
                 implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
             }
         }
-    }
-
-    mavenCoordinates {
-        groupId = 'pl.allegro.tech.build'
-        artifactId = 'axion-release-plugin'
     }
 }
 
@@ -147,7 +143,8 @@ gradlePlugin {
 
 publishing {
     publications {
-        pluginMaven(MavenPublication) {
+        sonatype(MavenPublication) {
+            from components.java
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
