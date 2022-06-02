@@ -14,11 +14,6 @@ plugins {
 }
 
 scmVersion {
-    hooks {
-        pre 'fileUpdate', [files: ['README.md', 'mkdocs.yml'], pattern: { v, p -> /'$v'/ }, replacement: { v, p -> "'$v'" }]
-        pre 'commit'
-    }
-
     versionCreator 'versionWithBranch'
 }
 
@@ -115,35 +110,32 @@ jacocoTestReport {
     }
 }
 
-if (System.getenv("GRADLE_PORTAL_KEY")) {
-    pluginBundle {
-        website = 'https://github.com/allegro/axion-release-plugin'
-        vcsUrl = 'https://github.com/allegro/axion-release-plugin'
-        description = 'Release and version management plugin.'
-        tags = ['release', 'version']
+pluginBundle {
+    website = 'https://github.com/allegro/axion-release-plugin'
+    vcsUrl = 'https://github.com/allegro/axion-release-plugin'
+    description = 'Release and version management plugin.'
+    tags = ['release', 'version']
 
-        gradlePlugin {
-            testSourceSets project.sourceSets.integration
-            plugins {
-                release {
-                    id = 'pl.allegro.tech.build.axion-release'
-                    displayName = 'axion-release-plugin'
-                    implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
-                }
+    gradlePlugin {
+        testSourceSets project.sourceSets.integration
+        plugins {
+            release {
+                id = 'pl.allegro.tech.build.axion-release'
+                displayName = 'axion-release-plugin'
+                implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
             }
         }
+    }
 
-        mavenCoordinates {
-            groupId = 'pl.allegro.tech.build'
-            artifactId = 'axion-release-plugin'
-        }
+    mavenCoordinates {
+        groupId = 'pl.allegro.tech.build'
+        artifactId = 'axion-release-plugin'
     }
 }
 
 publishing {
     publications {
-        sonatype(MavenPublication) {
-            from components.java
+        pluginMaven(MavenPublication) {
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
