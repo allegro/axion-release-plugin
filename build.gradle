@@ -138,16 +138,16 @@ if (System.getenv("GRADLE_PORTAL_KEY")) {
             artifactId = 'axion-release-plugin'
         }
     }
-} else {
-    // for local integration testing
-    gradlePlugin {
-        testSourceSets project.sourceSets.integration
-        plugins {
-            release {
-                id = 'pl.allegro.tech.build.axion-release'
-                displayName = 'axion-release-plugin'
-                implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
-            }
+}
+
+// for local integration testing
+gradlePlugin {
+    testSourceSets project.sourceSets.integration
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
+            implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
         }
     }
 }
