@@ -110,23 +110,23 @@ jacocoTestReport {
     }
 }
 
+gradlePlugin {
+    testSourceSets project.sourceSets.integration
+    setAutomatedPublishing(false)
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
+            implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
+        }
+    }
+}
+
 pluginBundle {
     website = 'https://github.com/allegro/axion-release-plugin'
     vcsUrl = 'https://github.com/allegro/axion-release-plugin'
     description = 'Release and version management plugin.'
     tags = ['release', 'version']
-
-    gradlePlugin {
-        testSourceSets project.sourceSets.integration
-        setAutomatedPublishing(false)
-        plugins {
-            release {
-                id = 'pl.allegro.tech.build.axion-release'
-                displayName = 'axion-release-plugin'
-                implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
-            }
-        }
-    }
 }
 
 publishing {
