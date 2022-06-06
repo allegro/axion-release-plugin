@@ -24,7 +24,7 @@ jobs:
           GRADLE_PORTAL_KEY: ${{ secrets.GRADLE_PORTAL_KEY }}
           GRADLE_PORTAL_SECRET: ${{ secrets.GRADLE_PORTAL_SECRET }}
       - name: Publish to maven central
-        run: ./gradlew publishSonatypePublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
