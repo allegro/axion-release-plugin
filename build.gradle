@@ -141,34 +141,35 @@ gradlePlugin {
 }
 
 publishing {
-    publications {
-        sonatype(MavenPublication) {
-            from components.java
-            pom {
-                name = project.name
-                description = 'Gradle release and version management plugin'
-                url = 'https://github.com/allegro/axion-release-plugin'
-                inceptionYear = '2014'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'adamdubiel'
-                        name = 'Adam Dubiel'
-                    }
-                    developer {
-                        id = 'bgalek'
-                        name = 'Bartosz Gałek'
-                    }
-                }
-                scm {
+    afterEvaluate {
+        publications {
+            withType(MavenPublication) {
+                pom {
+                    name = project.name
+                    description = 'Gradle release and version management plugin'
                     url = 'https://github.com/allegro/axion-release-plugin'
-                    connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
-                    developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    inceptionYear = '2014'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'adamdubiel'
+                            name = 'Adam Dubiel'
+                        }
+                        developer {
+                            id = 'bgalek'
+                            name = 'Bartosz Gałek'
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/allegro/axion-release-plugin'
+                        connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                        developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    }
                 }
             }
         }
