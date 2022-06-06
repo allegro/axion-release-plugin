@@ -131,7 +131,7 @@ pluginBundle {
 publishing {
     publications {
         sonatype(MavenPublication) {
-            from components.java
+            artifact sourcesJar
             pom {
                 name = project.name
                 description = 'Gradle release and version management plugin'
