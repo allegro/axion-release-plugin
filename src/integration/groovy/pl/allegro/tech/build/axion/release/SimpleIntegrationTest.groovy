@@ -65,7 +65,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should update file in pre release hook"() {
         given:
         File versionFile = newFile('version-file')
-        versionFile << "Version: 0.1.0"
+        versionFile << "🚀 Version: 0.1.0"
 
         buildFile("""
             scmVersion {
@@ -80,10 +80,10 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks', '-s')
 
         then:
-        versionFile.text == "Version: 1.0.0"
+        versionFile.text == "🚀 Version: 1.0.0"
     }
 
-    def "should fail gracefuly when failed to parse tag"() {
+    def "should fail gracefully when failed to parse tag"() {
         given:
         buildFile('')
         repository.tag(fullPrefix() + 'blabla-1.0.0')
@@ -95,7 +95,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains(fullPrefix() +'blabla')
     }
 
-    def "should use initial verison setting"() {
+    def "should use initial version setting"() {
         given:
         buildFile("""
             scmVersion {
