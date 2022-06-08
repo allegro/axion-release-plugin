@@ -314,7 +314,7 @@ public class GitRepository implements ScmRepository {
             .map(Repository::shortenRefName)
             .orElse(null);
 
-        if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null) {
+        if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
             branchName = Repository.shortenRefName(properties.getOverriddenBranchName());
         }
 

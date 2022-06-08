@@ -276,6 +276,26 @@ class GitRepositoryTest extends Specification {
         position.branch == 'HEAD'
     }
 
+    def "should provide current branch name as HEAD when in detached state and overriddenBranchName is empty"() {
+        given:
+        File repositoryDir = File.createTempDir('axion-release', 'tmp')
+        def scmProperties = scmProperties(repositoryDir)
+            .withOverriddenBranchName("")
+            .build()
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).usingProperties(scmProperties).build()
+
+        Grgit rawRepository = repositories[Grgit]
+        GitRepository repository = repositories[GitRepository]
+
+        String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        rawRepository.repository.jgit.checkout().setName(headCommitId).call()
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'HEAD'
+    }
+
     def "should provide current branch name from overriddenBranchName when in detached state and overriddenBranchName is set"() {
         given:
         File repositoryDir = File.createTempDir('axion-release', 'tmp')
