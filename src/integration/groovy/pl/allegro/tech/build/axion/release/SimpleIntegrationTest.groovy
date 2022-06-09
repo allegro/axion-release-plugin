@@ -2,6 +2,9 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.testkit.runner.TaskOutcome
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class SimpleIntegrationTest extends BaseIntegrationTest {
@@ -65,12 +68,12 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should update file in pre release hook"() {
         given:
         File versionFile = newFile('version-file')
-        versionFile << "Version: 0.1.0"
+        Files.write(versionFile.toPath(), "🚀 Version: 0.1.0".getBytes(StandardCharsets.UTF_8))
 
         buildFile("""
             scmVersion {
                 hooks {
-                    pre 'fileUpdate', [files: ['version-file'], pattern: { v, p -> v }, replacement: { v, p -> v }]
+                    pre 'fileUpdate', [files: ['version-file'], pattern: { v, p -> v }, replacement: { v, p -> v }, encoding: 'utf-8']
                     pre 'commit'
                 }
             }
@@ -80,7 +83,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks', '-s')
 
         then:
-        versionFile.text == "Version: 1.0.0"
+        versionFile.text == "🚀 Version: 1.0.0"
     }
 
     def "should fail gracefuly when failed to parse tag"() {

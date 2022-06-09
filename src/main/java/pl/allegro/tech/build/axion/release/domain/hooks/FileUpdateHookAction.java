@@ -3,14 +3,14 @@ package pl.allegro.tech.build.axion.release.domain.hooks;
 import groovy.lang.Closure;
 import pl.allegro.tech.build.axion.release.util.FileLoader;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 public class FileUpdateHookAction implements ReleaseHookAction {
@@ -37,6 +37,11 @@ public class FileUpdateHookAction implements ReleaseHookAction {
         String replacement = ((Closure) arguments.get("replacement"))
             .call(hookContext.getReleaseVersion(), hookContext).toString();
 
+        Charset charset = Optional.ofNullable(arguments.get("encoding"))
+            .map(Object::toString)
+            .map(Charset::forName)
+            .orElseGet(Charset::defaultCharset);
+
         try {
             hookContext.getLogger().quiet(
                 "Replacing pattern \"" + pattern + "\" with \"" + replacement + "\" in " + file.getCanonicalPath()
@@ -44,18 +49,16 @@ public class FileUpdateHookAction implements ReleaseHookAction {
 
             String replacedText = Pattern.compile(pattern, Pattern.MULTILINE).matcher(text).replaceAll(replacement);
 
-            write(file, replacedText);
+            write(file, replacedText, charset);
             hookContext.addCommitPattern(file.getCanonicalPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void write(File file, String text) {
-        try (FileWriter fw = new FileWriter(file)) {
-            BufferedWriter writer = new BufferedWriter(fw);
-            writer.write(text);
-            writer.flush();
+    private void write(File file, String text, Charset charset) {
+        try {
+            Files.write(file.toPath(), text.getBytes(charset));
         } catch (IOException e) {
             throw new FileUpdateHookException(e);
         }
