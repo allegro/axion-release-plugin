@@ -43,7 +43,8 @@ class ReleaseHooksBuilder(private val hooksConfig: HooksConfig, private val preR
         val configMap = mapOf(
             "files" to fileUpdateSpec.filesToUpdate,
             "pattern" to fileUpdateSpec.pattern,
-            "replacement" to fileUpdateSpec.replacement
+            "replacement" to fileUpdateSpec.replacement,
+            "encoding" to fileUpdateSpec.encoding
         )
         if (preRelease) {
             hooksConfig.pre("fileUpdate", configMap)
@@ -86,4 +87,5 @@ class FileUpdateSpec {
 
     var pattern: (String, HookContext) -> String = { previousVersion, context -> "" }
     var replacement: (String, HookContext) -> String = { currentVersion, context -> "" }
+    var encoding: String? = null
 }
