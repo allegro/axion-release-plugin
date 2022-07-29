@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
+import pl.allegro.tech.build.axion.release.domain.PredefinedSnapshotCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
 
@@ -15,7 +16,9 @@ class VersionPropertiesBuilder {
 
     private MonorepoProperties monorepoProperties = new MonorepoProperties()
 
-    private Closure<String> versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+    private VersionProperties.Creator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+
+    private VersionProperties.Creator snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
 
     private boolean sanitizeVersion = true
 
@@ -32,6 +35,7 @@ class VersionPropertiesBuilder {
             forceSnapshot,
             ignoreUncommittedChanges,
             versionCreator,
+            snapshotCreator,
             PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
             sanitizeVersion,
             useHighestVersion,
@@ -58,7 +62,7 @@ class VersionPropertiesBuilder {
         this.useHighestVersion = true
         return this
     }
-    
+
     VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
         this.monorepoProperties = monorepoProperties
         return this
@@ -66,6 +70,11 @@ class VersionPropertiesBuilder {
 
     VersionPropertiesBuilder withVersionCreator(Closure<String> creator) {
         this.versionCreator = creator
+        return this
+    }
+
+    VersionPropertiesBuilder withSnapshotCreator(Closure<String> creator) {
+        this.snapshotCreator = creator
         return this
     }
 

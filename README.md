@@ -4,10 +4,11 @@ axion-release-plugin
 *gradle release and version management plugin*
 
 [![Join the chat at https://gitter.im/allegro/axion-release-plugin](https://badges.gitter.im/allegro/axion-release-plugin.svg)](https://gitter.im/allegro/axion-release-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/allegro/axion-release-plugin.svg?branch=master)](https://travis-ci.org/allegro/axion-release-plugin)
+[![Build Status](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/allegro/axion-release-plugin/badge.svg?branch=development)](https://coveralls.io/r/allegro/axion-release-plugin)
 [![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ](http://axion-release-plugin.readthedocs.org/en/latest/)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/pl.allegro.tech.build/axion-release-plugin)
+![Maven Central](https://img.shields.io/maven-central/v/pl.allegro.tech.build/axion-release-plugin)
+![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/pl.allegro.tech.build.axion-release)
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
@@ -25,7 +26,7 @@ project versions along SCM tag versions.
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.13.0'
+    id 'pl.allegro.tech.build.axion-release' version '1.13.13'
 }
 
 project.version = scmVersion.version

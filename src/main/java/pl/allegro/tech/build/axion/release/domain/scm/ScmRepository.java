@@ -21,6 +21,8 @@ public interface ScmRepository {
 
     ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders);
 
+    Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision);
+
     TagsOnCommit latestTags(Pattern pattern);
 
     TagsOnCommit latestTags(Pattern pattern, String sinceCommit);

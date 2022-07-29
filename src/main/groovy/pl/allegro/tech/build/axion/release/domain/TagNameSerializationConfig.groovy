@@ -17,15 +17,23 @@ class TagNameSerializationConfig {
     String versionSeparator
 
     @Nested
-    Closure serialize = TagNameSerializer.DEFAULT.serializer
+    TagProperties.Serializer serialize = TagNameSerializer.DEFAULT.serializer
+
+    void setSerializer(TagProperties.Serializer serializer) {
+        this.serialize = serializer
+    }
 
     @Nested
-    Closure deserialize = TagNameSerializer.DEFAULT.deserializer
+    TagProperties.Deserializer deserialize = TagNameSerializer.DEFAULT.deserializer
+
+    void setDeserializer(TagProperties.Deserializer deserializer) {
+        this.deserialize = deserializer
+    }
 
     @Nested
-    Closure initialVersion = defaultInitialVersion()
+    TagProperties.InitialVersionSupplier initialVersion = defaultInitialVersion()
 
-    private static Closure defaultInitialVersion() {
+    private static TagProperties.InitialVersionSupplier defaultInitialVersion() {
         return { TagProperties rules, ScmPosition position ->
             return '0.1.0'
         }

@@ -41,15 +41,9 @@ public class VersionResolver {
             projectRootRelativePath, versionProperties.getMonorepoProperties().getDirsToExclude()
         );
 
-        VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition);
+        VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
-        VersionInfo versions;
-        if (versionProperties.isUseHighestVersion()) {
-            versions = readVersionsByHighestVersion(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
-        } else {
-            versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
-        }
-
+        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion());
 
         ScmState scmState = new ScmState(
             versions.onReleaseTag,
@@ -68,7 +62,8 @@ public class VersionResolver {
         TagProperties tagProperties,
         NextVersionProperties nextVersionProperties,
         VersionProperties versionProperties,
-        ScmPosition latestChangePosition
+        ScmPosition latestChangePosition,
+        Boolean useHighestVersions
     ) {
 
         String releaseTagPatternString = tagProperties.getPrefix();
@@ -80,61 +75,44 @@ public class VersionResolver {
         Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
 
-        TaggedCommits latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition);
-        VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(
-            latestTaggedCommit, false,
-            nextVersionTagPattern,
-            versionFactory,
-            forceSnapshot
-        );
+        TaggedCommits latestTaggedCommit;
+        TaggedCommits previousTaggedCommit;
+        if (useHighestVersions) {
+            TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
+            latestTaggedCommit = allTaggedCommits;
+            previousTaggedCommit = allTaggedCommits;
+        } else {
+            latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition);
+            previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
+        }
 
-        boolean onCommitWithLatestChange = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
-
-        TaggedCommits previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
-        VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern,
-            versionFactory, forceSnapshot);
-
-        Version currentVersion = currentVersionInfo.version;
-        Version previousVersion = previousVersionInfo.version;
-
-        return new VersionInfo(
-            currentVersion,
-            previousVersion,
-            (onCommitWithLatestChange && !currentVersionInfo.isNextVersion),
-            currentVersionInfo.isNextVersion,
-            currentVersionInfo.noTagsFound
-        );
-    }
-
-    private VersionInfo readVersionsByHighestVersion(
-        VersionFactory versionFactory,
-        final TagProperties tagProperties,
-        final NextVersionProperties nextVersionProperties,
-        VersionProperties versionProperties,
-        ScmPosition latestChangePosition
-    ) {
-
-        Pattern releaseTagPattern = Pattern.compile("^" + tagProperties.getPrefix() + ".*");
-        Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
-        boolean forceSnapshot = versionProperties.isForceSnapshot();
-
-        TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
-
-        VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(allTaggedCommits, false, nextVersionTagPattern, versionFactory, forceSnapshot);
-        VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(allTaggedCommits, true, nextVersionTagPattern, versionFactory, forceSnapshot);
+        VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern, versionFactory, forceSnapshot);
+        VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern, versionFactory, forceSnapshot);
 
         Version currentVersion = currentVersionInfo.version;
         Version previousVersion = previousVersionInfo.version;
 
-        boolean onCommitWithLatestChange = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
+        boolean onLatestVersion;
+        if (projectRootRelativePath.isEmpty()) {
+            // Regular case, enough to test if its the same commit
+            onLatestVersion = currentVersionInfo.isSameCommit(latestChangePosition.getRevision());
+        } else {
+            // Here we must check if there are git differences for the path example case path subProj1:
+            // A(last changes in subProj1) -> B -> C(tag 1.3.0) -> D -> E(head)
+            // Now if we test for anywhere from C to E we should get 1.3.0
+            String tagCommitRevision = currentVersionInfo.commit != null ? currentVersionInfo.commit : "";
+            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
+        }
+
 
         return new VersionInfo(
             currentVersion,
             previousVersion,
-            (onCommitWithLatestChange && !currentVersionInfo.isNextVersion),
+            (onLatestVersion && !currentVersionInfo.isNextVersion),
             currentVersionInfo.isNextVersion,
             currentVersionInfo.noTagsFound
         );
+
     }
 
     private VersionSorter.Result versionFromTaggedCommits(TaggedCommits taggedCommits, boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory, boolean forceSnapshot) {

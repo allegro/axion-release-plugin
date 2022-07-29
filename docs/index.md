@@ -1,7 +1,10 @@
-# axion-release-plugin
+---
+hide:
+- toc
+---
 
 Gradle release and version management plugin documentation.
-See [Github project](http://github.com/allegro/axion-release-plugin) 
+See [Github project](http://github.com/allegro/axion-release-plugin)
 for the source code and motivation for creating this plugin.
 
 ## Basic workflow
@@ -37,8 +40,5 @@ $ ./gradlew currentVersion
 1.0.0-SNAPSHOT
 ```
 
-Note: `publish` task comes from Gradle [maven-publish](https://docs.gradle.org/current/userguide/publishing_maven.html) plugin.
-
-## Changelog
-
-[Project changelog](changelog.md).
+Note: `publish` task comes from Gradle [maven-publish](https://docs.gradle.org/current/userguide/publishing_maven.html)
+plugin.

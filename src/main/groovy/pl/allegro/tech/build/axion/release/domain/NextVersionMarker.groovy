@@ -23,15 +23,15 @@ class NextVersionMarker {
             nextVersion = nextVersionRules.nextVersion
         } else {
             Version currentVersion = Version.valueOf(versionConfig.undecoratedVersion)
-            VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position())
+            VersionIncrementerContext context = new VersionIncrementerContext(currentVersion, repositoryService.position(), repositoryService.isLegacyDefTagnameRepo())
             nextVersion = nextVersionRules.versionIncrementer ?
-                PredefinedVersionIncrementer.versionIncrementerFor(nextVersionRules.versionIncrementer)(context) :
-                versionConfig.versionIncrementer(context)
+                PredefinedVersionIncrementer.versionIncrementerFor(nextVersionRules.versionIncrementer).apply(context) :
+                versionConfig.versionIncrementer.apply(context)
             logger.info("Next Version not specified. Creating next version with default incrementer: $nextVersion")
         }
 
-        String tagName = tagRules.serialize(tagRules, nextVersion.toString())
-        String nextVersionTag = nextVersionRules.serializer(nextVersionRules, tagName)
+        String tagName = tagRules.serialize.apply(tagRules, nextVersion.toString())
+        String nextVersionTag = nextVersionRules.serializer.apply(nextVersionRules, tagName)
 
         logger.quiet("Creating next version marker tag: $nextVersionTag")
         repositoryService.tag(nextVersionTag)

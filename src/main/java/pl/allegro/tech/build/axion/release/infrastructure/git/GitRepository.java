@@ -9,6 +9,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.util.io.DisabledOutputStream;
+import org.eclipse.jgit.diff.DiffFormatter;
 import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.scm.*;
 
@@ -246,14 +249,29 @@ public class GitRepository implements ScmRepository {
             return currentPosition;
         }
 
-        String revision = lastCommit.getName();
-        if (revision.equals(currentPosition.getRevision())) {
-            return currentPosition;
-        } else {
-            return new ScmPosition(
-                revision,
-                currentPosition.getBranch()
-            );
+        return new ScmPosition(
+            lastCommit.getName(),
+            currentPosition.getBranch()
+        );
+    }
+
+    @Override
+    public Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision) {
+        if (latestChangeRevision.isEmpty() || tagCommitRevision.isEmpty()) {
+            return false;
+        }
+        if (latestChangeRevision.equals(tagCommitRevision)) {
+            return true;
+        }
+        try {
+            ObjectId lastChange = jgitRepository.getRepository().resolve(latestChangeRevision);
+            ObjectId taggedCommit = jgitRepository.getRepository().resolve(tagCommitRevision);
+            DiffFormatter diffFormatter = new DiffFormatter(DisabledOutputStream.INSTANCE);
+            diffFormatter.setPathFilter(PathFilter.create(asUnixPath(path)));
+            diffFormatter.setRepository(jgitRepository.getRepository());
+            return diffFormatter.scan(lastChange, taggedCommit).isEmpty();
+        } catch (IOException e) {
+            throw new ScmException(e);
         }
     }
 
@@ -296,7 +314,7 @@ public class GitRepository implements ScmRepository {
             .map(Repository::shortenRefName)
             .orElse(null);
 
-        if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null) {
+        if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
             branchName = Repository.shortenRefName(properties.getOverriddenBranchName());
         }
 
@@ -495,5 +513,8 @@ public class GitRepository implements ScmRepository {
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
+    }
+    public Git getJgitRepository(){
+        return jgitRepository;
     }
 }

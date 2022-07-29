@@ -1,30 +1,22 @@
 package pl.allegro.tech.build.axion.release.domain.hooks;
 
-import groovy.lang.Closure;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
-
-import java.util.function.BiFunction;
+import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHookFactory.CustomAction;
 
 public class CommitHookAction implements ReleaseHookAction {
 
-    private final Closure customAction;
+    private final CustomAction customAction;
 
-    public CommitHookAction(Closure customAction) {
+    public CommitHookAction(CustomAction customAction) {
         this.customAction = customAction;
     }
 
     public CommitHookAction() {
-        this(new Closure<String>(null) {
-            @Override
-            public String call(Object... args) {
-                return "Release version: " + args[0];
-            }
-        });
+        this((hookContext) -> "Release version: " + hookContext.getCurrentVersion());
     }
 
     @Override
     public void act(HookContext hookContext) {
-        String message = (customAction.call(hookContext.getCurrentVersion(), hookContext.getPosition())).toString();
+        String message = (customAction.apply(hookContext)).toString();
         hookContext.commit(hookContext.getPatternsToCommit(), message);
     }
 
@@ -35,7 +27,7 @@ public class CommitHookAction implements ReleaseHookAction {
         }
 
         @Override
-        public ReleaseHookAction create(Closure customAction) {
+        public ReleaseHookAction create(CustomAction customAction) {
             return new CommitHookAction(customAction);
         }
 

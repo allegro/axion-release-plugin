@@ -1,36 +1,19 @@
-import com.bmuschko.gradle.docker.tasks.container.DockerCreateContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStartContainer
-import com.bmuschko.gradle.docker.tasks.container.DockerStopContainer
-import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
-import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-
 plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
     id 'groovy'
     id 'java-gradle-plugin'
-    id 'maven'
     id 'maven-publish'
     id 'signing'
     id 'jacoco'
-    id 'pl.allegro.tech.build.axion-release' version '1.13.0'
-    id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'com.gradle.plugin-publish' version '0.12.0'
-    id 'io.github.gradle-nexus.publish-plugin' version '1.0.0'
-    id 'com.coditory.integration-test' version "1.0.5"
-    id 'com.adarshr.test-logger' version '2.1.1'
-    id 'com.github.johnrengelman.shadow' version '6.1.0'
-    id 'com.bmuschko.docker-remote-api' version '3.2.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.13.14'
+    id 'com.github.kt3k.coveralls' version '2.12.0'
+    id 'com.gradle.plugin-publish' version '0.21.0'
+    id 'io.github.gradle-nexus.publish-plugin' version '1.1.0'
+    id 'com.coditory.integration-test' version "1.4.2"
+    id 'com.adarshr.test-logger' version '3.0.0'
 }
 
 scmVersion {
-    tag {
-        prefix = 'axion-release-'
-    }
-
-    hooks {
-        pre 'fileUpdate', [files: ['README.md', 'mkdocs.yml'], pattern: { v, p -> /'$v'/ }, replacement: { v, p -> "'$v'" }]
-        pre 'commit'
-    }
-
     versionCreator 'versionWithBranch'
 }
 
@@ -38,18 +21,25 @@ group = 'pl.allegro.tech.build'
 version = scmVersion.version
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    withSourcesJar()
+    withJavadocJar()
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
 }
 
 repositories {
     mavenCentral()
-    jcenter()
+    maven {
+        name = 'ajoberstar-backup'
+        url = 'https://ajoberstar.org/bintray-backup/'
+    }
 }
 
 project.ext.versions = [
-        jgit: '5.10.0.202012080955-r',
-        jsch: '0.1.55',
-        jschAgent: '0.0.9'
+    jgit     : '5.12.0.202106070339-r',
+    jsch     : '0.1.55',
+    jschAgent: '0.0.9'
 ]
 
 sourceSets {
@@ -57,28 +47,14 @@ sourceSets {
         java { srcDirs = [] }    // no source dirs for the java compiler
         groovy { srcDirs = ["src/main/java", "src/main/groovy"] }  // compile   everything in src/ with groovy
     }
-
-    remoteTest {
-        java.srcDir project.file('src/test-remote/java')
-        groovy.srcDir project.file('src/test-remote/groovy')
-
-        resources.srcDir project.file('src/test-remote/resources')
-        resources.srcDir project.sourceSets.test.resources
-        resources.srcDir project.sourceSets.main.resources
-
-        compileClasspath = project.sourceSets.main.output +
-            project.sourceSets.test.output +
-            project.configurations.testRuntime
-        runtimeClasspath = output + compileClasspath
-    }
 }
 
 dependencies {
-    shadow gradleApi()
-    shadow localGroovy()
+    api localGroovy()
 
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
     runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
 
@@ -92,80 +68,35 @@ dependencies {
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
-    testCompile (group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.0.1') {
+    testImplementation(group: 'org.ajoberstar.grgit', name: 'grgit-core', version: '4.1.0') {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit.ui'
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testCompile group: 'org.spockframework', name: 'spock-core', version: '1.3-groovy-2.5'
-    testCompile group: 'cglib', name: 'cglib-nodep', version: '3.1'
-    testCompile group: 'org.objenesis', name: 'objenesis', version: '2.4'
-    testCompile group: 'org.apache.sshd', name: 'sshd-core', version: '1.6.0'
-    testCompile group: 'org.apache.sshd', name: 'sshd-git', version: '1.6.0'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-2.5'
+    testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.3.0'
+    testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.2'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '2.8.0'
+    testImplementation group: 'org.apache.sshd', name: 'sshd-git', version: '2.8.0'
 
-    testCompile gradleTestKit()
+    testImplementation gradleTestKit()
 }
 
-shadowJar {
-    minimize()
+tasks.withType(Test) {
+    useJUnitPlatform()
 }
 
-task relocateShadowJar(type: ConfigureShadowRelocation) {
-    target = tasks.shadowJar
+tasks.check.dependsOn test, integrationTest
+
+// set kotlin to depend on groovy
+tasks.named("compileKotlin") {
+    classpath += files(sourceSets.main.groovy.classesDirectory)
 }
 
-tasks.shadowJar.dependsOn tasks.relocateShadowJar
-
-
-shadowJar {
-    archiveClassifier.set('')
-}
-
-project.configurations {
-    remoteTest {
-        extendsFrom project.configurations.testRuntime
-        description = 'Dependencies for tests with Docker'
-        transitive = true
-        visible = true
-    }
-}
-
-task buildDockerImage(type: DockerBuildImage) {
-    inputDir = file('docker')
-    tag = 'test/axion-release-remote:latest'
-}
-
-task createDockerContainer(type: DockerCreateContainer) {
-    dependsOn buildDockerImage
-    targetImageId { buildDockerImage.getImageId() }
-    portBindings = ['2222:22']
-}
-
-task startDockerContainer(type: DockerStartContainer) {
-    dependsOn createDockerContainer
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-task stopDockerContainer(type: DockerStopContainer) {
-    targetContainerId { createDockerContainer.getContainerId() }
-}
-
-task remoteTest(type: Test) {
-    testClassesDirs = project.sourceSets.remoteTest.output.classesDirs
-    classpath = project.sourceSets.main.output +
-        project.sourceSets.test.output +
-        project.sourceSets.remoteTest.runtimeClasspath +
-        project.configurations.testRuntime +
-        project.configurations.remoteTestRuntime
-
-    dependsOn startDockerContainer
-    finalizedBy stopDockerContainer
-}
-
-tasks.check.dependsOn integrationTest, remoteTest
-
-gradlePlugin {
-    testSourceSets project.sourceSets.integration
+// set groovy to not depend on Kotlin
+tasks.named("compileGroovy") {
+    classpath = sourceSets.main.compileClasspath
 }
 
 jacoco {
@@ -174,8 +105,19 @@ jacoco {
 
 jacocoTestReport {
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
+    }
+}
+
+gradlePlugin {
+    testSourceSets project.sourceSets.integration
+    plugins {
+        release {
+            id = 'pl.allegro.tech.build.axion-release'
+            displayName = 'axion-release-plugin'
+            implementationClass = 'pl.allegro.tech.build.axion.release.ReleasePlugin'
+        }
     }
 }
 
@@ -184,45 +126,38 @@ pluginBundle {
     vcsUrl = 'https://github.com/allegro/axion-release-plugin'
     description = 'Release and version management plugin.'
     tags = ['release', 'version']
-
-    plugins {
-        release {
-            id = 'pl.allegro.tech.build.axion-release'
-            displayName = 'axion-release-plugin'
-        }
-    }
-
-    mavenCoordinates {
-        groupId = 'pl.allegro.tech.build'
-        artifactId = 'axion-release-plugin'
-    }
 }
 
 publishing {
-    publications {
-        sonatype(MavenPublication) { publication ->
-            from project.shadow.component(publication)
-            pom {
-                name = project.name
-                description = 'Gradle release and version management plugin'
-                url = 'https://github.com/allegro/axion-release-plugin'
-                inceptionYear = '2014'
-                licenses {
-                    license {
-                        name = 'The Apache License, Version 2.0'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'adamdubiel'
-                        name = 'Adam Dubiel'
-                    }
-                }
-                scm {
+    afterEvaluate {
+        publications {
+            withType(MavenPublication) {
+                pom {
+                    name = project.name
+                    description = 'Gradle release and version management plugin'
                     url = 'https://github.com/allegro/axion-release-plugin'
-                    connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
-                    developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    inceptionYear = '2014'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'adamdubiel'
+                            name = 'Adam Dubiel'
+                        }
+                        developer {
+                            id = 'bgalek'
+                            name = 'Bartosz Gałek'
+                        }
+                    }
+                    scm {
+                        url = 'https://github.com/allegro/axion-release-plugin'
+                        connection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                        developerConnection = 'scm:git@github.com:allegro/axion-release-plugin.git'
+                    }
                 }
             }
         }
@@ -245,6 +180,6 @@ if (System.getenv("GPG_KEY_ID")) {
             System.getenv("GPG_PRIVATE_KEY"),
             System.getenv("GPG_PRIVATE_KEY_PASSWORD")
         )
-        sign publishing.publications.sonatype
+        sign publishing.publications
     }
 }

@@ -4,20 +4,31 @@ import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.api.TransportConfigCallback
 import org.eclipse.jgit.transport.SshTransport
 import org.eclipse.jgit.transport.Transport
+import org.testcontainers.containers.GenericContainer
+import org.testcontainers.images.builder.ImageFromDockerfile
+import org.testcontainers.spock.Testcontainers
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
+import spock.lang.Shared
 import spock.lang.Specification
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import java.nio.file.Paths
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
+
+@Testcontainers
 class RemoteRejectionTest extends Specification {
 
-    // defined in Docker run script in build.gradle
-    private static final int SSH_PORT = 2222
+    @Shared
+    GenericContainer gitServerContainer = new GenericContainer(
+        new ImageFromDockerfile("test/axion-release-remote:latest", true)
+            .withDockerfile(Paths.get("docker/Dockerfile")))
+        .withExposedPorts(22)
+
 
     def "should return error on push failure"() {
         given:
@@ -32,7 +43,7 @@ class RemoteRejectionTest extends Specification {
                     sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
                 }
             })
-            .setURI("ssh://git@localhost:${SSH_PORT}/git-server/repos/rejecting-repo")
+            .setURI("ssh://git@${gitServerContainer.getContainerIpAddress()}:${gitServerContainer.firstMappedPort}/git-server/repos/rejecting-repo")
             .call()
 
         GitRepository repository = new GitRepository(ScmPropertiesBuilder.scmProperties(repoDir).build())

@@ -8,7 +8,6 @@ import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactory
 
 class RulesFactory {
 

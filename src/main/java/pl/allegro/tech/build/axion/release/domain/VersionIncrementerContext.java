@@ -7,10 +7,16 @@ public class VersionIncrementerContext {
 
     private final Version currentVersion;
     private final ScmPosition scmPosition;
+    private final boolean isLegacyDefTagnameRepo;
 
-    public VersionIncrementerContext(Version currentVersion, ScmPosition scmPosition) {
+    public VersionIncrementerContext(Version currentVersion, ScmPosition scmPosition, boolean isLegacyDefTagnameRepo) {
         this.currentVersion = currentVersion;
         this.scmPosition = scmPosition;
+        this.isLegacyDefTagnameRepo = isLegacyDefTagnameRepo;
+    }
+
+    public VersionIncrementerContext(Version currentVersion, ScmPosition scmPosition) {
+        this(currentVersion, scmPosition, false);
     }
 
     public Version getCurrentVersion() {
@@ -19,5 +25,9 @@ public class VersionIncrementerContext {
 
     public ScmPosition getScmPosition() {
         return scmPosition;
+    }
+
+    public boolean isLegacyDefTagnameRepo() {
+        return isLegacyDefTagnameRepo;
     }
 }

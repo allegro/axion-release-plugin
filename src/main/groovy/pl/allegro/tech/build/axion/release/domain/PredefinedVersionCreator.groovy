@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+
+import java.util.function.BiFunction
 
 enum PredefinedVersionCreator {
 
@@ -9,7 +12,7 @@ enum PredefinedVersionCreator {
     }),
 
     VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
-        if (position.branch != 'master' && position.branch != 'HEAD') {
+        if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD') {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
@@ -17,14 +20,14 @@ enum PredefinedVersionCreator {
 
     private final String type
 
-    final Closure versionCreator
+    final VersionProperties.Creator versionCreator
 
     private PredefinedVersionCreator(String type, Closure c) {
         this.type = type
         this.versionCreator = c
     }
 
-    static Closure versionCreatorFor(String type) {
+    static VersionProperties.Creator versionCreatorFor(String type) {
         PredefinedVersionCreator creator = values().find { it.type == type }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version creator with $type type. " +
@@ -32,4 +35,5 @@ enum PredefinedVersionCreator {
         }
         return creator.versionCreator
     }
+
 }

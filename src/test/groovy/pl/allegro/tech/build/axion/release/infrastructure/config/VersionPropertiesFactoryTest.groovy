@@ -23,14 +23,14 @@ class VersionPropertiesFactoryTest extends Specification {
 
     def "should copy non-project properties from VersionConfig object"() {
         given:
-        versionConfig.versionIncrementer = { new Version.Builder('1.2.3').build() }
+        versionConfig.versionIncrementer = {VersionIncrementerContext c -> new Version.Builder('1.2.3').build() }
         versionConfig.sanitizeVersion = false
 
         when:
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
 
         then:
-        rules.versionIncrementer() == new Version.Builder('1.2.3').build()
+        rules.versionIncrementer.apply(null) == new Version.Builder('1.2.3').build()
         rules.sanitizeVersion == versionConfig.sanitizeVersion
     }
 
@@ -123,7 +123,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
 
         then:
-        rules.versionCreator(null, null) == 'default'
+        rules.versionCreator.apply(null, null) == 'default'
     }
 
     def "should pick version creator suitable for current branch if defined in per branch creators"() {
@@ -137,7 +137,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator(null, null) == 'someBranch'
+        rules.versionCreator.apply(null, null) == 'someBranch'
     }
 
     def "should use predefined version creator when supplied with String in per branch creators"() {
@@ -151,7 +151,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0-someBranch'
+        rules.versionCreator.apply('1.0.0', scmPosition('someBranch')) == '1.0.0-someBranch'
     }
 
 
@@ -167,12 +167,12 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionCreator('1.0.0', scmPosition('someBranch')) == '1.0.0'
+        rules.versionCreator.apply('1.0.0', scmPosition('someBranch')) == '1.0.0'
     }
 
     def "should pick default version incrementer if none branch incrementers match"() {
         given:
-        versionConfig.versionIncrementer = { c -> c.currentVersion }
+        versionConfig.versionIncrementer = {VersionIncrementerContext c -> c.currentVersion }
         versionConfig.branchVersionIncrementer = [
             'some.*': { c -> c.currentVersion.incrementMajorVersion() }
         ]
@@ -181,7 +181,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'master')
 
         then:
-        rules.versionIncrementer(
+        rules.versionIncrementer.apply(
             new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(1)
     }
@@ -197,7 +197,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(
+        rules.versionIncrementer.apply(
             new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(2)
     }
@@ -213,7 +213,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(
+        rules.versionIncrementer.apply(
             new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(2)
     }
@@ -229,7 +229,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(
+        rules.versionIncrementer.apply(
             new VersionIncrementerContext(Version.forIntegers(1), scmPosition('someBranch'))
         ) == Version.forIntegers(1, 1)
     }
@@ -243,7 +243,7 @@ class VersionPropertiesFactoryTest extends Specification {
         VersionProperties rules = VersionPropertiesFactory.create(project, versionConfig, 'someBranch')
 
         then:
-        rules.versionIncrementer(
+        rules.versionIncrementer.apply(
             new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(2)
 

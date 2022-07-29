@@ -63,4 +63,8 @@ public class ScmService {
     public List<String> lastLogMessages(int messageCount) {
         return repository.lastLogMessages(messageCount);
     }
+
+    public boolean isLegacyDefTagnameRepo() {
+        return repository.isLegacyDefTagnameRepo();
+    }
 }

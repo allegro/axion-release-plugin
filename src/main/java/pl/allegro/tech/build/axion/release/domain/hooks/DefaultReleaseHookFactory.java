@@ -1,10 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain.hooks;
 
-import groovy.lang.Closure;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
-
 import java.util.Map;
-import java.util.function.BiFunction;
 
 public class DefaultReleaseHookFactory implements ReleaseHookFactory {
 
@@ -19,7 +15,7 @@ public class DefaultReleaseHookFactory implements ReleaseHookFactory {
     }
 
     @Override
-    public ReleaseHookAction create(Closure customAction) {
+    public ReleaseHookAction create(CustomAction customAction) {
         throw new UnsupportedOperationException(this.getClass() + " does not construct release hooks from Closure");
     }
 
