@@ -3,6 +3,7 @@ site_description: Gradle release & version mamangement plugin.
 site_author: allegro.tech
 
 repo_url: https://github.com/allegro/axion-release-plugin
+edit_uri: edit/main/docs/
 
 theme:
   name: material
