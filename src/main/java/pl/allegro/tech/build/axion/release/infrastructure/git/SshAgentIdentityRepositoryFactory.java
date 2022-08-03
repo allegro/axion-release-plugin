@@ -8,7 +8,8 @@ import com.jcraft.jsch.agentproxy.connector.PageantConnector;
 import com.jcraft.jsch.agentproxy.connector.SSHAgentConnector;
 import com.jcraft.jsch.agentproxy.usocket.JNAUSocketFactory;
 import com.jcraft.jsch.agentproxy.usocket.NCUSocketFactory;
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -23,7 +24,7 @@ import java.util.Optional;
  */
 class SshAgentIdentityRepositoryFactory {
 
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(SshAgentIdentityRepositoryFactory.class);
+    private static final Logger logger = Logging.getLogger(SshAgentIdentityRepositoryFactory.class);
 
     static Optional<IdentityRepository> tryToCreateIdentityRepository() {
         Connector connector;

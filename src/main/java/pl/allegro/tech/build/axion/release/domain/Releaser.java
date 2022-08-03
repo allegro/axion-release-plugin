@@ -1,8 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.Version;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 public class Releaser {
 
-    private final ReleaseLogger logger = ReleaseLogger.Factory.logger(Releaser.class);
+    private static final Logger logger = Logging.getLogger(Releaser.class);
     private final VersionService versionService;
     private final ScmService repository;
     private final ReleaseHooksRunner hooksRunner;

@@ -1,16 +1,17 @@
 package pl.allegro.tech.build.axion.release.domain.hooks
 
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.tasks.Internal
+import pl.allegro.tech.build.axion.release.domain.BaseExtension
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHookFactory.CustomAction
 
-import org.gradle.api.tasks.Input
+abstract class HooksConfig extends BaseExtension {
 
-class HooksConfig {
+    @Internal
+    abstract ListProperty<ReleaseHookAction> getPreReleaseHooks()
 
-    @Input
-    List<ReleaseHookAction> preReleaseHooks = []
-
-    @Input
-    List<ReleaseHookAction> postReleaseHooks = []
+    @Internal
+    abstract ListProperty<ReleaseHookAction> getPostReleaseHooks()
 
     void pre(ReleaseHookAction action) {
         pre({HookContext c -> action.act(c)})

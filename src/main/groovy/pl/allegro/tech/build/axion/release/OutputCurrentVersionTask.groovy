@@ -1,29 +1,31 @@
 package pl.allegro.tech.build.axion.release
 
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.Nested
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
-import pl.allegro.tech.build.axion.release.domain.VersionConfig
-import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
 import pl.allegro.tech.build.axion.release.infrastructure.output.OutputWriter
 
-class OutputCurrentVersionTask extends DefaultTask {
+import javax.inject.Inject
 
-    @Nested
+abstract class OutputCurrentVersionTask extends BaseAxionTask {
+
+    @Input
     @Optional
-    VersionConfig versionConfig
+    abstract Property<Boolean> getQuiet()
 
+    @Inject
     OutputCurrentVersionTask() {
         this.outputs.upToDateWhen { false }
+        getQuiet().convention(providers.gradleProperty("release.quiet").map({true})
+            .orElse(false))
     }
 
     @TaskAction
     void output() {
-        boolean quiet = project.hasProperty('release.quiet')
-        VersionConfig config = GradleAwareContext.configOrCreateFromProject(project, versionConfig)
+        boolean quiet = getQuiet().get()
 
-        String outputContent = config.version
+        String outputContent = versionConfig.version
         if (!quiet) {
             outputContent = '\nProject version: ' + outputContent
         }

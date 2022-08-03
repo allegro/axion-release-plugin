@@ -1,10 +1,10 @@
 package pl.allegro.tech.build.axion.release.infrastructure.output
 
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger
+import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
 
 class OutputWriter {
-
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(OutputWriter)
+    private static final Logger logger = Logging.getLogger(OutputWriter.class);
 
     void println(String text) {
         logger.quiet(text)

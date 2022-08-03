@@ -6,9 +6,9 @@ using `scmVersion.checks` properties:
 
     scmVersion {
         checks {
-            uncommittedChanges = false
-            aheadOfRemote = false
-            snapshotDependencies = false
+            uncommittedChanges.set(false)
+            aheadOfRemote.set(false)
+            snapshotDependencies.set(false)
         }
     }
 

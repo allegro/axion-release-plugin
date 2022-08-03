@@ -4,10 +4,12 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class NextVersionProperties {
 
+    @FunctionalInterface
     public interface Serializer {
         String apply(NextVersionProperties nextVersionProperties, String version);
     }
 
+    @FunctionalInterface
     public interface Deserializer {
         String apply(NextVersionProperties nextVersionProperties, ScmPosition position, String tag);
     }

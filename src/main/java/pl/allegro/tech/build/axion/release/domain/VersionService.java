@@ -36,13 +36,11 @@ public class VersionService {
             finalVersion = finalVersion + versionProperties.getSnapshotCreator().apply(version,  versionContext.getPosition());
         }
 
-
         return new DecoratedVersion(versionContext.getVersion().toString(), finalVersion, versionContext.getPosition(),
             versionContext.getPreviousVersion().toString());
     }
 
     public static class DecoratedVersion {
-
         private final String undecoratedVersion;
         private final String decoratedVersion;
         private final ScmPosition position;

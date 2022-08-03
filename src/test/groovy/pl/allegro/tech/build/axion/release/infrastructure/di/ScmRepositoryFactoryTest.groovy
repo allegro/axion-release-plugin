@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
@@ -17,13 +18,13 @@ class ScmRepositoryFactoryTest extends Specification {
 
     Project project
 
-    RepositoryConfig config = new RepositoryConfig()
+    RepositoryConfig config
 
     def setup() {
-        project = ProjectBuilder.builder().build()
+        project = Fixtures.project()
         Grgit.init(dir: project.rootDir)
 
-        config.directory = project.rootDir
+        config = Fixtures.repositoryConfig(project)
     }
 
     def "should return git repository by default"() {
@@ -36,7 +37,7 @@ class ScmRepositoryFactoryTest extends Specification {
 
     def "should return dummy repository when underlying repository is not initialized"() {
         given:
-        Project gitlessProject = ProjectBuilder.builder().build()
+        Project gitlessProject = Fixtures.project()
         ScmProperties properties = scmProperties(gitlessProject.rootDir).build()
 
         expect:

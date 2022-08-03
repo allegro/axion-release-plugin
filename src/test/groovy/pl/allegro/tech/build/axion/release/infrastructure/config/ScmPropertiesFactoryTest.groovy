@@ -1,24 +1,22 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import spock.lang.Specification
 
 class ScmPropertiesFactoryTest extends Specification {
 
-    private Project project = ProjectBuilder.builder().build()
-
-    private VersionConfig config = new VersionConfig(project)
+    private VersionConfig config = Fixtures.versionConfig()
 
     def "should return remote name and tagsOnly option from configuration when no flags on project"() {
         given:
-        config.repository.remote = 'someRemote'
-        config.repository.pushTagsOnly = true
+        config.repository.remote.set( 'someRemote')
+        config.repository.pushTagsOnly.set(true)
 
         when:
-        ScmProperties properties = ScmPropertiesFactory.create(project, config)
+        ScmProperties properties = ScmPropertiesFactory.create(config)
 
         then:
         properties.remote == 'someRemote'
@@ -27,14 +25,14 @@ class ScmPropertiesFactoryTest extends Specification {
 
     def "should return true for tagsOnly when enabled via project flag"() {
         given:
-        config.repository.pushTagsOnly = false
-        project.extensions.extraProperties.set('release.pushTagsOnly', true)
+        def project = Fixtures.project(['release.pushTagsOnly':''])
+        VersionConfig config = Fixtures.versionConfig(project)
+        config.repository.pushTagsOnly.set(false)
 
         when:
-        ScmProperties properties = ScmPropertiesFactory.create(project, config)
+        ScmProperties properties = ScmPropertiesFactory.create(config)
 
         then:
         properties.pushTagsOnly
     }
-
 }

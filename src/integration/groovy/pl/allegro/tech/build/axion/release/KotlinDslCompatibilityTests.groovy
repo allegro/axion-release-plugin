@@ -21,39 +21,31 @@ class KotlinDslCompatibilityTests extends Specification {
         }
 
         scmVersion {
-            localOnly = true
-            useHighestVersion = true
+            localOnly.set(true)
+            useHighestVersion.set(true)
             tag {
-                prefix = "release"
-                versionSeparator = "/"
+                prefix.set("release")
+                versionSeparator.set("/")
 
                 // configure via function calls
-                setDeserializer({ a,b,c -> "d" })
-                setSerializer( { a,b -> "c" })
+                deserializer({ a,b,c -> "d" })
+                serializer( { a,b -> "c" })
 
-                // assignment via Kotlin property extension
-//                tagNameSerializer = { a,b -> "c" }
-//                tagNameDeserializer = { a,b,c -> "d" }
-
-                // assignment to existing variables
-                serialize = TagProperties.Serializer({a,b -> "c"})
-                deserialize = TagProperties.Deserializer({a,b,c -> "d"})
+                // assignment to existing properties
+                serialize.set(TagProperties.Serializer({a,b -> "c"}))
+                deserialize.set(TagProperties.Deserializer({a,b,c -> "d"}))
             }
             repository {
-                type = "git"
+                type.set("git")
             }
             checks {
-                setAheadOfRemote(false)
-                setSnapshotDependencies(true)
+                aheadOfRemote.set(false)
+                snapshotDependencies.set(true)
             }
             nextVersion {
                 // function calls
-                setDeserializer( { a,b,c -> "d" })
-                setSerializer( {a,b -> "c"})
-
-                // assignment via Kotlin property extension
-//                versionSerializer = {a,b -> "c"}
-//                versionDeserializer = {a,b,c -> "d" }
+                deserializer( { a,b,c -> "d" })
+                serializer( {a,b -> "c"})
             }
             hooks {
                 pre({println("here")})
@@ -92,13 +84,13 @@ class KotlinDslCompatibilityTests extends Specification {
             monorepos {
             }
 
-            versionCreator = VersionProperties.Creator({a,b -> "c"})
+            versionCreator(VersionProperties.Creator({a,b -> "c"}))
             versionCreator({a,b -> "c"})
 
-            snapshotCreator = VersionProperties.Creator({a,b -> "c"})
+            snapshotCreator(VersionProperties.Creator({a,b -> "c"}))
             snapshotCreator({a,b -> "c"})
 
-            versionIncrementer = VersionProperties.Incrementer({a -> null})
+            versionIncrementer(VersionProperties.Incrementer({a -> null}))
             versionIncrementer({a -> null})
         }
 
@@ -109,7 +101,7 @@ class KotlinDslCompatibilityTests extends Specification {
         def result = GradleRunner.create()
             .withProjectDir(temporaryFolder)
             .withPluginClasspath()
-            .withArguments('currentVersion', '--stacktrace')
+            .withArguments('currentVersion')
             .build()
 
         then:

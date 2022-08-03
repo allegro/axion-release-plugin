@@ -10,19 +10,18 @@ class TagPropertiesFactory {
     static TagProperties create(TagNameSerializationConfig config, String currentBranch) {
         return new TagProperties(
             findPrefix(config, currentBranch),
-            config.versionSeparator,
-            config.serialize,
-            config.deserialize,
-            config.initialVersion
+            config.versionSeparator.get(),
+            config.serialize.get(),
+            config.deserialize.get(),
+            config.initialVersion.get()
         )
     }
 
     private static String findPrefix(TagNameSerializationConfig config, String currentBranch) {
-        String prefix = config.branchPrefix.findResult { pattern, prefix ->
+        String prefix = config.branchPrefix.get().findResult { pattern, prefix ->
             Pattern.compile(pattern).matcher(currentBranch).matches() ? prefix : null
         }
 
-        return prefix ?: config.prefix
+        return prefix ?: config.prefix.get()
     }
-
 }
