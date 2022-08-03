@@ -28,12 +28,19 @@ This replacement pattern will update any `version* x.x.x` occurrences in README.
 
 As of v1.13.8, configuration constructs are compatible with Gradle"s Kotlin DSL.  As the configuration is richly typed, IDE code completion will be available (for IDEs that provide this for Gradle Kotlin DSL build scripts)
 with these key configuration objects available for reference:
+
 * [VersionConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/VersionConfig.groovy)
+
 * [TagNameSerializationConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/TagNameSerializationConfig.groovy)
+
 * [HooksConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/hooks/HooksConfig.groovy)
+
 * [RepositoryConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/RepositoryConfig.groovy)
+
 * [MonorepoConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/MonorepoConfig.java)
+
 * [NextVersionConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/NextVersionConfig.java)
+
 * [ChecksConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/ChecksConfig.java)
 
 A full example showing most configurable elements:
