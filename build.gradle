@@ -74,7 +74,7 @@ dependencies {
     }
 
     testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
-    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-2.5'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.2-groovy-4.0'
     testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.3.0'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.3'
     testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '2.9.0'
