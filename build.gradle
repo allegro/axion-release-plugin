@@ -36,12 +36,6 @@ repositories {
     }
 }
 
-project.ext.versions = [
-    jgit     : '5.13.1.202206130422-r',
-    jsch     : '0.1.55',
-    jschAgent: '0.0.9'
-]
-
 sourceSets {
     main {
         java { srcDirs = [] }    // no source dirs for the java compiler
@@ -52,19 +46,19 @@ sourceSets {
 dependencies {
     api localGroovy()
 
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: versions.jgit
-    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: versions.jgit
-    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: versions.jgit
-    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: versions.jgit
-    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: versions.jgit
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.12.0.202106070339-r'
+    implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.jsch', version: '5.12.0.202106070339-r'
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ssh.apache', version: '5.12.0.202106070339-r'
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.ui', version: '5.12.0.202106070339-r'
+    runtimeOnly group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.gpg.bc', version: '5.12.0.202106070339-r'
 
-    implementation group: 'com.jcraft', name: 'jsch', version: versions.jsch
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.core', version: versions.jschAgent
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: versions.jschAgent
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: versions.jschAgent
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: versions.jschAgent
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: versions.jschAgent
-    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: versions.jschAgent
+    implementation group: 'com.jcraft', name: 'jsch', version: '0.1.55'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.core', version: '0.0.9'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.jsch', version: '0.0.9'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.sshagent', version: '0.0.9'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.pageant', version: '0.0.9'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-jna', version: '0.0.9'
+    implementation group: 'com.jcraft', name: 'jsch.agentproxy.usocket-nc', version: '0.0.9'
 
     implementation group: 'com.github.zafarkhaja', name: 'java-semver', version: '0.9.0'
 
@@ -73,8 +67,8 @@ dependencies {
         exclude group: 'org.eclipse.jgit', module: 'org.eclipse.jgit'
     }
 
-    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.15.3'
-    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.0-groovy-2.5'
+    testImplementation group: 'org.testcontainers', name: 'spock', version: '1.17.3'
+    testImplementation group: 'org.spockframework', name: 'spock-core', version: '2.2-groovy-2.5'
     testImplementation group: 'cglib', name: 'cglib-nodep', version: '3.3.0'
     testImplementation group: 'org.objenesis', name: 'objenesis', version: '3.3'
     testImplementation group: 'org.apache.sshd', name: 'sshd-core', version: '2.9.1'
