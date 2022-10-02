@@ -41,24 +41,28 @@ object Versions {
     const val jschAgent = "0.0.9"
 }
 
+/**
+ *  no source dirs for the java compiler
+ *  compile everything in src/ with groovy
+ */
 sourceSets {
     main {
-        java { setSrcDirs(emptyList<String>()) }    // no source dirs for the java compiler
+        java { setSrcDirs(emptyList<String>()) }
         withConvention(GroovySourceSet::class) {
             groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }  // compile everything in src/ with groovy
+        }
     }
 }
 
 dependencies {
     api(localGroovy())
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:${Versions.jgit}")
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:${Versions.jgit}")
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:${Versions.jgit}")
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:${Versions.jgit}")
 
+    implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:${Versions.jgit}")
     implementation("com.jcraft:jsch:${Versions.jsch}")
     implementation("com.jcraft:jsch.agentproxy.core:${Versions.jschAgent}")
     implementation("com.jcraft:jsch.agentproxy.jsch:${Versions.jschAgent}")
@@ -66,21 +70,18 @@ dependencies {
     implementation("com.jcraft:jsch.agentproxy.pageant:${Versions.jschAgent}")
     implementation("com.jcraft:jsch.agentproxy.usocket-jna:${Versions.jschAgent}")
     implementation("com.jcraft:jsch.agentproxy.usocket-nc:${Versions.jschAgent}")
-
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
-
-    testImplementation("org.testcontainers:spock:1.15.3")
-    testImplementation("org.spockframework:spock-core:2.0-groovy-2.5")
+    testImplementation("org.testcontainers:spock:1.17.3")
+    testImplementation("org.spockframework:spock-core:2.2-groovy-2.5")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.3")
     testImplementation("org.apache.sshd:sshd-core:2.9.1")
     testImplementation("org.apache.sshd:sshd-git:2.9.1")
-
     testImplementation(gradleTestKit())
 }
 
@@ -88,24 +89,29 @@ tasks {
     withType<Test>().configureEach {
         useJUnitPlatform()
     }
+
     named("check") {
         dependsOn(named("test"))
         dependsOn(named("integrationTest"))
     }
 
-    // set kotlin to depend on groovy
+    /**
+     * set kotlin to depend on groovy
+     */
     named<AbstractCompile>("compileKotlin") {
         classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
     }
 
-    // set groovy to not depend on Kotlin
+    /**
+     * set groovy to not depend on Kotlin
+     */
     named<AbstractCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
+
     jacocoTestReport {
         reports {
             xml.required.set(true)
-            html.required.set(true)
         }
     }
 }
