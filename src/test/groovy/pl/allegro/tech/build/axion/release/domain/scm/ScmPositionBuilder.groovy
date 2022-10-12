@@ -8,6 +8,8 @@ class ScmPositionBuilder {
 
     private String shortRevision = 'c143976'
 
+    private boolean isClean = true
+
     private ScmPositionBuilder() {
     }
 
@@ -20,7 +22,7 @@ class ScmPositionBuilder {
     }
 
     ScmPosition build() {
-        return new ScmPosition(revision, shortRevision, branch)
+        return new ScmPosition(revision, shortRevision, branch, isClean)
     }
 
     ScmPositionBuilder withBranch(String branch) {
@@ -31,6 +33,11 @@ class ScmPositionBuilder {
     ScmPositionBuilder withRevision(String revision) {
         this.revision = revision
         this.shortRevision = revision.substring(0, 7)
+        return this
+    }
+
+    ScmPositionBuilder withUnclean() {
+        this.isClean = false
         return this
     }
 }

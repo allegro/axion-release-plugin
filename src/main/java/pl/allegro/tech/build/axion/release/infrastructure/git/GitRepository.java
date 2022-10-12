@@ -280,7 +280,8 @@ public class GitRepository implements ScmRepository {
 
         return new ScmPosition(
             lastCommit.getName(),
-            currentPosition.getBranch()
+            currentPosition.getBranch(),
+            currentPosition.getIsClean()
         );
     }
 
@@ -326,8 +327,10 @@ public class GitRepository implements ScmRepository {
                 revision = head.name();
             }
 
+            boolean isClean = !checkUncommittedChanges();
+
             String branchName = branchName();
-            return new ScmPosition(revision, branchName);
+            return new ScmPosition(revision, branchName, isClean);
         } catch (IOException e) {
             throw new ScmException(e);
         }
