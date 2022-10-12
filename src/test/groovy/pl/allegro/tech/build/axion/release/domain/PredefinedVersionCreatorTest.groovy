@@ -23,6 +23,16 @@ class PredefinedVersionCreatorTest extends Specification {
         PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('branch')) == 'version-branch'
     }
 
+    def "versionWithCommitHash version creator should return simple version when on main"() {
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('main')) == 'version'
+    }
+
+    def "versionWithCommitHash version creator should return version with appended short SHA-1 hash when not on main"() {
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('branch')) == 'version-c143976'
+    }
+
     def "should return version creator of given type"() {
         expect:
         PredefinedVersionCreator.versionCreatorFor('simple').apply('version', null) == 'version'

@@ -16,6 +16,13 @@ enum PredefinedVersionCreator {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
+    }),
+
+    VERSION_WITH_COMMIT_HASH('versionWithCommitHash', { String versionFromTag, ScmPosition position ->
+    if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD') {
+        return "$versionFromTag-$position.shortRevision".toString()
+    }
+    return versionFromTag
     })
 
     private final String type
