@@ -58,6 +58,7 @@ public class ScmPosition {
         return branch;
     }
 
+    @Input
     public boolean getIsClean() {
         return isClean;
     }
