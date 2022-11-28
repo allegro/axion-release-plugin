@@ -322,6 +322,18 @@ This version creator appends branch name to version unless you are on
     decorate(version: '0.1.0', branch: 'master') == 0.1.0
     decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
 
+#### versionWithCommitHash
+
+    scmVersion {
+        versionCreator('versionWithCommitHash')
+    }
+
+This version creator appends short SHA-1 hash to version unless you are on
+*main*/*master* or *detached HEAD*:
+
+    decorate(version: '0.1.0', branch: 'main') == 0.1.0
+    decorate(version: '0.1.0', branch: 'some-other-branch', revision: 'c1439767113643abda121896ee3fa42b500f16d0') == 0.1.0-c143976
+
 ### Custom version creator
 
 Custom version creators can be implemented by creating closure:
