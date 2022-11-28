@@ -3,7 +3,6 @@ axion-release-plugin
 
 *gradle release and version management plugin*
 
-[![Join the chat at https://gitter.im/allegro/axion-release-plugin](https://badges.gitter.im/allegro/axion-release-plugin.svg)](https://gitter.im/allegro/axion-release-plugin?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/allegro/axion-release-plugin/badge.svg?branch=development)](https://coveralls.io/r/allegro/axion-release-plugin)
 [![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ](http://axion-release-plugin.readthedocs.org/en/latest/)
