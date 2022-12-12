@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     signing
     jacoco
-    id("pl.allegro.tech.build.axion-release") version "1.14.2"
+    id("pl.allegro.tech.build.axion-release") version "1.14.3"
     id("com.github.kt3k.coveralls") version "2.12.0"
     id("com.gradle.plugin-publish") version "0.21.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
