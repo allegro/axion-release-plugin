@@ -28,7 +28,7 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
@@ -41,7 +41,7 @@ repositories {
 }
 
 project.ext.versions = [
-    jgit     : '5.12.0.202106070339-r',
+    jgit     : '6.4.0.202211300538-r',
     jsch     : '0.1.55',
     jschAgent: '0.0.9'
 ]
