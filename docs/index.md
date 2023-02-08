@@ -4,7 +4,7 @@ hide:
 ---
 
 Gradle release and version management plugin documentation.
-See [Github project](http://github.com/allegro/axion-release-plugin)
+See [GitHub project](http://github.com/allegro/axion-release-plugin)
 for the source code and motivation for creating this plugin.
 
 ## Basic workflow
