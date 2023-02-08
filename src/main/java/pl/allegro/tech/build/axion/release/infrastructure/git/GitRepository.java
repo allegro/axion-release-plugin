@@ -132,11 +132,9 @@ public class GitRepository implements ScmRepository {
     }
 
     public ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions, boolean all) {
-        PushCommand command = pushCommand(identity, pushOptions.getRemote(), all);
-
-        // command has to be called twice:
-        // once for commits (only if needed)
+        // push once for commits (only if needed)
         if (!pushOptions.isPushTagsOnly()) {
+            PushCommand command = pushCommand(identity, pushOptions.getRemote(), all);
             ScmPushResult result = verifyPushResults(callPush(command));
             if (!result.isSuccess()) {
                 return result;
@@ -144,7 +142,9 @@ public class GitRepository implements ScmRepository {
 
         }
 
-        // and another time for tags
+        // and again for tags
+        // Note: push commands can *not* be re-used.
+        PushCommand command = pushCommand(identity, pushOptions.getRemote(), all);
         return verifyPushResults(callPush(command.setPushTags()));
     }
 
