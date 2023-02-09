@@ -23,7 +23,7 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
@@ -48,7 +48,7 @@ sourceSets {
     }
 }
 
-val jgitVersion = "5.13.1.202206130422-r"
+val jgitVersion = "6.4.0.202211300538-r"
 val jschVersion = "0.1.55"
 val jschAgentVersion = "0.0.9"
 
