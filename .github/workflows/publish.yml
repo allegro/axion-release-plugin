@@ -14,10 +14,12 @@ jobs:
         with:
           fetch-depth: 0
       - uses: gradle/wrapper-validation-action@v1
-      - name: Set up JDK 1.8
+      - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+            distribution: 'temurin'
+            java-version: '11'
+            cache: 'gradle'
       - name: Publish to gradle
         run: ./gradlew publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}
         env:
