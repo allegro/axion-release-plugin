@@ -78,7 +78,7 @@ even though tag `T2` has higher version number. It all comes down to
 what is the history of current commit, not what has happened in
 repository in general.
 
-### Tag with highest version
+### Tag with the highest version
 
 Second mode is searching for highest version visible in the git tree's
 history. This means that all commits from HEAD till first commit will be
@@ -106,7 +106,7 @@ to:
     # ./gradlew currentVersion
     1.5.0
 
-You can also active this option using command line:
+You can also activate this option using command line:
 
     # ./gradlew currentVersion -Prelease.useHighestVersion
     1.5.0
@@ -185,8 +185,8 @@ Input objects have same structure as deserialization closure inputs.
 
 ## Incrementing
 
-Incrementing phase does incrementing the version in accordance with
-*version incrementer*. By default version patch (least significant)
+Incrementing phase does increment the version in accordance with
+*version incrementer*. By default, version patch (least significant)
 number is incremented. There are other predefined rules:
 
 -   *incrementPatch* - increment patch number
@@ -195,7 +195,7 @@ number is incremented. There are other predefined rules:
 -   *incrementMinorIfNotOnRelease* - increment patch number if on
     release branch. Increment minor otherwise
 -   *incrementPrerelease* - increment pre-release suffix if possible
-    (-rc1 to -rc2). Add `initialPreReleaseIfNotOnPrerelease` to increment patch with prerelase version. Increment patch otherwise
+    (-rc1 to -rc2). Add `initialPreReleaseIfNotOnPrerelease` to increment patch with pre-release version. Increment patch otherwise
 
 You can set one of predefined rules via `scmVersion.versionIncrementer`
 method:

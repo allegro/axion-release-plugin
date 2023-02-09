@@ -21,7 +21,7 @@ You can also change remote used to push changes:
         }
     }
 
-By default all changes are pushed to `origin`.
+By default, all changes are pushed to `origin`.
 
 In some cases (i.e. CI environments) the repository will be working in a
 `detached head` state, where a single commit is checked out without
