@@ -17,11 +17,11 @@ current release build:
 
     ./gradlew release -Prelease.disableChecks
 
-## Uncommited changes check
+## Uncommitted changes check
 
 This check seeks staged, but uncommitted changes in repository. It will
 stop the build if they are found. Since in some corner cases `JGit`
-behaves different than shell `git`, this task will print all staged and
+behaves different from shell `git`, this task will print all staged and
 unstaged changes as seen by plugin on failure:
 
     ./gradlew release
@@ -43,7 +43,7 @@ You can disable this check using either
 ## Ahead of remote check
 
 This check tries to verify if all local commits have been pushed to
-remote. In order to do so, it need full information about remote and
+remote. In order to do so, it needs full information about remote and
 HEAD commit, which might be lacking in CI environment (for more on CI
 build read [CI Servers](ci_servers.md)).
 

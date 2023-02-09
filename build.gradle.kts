@@ -35,12 +35,6 @@ repositories {
     }
 }
 
-object Versions {
-    const val jgit = "6.4.0.202211300538-r"
-    const val jsch = "0.1.55"
-    const val jschAgent = "0.0.9"
-}
-
 /**
  *  no source dirs for the java compiler
  *  compile everything in src/ with groovy
@@ -54,22 +48,26 @@ sourceSets {
     }
 }
 
+val jgitVersion = "6.4.0.202211300538-r"
+val jschVersion = "0.1.55"
+val jschAgentVersion = "0.0.9"
+
 dependencies {
     api(localGroovy())
 
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:${Versions.jgit}")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:${Versions.jgit}")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:${Versions.jgit}")
+    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:$jgitVersion")
+    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:$jgitVersion")
+    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:${Versions.jgit}")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:${Versions.jgit}")
-    implementation("com.jcraft:jsch:${Versions.jsch}")
-    implementation("com.jcraft:jsch.agentproxy.core:${Versions.jschAgent}")
-    implementation("com.jcraft:jsch.agentproxy.jsch:${Versions.jschAgent}")
-    implementation("com.jcraft:jsch.agentproxy.sshagent:${Versions.jschAgent}")
-    implementation("com.jcraft:jsch.agentproxy.pageant:${Versions.jschAgent}")
-    implementation("com.jcraft:jsch.agentproxy.usocket-jna:${Versions.jschAgent}")
-    implementation("com.jcraft:jsch.agentproxy.usocket-nc:${Versions.jschAgent}")
+    implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")
+    implementation("com.jcraft:jsch:$jschVersion")
+    implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.pageant:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.usocket-jna:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.usocket-nc:$jschAgentVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {

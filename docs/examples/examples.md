@@ -26,7 +26,7 @@ This replacement pattern will update any `version* x.x.x` occurrences in README.
 
 ## Use with Gradle Kotlin DSL
 
-As of v1.13.8, configuration constructs are compatible with Gradle"s Kotlin DSL.  As the configuration is richly typed, IDE code completion will be available (for IDEs that provide this for Gradle Kotlin DSL build scripts)
+As of v1.13.8, configuration constructs are compatible with Gradle's Kotlin DSL.  As the configuration is richly typed, IDE code completion will be available (for IDEs that provide this for Gradle Kotlin DSL build scripts)
 with these key configuration objects available for reference:
 
 * [VersionConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/VersionConfig.groovy)
@@ -54,7 +54,7 @@ scmVersion {
                 versionSeparator.set("/")
 
                 // configure via function calls
-                deserializer({ tagProperties,scmPostion,String -> "tag" })
+                deserializer({ tagProperties,scmPosition,String -> "tag" })
                 serializer( { tagProperties,version -> "tag" })
             }
             repository {
