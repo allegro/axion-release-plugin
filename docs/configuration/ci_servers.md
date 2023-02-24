@@ -117,6 +117,8 @@ In order to push tags into the repository release step must use GitHub actor and
               -Prelease.customUsername=${{ github.actor }} \
               -Prelease.customPassword=${{ github.token }}
 
+> Your GitHub token requires write permissions to successfully push tags into the repository.
+> You can grant write permissions to your token using `Settings -> Actions -> General -> Workflow permissions` option.
 
 ## GitLab CI
 
