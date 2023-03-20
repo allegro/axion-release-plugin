@@ -21,11 +21,13 @@ a release version. If there were any commits after last tag, project is in SNAPS
 intuitive philosophy, alongside with [Semantic Versioning](http://semver.org/) rules, makes it a lot easier to manage
 project versions along SCM tag versions.
 
+JDK11+ required.
+
 ## Basic usage
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.14.4'
+    id 'pl.allegro.tech.build.axion-release' version '1.15.0'
 }
 
 project.version = scmVersion.version
