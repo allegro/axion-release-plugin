@@ -1,5 +1,3 @@
-import java.util.Base64
-
 plugins {
     `kotlin-dsl`
     groovy
@@ -187,7 +185,7 @@ if (System.getenv("GPG_KEY_ID") != null) {
     signing {
         useInMemoryPgpKeys(
             System.getenv("GPG_KEY_ID"),
-            String(Base64.getDecoder().decode(System.getenv("GPG_PRIVATE_KEY_BASE64"))),
+            System.getenv("GPG_PRIVATE_KEY"),
             System.getenv("GPG_PRIVATE_KEY_PASSWORD")
         )
         sign(publishing.publications)

@@ -25,6 +25,9 @@ jobs:
         env:
           GRADLE_PORTAL_KEY: ${{ secrets.GRADLE_PORTAL_KEY }}
           GRADLE_PORTAL_SECRET: ${{ secrets.GRADLE_PORTAL_SECRET }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY_PASSWORD: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
       - name: Publish to maven central
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
         env:
