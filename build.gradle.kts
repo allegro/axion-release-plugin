@@ -49,7 +49,7 @@ sourceSets {
 }
 
 val jgitVersion = "6.5.0.202303070854-r"
-val jschVersion = "0.1.55"
+val jschVersion = "0.2.8"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -61,7 +61,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
     implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")
-    implementation("com.jcraft:jsch:$jschVersion")
+    implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion")
     implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion")
     implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion")
