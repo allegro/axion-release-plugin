@@ -62,13 +62,26 @@ dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
     implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")
     implementation("com.github.mwiede:jsch:$jschVersion")
-    implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.pageant:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-jna:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-nc:$jschAgentVersion")
+    implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.jcraft:jsch.agentproxy.pageant:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.jcraft:jsch.agentproxy.usocket-jna:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.jcraft:jsch.agentproxy.usocket-nc:$jschAgentVersion") {
+        exclude("com.jcraft", "jsch")
+    }
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.73")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
