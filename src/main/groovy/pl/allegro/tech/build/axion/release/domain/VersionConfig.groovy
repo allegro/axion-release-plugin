@@ -68,34 +68,27 @@ abstract class VersionConfig extends BaseExtension {
     final MonorepoConfig monorepoConfig = objects.newInstance(MonorepoConfig)
 
     @Internal
-    @Optional
     abstract Property<Boolean> getLocalOnly()
 
     @Internal
-    @Optional
     abstract Property<Boolean> getDryRun()
 
     @Internal
-    @Optional
     abstract Property<Boolean> getIgnoreUncommittedChanges()
 
     @Internal
-    @Optional
     abstract Property<Boolean> getUseHighestVersion();
 
     @Internal
     abstract MapProperty<String, Object> getBranchVersionIncrementer();
 
     @Internal
-    @Optional
     abstract Property<Pattern> getReleaseBranchPattern();
 
     @Internal
-    @Optional
     abstract Property<Boolean> getSanitizeVersion()
 
     @Internal
-    @Optional
     abstract Property<Boolean> getCreateReleaseCommit()
 
     @Internal
