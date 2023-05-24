@@ -106,6 +106,12 @@ scmVersion {
             monorepos {
             }
 
+            branchVersionIncrementer.putAll(
+                mapOf<String, Any>(
+                    "master" to VersionProperties.Incrementer { c: VersionIncrementerContext -> c.currentVersion.incrementMajorVersion() }
+                )
+            )
+
             versionCreator({versionFromTag,scmPosition -> "version"})
             snapshotCreator({versionFromTag,scmPosition -> "version"})
             versionIncrementer({versionIncrementerContext -> Version})
