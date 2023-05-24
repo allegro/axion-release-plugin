@@ -84,6 +84,12 @@ class KotlinDslCompatibilityTests extends Specification {
             monorepos {
             }
 
+            branchVersionIncrementer.putAll(
+                mapOf<String, Any>(
+                    "master" to VersionProperties.Incrementer { c: VersionIncrementerContext -> c.currentVersion.incrementMajorVersion() }
+                )
+            )
+
             versionCreator(VersionProperties.Creator({a,b -> "c"}))
             versionCreator({a,b -> "c"})
 

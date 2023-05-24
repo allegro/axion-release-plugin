@@ -67,10 +67,10 @@ class VersionPropertiesFactory {
 
         if (value == null) {
             return defaultValue
-        } else if (!(value instanceof Closure)) {
-            return converter.call(value)
-        } else {
+        } else if ((value instanceof Closure) || (value instanceof VersionProperties.Incrementer)) {
             return value
+        } else {
+            return converter.call(value)
         }
     }
 
