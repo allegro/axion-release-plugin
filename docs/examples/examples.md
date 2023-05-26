@@ -112,6 +112,12 @@ scmVersion {
                 )
             )
 
+            branchVersionCreator.putAll(
+                mapOf(
+                    "master" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "${s}-${scmPosition.branch}"}
+                )
+            )
+
             versionCreator({versionFromTag,scmPosition -> "version"})
             snapshotCreator({versionFromTag,scmPosition -> "version"})
             versionIncrementer({versionIncrementerContext -> Version})
