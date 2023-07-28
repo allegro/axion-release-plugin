@@ -11,6 +11,14 @@ enum PredefinedSnapshotCreator {
         return "-SNAPSHOT";
     }),
 
+    UNCLEAN('unclean', { String version, ScmPosition position ->
+        if (!position.isClean) {
+            return "-unclean-SNAPSHOT"
+        } else {
+            return "-SNAPSHOT";
+        };
+    }),
+
     private final String type
 
     final VersionProperties.Creator snapshotCreator
