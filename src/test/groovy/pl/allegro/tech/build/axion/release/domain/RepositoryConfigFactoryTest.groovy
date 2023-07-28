@@ -15,7 +15,7 @@ class RepositoryConfigFactoryTest extends Specification {
         RepositoryConfig config = Fixtures.repositoryConfig(project)
 
         then:
-        config.directory.asFile.get() == project.rootDir
+        new File(config.directory.get()) == project.rootDir
     }
 
     def "should not initialize authorization options when no flags on project"() {
