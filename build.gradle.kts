@@ -49,8 +49,6 @@ sourceSets {
 }
 
 val jgitVersion = "6.6.0.202305301015-r"
-val jschVersion = "0.1.55"
-val jschAgentVersion = "0.0.9"
 
 dependencies {
     api(localGroovy())
@@ -61,13 +59,7 @@ dependencies {
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
     implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")
-    implementation("com.jcraft:jsch:$jschVersion")
-    implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.pageant:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-jna:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-nc:$jschAgentVersion")
+    implementation("com.github.mwiede:jsch:0.2.10")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
