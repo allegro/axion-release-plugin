@@ -8,7 +8,7 @@ All `axion-release-plugin` configuration options:
         repository {
             // doc: Repository
             type.set("git") // type of repository
-            directory.set(project.rootProject.file("./")) // repository location
+            directory.set(project.rootProject.absolutePath) // repository location
             remote.set("origin") // remote name
 
             // doc: Authorization
