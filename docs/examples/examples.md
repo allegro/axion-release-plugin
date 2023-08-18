@@ -3,7 +3,7 @@
 ## Basic Allegro setup
 
 This is basic Allegro setup we use in most projects. Tag prefix is set to root project name
-and each version has branch name appended (unless on master). This allows us on publishing snapshots
+and each version has branch name appended (unless on *main*/*master*). This allows us on publishing snapshots
 of branches that are ready for testing:
 
     scmVersion {
