@@ -6,7 +6,7 @@ plugins {
     jacoco
     id("pl.allegro.tech.build.axion-release") version "1.15.4"
     id("com.github.kt3k.coveralls") version "2.12.2"
-    id("com.gradle.plugin-publish") version "1.2.0"
+    id("com.gradle.plugin-publish") version "1.2.1"
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
