@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import spock.lang.Specification
@@ -14,16 +15,16 @@ class TagPropertiesFactoryTest extends Specification {
     private VersionConfig config
 
     def setup() {
-        project = builder().build()
-        config = new VersionConfig(project)
+        project = Fixtures.project()
+        config = Fixtures.versionConfig(project)
     }
 
     def "should pick default prefix if none branch prefixes match"() {
         given:
-        config.tag.prefix = 'default-prefix'
-        config.tag.branchPrefix = [
+        config.tag.prefix.set( 'default-prefix')
+        config.tag.branchPrefix.set( [
                 'some.*': 'some-prefix'
-        ]
+        ])
 
         when:
         TagProperties tagProperties = TagPropertiesFactory.create(config.tag, 'master')

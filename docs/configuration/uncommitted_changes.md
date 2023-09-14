@@ -8,7 +8,7 @@ In order to treat uncommitted changes as trigger for version increment,
 change setting:
 
     scmVersion {
-        ignoreUncommittedChanges = false
+        ignoreUncommittedChanges.set(false)
     }
 
 This changes behavior from:

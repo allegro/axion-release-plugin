@@ -107,7 +107,6 @@ public class VersionResolver {
             }
         }
 
-
         return new VersionInfo(
             currentVersion,
             previousVersion,

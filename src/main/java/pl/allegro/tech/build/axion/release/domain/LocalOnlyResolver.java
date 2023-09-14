@@ -4,8 +4,8 @@ public class LocalOnlyResolver {
 
     private final boolean localOnly;
 
-    public LocalOnlyResolver(boolean baseValue) {
-        this.localOnly = baseValue;
+    public LocalOnlyResolver(boolean localOnly) {
+        this.localOnly = localOnly;
     }
 
     public boolean localOnly(boolean remoteAttached) {

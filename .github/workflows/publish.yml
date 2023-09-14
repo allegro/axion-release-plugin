@@ -8,25 +8,29 @@ jobs:
   publish:
 
     runs-on: ubuntu-latest
-    environment: ci
-    
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
       - uses: gradle/wrapper-validation-action@v1
-      - name: Set up JDK 1.8
-        uses: actions/setup-java@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 1.8
+            distribution: 'temurin'
+            java-version: '11'
+            cache: 'gradle'
       - name: Publish to gradle
         run: ./gradlew publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}
         env:
           GRADLE_PORTAL_KEY: ${{ secrets.GRADLE_PORTAL_KEY }}
           GRADLE_PORTAL_SECRET: ${{ secrets.GRADLE_PORTAL_SECRET }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PRIVATE_KEY_PASSWORD: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
       - name: Publish to maven central
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-        env:  
+        env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}

@@ -54,7 +54,7 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
         buildFile('''
         scmVersion {
             monorepos {
-                projectDirs = project.subprojects.collect({p -> p.name})
+                exclude(project.subprojects.collect({p -> p.name}))
             }
         }
         '''

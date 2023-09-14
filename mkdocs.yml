@@ -3,6 +3,7 @@ site_description: Gradle release & version mamangement plugin.
 site_author: allegro.tech
 
 repo_url: https://github.com/allegro/axion-release-plugin
+edit_uri: edit/main/docs/
 
 theme:
   name: material
@@ -15,9 +16,6 @@ theme:
 markdown_extensions:
   - toc:
       anchorlink: true
-
-extra:
-  version: '1.13.6'
 
 nav:
   - Home: 'index.md'
@@ -38,4 +36,5 @@ nav:
     - Publishing: 'configuration/publishing.md'
     - Dry run: 'configuration/dry_run.md'
     - CI Servers: 'configuration/ci_servers.md'
+    - Resolving dependency conflicts: 'configuration/resolving_dependency_conflicts.md'
     - Extensions: 'configuration/extensions.md'

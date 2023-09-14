@@ -4,14 +4,14 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
-import pl.allegro.tech.build.axion.release.infrastructure.DryRepository
+import pl.allegro.tech.build.axion.release.infrastructure.NoOpRepository
 import spock.lang.Specification
 
-class DryRepositoryTest extends Specification {
+class NoOpRepositoryTest extends Specification {
 
     ScmRepository scm = Mock(ScmRepository)
 
-    DryRepository dryRepository = new DryRepository(scm)
+    NoOpRepository dryRepository = new NoOpRepository(scm)
 
     def "should not create actual tags in scm"() {
         when:

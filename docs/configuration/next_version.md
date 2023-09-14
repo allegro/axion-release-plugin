@@ -45,8 +45,8 @@ using `scmVersion.nextVersion.suffix` and
 
     scmVersion {
         nextVersion {
-            suffix = 'alpha'
-            separator = '-'
+            suffix.set("alpha")
+            separator.set("-")
         }
     }
 
@@ -56,7 +56,7 @@ documentation to see what serializers and deserializers are:
 
     scmVersion {
         nextVersion {
-            serializer = { nextVersionConfig, version -> ...}
-            deserializer = { nextVersionConfig, position -> ...}
+            serializer( { nextVersionConfig, version -> ...})
+            deserializer( { nextVersionConfig, position -> ...})
         }
     }

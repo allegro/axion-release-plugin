@@ -1,77 +1,63 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.ChecksConfig
-import pl.allegro.tech.build.axion.release.domain.properties.ChecksProperties
 import spock.lang.Specification
 
 class ChecksPropertiesFactoryTest extends Specification {
 
-    private ChecksConfig config = new ChecksConfig()
-
-    private Project project = ProjectBuilder.builder().build()
-
     def "should return default value from config when no project properties are present"() {
         given:
-        config.aheadOfRemote = true
-        config.uncommittedChanges = true
-        config.snapshotDependencies = true
-
-        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+        ChecksConfig config = Fixtures.checksConfig(Fixtures.project())
+        config.aheadOfRemote.set(true)
+        config.uncommittedChanges.set(true)
+        config.snapshotDependencies.set(true)
 
         expect:
-        rules.checkUncommittedChanges
-        rules.checkAheadOfRemote
-        rules.checkSnapshotDependencies
+        config.checkUncommittedChanges().get()
+        config.checkAheadOfRemote().get()
+        config.checkSnapshotDependencies().get()
     }
 
     def "should always return false if checks are globally disabled using release.disableChecks"() {
         given:
-        project.extensions.extraProperties.set('release.disableChecks', true)
-        config.aheadOfRemote = true
-        config.uncommittedChanges = true
-        config.snapshotDependencies = true
-
-        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+        ChecksConfig config = Fixtures.checksConfig(Fixtures.project(['release.disableChecks' : ""]))
+        config.aheadOfRemote.set(true)
+        config.uncommittedChanges.set(true)
+        config.snapshotDependencies.set(true)
 
         expect:
-        !rules.checkUncommittedChanges
-        !rules.checkAheadOfRemote
-        !rules.checkSnapshotDependencies
+        !config.checkUncommittedChanges().get()
+        !config.checkAheadOfRemote().get()
+        !config.checkSnapshotDependencies().get()
     }
 
     def "should skip uncommitted changes check if it was disabled using project property"() {
         given:
-        project.extensions.extraProperties.set('release.disableUncommittedCheck', true)
-        config.uncommittedChanges = true
-
-        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+        ChecksConfig config = Fixtures.checksConfig(Fixtures.project(['release.disableUncommittedCheck' : ""]))
+        config.uncommittedChanges.set(true)
 
         expect:
-        !rules.checkUncommittedChanges
+        !config.checkUncommittedChanges().get()
     }
 
     def "should skip ahead of remote check if it was disabled using project property"() {
         given:
-        project.extensions.extraProperties.set('release.disableRemoteCheck', true)
-        config.aheadOfRemote = true
-
-        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+        ChecksConfig config = Fixtures.checksConfig(Fixtures.project(['release.disableRemoteCheck' : ""]))
+        config.aheadOfRemote.set(true)
 
         expect:
-        !rules.checkAheadOfRemote
+        !config.checkAheadOfRemote().get()
     }
 
     def "should skip snapshots check if it was disabled using project property"() {
         given:
-        project.extensions.extraProperties.set('release.disableSnapshotsCheck', true)
-        config.snapshotDependencies = true
-
-        ChecksProperties rules = ChecksPropertiesFactory.create(project, config)
+        ChecksConfig config = Fixtures.checksConfig(Fixtures.project(['release.disableSnapshotsCheck' : ""]))
+        config.snapshotDependencies.set(true)
 
         expect:
-        !rules.checkSnapshotDependencies
+        !config.checkSnapshotDependencies().get()
     }
 
 }

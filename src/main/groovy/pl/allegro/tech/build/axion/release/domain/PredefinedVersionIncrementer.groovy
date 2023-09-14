@@ -2,7 +2,9 @@ package pl.allegro.tech.build.axion.release.domain
 
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.TagPrefixConf
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
+import java.util.function.BiFunction
 import java.util.regex.Matcher
 
 import static java.lang.String.format
@@ -23,7 +25,7 @@ enum PredefinedVersionIncrementer {
 
     INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
         if (!config.releaseBranchPattern) {
-            config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.prefix() + '/.+'
+            config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.defaultPrefix() + '/.+'
         }
         if (context.scmPosition.branch ==~ config.releaseBranchPattern) {
             return context.currentVersion.incrementPatchVersion()
@@ -55,24 +57,26 @@ enum PredefinedVersionIncrementer {
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
         def incrementer = config.find { context.scmPosition.branch ==~ it.key }
-        return versionIncrementerFor(incrementer.value, config)(context)
+        return versionIncrementerFor(incrementer.value.toString(), config).apply(context)
     })
 
     private final String name
 
-    final Closure<Version> versionIncrementer
+    final VersionIncrementer versionIncrementer
 
     private PredefinedVersionIncrementer(String name, Closure<Version> c) {
         this.name = name
         this.versionIncrementer = c
     }
 
-    static Closure<Version> versionIncrementerFor(String name, Map configuration = [:]) {
+    static VersionProperties.Incrementer versionIncrementerFor(String name, Map configuration = [:]) {
         PredefinedVersionIncrementer creator = values().find { it.name == name }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
                 "You can choose from: ${values().collect { it.name }}")
         }
-        return { VersionIncrementerContext context -> creator.versionIncrementer(context, configuration) }
+        return { VersionIncrementerContext context -> creator.versionIncrementer.apply(context, configuration) }
     }
+
+    interface VersionIncrementer extends BiFunction<VersionIncrementerContext,Map,Version> {}
 }

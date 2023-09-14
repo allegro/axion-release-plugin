@@ -1,19 +1,24 @@
 package pl.allegro.tech.build.axion.release.domain;
 
+import org.gradle.api.provider.ListProperty;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class MonorepoConfig {
-    @Internal
-    private List<String> projectDirs = new LinkedList<>();
+public abstract class MonorepoConfig extends BaseExtension {
+    @Input
+    public abstract ListProperty<String> getProjectDirs();
 
-    public List<String> getProjectDirs() {
-        return projectDirs;
+    @Internal
+    public ListProperty<String> getExcludeDirs() { return getProjectDirs(); }
+
+    public void exclude(String dir) {
+        getProjectDirs().add(dir);
     }
 
-    public void setProjectDirs(List<String> projectDirs) {
-        this.projectDirs = projectDirs;
+    public void exclude(List<String> dirs) {
+        getProjectDirs().addAll(dirs);
     }
 }

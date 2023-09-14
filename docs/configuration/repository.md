@@ -9,7 +9,7 @@ property:
 
     scmVersion {
         repository {
-            directory = project.rootProject.file('../')
+            directory.set(project.rootProject.file('../'))
         }
     }
 
@@ -17,11 +17,11 @@ You can also change remote used to push changes:
 
     scmVersion {
         repository {
-            remote = 'myRemote'
+            remote.set("myRemote")
         }
     }
 
-By default all changes are pushed to `origin`.
+By default, all changes are pushed to `origin`.
 
 In some cases (i.e. CI environments) the repository will be working in a
 `detached head` state, where a single commit is checked out without
@@ -32,7 +32,7 @@ allowed even when a local branch is not checked out:
 
     scmVersion {
         repository {
-            pushTagsOnly = true
+            pushTagsOnly.set(true)
         }
     }
 

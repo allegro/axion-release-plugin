@@ -19,13 +19,14 @@ enum TagNameSerializer {
 
     private final String type
 
-    final Closure<String> serializer
+    final TagProperties.Serializer serializer
 
-    final Closure<String> deserializer
+    final TagProperties.Deserializer deserializer
 
-    private TagNameSerializer(String type, Closure serializer, Closure deserializer) {
+    private TagNameSerializer(String type, TagProperties.Serializer serializer, TagProperties.Deserializer deserializer) {
         this.type = type
         this.serializer = serializer
         this.deserializer = deserializer
     }
 }
+

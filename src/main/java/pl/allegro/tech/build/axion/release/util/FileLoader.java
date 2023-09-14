@@ -27,14 +27,6 @@ public final class FileLoader {
         }
     }
 
-    public static String readIfFile(Object potentialFile) {
-        if (potentialFile instanceof File) {
-            return readFrom(potentialFile);
-        }
-
-        return ((String) (potentialFile));
-    }
-
     public static File asFile(Object file) {
         if (file instanceof File) {
             return ((File) (file));

@@ -1,11 +1,13 @@
 package pl.allegro.tech.build.axion.release.domain.properties;
 
+import pl.allegro.tech.build.axion.release.domain.ChecksConfig;
+
 public class Properties {
 
     private final boolean dryRun;
     private final VersionProperties version;
     private final TagProperties tag;
-    private final ChecksProperties checks;
+    private final ChecksConfig checks;
     private final NextVersionProperties nextVersion;
     private final HooksProperties hooks;
 
@@ -13,7 +15,7 @@ public class Properties {
         boolean dryRun,
         VersionProperties version,
         TagProperties tag,
-        ChecksProperties checks,
+        ChecksConfig checks,
         NextVersionProperties nextVersion,
         HooksProperties hooks
     ) {
@@ -37,7 +39,7 @@ public class Properties {
         return tag;
     }
 
-    public final ChecksProperties getChecks() {
+    public final ChecksConfig getChecks() {
         return checks;
     }
 

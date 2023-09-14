@@ -1,62 +1,39 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
-import org.gradle.api.Project
+
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
 import java.util.regex.Pattern
 
 class VersionPropertiesFactory {
 
-    private static final String DEPRECATED_FORCE_VERSION_PROPERTY = 'release.forceVersion'
-
-    private static final String FORCE_VERSION_PROPERTY = 'release.version'
-
-    private static final String IGNORE_UNCOMMITTED_CHANGES_PROPERTY = 'release.ignoreUncommittedChanges'
-
-    private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
-
-    private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
-
-    private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
-
-    private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
-
-    static VersionProperties create(Project project, VersionConfig config, String currentBranch) {
-        String forceVersionValue = project.hasProperty(FORCE_VERSION_PROPERTY) ? project.property(FORCE_VERSION_PROPERTY) : null
-        if (forceVersionValue == null) {
-            forceVersionValue = project.hasProperty(DEPRECATED_FORCE_VERSION_PROPERTY) ? project.property(DEPRECATED_FORCE_VERSION_PROPERTY) : null
-        }
-
-        boolean ignoreUncommittedChanges = project.hasProperty(IGNORE_UNCOMMITTED_CHANGES_PROPERTY) ?: config.ignoreUncommittedChanges
-        boolean forceSnapshot = project.hasProperty(FORCE_SNAPSHOT_PROPERTY)
-
-        boolean useHighestVersion = project.hasProperty(USE_HIGHEST_VERSION_PROPERTY) ?: config.useHighestVersion
-
+    static VersionProperties create(VersionConfig config, String currentBranch) {
         return new VersionProperties(
-            forceVersionValue?.trim() ? forceVersionValue.trim() : null,
-            forceSnapshot,
-            ignoreUncommittedChanges,
-            findVersionCreator(project, config, currentBranch),
-            config.snapshotCreator,
-            findVersionIncrementer(project, config, currentBranch),
-            config.sanitizeVersion,
-            useHighestVersion,
-            MonorepoPropertiesFactory.create(project, config.monorepoConfig, currentBranch)
+            config.forcedVersion().getOrNull(),
+            config.forceSnapshot().get(),
+            config.ignoreUncommittedChanges().get(),
+            findVersionCreator(config, currentBranch),
+            config.snapshotCreator.get(),
+            findVersionIncrementer(config, currentBranch),
+            config.sanitizeVersion.get(),
+            config.useHighestVersion().get(),
+            config.monorepoConfig
         )
     }
 
-    private static Closure findVersionIncrementer(Project project, VersionConfig config, String currentBranch) {
-        if (project.hasProperty(VERSION_INCREMENTER_PROPERTY)) {
-            return PredefinedVersionIncrementer.versionIncrementerFor(project.property(VERSION_INCREMENTER_PROPERTY), [:])
+    private static VersionProperties.Incrementer findVersionIncrementer(VersionConfig config, String currentBranch) {
+        if( config.versionIncrementerType().isPresent()) {
+           return PredefinedVersionIncrementer.versionIncrementerFor(config.versionIncrementerType().get(), [:])
         }
 
-        return find(
+        return findVersionIncrementer(
             currentBranch,
-            config.branchVersionIncrementer,
-            config.versionIncrementer,
+            config.branchVersionIncrementer.get(),
+            { VersionIncrementerContext a -> config.versionIncrementer.get().apply(a) },
             { v ->
                 if (v instanceof List) {
                     return PredefinedVersionIncrementer.versionIncrementerFor(v[0], v[1])
@@ -66,31 +43,49 @@ class VersionPropertiesFactory {
         )
     }
 
-    private static Closure findVersionCreator(Project project, VersionConfig config, String currentBranch) {
-        if (project.hasProperty(VERSION_CREATOR_PROPERTY)) {
-            return PredefinedVersionCreator.versionCreatorFor(project.property(VERSION_CREATOR_PROPERTY))
+    private static VersionProperties.Creator findVersionCreator(VersionConfig config, String currentBranch) {
+        if (config.versionCreatorType().isPresent()) {
+            return PredefinedVersionCreator.versionCreatorFor(config.versionCreatorType().get())
         }
 
         return find(
             currentBranch,
-            config.branchVersionCreator,
-            config.versionCreator,
+            config.branchVersionCreator.get(),
+            config.versionCreator.get(),
             { String s -> PredefinedVersionCreator.versionCreatorFor(s) }
         )
     }
 
     private
-    static Closure find(String currentBranch, Map<String, Object> collection, Closure defaultValue, Closure<Closure> converter) {
+    static VersionProperties.Incrementer findVersionIncrementer(String currentBranch,
+                                                                Map<String, Object> collection,
+                                                                VersionProperties.Incrementer defaultValue,
+                                                                Closure<VersionProperties.Incrementer> converter) {
         Object value = collection?.findResult { pattern, value ->
             Pattern.matches(pattern, currentBranch) ? value : null
         }
 
         if (value == null) {
             return defaultValue
-        } else if (!(value instanceof Closure)) {
-            return converter.call(value)
-        } else {
+        } else if ((value instanceof Closure) || (value instanceof VersionProperties.Incrementer)) {
             return value
+        } else {
+            return converter.call(value)
+        }
+    }
+
+    private
+    static VersionProperties.Creator find(String currentBranch, Map<String, Object> collection, VersionProperties.Creator defaultValue, Closure<VersionProperties.Creator> converter) {
+        Object value = collection?.findResult { pattern, value ->
+            Pattern.matches(pattern, currentBranch) ? value : null
+        }
+
+        if (value == null) {
+            return defaultValue
+        } else if ((value instanceof Closure) || (value instanceof VersionProperties.Creator)) {
+            return value
+        } else {
+            return converter.call(value)
         }
     }
 }

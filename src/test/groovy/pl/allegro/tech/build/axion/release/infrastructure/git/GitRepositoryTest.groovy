@@ -16,7 +16,7 @@ import java.util.regex.Pattern
 
 import static java.util.regex.Pattern.compile
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.prefix
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class GitRepositoryTest extends Specification {
@@ -71,7 +71,7 @@ class GitRepositoryTest extends Specification {
 
         when:
         lightweightTagRepository.tag(fullPrefix() + '2')
-        TagsOnCommit tags = lightweightTagRepository.latestTags(compile('^' + prefix() + '.*'))
+        TagsOnCommit tags = lightweightTagRepository.latestTags(compile('^' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
@@ -132,7 +132,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after release")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + prefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -143,7 +143,7 @@ class GitRepositoryTest extends Specification {
         GitRepository commitlessRepository = GitProjectBuilder.gitProject(File.createTempDir('axion-release', 'tmp')).build()[GitRepository]
 
         when:
-        TagsOnCommit tags = commitlessRepository.latestTags(Pattern.compile('^' + prefix() + '.*'))
+        TagsOnCommit tags = commitlessRepository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == []
@@ -154,7 +154,7 @@ class GitRepositoryTest extends Specification {
         repository.tag(fullPrefix() + '1')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('' + prefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(Pattern.compile('' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -171,7 +171,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "bugfix after " + fullPrefix() + "1")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile("^" + prefix() + ".*"))
+        TagsOnCommit tags = repository.latestTags(Pattern.compile("^" + defaultPrefix() + ".*"))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -192,7 +192,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after " + fullPrefix() + "3")
 
         when:
-        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(Pattern.compile('^' + prefix() + '.*'))
+        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(Pattern.compile('^' + defaultPrefix() + '.*'))
 
         then:
         allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() +'3',fullPrefix() + '4', fullPrefix() + '2', fullPrefix() +'1']
@@ -205,7 +205,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('otherTag')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + prefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -232,7 +232,7 @@ class GitRepositoryTest extends Specification {
         repository.tag(fullPrefix() + '2')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + prefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
 
         then:
         tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
@@ -269,6 +269,26 @@ class GitRepositoryTest extends Specification {
         String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
         rawRepository.repository.jgit.checkout().setName(headCommitId).call()
 
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'HEAD'
+    }
+
+    def "should provide current branch name as HEAD when in detached state and overriddenBranchName is empty"() {
+        given:
+        File repositoryDir = File.createTempDir('axion-release', 'tmp')
+        def scmProperties = scmProperties(repositoryDir)
+            .withOverriddenBranchName("")
+            .build()
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).usingProperties(scmProperties).build()
+
+        Grgit rawRepository = repositories[Grgit]
+        GitRepository repository = repositories[GitRepository]
+
+        String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        rawRepository.repository.jgit.checkout().setName(headCommitId).call()
         when:
         ScmPosition position = repository.currentPosition()
 

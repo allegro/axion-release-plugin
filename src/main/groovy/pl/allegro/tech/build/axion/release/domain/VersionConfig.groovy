@@ -1,238 +1,249 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import org.gradle.api.Project
+import org.gradle.api.Action
+import org.gradle.api.file.Directory
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
-import pl.allegro.tech.build.axion.release.ReleasePlugin
-import pl.allegro.tech.build.axion.release.TagPrefixConf
+import org.gradle.api.tasks.Optional
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
-import pl.allegro.tech.build.axion.release.domain.properties.Properties
-import pl.allegro.tech.build.axion.release.infrastructure.di.Context
-import pl.allegro.tech.build.axion.release.infrastructure.di.GradleAwareContext
-import pl.allegro.tech.build.axion.release.util.FileLoader
+import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.infrastructure.di.MemoizedVersionSupplier
+import pl.allegro.tech.build.axion.release.infrastructure.di.VersionSupplier
 
 import javax.inject.Inject
 import java.util.regex.Pattern
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
 
-class VersionConfig {
+abstract class VersionConfig extends BaseExtension {
+    private final VersionSupplier versionSupplier = new VersionSupplier()
+    private final MemoizedVersionSupplier cachedVersionSupplier = new MemoizedVersionSupplier()
 
-    private final Project project
-
-    @Input
-    boolean localOnly = false
-
-    @Input
-    boolean dryRun
-
-    @Input
-    boolean ignoreUncommittedChanges = true
-
-    @Input
-    boolean useHighestVersion = false
-
-    @Nested
-    RepositoryConfig repository
-
-    @Nested
-    TagNameSerializationConfig tag = new TagNameSerializationConfig()
-
-    @Nested
-    Closure versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
-
-    @Nested
-    Closure snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
-
-    @Input
-    Map<String, Object> branchVersionCreator = [:]
-
-    @Nested
-    Closure versionIncrementer = { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() }
-
-    @Input
-    Map<String, Object> branchVersionIncrementer = [:]
-
-    @Input
-    Pattern releaseBranchPattern = Pattern.compile('^'+ prefix() + '(/.*)?$')
-
-    @Nested
-    ChecksConfig checks = new ChecksConfig()
-
-    @Input
-    boolean sanitizeVersion = true
-
-    @Input
-    boolean createReleaseCommit = false
-
-    @Nested
-    Closure releaseCommitMessage = PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator
-
-    @Nested
-    NextVersionConfig nextVersion = new NextVersionConfig()
-
-    @Nested
-    HooksConfig hooks = new HooksConfig()
-
-    @Nested
-    MonorepoConfig monorepoConfig = new MonorepoConfig()
-
-    private Context context
-
-    private VersionService.DecoratedVersion resolvedVersion = null
+    private static final String DRY_RUN_FLAG = 'release.dryRun'
+    private static final String IGNORE_UNCOMMITTED_CHANGES_PROPERTY = 'release.ignoreUncommittedChanges'
+    private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
+    private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
+    private static final String LOCAL_ONLY = "release.localOnly"
+    private static final String FORCE_VERSION_PROPERTY = 'release.version'
+    private static final String DEPRECATED_FORCE_VERSION_PROPERTY = 'release.forceVersion'
+    private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
+    private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
 
     @Inject
-    VersionConfig(Project project) {
-        this.project = project
-        FileLoader.setRoot(project.rootDir)
-
-        this.repository = RepositoryConfigFactory.create(project)
-        this.dryRun = project.hasProperty(ReleasePlugin.DRY_RUN_FLAG)
+    VersionConfig(Directory repositoryDirectory) {
+        getDryRun().convention(gradlePropertyPresent(DRY_RUN_FLAG).orElse(false))
+        getLocalOnly().convention(false)
+        getIgnoreUncommittedChanges().convention(true)
+        getUseHighestVersion().convention(false)
+        getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
+        getSanitizeVersion().convention(true)
+        getCreateReleaseCommit().convention(false)
+        getVersionCreator().convention(PredefinedVersionCreator.SIMPLE.versionCreator)
+        getVersionIncrementer().convention((VersionProperties.Incrementer) { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() })
+        getSnapshotCreator().convention(PredefinedSnapshotCreator.SIMPLE.snapshotCreator)
+        getReleaseCommitMessage().convention(PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator)
+        repository = objects.newInstance(RepositoryConfig, repositoryDirectory)
     }
 
-    void repository(Closure c) {
-        project.configure(repository, c)
+    @Nested
+    final RepositoryConfig repository
+
+    @Nested
+    final TagNameSerializationConfig tag = objects.newInstance(TagNameSerializationConfig)
+
+    @Nested
+    final ChecksConfig checks = objects.newInstance(ChecksConfig)
+
+    @Nested
+    final NextVersionConfig nextVersion = objects.newInstance(NextVersionConfig)
+
+    @Nested
+    final HooksConfig hooks = objects.newInstance(HooksConfig)
+
+    @Nested
+    final MonorepoConfig monorepoConfig = objects.newInstance(MonorepoConfig)
+
+    @Internal
+    abstract Property<Boolean> getLocalOnly()
+
+    @Internal
+    abstract Property<Boolean> getDryRun()
+
+    @Internal
+    abstract Property<Boolean> getIgnoreUncommittedChanges()
+
+    @Internal
+    abstract Property<Boolean> getUseHighestVersion();
+
+    @Internal
+    abstract MapProperty<String, Object> getBranchVersionIncrementer();
+
+    @Internal
+    abstract Property<Pattern> getReleaseBranchPattern();
+
+    @Internal
+    abstract Property<Boolean> getSanitizeVersion()
+
+    @Internal
+    abstract Property<Boolean> getCreateReleaseCommit()
+
+    @Internal
+    abstract Property<VersionProperties.Creator> getVersionCreator()
+
+    @Internal
+    abstract Property<VersionProperties.Creator> getSnapshotCreator()
+
+    @Internal
+    abstract MapProperty<String, Object> getBranchVersionCreator()
+
+    @Internal
+    abstract Property<VersionProperties.Incrementer> getVersionIncrementer()
+
+    @Internal
+    abstract Property<PredefinedReleaseCommitMessageCreator.CommitMessageCreator> getReleaseCommitMessage()
+
+    Provider<Boolean> ignoreUncommittedChanges() {
+        gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
+            .orElse(ignoreUncommittedChanges)
     }
 
-    void tag(Closure c) {
-        project.configure(tag, c)
+    Provider<Boolean> forceSnapshot() {
+        gradlePropertyPresent(FORCE_SNAPSHOT_PROPERTY).orElse(false)
     }
 
-    void checks(Closure c) {
-        project.configure(checks, c)
+    Provider<Boolean> useHighestVersion() {
+        gradlePropertyPresent(USE_HIGHEST_VERSION_PROPERTY).orElse(useHighestVersion)
     }
 
-    void nextVersion(Closure c) {
-        project.configure(nextVersion, c)
+    Provider<Boolean> localOnly() {
+        gradlePropertyPresent(LOCAL_ONLY).orElse(localOnly)
     }
 
-    void hooks(Closure c) {
-        project.configure(hooks, c)
+    Provider<String> forcedVersion() {
+        gradleProperty(FORCE_VERSION_PROPERTY)
+            .orElse(gradleProperty(DEPRECATED_FORCE_VERSION_PROPERTY))
+        .map({it.trim()})
+        .map({ it.isBlank() ? null : it})
+    }
+
+    Provider<String> versionIncrementerType() {
+        gradleProperty(VERSION_INCREMENTER_PROPERTY)
+    }
+
+    Provider<String> versionCreatorType() {
+        gradleProperty(VERSION_CREATOR_PROPERTY)
+    }
+
+    void repository(Action<RepositoryConfig> action) {
+        action.execute(repository)
+    }
+
+    void tag(Action<TagNameSerializationConfig> action) {
+        action.execute(tag)
+    }
+
+    void checks(Action<ChecksConfig> action) {
+        action.execute(checks)
+    }
+
+    void nextVersion(Action<NextVersionConfig> action) {
+        action.execute(nextVersion)
+    }
+
+    void hooks(Action<HooksConfig> action) {
+        action.execute(hooks)
+    }
+
+    void monorepos(Action<MonorepoConfig> action) {
+        action.execute(monorepoConfig)
     }
 
     void versionCreator(String type) {
-        this.versionCreator = PredefinedVersionCreator.versionCreatorFor(type)
+        this.versionCreator.set(PredefinedVersionCreator.versionCreatorFor(type))
     }
 
     @Deprecated
-    void releaseCommitMessage(Closure c) {
-        releaseCommitMessage = c
+    void releaseCommitMessage(PredefinedReleaseCommitMessageCreator.CommitMessageCreator commitMessageCreator) {
+        this.releaseCommitMessage.set(commitMessageCreator)
     }
 
     @Deprecated
     void createReleaseCommit(boolean createReleaseCommit) {
-        this.createReleaseCommit = createReleaseCommit
+        this.createReleaseCommit.set(createReleaseCommit)
     }
 
-    void versionCreator(Closure c) {
-        this.versionCreator = c
+    void versionCreator(VersionProperties.Creator versionCreator) {
+        this.versionCreator.set(versionCreator)
     }
 
-    void snapshotCreator(Closure c) {
-        this.snapshotCreator = c
+    void snapshotCreator(VersionProperties.Creator snapshotCreator) {
+        this.snapshotCreator.set(snapshotCreator)
     }
 
     void branchVersionCreator(Map<String, Object> creators) {
-        this.branchVersionCreator = creators
+        this.branchVersionCreator.putAll(creators)
     }
 
     void branchVersionCreators(Map<String, Object> creators) {
-        this.branchVersionCreator = creators
+        this.branchVersionCreator.putAll(creators)
     }
 
     void versionIncrementer(String ruleName) {
-        this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName)
+        this.versionIncrementer.set(PredefinedVersionIncrementer.versionIncrementerFor(ruleName))
     }
 
     void versionIncrementer(String ruleName, Map configuration) {
-        this.versionIncrementer = PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration)
+        this.versionIncrementer.set(PredefinedVersionIncrementer.versionIncrementerFor(ruleName, configuration))
     }
 
-    void versionIncrementer(Closure c) {
-        this.versionIncrementer = c
+    void versionIncrementer(VersionProperties.Incrementer versionIncrementer) {
+        this.versionIncrementer.set(versionIncrementer)
     }
 
     void branchVersionIncrementer(Map<String, Object> creators) {
-        this.branchVersionIncrementer = creators
+        this.branchVersionIncrementer.putAll(creators)
+    }
+
+    Provider<VersionService.DecoratedVersion> versionProvider() {
+        def cachedVersionSupplier = this.cachedVersionSupplier
+        providers.provider( { cachedVersionSupplier.resolve(this,layout.projectDirectory)})
+    }
+
+    Provider<VersionService.DecoratedVersion> uncachedVersionProvider() {
+        def versionSupplier = this.versionSupplier
+        providers.provider( { versionSupplier.resolve(this, layout.projectDirectory)})
+    }
+
+    @Nested
+    VersionService.DecoratedVersion getUncached() {
+        return uncachedVersionProvider().get()
     }
 
     @Input
     String getVersion() {
-        ensureVersionExists()
-        return resolvedVersion.decoratedVersion
+        return versionProvider().map({ it.decoratedVersion}).get()
     }
 
     @Input
     String getPreviousVersion() {
-        ensureVersionExists()
-        return resolvedVersion.previousVersion
+        return versionProvider().map({ it.previousVersion}).get()
     }
 
     @Input
     String getUndecoratedVersion() {
-        ensureVersionExists()
-        return resolvedVersion.undecoratedVersion
+        return versionProvider().map({ it.undecoratedVersion}).get()
     }
 
     @Nested
     VersionScmPosition getScmPosition() {
-        ensureVersionExists()
-        return new VersionScmPosition(
-            resolvedVersion.position.revision,
-            resolvedVersion.position.shortRevision,
-            resolvedVersion.position.branch
-        )
-    }
-
-    private void ensureVersionExists() {
-        if (resolvedVersion == null) {
-            resolvedVersion = getUncachedVersion()
-        }
-    }
-
-    /**
-     * @deprecated Due to the fact it uses the cached context, which results in returning the same
-     * version even though project properties got changed. Use {@link #getUncached()} instead.
-     * @return uncached version, but based on a cached context
-     */
-    @Deprecated
-    @Nested
-    VersionService.DecoratedVersion getUncachedVersion() {
-        ensureContextExists()
-        return getVersionFromContext(context)
-    }
-
-    /**
-     * Allows to calculate and get the version, omitting caching mechanisms.
-     * May be slower for large projects, use then {@link #getVersion()} instead.
-     * @since 1.13.4
-     * @return uncached version
-     */
-    @Nested
-    VersionService.DecoratedVersion getUncached() {
-        def context = GradleAwareContext.create(project, this)
-        return getVersionFromContext(context)
-    }
-
-    private static VersionService.DecoratedVersion getVersionFromContext(Context context) {
-        Properties rules = context.rules()
-        def versionService = context.versionService()
-        return versionService.currentDecoratedVersion(rules.version, rules.tag, rules.nextVersion)
-    }
-
-    @Nested
-    VersionService getVersionService() {
-        ensureContextExists()
-        return context.versionService()
-    }
-
-    private void ensureContextExists() {
-        if (context == null) {
-            this.context = GradleAwareContext.create(project, this)
-        }
-    }
-
-    void monorepos(Closure c) {
-        project.configure(monorepoConfig, c)
+        return versionProvider().map({ new VersionScmPosition(
+            it.position.revision,
+            it.position.shortRevision,
+            it.position.branch
+        )}).get()
     }
 }

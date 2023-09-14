@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
+import pl.allegro.tech.build.axion.release.Fixtures
+import pl.allegro.tech.build.axion.release.domain.MonorepoConfig
 import pl.allegro.tech.build.axion.release.domain.PredefinedSnapshotCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionCreator
 import pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer
@@ -14,11 +16,11 @@ class VersionPropertiesBuilder {
 
     private boolean useHighestVersion = false
 
-    private MonorepoProperties monorepoProperties = new MonorepoProperties()
+    private MonorepoConfig monorepoConfig = Fixtures.monorepoConfig()
 
-    private Closure<String> versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+    private VersionProperties.Creator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
-    private Closure<String> snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
+    private VersionProperties.Creator snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
 
     private boolean sanitizeVersion = true
 
@@ -39,7 +41,7 @@ class VersionPropertiesBuilder {
             PredefinedVersionIncrementer.versionIncrementerFor('incrementPatch'),
             sanitizeVersion,
             useHighestVersion,
-            monorepoProperties
+            monorepoConfig
         )
     }
 
@@ -63,8 +65,8 @@ class VersionPropertiesBuilder {
         return this
     }
 
-    VersionPropertiesBuilder supportMonorepos(MonorepoProperties monorepoProperties) {
-        this.monorepoProperties = monorepoProperties
+    VersionPropertiesBuilder supportMonorepos(MonorepoConfig monorepoConfig) {
+        this.monorepoConfig = monorepoConfig
         return this
     }
 

@@ -23,23 +23,32 @@ is to update version in README:
 
     scmVersion {
         hooks {
-            pre 'fileUpdate', [file: 'README.md', pattern: {v, c -> /version: $v/}, replacement: {v, c -> "version: $v"}]
+            pre 'fileUpdate', [file: 'README.md', pattern: {v, c -> /version: $v/}, replacement: {v, c -> "version: $v"}, encoding: 'utf-8']
         }
     }
 
 Syntax of action is simple: first comes name, then map of arguments.
 Supported arguments:
 
--   file - path to file in form of string or `File` instance to update
--   files - array of files, takes precedence over single file definition
+- file - path to file in form of string or `File` instance to update
+- files - array of files, takes precedence over single file definition
     if not empty
--   pattern - closure that should return String pattern, arguments are
+- pattern - closure that should return String pattern, arguments are
     **previous version** and context (described below)
--   replacement - closure that should return replacement, arguments are
+- replacement - closure that should return replacement, arguments are
     **current version** and context
+- encoding - the name of encoding to use during processing the specified files.
+    By default, it uses default JVM encoding (described below)
 
 All patterns have multiline flag switched on by default to match against
 content of whole file.
+
+All files are processed using JVM encoding that by default is equal to the system's encoding,
+so this operation should be considered as OS-dependent.
+To avoid consequences of such behaviour,
+it's recommended to explicitly declare project's encoding through
+e.g. `-Dfile.encoding=<encoding>` flag in `gradle.properties` file.
+For individual cases, the `fileUpdate.encoding` can be used.
 
 File update operation adds all changed files to set of files to commit
 in context, which are later processed by **commit** hook.

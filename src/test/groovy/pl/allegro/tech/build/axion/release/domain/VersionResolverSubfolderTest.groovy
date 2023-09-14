@@ -1,8 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.*
-import pl.allegro.tech.build.axion.release.infrastructure.di.Context
+import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import spock.lang.Shared
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
@@ -19,8 +20,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     NextVersionProperties nextVersionRules = nextVersionProperties().build()
 
     @Shared
-    MonorepoProperties defaultMonorepoProperties = MonorepoPropertiesBuilder.monorepoProperties()
-        .build()
+    MonorepoConfig defaultMonorepoProperties = Fixtures.monorepoConfig()
 
     VersionProperties defaultMonorepoVersionRules = VersionPropertiesBuilder.versionProperties()
         .supportMonorepos(defaultMonorepoProperties)
@@ -204,7 +204,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     }
 
     private void configureContextWithVersionRules(VersionProperties versionRules) {
-        context = new Context(
+        context = new VersionResolutionContext(
             PropertiesBuilder.properties().withVersionRules(versionRules).build(),
             context.repository(),
             scmProperties(temporaryFolder).build(),

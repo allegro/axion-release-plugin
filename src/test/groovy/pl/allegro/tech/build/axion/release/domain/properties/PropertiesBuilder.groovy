@@ -1,5 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
+import pl.allegro.tech.build.axion.release.Fixtures
+import pl.allegro.tech.build.axion.release.domain.ChecksConfig
+
 class PropertiesBuilder {
 
     private TagProperties tagProperties = TagPropertiesBuilder.tagProperties().build()
@@ -7,8 +10,6 @@ class PropertiesBuilder {
     private NextVersionProperties nextVersionProperties = NextVersionPropertiesBuilder.nextVersionProperties().build()
 
     private VersionProperties versionProperties = VersionPropertiesBuilder.versionProperties().build()
-
-    private ChecksProperties checksProperties = new ChecksProperties(true, true, false)
 
     private HooksProperties hooksProperties = new HooksProperties([], [])
 
@@ -20,13 +21,15 @@ class PropertiesBuilder {
     }
 
     Properties build() {
+        ChecksConfig checksConfig = Fixtures.checksConfig(Fixtures.project())
+        checksConfig.snapshotDependencies.set(false)
         return new Properties(
-                false,
-                versionProperties,
-                tagProperties,
-                checksProperties,
-                nextVersionProperties,
-                hooksProperties
+            false,
+            versionProperties,
+            tagProperties,
+            checksConfig,
+            nextVersionProperties,
+            hooksProperties
         )
     }
 

@@ -4,28 +4,21 @@ public final class TagPrefixConf {
 
     private TagPrefixConf() {
     }
-    private static String defaultPrefix = "v";
-    private static String defaultSeparator = "";
+    private static final String DEFAULT_PREFIX = "v";
+    private static final String DEFAULT_SEPARATOR = "";
 
     public final static String DEFAULT_LEGACY_PREFIX = "release";
     public final static String DEFAULT_LEGACY_SEP = "-";
 
-    public static String prefix() {
-        return defaultPrefix;
+    public static String defaultPrefix() {
+        return DEFAULT_PREFIX;
     }
-    public static void setDefPrefix(String prefix) {
-        defaultPrefix = prefix;
-    }
-    public static void setDefSeparator(String sep) {
-        defaultSeparator = sep;
-    }
-
-    public static String separator() {
-        return defaultSeparator;
+    public static String defaultSeparator() {
+        return DEFAULT_SEPARATOR;
     }
 
     public static String fullPrefix() {
-        return defaultPrefix + defaultSeparator;
+        return DEFAULT_PREFIX + DEFAULT_SEPARATOR;
     }
 
     public static String fullLegacyPrefix() {

@@ -1,8 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain.hooks;
 
 import com.github.zafarkhaja.semver.Version;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.VersionService;
-import pl.allegro.tech.build.axion.release.domain.logging.ReleaseLogger;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
@@ -12,8 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class HookContext {
-
-    private static final ReleaseLogger logger = ReleaseLogger.Factory.logger(HookContext.class);
+    private static final Logger logger = Logging.getLogger(HookContext.class);
 
     private final VersionService versionService;
     private final ScmService scmService;
@@ -77,7 +77,7 @@ public class HookContext {
         scmService.push();
     }
 
-    public static ReleaseLogger getLogger() {
+    public static Logger getLogger() {
         return logger;
     }
 
