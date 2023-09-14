@@ -11,6 +11,7 @@ import java.util.List;
 public abstract class MonorepoConfig extends BaseExtension {
     @Input
     public abstract ListProperty<String> getProjectDirs();
+    @Input
     public abstract SetProperty<String> getDependenciesFolders();
 
     @Internal
