@@ -524,7 +524,7 @@ class GitRepositoryTest extends Specification {
         repository.commit([fileInB], 'Add file bar in subdirB')
 
         when:
-        ScmPosition position = repository.positionOfLastChangeIn('a\\aa', [], [])
+        ScmPosition position = repository.positionOfLastChangeIn('a\\aa', [], [].toSet())
 
         then:
         position.revision == headSubDirAChanged
@@ -552,7 +552,7 @@ class GitRepositoryTest extends Specification {
         commitFile('after/aa', 'after')
 
         when:
-        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [], [])
+        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [], [].toSet())
 
         then:
         position.revision == headSubDirAChanged
