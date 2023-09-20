@@ -269,7 +269,7 @@ public class GitRepository implements ScmRepository {
                 assertPathExists(unixStylePath);
                 logCommand = jgitRepository.log().setMaxCount(1).addPath(unixStylePath);
                 for (String dep: dependenciesFolders) {
-                    logCommand.addPath(dep);
+                    logCommand.addPath(asUnixPath(dep));
                 }
             }
             lastCommit = logCommand.call().iterator().next();

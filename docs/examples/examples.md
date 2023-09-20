@@ -37,7 +37,8 @@ with these key configuration objects available for reference:
 
 * [RepositoryConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/RepositoryConfig.groovy)
 
-* [MonorepoConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/MonorepoConfig.java)
+* [
+* MonorepoConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/MonorepoConfig.java)
 
 * [NextVersionConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/NextVersionConfig.java)
 

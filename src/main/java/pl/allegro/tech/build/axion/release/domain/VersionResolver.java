@@ -38,7 +38,7 @@ public class VersionResolver {
 
     public VersionContext resolveVersion(VersionProperties versionProperties, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {
         ScmPosition latestChangePosition = repository.positionOfLastChangeIn(
-            projectRootRelativePath, versionProperties.getMonorepoConfig().getProjectDirs().get(), versionProperties.getMonorepoConfig().getDependenciesFolders().get()
+            projectRootRelativePath, versionProperties.getMonorepoConfig().getProjectDirs().get(), versionProperties.getMonorepoConfig().getDependenciesDirs().get()
         );
 
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
@@ -102,7 +102,7 @@ public class VersionResolver {
             // Now if we test for anywhere from C to E we should get 1.3.0
             String tagCommitRevision = currentVersionInfo.commit != null ? currentVersionInfo.commit : "";
             onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
-            for (String dependency: versionProperties.getMonorepoConfig().getDependenciesFolders().get()) {
+            for (String dependency: versionProperties.getMonorepoConfig().getDependenciesDirs().get()) {
                 onLatestVersion = onLatestVersion && repository.isIdenticalForPath(dependency, latestChangePosition.getRevision(),tagCommitRevision);
             }
         }

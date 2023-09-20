@@ -130,6 +130,26 @@ scmVersion {
 }
 ```
 
+Use the `include` configuration parameter within a `monorepos` block to identify dependencies
+directories that should be added to consideration when calculating whether to increment
+the version of the parent project. For example if we have 2 modules `A` & `B` in our repository,
+and we have a composite build of `A` that has a dependency on `B` we can set on `A` a dependency on `B` and get
+increment to the version of `A` even if its code did not change, but we only had changes in `B`
+
+Note: these values need to be relative to project root
+
+
+```
+scmVersion {
+        monorepos {
+            include([
+                    "common/sdkA",
+                    "common/sdkB"
+            ])
+        }
+}
+```
+
 Version calculation rules:
 1. Changes to files within a submodule increment that submodule's version only.
 2. Changes to a submodule do not cause a change to the parent project's version if
@@ -138,6 +158,8 @@ the parent is set to ignore that submodule, via `exclude()`.
 `exclude()` will cause the parent project's version to increment but not the
 versions of any submodules.  If this is desired then consider wiring the `createRelease` or
 `release` tasks of the submodules to be dependencies of the tasks of the same name in the parent.
+4. Changes to directories provided with `include` configuration will also cause an
+incrementation of version (even if the main module did not have any changes)
 
 ## Releasing
 
