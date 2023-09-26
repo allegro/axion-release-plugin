@@ -558,6 +558,31 @@ class GitRepositoryTest extends Specification {
         position.revision == headSubDirAChanged
     }
 
+    def "last position with monorepo dependency config - change made in dependency folder"() {
+        given:
+        String importantDir = 'a/aa'
+        String dependencyDir = 'b/bb'
+        String notInterestingDir = 'c/cc'
+
+
+        commitFile(notInterestingDir, 'unintresting1')
+        commitFile(notInterestingDir, 'unintresting2')
+
+        commitFile(importantDir, 'main_dir')
+        commitFile(dependencyDir, 'dep_dir')
+        String headSubDirAChanged = rawRepository.head().id
+
+        commitFile(notInterestingDir, 'non_intresting')
+
+        commitFile('after/aa', 'after')
+
+        when:
+        ScmPosition position = repository.positionOfLastChangeIn(importantDir, [], [dependencyDir].toSet())
+
+        then:
+        position.revision == headSubDirAChanged
+    }
+
     private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
