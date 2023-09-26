@@ -54,7 +54,7 @@ class NoOpRepository implements ScmRepository {
     }
 
     @Override
-    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders, Set<String> dependenciesFolders) {
         return delegateRepository.positionOfLastChangeIn(path)
     }
 

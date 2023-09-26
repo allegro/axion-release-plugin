@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -250,24 +251,28 @@ public class GitRepository implements ScmRepository {
     }
 
     @Override
-    public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders) {
+    public ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders, Set<String> dependenciesFolders) {
         RevCommit lastCommit;
 
         // if the path is empty ('') then it means we are at the root of the Git directory
         // in which case, we should exclude changes that occurred in subdirectory projects when deciding on
         // which is the latest change that is relevant to the root project
         try {
+            LogCommand logCommand;
             if (path.isEmpty()) {
-                LogCommand logCommand = jgitRepository.log().setMaxCount(1);
+                logCommand = jgitRepository.log().setMaxCount(1);
                 for (String excludedPath : excludeSubFolders) {
                     logCommand.excludePath(asUnixPath(excludedPath));
                 }
-                lastCommit = logCommand.call().iterator().next();
             } else {
                 String unixStylePath = asUnixPath(path);
                 assertPathExists(unixStylePath);
-                lastCommit = jgitRepository.log().setMaxCount(1).addPath(unixStylePath).call().iterator().next();
+                logCommand = jgitRepository.log().setMaxCount(1).addPath(unixStylePath);
+                for (String dep: dependenciesFolders) {
+                    logCommand.addPath(asUnixPath(dep));
+                }
             }
+            lastCommit = logCommand.call().iterator().next();
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }

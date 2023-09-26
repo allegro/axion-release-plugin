@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public interface ScmRepository {
@@ -19,7 +20,7 @@ public interface ScmRepository {
 
     ScmPosition currentPosition();
 
-    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders);
+    ScmPosition positionOfLastChangeIn(String path, List<String> excludeSubFolders, Set<String> dependenciesFolders);
 
     Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision);
 
