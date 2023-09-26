@@ -117,20 +117,20 @@ my-service
 my-service-client
 ```
 
-Use the `exclude()` configuration parameter within a `monorepos` block to identify submodules
+Use the `exclude()` configuration parameter within a `monorepo` block to identify submodules
 that should be excluded from consideration when calculating whether to increment
 the version of the parent project.  Typically, you would do this in the top level
 project, assuming that submodules are named after the directory they appear in:
 
 ```
 scmVersion {
-    monorepos {
+    monorepo {
         exclude(project.subprojects.collect({p -> p.name}))
     }
 }
 ```
 
-Use the `include` configuration parameter within a `monorepos` block to identify dependencies
+Use the `include` configuration parameter within a `monorepo` block to identify dependencies
 directories that should be added to consideration when calculating whether to increment
 the version of the parent project. For example if we have 2 modules `A` & `B` in our repository,
 and we have a composite build of `A` that has a dependency on `B` we can set on `A` a dependency on `B` and get
@@ -141,7 +141,7 @@ Note: these values need to be relative to project root
 
 ```
 scmVersion {
-        monorepos {
+        monorepo {
             include([
                     "common/sdkA",
                     "common/sdkB"

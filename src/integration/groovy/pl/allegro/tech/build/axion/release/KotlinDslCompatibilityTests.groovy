@@ -82,7 +82,7 @@ class KotlinDslCompatibilityTests extends Specification {
                     }
                 }
             }
-            monorepos {
+            monorepo {
             }
 
             branchVersionIncrementer.putAll(
