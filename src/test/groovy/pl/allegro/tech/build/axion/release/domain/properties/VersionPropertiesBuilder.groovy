@@ -65,7 +65,7 @@ class VersionPropertiesBuilder {
         return this
     }
 
-    VersionPropertiesBuilder supportMonorepos(MonorepoConfig monorepoConfig) {
+    VersionPropertiesBuilder supportMonorepo(MonorepoConfig monorepoConfig) {
         this.monorepoConfig = monorepoConfig
         return this
     }

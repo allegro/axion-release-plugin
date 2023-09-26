@@ -23,7 +23,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
     MonorepoConfig defaultMonorepoProperties = Fixtures.monorepoConfig()
 
     VersionProperties defaultMonorepoVersionRules = VersionPropertiesBuilder.versionProperties()
-        .supportMonorepos(defaultMonorepoProperties)
+        .supportMonorepo(defaultMonorepoProperties)
         .build()
 
     String projectRootSubfolder
@@ -111,7 +111,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
         repository.commit(['*'], 'Commit without change in subfolder')
 
         VersionProperties versionRules = VersionPropertiesBuilder.versionProperties()
-            .supportMonorepos(defaultMonorepoProperties)
+            .supportMonorepo(defaultMonorepoProperties)
             .forceSnapshot()
             .build()
         configureContextWithVersionRules(versionRules)
@@ -142,8 +142,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
         where:
         versionRules << [
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).build(),
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).forceSnapshot().build()
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).forceSnapshot().build()
         ]
     }
 
@@ -170,8 +170,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
         where:
         versionRules << [
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().build(),
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).useHighestVersion().build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
         ]
     }
 
@@ -198,8 +198,8 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
         where:
         versionRules << [
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().build(),
-            VersionPropertiesBuilder.versionProperties().supportMonorepos(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).useHighestVersion().build(),
+            VersionPropertiesBuilder.versionProperties().supportMonorepo(defaultMonorepoProperties).useHighestVersion().forceSnapshot().build()
         ]
     }
 

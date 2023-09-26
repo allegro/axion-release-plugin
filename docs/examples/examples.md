@@ -104,7 +104,7 @@ scmVersion {
                     }
                 }
             }
-            monorepos {
+            monorepo {
             }
 
             branchVersionIncrementer.putAll(

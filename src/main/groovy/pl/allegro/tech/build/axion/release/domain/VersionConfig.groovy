@@ -158,7 +158,7 @@ abstract class VersionConfig extends BaseExtension {
         action.execute(hooks)
     }
 
-    void monorepos(Action<MonorepoConfig> action) {
+    void monorepo(Action<MonorepoConfig> action) {
         action.execute(monorepoConfig)
     }
 
