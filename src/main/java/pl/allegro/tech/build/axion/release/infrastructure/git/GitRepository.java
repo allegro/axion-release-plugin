@@ -27,6 +27,7 @@ import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.eclipse.jgit.transport.TagOpt;
 import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
+import org.eclipse.jgit.util.SystemReader;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -66,6 +67,8 @@ public class GitRepository implements ScmRepository {
     private final ScmProperties properties;
 
     public GitRepository(ScmProperties properties) {
+        SystemReader.setInstance(new SystemReaderWithoutSystemConfig());
+
         try {
             this.repositoryDir = properties.getDirectory();
             this.jgitRepository = Git.open(repositoryDir);
