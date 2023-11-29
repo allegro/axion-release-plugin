@@ -14,9 +14,11 @@ abstract class ReleaseTask extends BaseAxionTask {
         ScmPushResult result = releaser.releaseAndPush(context.rules())
 
         if(!result.success) {
+            def status = result.failureStatus.orElse("Unknown status of push")
             def message = result.remoteMessage.orElse("Unknown error during push")
+            logger.error("remote status: ${status}")
             logger.error("remote message: ${message}")
-            throw new ReleaseFailedException(message)
+            throw new ReleaseFailedException("Status: ${status}\nMessage: ${message}")
         }
     }
 }

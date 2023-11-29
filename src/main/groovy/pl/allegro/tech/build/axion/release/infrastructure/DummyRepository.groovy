@@ -40,7 +40,7 @@ class DummyRepository implements ScmRepository {
     @Override
     ScmPushResult push(ScmIdentity identity, ScmPushOptions pushOptions) {
         log('push')
-        return new ScmPushResult(true, Optional.empty())
+        return new ScmPushResult(true, Optional.empty(), Optional.empty())
     }
 
     @Override

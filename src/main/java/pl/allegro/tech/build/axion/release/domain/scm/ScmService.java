@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
+import org.eclipse.jgit.transport.RemoteRefUpdate;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver;
@@ -36,7 +37,7 @@ public class ScmService {
     public ScmPushResult push() {
         if (localOnlyResolver.localOnly(this.remoteAttached())) {
             logger.quiet("Changes made to local repository only");
-            return new ScmPushResult(true, Optional.empty());
+            return new ScmPushResult(true, Optional.of(RemoteRefUpdate.Status.NOT_ATTEMPTED), Optional.empty());
         }
 
         try {

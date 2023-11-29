@@ -194,11 +194,16 @@ public class GitRepository implements ScmRepository {
 
         Optional<RemoteRefUpdate> failedRefUpdate = pushResult.getRemoteUpdates().stream().filter(ref ->
             !ref.getStatus().equals(RemoteRefUpdate.Status.OK)
-                && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
+            && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
         ).findFirst();
 
+        boolean isSuccess = !failedRefUpdate.isPresent();
+        Optional<RemoteRefUpdate.Status> failureCause = isSuccess ?
+            Optional.empty() : Optional.of(failedRefUpdate.get().getStatus());
+
         return new ScmPushResult(
-            !failedRefUpdate.isPresent(),
+            isSuccess,
+            failureCause,
             Optional.ofNullable(pushResult.getMessages())
         );
     }
@@ -271,7 +276,7 @@ public class GitRepository implements ScmRepository {
                 String unixStylePath = asUnixPath(path);
                 assertPathExists(unixStylePath);
                 logCommand = jgitRepository.log().setMaxCount(1).addPath(unixStylePath);
-                for (String dep: dependenciesFolders) {
+                for (String dep : dependenciesFolders) {
                     logCommand.addPath(asUnixPath(dep));
                 }
             }
@@ -536,9 +541,9 @@ public class GitRepository implements ScmRepository {
     public boolean isLegacyDefTagnameRepo() {
         try {
             List<Ref> call = jgitRepository.tagList().call();
-            if(call.isEmpty()) return false;
+            if (call.isEmpty()) return false;
 
-            return call.stream().allMatch(ref-> ref.getName().startsWith("refs/tags/"+fullLegacyPrefix()));
+            return call.stream().allMatch(ref -> ref.getName().startsWith("refs/tags/" + fullLegacyPrefix()));
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
@@ -554,7 +559,8 @@ public class GitRepository implements ScmRepository {
             throw new ScmException(e);
         }
     }
-    public Git getJgitRepository(){
+
+    public Git getJgitRepository() {
         return jgitRepository;
     }
 }
