@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.infrastructure.di.MemoizedVersionSupplier
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionSupplier
 
@@ -239,11 +240,7 @@ abstract class VersionConfig extends BaseExtension {
     }
 
     @Nested
-    VersionScmPosition getScmPosition() {
-        return versionProvider().map({ new VersionScmPosition(
-            it.position.revision,
-            it.position.shortRevision,
-            it.position.branch
-        )}).get()
+    ScmPosition getScmPosition() {
+        return versionProvider().map({it.position}).get()
     }
 }
