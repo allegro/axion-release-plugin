@@ -49,7 +49,7 @@ sourceSets {
 }
 
 val jgitVersion = "6.8.0.202311291450-r"
-val jschVersion = "0.1.55"
+val jschVersion = "0.2.16"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -60,22 +60,21 @@ dependencies {
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")
-    implementation("com.jcraft:jsch:$jschVersion")
-    implementation("com.jcraft:jsch.agentproxy.core:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.jsch:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.sshagent:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.pageant:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-jna:$jschAgentVersion")
-    implementation("com.jcraft:jsch.agentproxy.usocket-nc:$jschAgentVersion")
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")  {
+        exclude("com.jcraft", "jsch")
+    }
+    implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.77")
+    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.8.3")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.14.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
     testImplementation("org.testcontainers:spock:1.17.6")
-    testImplementation("org.spockframework:spock-core:2.2-groovy-2.5")
+    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.3")
     testImplementation("org.apache.sshd:sshd-core:2.12.0")
@@ -181,13 +180,14 @@ nexusPublishing {
     }
 }
 
-if (System.getenv("GPG_KEY_ID") != null) {
-    signing {
-        useInMemoryPgpKeys(
-            System.getenv("GPG_KEY_ID"),
-            System.getenv("GPG_PRIVATE_KEY"),
-            System.getenv("GPG_PRIVATE_KEY_PASSWORD")
-        )
-        sign(publishing.publications)
+signing {
+    setRequired {
+        System.getenv("GPG_KEY_ID") != null
     }
+    useInMemoryPgpKeys(
+        System.getenv("GPG_KEY_ID"),
+        System.getenv("GPG_PRIVATE_KEY"),
+        System.getenv("GPG_PRIVATE_KEY_PASSWORD")
+    )
+    sign(publishing.publications)
 }

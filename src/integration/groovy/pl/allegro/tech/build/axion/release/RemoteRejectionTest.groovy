@@ -16,6 +16,7 @@ import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Shared
 import spock.lang.Specification
 
+import java.nio.file.Files
 import java.nio.file.Paths
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
@@ -33,6 +34,8 @@ class RemoteRejectionTest extends Specification {
     def "should return error on push failure"() {
         given:
         File repoDir = File.createTempDir('axion-release', 'tmp')
+        String privateKey = Files.readString(Paths.get(getClass().getResource("/id_rsa").toURI()))
+        ScmIdentity keyIdentity = ScmIdentity.keyIdentity(privateKey, "UrbanCookieCollective")
 
         Git.cloneRepository()
             .setDirectory(repoDir)
@@ -40,10 +43,10 @@ class RemoteRejectionTest extends Specification {
                 @Override
                 void configure(Transport transport) {
                     SshTransport sshTransport = (SshTransport) transport
-                    sshTransport.setSshSessionFactory(new SshConnector(ScmIdentity.defaultIdentityWithoutAgents()))
+                    sshTransport.setSshSessionFactory(new SshConnector(keyIdentity))
                 }
             })
-            .setURI("ssh://git@${gitServerContainer.getContainerIpAddress()}:${gitServerContainer.firstMappedPort}/git-server/repos/rejecting-repo")
+            .setURI("ssh://git@${gitServerContainer.getHost()}:${gitServerContainer.firstMappedPort}/srv/git/repos/rejecting-repo")
             .call()
 
         GitRepository repository = new GitRepository(ScmPropertiesBuilder.scmProperties(repoDir).build())
@@ -53,7 +56,7 @@ class RemoteRejectionTest extends Specification {
         repository.commit(['*'], 'commit after ' + fullPrefix() + 'custom')
 
         when:
-        ScmPushResult result = repository.push(ScmIdentity.defaultIdentityWithoutAgents(), new ScmPushOptions('origin', false), true)
+        ScmPushResult result = repository.push(keyIdentity, new ScmPushOptions('origin', false), true)
 
         then:
         !result.success
