@@ -21,7 +21,7 @@ a release version. If there were any commits after last tag, project is in SNAPS
 intuitive philosophy, alongside with [Semantic Versioning](http://semver.org/) rules, makes it a lot easier to manage
 project versions along SCM tag versions.
 
-JDK11+ & Gradle 6+ required.
+JDK11+ & Gradle 7+ required.
 
 ## Basic usage
 
