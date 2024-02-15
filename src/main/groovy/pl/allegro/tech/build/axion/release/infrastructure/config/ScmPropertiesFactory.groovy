@@ -8,7 +8,7 @@ class ScmPropertiesFactory {
     static ScmProperties create(VersionConfig config) {
         return new ScmProperties(
             config.repository.type.get(),
-            config.repository.directory.asFile.get(),
+            new File(config.repository.directory.get()),
             config.repository.remote.get(),
             config.repository.pushTagsOnly().get(),
             config.repository.fetchTags().get(),
