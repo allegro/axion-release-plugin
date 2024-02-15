@@ -73,7 +73,7 @@ dependencies {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
-    testImplementation("org.testcontainers:spock:1.17.6")
+    testImplementation("org.testcontainers:spock:1.19.5")
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.3")
