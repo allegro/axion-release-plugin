@@ -15,6 +15,7 @@ class ScmPropertiesFactory {
             config.repository.attachRemote().isPresent(),
             config.repository.attachRemote().getOrNull(),
             config.repository.overriddenBranch().getOrNull(),
+            config.repository.overriddenIsClean().getOrNull(),
             ScmIdentityFactory.create(config.repository, config.repository.disableSshAgent().get())
         )
     }

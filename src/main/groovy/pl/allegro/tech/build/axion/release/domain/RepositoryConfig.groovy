@@ -20,6 +20,7 @@ abstract class RepositoryConfig extends BaseExtension {
     private static final String RELEASE_PUSH_TAGS_ONLY_PROPERTY = 'release.pushTagsOnly'
     private static final String ATTACH_REMOTE_PROPERTY = 'release.attachRemote'
     private static final String OVERRIDDEN_BRANCH_NAME = 'release.overriddenBranchName'
+    private static final String OVERRIDDEN_IS_CLEAN = 'release.overriddenIsClean'
     private static final String DISABLE_SSH_AGENT = 'release.disableSshAgent'
     private static final String FETCH_TAGS_PROPERTY = 'release.fetchTags'
 
@@ -85,6 +86,10 @@ abstract class RepositoryConfig extends BaseExtension {
 
     Provider<String> overriddenBranch() {
         gradleProperty(OVERRIDDEN_BRANCH_NAME)
+    }
+
+    Provider<Boolean> overriddenIsClean() {
+        gradlePropertyBoolean(OVERRIDDEN_IS_CLEAN)
     }
 
     Provider<Boolean> disableSshAgent() {

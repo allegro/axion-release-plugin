@@ -6,6 +6,7 @@ class ScmPropertiesBuilder {
 
     private String type = 'git'
     private String overriddenBranchName
+    private Boolean overriddenIsClean = null
 
     private ScmPropertiesBuilder(File directory) {
         this.directory = directory
@@ -20,6 +21,11 @@ class ScmPropertiesBuilder {
         return this
     }
 
+    ScmPropertiesBuilder withOverriddenIsClean(Boolean overriddenIsClean) {
+        this.overriddenIsClean = overriddenIsClean
+        return this
+    }
+
     ScmProperties build() {
         return new ScmProperties(
                 type,
@@ -30,6 +36,7 @@ class ScmPropertiesBuilder {
                 false,
                 null,
                 overriddenBranchName,
+                overriddenIsClean,
                 ScmIdentity.defaultIdentityWithoutAgents()
         )
     }
