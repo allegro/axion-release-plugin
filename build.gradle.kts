@@ -78,7 +78,7 @@ dependencies {
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.3")
     testImplementation("org.apache.sshd:sshd-core:2.12.1")
-    testImplementation("org.apache.sshd:sshd-git:2.12.0")
+    testImplementation("org.apache.sshd:sshd-git:2.12.1")
     testImplementation(gradleTestKit())
 }
 
