@@ -17,7 +17,7 @@ abstract class OutputCurrentVersionTask extends BaseAxionTask {
     @Inject
     OutputCurrentVersionTask() {
         this.outputs.upToDateWhen { false }
-        getQuiet().convention(providers.gradleProperty("release.quiet").map({true})
+        getQuiet().convention(providers.gradleProperty("release.quiet").map({ true })
             .orElse(false))
     }
 

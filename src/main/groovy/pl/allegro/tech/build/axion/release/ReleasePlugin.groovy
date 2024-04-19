@@ -6,6 +6,10 @@ import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
+
 abstract class ReleasePlugin implements Plugin<Project> {
 
     public static final String VERSION_EXTENSION = 'scmVersion'
@@ -22,7 +26,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
 
         def versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
 
-        project.tasks.withType(BaseAxionTask).configureEach( {
+        project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
         })
 
@@ -62,6 +66,16 @@ abstract class ReleasePlugin implements Plugin<Project> {
         project.tasks.register(CURRENT_VERSION_TASK, OutputCurrentVersionTask) {
             group = 'Help'
             description = 'Prints current project version extracted from SCM.'
+        }
+
+        project.afterEvaluate {
+            if (System.getenv().containsKey('GITHUB_ACTIONS')) {
+                Files.write(
+                    Paths.get(System.getenv('GITHUB_OUTPUT')),
+                    "current-version=${versionConfig.version}\n".getBytes(),
+                    StandardOpenOption.APPEND
+                )
+            }
         }
     }
 }
