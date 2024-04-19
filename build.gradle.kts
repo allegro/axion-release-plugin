@@ -69,7 +69,7 @@ dependencies {
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.14.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:4.1.0") {
+    testImplementation("org.ajoberstar.grgit:grgit-core:5.2.2") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
