@@ -75,3 +75,35 @@ All `axion-release-plugin` configuration options:
             aheadOfRemote.set(false) // permanently disable ahead of remote check
         }
     }
+
+All `axion-release-plugin` configuration flags:
+
+- release.customKey
+    - see [Authorization](authorization.md)
+- release.customKeyFile
+    - see [Authorization](authorization.md)
+- release.customKeyPassword
+    - see [Authorization](authorization.md)
+- release.customUsername
+    - see [Authorization](authorization.md) and [CI Servers](ci_servers.md)
+- release.customPassword
+    - see [Authorization](authorization.md) and [CI Servers](ci_servers.md)
+- release.pushTagsOnly
+    - see [Repository](repository.md) and [CI Servers](ci_servers.md)
+- release.attachRemote
+    - see [CI Servers](ci_servers.md)
+- release.overriddenBranchName
+    - possible values: any string like `develop`
+    - usually the plugin detects the branch name automatically. With this flag, the result can be overridden.
+    - see [CI Servers](ci_servers.md)
+- release.overriddenIsClean
+    - default: not set = determine the `isClean`-state
+    - possible values: `true` or `false`
+    - usually the plugin performs a check if the working directory is clean. With this flag, the result of the check can be overridden.
+    - If you have a repository with a lot of files and do not use the isClean-feature, you may set this flag for a speed-up.
+- release.disableSshAgent
+    - default: false
+    - do not use the ssh agent
+- release.fetchTags
+    - default: false
+    - fetch tags from the remote repository

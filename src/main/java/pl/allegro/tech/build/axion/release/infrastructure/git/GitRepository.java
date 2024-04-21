@@ -194,7 +194,7 @@ public class GitRepository implements ScmRepository {
 
         Optional<RemoteRefUpdate> failedRefUpdate = pushResult.getRemoteUpdates().stream().filter(ref ->
             !ref.getStatus().equals(RemoteRefUpdate.Status.OK)
-            && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
+                && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
         ).findFirst();
 
         boolean isSuccess = !failedRefUpdate.isPresent();
@@ -504,8 +504,16 @@ public class GitRepository implements ScmRepository {
         return config.getSubsections("remote").stream().anyMatch(n -> n.equals(remoteName));
     }
 
+    /**
+     * @return true when there are uncommitted changes. This means: not clean
+     */
     @Override
     public boolean checkUncommittedChanges() {
+        Optional<Boolean> overriddenIsClean = properties.getOverriddenIsClean();
+        if (overriddenIsClean.isPresent()) {
+            // the logic to get the isClean-property is inverted
+            return !overriddenIsClean.get();
+        }
         try {
             return !jgitRepository.status().call().isClean();
         } catch (GitAPIException e) {
