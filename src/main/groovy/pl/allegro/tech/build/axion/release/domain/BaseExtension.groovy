@@ -23,6 +23,10 @@ abstract class BaseExtension {
         return providers.gradleProperty(name).forUseAtConfigurationTime()
     }
 
+    protected Provider<Boolean> gradlePropertyBoolean(String name) {
+        return gradleProperty(name).map(Boolean::valueOf)
+    }
+
     protected Provider<Boolean> gradlePropertyPresent(String name) {
         return gradleProperty(name).map({true})
     }

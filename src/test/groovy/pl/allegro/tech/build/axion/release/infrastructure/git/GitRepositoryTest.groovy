@@ -12,6 +12,8 @@ import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.*
 import spock.lang.Specification
 
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.regex.Pattern
 
 import static java.util.regex.Pattern.compile
@@ -294,6 +296,43 @@ class GitRepositoryTest extends Specification {
 
         then:
         position.branch == 'HEAD'
+    }
+
+
+    def "should respect overriddenIsClean-flag"(boolean expectedIsClean, Boolean overridenIsCleanFlag, boolean dirtyRepository) {
+        given:
+        File repositoryDir = File.createTempDir('axion-release', 'tmp')
+        def scmProperties = scmProperties(repositoryDir)
+            .withOverriddenIsClean(overridenIsCleanFlag)
+            .build()
+        Map repositories = GitProjectBuilder.gitProject(repositoryDir, remoteRepositoryDir).usingProperties(scmProperties).build()
+
+        Grgit rawRepository = repositories[Grgit]
+        GitRepository repository = repositories[GitRepository]
+
+        String headCommitId = rawRepository.repository.jgit.repository.resolve(Constants.HEAD).name()
+        rawRepository.repository.jgit.checkout().setName(headCommitId).call()
+        when:
+        def dirtyFile = Path.of(repositoryDir.path).resolve("dirty-file")
+        if (dirtyRepository && !Files.exists(dirtyFile)) {
+            Files.createFile(dirtyFile)
+        }
+        if (!dirtyRepository && Files.exists(dirtyFile)) {
+            Files.delete(Path.of(repositoryDir.path).resolve("dirty-file"));
+        }
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.isClean == expectedIsClean
+
+        where:
+        expectedIsClean | overridenIsCleanFlag | dirtyRepository
+        false | false | false
+        true | true | false
+        false | false | true
+        true | true | true
+        true | null | false
+        false | null | true
     }
 
     def "should provide current branch name from overriddenBranchName when in detached state and overriddenBranchName is set"() {

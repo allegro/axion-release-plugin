@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
 import java.io.File;
+import java.util.Optional;
 
 public class ScmProperties {
 
@@ -12,6 +13,7 @@ public class ScmProperties {
     private final boolean attachRemote;
     private final String remoteUrl;
     private final String overriddenBranchName;
+    private final Boolean overriddenIsClean;
     private final ScmIdentity identity;
 
     public ScmProperties(
@@ -23,6 +25,7 @@ public class ScmProperties {
         boolean attachRemote,
         String remoteUrl,
         String overriddenBranchName,
+        Boolean overriddenIsClean,
         ScmIdentity identity
     ) {
         this.type = type;
@@ -33,6 +36,7 @@ public class ScmProperties {
         this.attachRemote = attachRemote;
         this.remoteUrl = remoteUrl;
         this.overriddenBranchName = overriddenBranchName;
+        this.overriddenIsClean = overriddenIsClean;
         this.identity = identity;
     }
 
@@ -70,6 +74,10 @@ public class ScmProperties {
 
     public String getOverriddenBranchName() {
         return overriddenBranchName;
+    }
+
+    public Optional<Boolean> getOverriddenIsClean() {
+        return Optional.ofNullable(overriddenIsClean);
     }
 
     public final ScmIdentity getIdentity() {
