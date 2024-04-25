@@ -39,7 +39,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should define an github output when plugin is applied in project during github workflow"() {
+    def "should define an github output when running release task in github workflow context"() {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
         environmentVariablesRule.set("GITHUB_ACTIONS", "true")
@@ -48,11 +48,10 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         buildFile('')
 
         when:
-        def result = runGradle('currentVersion')
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
-        outputFile.getText().contains('current-version=0.1.0-SNAPSHOT')
-        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+        outputFile.getText().contains('released-version=1.0.0')
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
