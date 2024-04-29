@@ -39,7 +39,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should define an github output when running release task in github workflow context"() {
+    def "should define a github output when running release task in github workflow context"() {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
         environmentVariablesRule.set("GITHUB_ACTIONS", "true")
