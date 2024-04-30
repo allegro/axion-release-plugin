@@ -22,7 +22,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
 
         def versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
 
-        project.tasks.withType(BaseAxionTask).configureEach( {
+        project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
         })
 

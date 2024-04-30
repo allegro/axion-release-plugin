@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release
 
 import org.gradle.testkit.runner.TaskOutcome
+import org.junit.Rule
+import org.junit.contrib.java.lang.system.EnvironmentVariables
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -8,6 +10,9 @@ import java.nio.file.Files
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class SimpleIntegrationTest extends BaseIntegrationTest {
+
+    @Rule
+    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables();
 
     def "should return default version on calling currentVersion task on vanilla repo"() {
         given:
@@ -32,6 +37,24 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains('0.1.0-SNAPSHOT')
         !result.output.contains('Project version: ')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should define a github output when running release task in github workflow context"() {
+        given:
+        def outputFile = File.createTempFile("github-outputs", ".tmp")
+        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
+        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
+
+        buildFile('')
+
+        when:
+        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        outputFile.getText().contains('released-version=1.0.0')
+
+        cleanup:
+        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
     }
 
     def "should return released version on calling cV on repo with release commit"() {
@@ -95,7 +118,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         def result = gradle().withArguments('cV').buildAndFail()
 
         then:
-        result.output.contains(fullPrefix() +'blabla')
+        result.output.contains(fullPrefix() + 'blabla')
     }
 
     def "should use initial version setting"() {
