@@ -59,6 +59,17 @@ abstract class ReleasePlugin implements Plugin<Project> {
             description = 'Creates next version marker tag and pushes it to remote.'
         }
 
+        project.tasks.addRule("Pattern: " + MARK_NEXT_VERSION_TASK + "<VersionIncrementer>: Creates next version marker tag and pushes it to remote, using the specified incrementer.") { String taskName ->
+            if (taskName.startsWith(MARK_NEXT_VERSION_TASK)) {
+                project.tasks.register(taskName, MarkNextVersionTask) {
+                    group = 'Release'
+                    description = 'Creates next version marker tag and pushes it to remote.'
+
+                    versionIncrementerName = taskName.substring(MARK_NEXT_VERSION_TASK.length()).uncapitalize()
+                }
+            }
+        }
+
         project.tasks.register(CURRENT_VERSION_TASK, OutputCurrentVersionTask) {
             group = 'Help'
             description = 'Prints current project version extracted from SCM.'

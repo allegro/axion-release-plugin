@@ -11,19 +11,19 @@ import static java.lang.String.format
 
 enum PredefinedVersionIncrementer {
 
-    INCREMENT_PATCH('incrementPatch', { VersionIncrementerContext context, Map config ->
+    INCREMENT_PATCH('incrementPatch', ['patch'], { VersionIncrementerContext context, Map config ->
         return context.currentVersion.incrementPatchVersion()
     }),
 
-    INCREMENT_MINOR('incrementMinor', { VersionIncrementerContext context, Map config ->
+    INCREMENT_MINOR('incrementMinor', ['minor'], { VersionIncrementerContext context, Map config ->
         return context.currentVersion.incrementMinorVersion()
     }),
 
-    INCREMENT_MAJOR('incrementMajor', { VersionIncrementerContext context, Map config ->
+    INCREMENT_MAJOR('incrementMajor', ['major'], { VersionIncrementerContext context, Map config ->
         return context.currentVersion.incrementMajorVersion()
     }),
 
-    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
+    INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', ['minorIfNotRelease'], { VersionIncrementerContext context, Map config ->
         if (!config.releaseBranchPattern) {
             config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.defaultPrefix() + '/.+'
         }
@@ -33,7 +33,7 @@ enum PredefinedVersionIncrementer {
         return context.currentVersion.incrementMinorVersion()
     }),
 
-    INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map config ->
+    INCREMENT_PRERELEASE('incrementPrerelease', ['prerelease'], { VersionIncrementerContext context, Map config ->
         if (context.currentVersion.preReleaseVersion) {
             Matcher matcher = context.currentVersion.preReleaseVersion =~ /^(.*?)(\d+)$/
             if (matcher.matches()) {
@@ -55,25 +55,31 @@ enum PredefinedVersionIncrementer {
         return context.currentVersion.incrementPatchVersion()
     }),
 
-    BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
+    BRANCH_SPECIFIC('branchSpecific', ['branch'], { VersionIncrementerContext context, Map config ->
         def incrementer = config.find { context.scmPosition.branch ==~ it.key }
         return versionIncrementerFor(incrementer.value.toString(), config).apply(context)
     })
 
     private final String name
+    private final List<String> aliases
 
     final VersionIncrementer versionIncrementer
 
-    private PredefinedVersionIncrementer(String name, Closure<Version> c) {
+    private PredefinedVersionIncrementer(String name, List<String> aliases, Closure<Version> c) {
         this.name = name
+        this.aliases = aliases
         this.versionIncrementer = c
     }
 
     static VersionProperties.Incrementer versionIncrementerFor(String name, Map configuration = [:]) {
         PredefinedVersionIncrementer creator = values().find { it.name == name }
         if (creator == null) {
-            throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
-                "You can choose from: ${values().collect { it.name }}")
+            creator = values().find { it.aliases.contains(name) }
+
+            if (creator == null) { // if *still* null (no aliases and no names match)
+                throw new IllegalArgumentException("There is no predefined version incrementer with $name name. " +
+                    "You can choose from: ${values().collect { it.name }}")
+            }
         }
         return { VersionIncrementerContext context -> creator.versionIncrementer.apply(context, configuration) }
     }
