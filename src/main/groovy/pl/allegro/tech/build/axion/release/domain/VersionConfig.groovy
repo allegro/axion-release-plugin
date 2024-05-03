@@ -224,6 +224,11 @@ abstract class VersionConfig extends BaseExtension {
         return uncachedVersionProvider().get()
     }
 
+    @Nested
+    VersionService.DecoratedVersion getDecoratedVersion() {
+        return versionProvider().get()
+    }
+
     @Input
     String getVersion() {
         return versionProvider().map({ it.decoratedVersion}).get()
