@@ -173,6 +173,21 @@ incrementation of version (even if the main module did not have any changes)
 0.1.0
 ```
 
+### GitHub workflow context
+
+If `release` task is executed in GitHub workflow it will generate an output variable `released-version`
+that you can access later on in your workflow steps.
+
+```
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - id: release
+        run: ./gradlew release
+      - run: echo ${{steps.release.outputs.released-version}}
+```
+
 ## Accessing previous version
 
 Property `scmVersion.previousVersion` contains the previous version String.

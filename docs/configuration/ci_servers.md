@@ -93,14 +93,14 @@ you need to override branch name with `overriddenBranchName` flag and set it to
 Your workflow needs to use `actions/checkout@v3` with configuration to [fetch tags](https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches):
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
 When you have a lot of tags/commit you can speed up your build - plugin successfully works using local git shallow repository, but you must run `git fetch --tags --unshallow` before running `./gradlew release` - that will ensure the plugin has all the info it needs to run.
 
     steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v4
         - name: Publish using Axion
           run: |
               # Fetch a full copy of the repo, as required by release plugin:
