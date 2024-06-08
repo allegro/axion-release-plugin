@@ -20,13 +20,16 @@ abstract class BaseExtension {
 
     protected Provider<String> gradleProperty(String name) {
         // Deprecated and a noop starting in 7.4
-        if (GradleVersion.current() < GradleVersion.version("7.4")) {
+        if (currentGradleVersion() < GradleVersion.version("7.4")) {
             return providers.gradleProperty(name).forUseAtConfigurationTime()
         } else {
-            return provider
+            return providers.gradleProperty(name)
         }
     }
 
+    protected GradleVersion currentGradleVersion() {
+        GradleVersion.current()
+    }
 
     protected Provider<Boolean> gradlePropertyBoolean(String name) {
         return gradleProperty(name).map(Boolean::valueOf)
