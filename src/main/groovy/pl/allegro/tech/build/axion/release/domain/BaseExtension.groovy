@@ -19,12 +19,9 @@ abstract class BaseExtension {
     protected abstract ObjectFactory getObjects();
 
     protected Provider<String> gradleProperty(String name) {
+        Provider<String> property = providers.gradleProperty(name)
         // Deprecated and a noop starting in 7.4
-        if (currentGradleVersion() < GradleVersion.version("7.4")) {
-            return providers.gradleProperty(name).forUseAtConfigurationTime()
-        } else {
-            return providers.gradleProperty(name)
-        }
+        return currentGradleVersion() < GradleVersion.version("7.4") ? property.forUseAtConfigurationTime() : property
     }
 
     protected GradleVersion currentGradleVersion() {
