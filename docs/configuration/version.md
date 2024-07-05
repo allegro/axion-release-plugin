@@ -265,7 +265,7 @@ This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease`
 ## Decorating
 
 Decorating phase happens only when version is read (and deserialized).
-During this phase version will be decorated with branch name.
+During this phase, the version will be decorated with a branch name (default behavior).
 `axion-release-plugin` supports adding predefined named version creators
 (so don't be afraid to post pull request if you have something useful!).
 Decoration phase is conducted by *version creators*,
@@ -295,9 +295,23 @@ Per-branch version creators must be closures, there is no support for
 predefined creators. First match wins, but the order depends on
 collection type used (default for `[:]` is LinkedHashMap).
 
+#### versionWithBranch [default]
+
+    scmVersion {
+        versionCreator('versionWithBranch')
+    }
+
+This version creator appends branch name to version unless you are on
+*main*/*master* or *detached HEAD*:
+
+    decorate(version: '0.1.0', branch: 'master') == 0.1.0
+    decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
+
+This is the default version creator since version 1.18.0 of the plugin. 
+
 #### simple
 
-This is the default version creator that does nothing:
+This version creator is no operation one:
 
     decorate(version: '0.1.0') == 0.1.0
 
@@ -309,18 +323,6 @@ It might be useful when you want some branches to do *nothing*:
             'release/.*': 'simple'
         ])
     }
-
-#### versionWithBranch
-
-    scmVersion {
-        versionCreator('versionWithBranch')
-    }
-
-This version creator appends branch name to version unless you are on
-*main*/*master* or *detached HEAD*:
-
-    decorate(version: '0.1.0', branch: 'master') == 0.1.0
-    decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
 
 #### versionWithCommitHash
 
