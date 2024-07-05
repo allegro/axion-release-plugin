@@ -49,7 +49,7 @@ sourceSets {
 }
 
 val jgitVersion = "6.9.0.202403050737-r"
-val jschVersion = "0.2.17"
+val jschVersion = "0.2.18"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
