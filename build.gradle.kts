@@ -48,8 +48,8 @@ sourceSets {
     }
 }
 
-val jgitVersion = "6.9.0.202403050737-r"
-val jschVersion = "0.2.17"
+val jgitVersion = "6.10.0.202406032230-r"
+val jschVersion = "0.2.18"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -78,8 +78,8 @@ dependencies {
     testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.12.1")
-    testImplementation("org.apache.sshd:sshd-git:2.12.1")
+    testImplementation("org.apache.sshd:sshd-core:2.13.1")
+    testImplementation("org.apache.sshd:sshd-git:2.13.1")
     testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
     testImplementation(gradleTestKit())
 }
