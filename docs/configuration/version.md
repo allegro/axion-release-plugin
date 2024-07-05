@@ -255,8 +255,8 @@ it's set to `v/.+`):
 
 ### incrementPrerelease
 
-This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease` (by default
-it's empty):
+This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease`
+(by default it's empty):
 
     scmVersion {
         versionIncrementer('incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1'])
@@ -265,15 +265,15 @@ it's empty):
 ## Decorating
 
 Decorating phase happens only when version is read (and deserialized).
-During this phase version can be decorated with i.e. branch name.
-Default decorator does nothing. `axion-release-plugin` supports adding
-predefined named version creators (so don't be afraid to post pull
-request if you have something useful!). Decoration phase is conducted by
-*version creators*, you can configure it via `scmVersion.versionCreator`
+During this phase version will be decorated with branch name.
+`axion-release-plugin` supports adding predefined named version creators
+(so don't be afraid to post pull request if you have something useful!).
+Decoration phase is conducted by *version creators*,
+you can configure it via `scmVersion.versionCreator`
 method:
 
     scmVersion {
-        versionCreator('versionWithBranch')
+        versionCreator('versionWithCommitHash')
     }
 
 Or via `release.versionCreator` command line argument, which overrides

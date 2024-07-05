@@ -8,7 +8,7 @@ import java.util.function.BiFunction
 enum PredefinedVersionCreator {
 
     SIMPLE('simple', { String versionFromTag, ScmPosition position ->
-        return versionFromTag.toString()
+        return versionFromTag
     }),
 
     VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
