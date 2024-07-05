@@ -43,7 +43,7 @@ abstract class VersionConfig extends BaseExtension {
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
-        getVersionCreator().convention(PredefinedVersionCreator.SIMPLE.versionCreator)
+        getVersionCreator().convention(PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator)
         getVersionIncrementer().convention((VersionProperties.Incrementer) { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() })
         getSnapshotCreator().convention(PredefinedSnapshotCreator.SIMPLE.snapshotCreator)
         getReleaseCommitMessage().convention(PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator)
