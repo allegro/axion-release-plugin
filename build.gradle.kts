@@ -78,7 +78,7 @@ dependencies {
     testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.12.1")
+    testImplementation("org.apache.sshd:sshd-core:2.13.1")
     testImplementation("org.apache.sshd:sshd-git:2.13.1")
     testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
     testImplementation(gradleTestKit())
