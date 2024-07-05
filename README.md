@@ -27,7 +27,7 @@ JDK11+ & Gradle 7+ required.
 
 ```
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.15.1'
+    id 'pl.allegro.tech.build.axion-release' version '1.18.0'
 }
 
 project.version = scmVersion.version
@@ -38,7 +38,7 @@ $ git tag
 <empty list>
 
 $ ./gradlew currentVersion
-0.1.0-SNAPSHOT
+0.1.0-branch-SNAPSHOT
 
 $ ./gradlew release
 
