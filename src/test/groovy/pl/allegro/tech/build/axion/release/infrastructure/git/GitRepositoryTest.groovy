@@ -9,7 +9,7 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.TestEnvironment
+import pl.allegro.tech.build.axion.release.util.WithEnvironment
 import pl.allegro.tech.build.axion.release.domain.scm.ScmException
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
@@ -629,11 +629,21 @@ class GitRepositoryTest extends Specification {
         position.revision == headSubDirAChanged
     }
 
+    @WithEnvironment([
+        "GITHUB_HEAD_REF=pull-request-branch"
+    ])
+    def "should get branch name from GITHUB_HEAD_REF if available"() {
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == "pull-request-branch"
+    }
+
     private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
         new File(repositoryDir, fileInA).createNewFile()
         repository.commit([fileInA], "Add file ${fileName} in ${subDir}")
     }
-
 }

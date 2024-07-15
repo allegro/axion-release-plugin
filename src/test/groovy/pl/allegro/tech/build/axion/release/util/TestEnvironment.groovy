@@ -1,4 +1,4 @@
-package pl.allegro.tech.build.axion.release
+package pl.allegro.tech.build.axion.release.util
 
 import org.spockframework.runtime.extension.IGlobalExtension
 
