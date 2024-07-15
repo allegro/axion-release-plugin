@@ -13,12 +13,11 @@ class WithEnvironmentExtension implements IAnnotationDrivenExtension<WithEnviron
     @Override
     void visitFeatureAnnotation(WithEnvironment annotation, FeatureInfo feature) {
         feature.getFeatureMethod().addInterceptor { invocation ->
-            def envVarDefinitions = annotation.value().toList().stream()
-                .map {
-                    def array = it.split("=")
-                    Pair.of(array[0], array[1])
-                }
+            List<Pair<String, String>> envVarDefinitions = annotation.value().toList().stream()
+                .map { it.split("=") }
+                .map { Pair.of(it[0], it[1]) }
                 .collect(toList())
+
             envVarDefinitions.forEach { setEnvVariable(it.first(), it.second()) }
             invocation.proceed()
             envVarDefinitions.forEach { unsetEnvVariable(it.first()) }
