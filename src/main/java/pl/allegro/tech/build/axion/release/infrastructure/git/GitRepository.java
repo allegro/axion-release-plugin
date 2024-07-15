@@ -324,14 +324,46 @@ public class GitRepository implements ScmRepository {
     }
 
     private String branchName() {
-        return branchNameFromEnvVariable().orElseGet(this::branchNameFromGit);
+        return branchNameFromGithubEnvVariable().orElseGet(this::branchNameFromGit);
     }
 
     /**
-     * @return head ref or source branch of the pull request in a workflow run
+     * @return branch name based on GitHub event that triggered the workflow
      */
-    private Optional<String> branchNameFromEnvVariable() {
-        return Optional.ofNullable(System.getenv("GITHUB_HEAD_REF"));
+    private Optional<String> branchNameFromGithubEnvVariable() {
+        return env("GITHUB_EVENT_NAME").flatMap(eventName -> {
+            switch (eventName) {
+                case "push":
+                    return branchNameForPushEvent();
+                case "pull_request":
+                case "pull_request_target":
+                    return branchNameForPullRequestEvent();
+                default:
+                    return Optional.empty();
+            }
+        });
+    }
+
+    private Optional<String> env(String name) {
+        return Optional.ofNullable(System.getenv(name));
+    }
+
+    /**
+     * Returns:
+     * <li>branch name if the branch ref triggered the workflow</li>
+     * <li>Optional.empty if tag ref triggered the workflow</li>
+     */
+    private Optional<String> branchNameForPushEvent() {
+        return env("GITHUB_REF_TYPE")
+            .filter(refType -> refType.equals("branch"))
+            .flatMap(it -> env("GITHUB_REF_NAME"));
+    }
+
+    /**
+     * @return source branch of the pull request that triggered the workflow
+     */
+    private Optional<String> branchNameForPullRequestEvent() {
+        return env("GITHUB_HEAD_REF");
     }
 
     /**

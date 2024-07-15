@@ -630,14 +630,56 @@ class GitRepositoryTest extends Specification {
     }
 
     @WithEnvironment([
-        "GITHUB_HEAD_REF=pull-request-branch"
+        'GITHUB_EVENT_NAME=pull_request',
+        'GITHUB_HEAD_REF=pull-request-branch'
     ])
-    def "should get branch name from GITHUB_HEAD_REF if available"() {
+    def "should get branch name on Github Actions if pull_request triggered the workflow"() {
         when:
         ScmPosition position = repository.currentPosition()
 
         then:
-        position.branch == "pull-request-branch"
+        position.branch == 'pull-request-branch'
+    }
+
+    @WithEnvironment([
+        'GITHUB_EVENT_NAME=pull_request_target',
+        'GITHUB_HEAD_REF=pull-request-branch'
+    ])
+    def "should get branch name on Github Actions if pull_request_target triggered the workflow"() {
+        when:
+            ScmPosition position = repository.currentPosition()
+
+        then:
+            position.branch == 'pull-request-branch'
+    }
+
+    @WithEnvironment([
+        'GITHUB_EVENT_NAME=push',
+        'GITHUB_REF_TYPE=branch',
+        'GITHUB_REF_NAME=pushed-branch'
+    ])
+    def "should get branch name on Github Actions if branch push triggered the workflow"() {
+        when:
+            ScmPosition position = repository.currentPosition()
+
+        then:
+            position.branch == 'pushed-branch'
+    }
+
+    @WithEnvironment([
+        'GITHUB_EVENT_NAME=push',
+        'GITHUB_REF_TYPE=tag',
+        'GITHUB_REF_NAME=pushed-tag'
+    ])
+    def "should fall back to git on Github Actions if tag push triggered the workflow"() {
+        given:
+            rawRepository.checkout(branch: 'some-branch', createBranch: true)
+
+        when:
+            ScmPosition position = repository.currentPosition()
+
+        then:
+            position.branch == 'some-branch'
     }
 
     private void commitFile(String subDir, String fileName) {
