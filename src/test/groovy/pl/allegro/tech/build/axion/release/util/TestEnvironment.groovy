@@ -1,5 +1,10 @@
 package pl.allegro.tech.build.axion.release.util
 
+/**
+ * <p>Helper class for manipulating environment variables.</p>
+ *
+ * Credits to Kotest's <a href="https://github.com/kotest/kotest/blob/master/kotest-extensions/src/jvmMain/kotlin/io/kotest/extensions/system/SystemEnvironmentExtensions.kt#L26">withEnvironment</a>
+ */
 class TestEnvironment {
 
     private static Map<String, String> MUTABLE_ENV_MAP
