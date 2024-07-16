@@ -9,7 +9,14 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.util.WithEnvironment
+import pl.allegro.tech.build.axion.release.domain.scm.ScmException
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -17,8 +24,8 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 
 import static java.util.regex.Pattern.compile
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class GitRepositoryTest extends Specification {
@@ -622,11 +629,36 @@ class GitRepositoryTest extends Specification {
         position.revision == headSubDirAChanged
     }
 
+    @WithEnvironment([
+        'GITHUB_ACTIONS=true',
+        'GITHUB_EVENT_NAME=pull_request',
+        'GITHUB_HEAD_REF=pr-source-branch'
+    ])
+    def "should get branch name on Github Actions if pull_request triggered the workflow"() {
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'pr-source-branch'
+    }
+
+    @WithEnvironment([
+        'GITHUB_ACTIONS=true',
+        'GITHUB_EVENT_NAME=pull_request_target',
+        'GITHUB_HEAD_REF=pr-source-branch'
+    ])
+    def "should get branch name on Github Actions if pull_request_target triggered the workflow"() {
+        when:
+            ScmPosition position = repository.currentPosition()
+
+        then:
+            position.branch == 'pr-source-branch'
+    }
+
     private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
         new File(repositoryDir, fileInA).createNewFile()
         repository.commit([fileInA], "Add file ${fileName} in ${subDir}")
     }
-
 }
