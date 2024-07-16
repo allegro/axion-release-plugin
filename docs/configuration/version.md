@@ -297,6 +297,8 @@ collection type used (default for `[:]` is LinkedHashMap).
 
 #### versionWithBranch [default]
 
+This is the default version creator since version 1.18.0 of the plugin.
+
     scmVersion {
         versionCreator('versionWithBranch')
     }
@@ -307,7 +309,13 @@ This version creator appends branch name to version unless you are on
     decorate(version: '0.1.0', branch: 'master') == 0.1.0
     decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
 
-This is the default version creator since version 1.18.0 of the plugin. 
+If your Gradle build is executed within workflow on GitHub Actions and that workflow is triggered by either
+`pull_request` or `pull_request_target` event, GitHub will not check out the source branch of the pull request but
+a custom reference `refs/pull/<pr_number>/merge` (known as "merge branch"). Consequently, the repository will be in
+detached-HEAD state.
+
+In that case, the branch name will be taken from `GITHUB_HEAD_REF` environment variable
+[provided by GitHub](https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables).
 
 #### simple
 

@@ -328,42 +328,28 @@ public class GitRepository implements ScmRepository {
     }
 
     /**
-     * @return branch name based on GitHub event that triggered the workflow
+     * <p>If executed within workflow on GitHub Actions and that workflow is triggered by pull_request (or pull_request_target)
+     * event, GitHub will not check out the source branch of the PR, but some custom ref: 'refs/pull/<pr_number>/merge'
+     * (they call it a "merge branch"). It effectively means that repository is in detached-HEAD state and axion-release
+     * is not able to get the branch name from HEAD ref.</p>
+     *
+     * <p>For pull_request and pull_request_target events, GitHub sets a special environment variable GITHUB_HEAD_REF.
+     * It contains the head ref of source branch of the PR which triggered the workflow. This variable is not set
+     * for other event types.</p>
+     *
+     * <p>If the build is not executed on GitHub Actions, this method will always return Optional.empty.</p>
+     *
+     *  @return source branch of the PR which triggered GitHub Actions workflow
      */
     private Optional<String> branchNameFromGithubEnvVariable() {
-        return env("GITHUB_EVENT_NAME").flatMap(eventName -> {
-            switch (eventName) {
-                case "push":
-                    return branchNameForPushEvent();
-                case "pull_request":
-                case "pull_request_target":
-                    return branchNameForPullRequestEvent();
-                default:
-                    return Optional.empty();
-            }
-        });
+        if (env("GITHUB_ACTIONS").isPresent()) {
+            return env("GITHUB_HEAD_REF");
+        }
+        return Optional.empty();
     }
 
     private Optional<String> env(String name) {
         return Optional.ofNullable(System.getenv(name));
-    }
-
-    /**
-     * Returns:
-     * <li>branch name if the branch ref triggered the workflow</li>
-     * <li>Optional.empty if tag ref triggered the workflow</li>
-     */
-    private Optional<String> branchNameForPushEvent() {
-        return env("GITHUB_REF_TYPE")
-            .filter(refType -> refType.equals("branch"))
-            .flatMap(it -> env("GITHUB_REF_NAME"));
-    }
-
-    /**
-     * @return source branch of the pull request that triggered the workflow
-     */
-    private Optional<String> branchNameForPullRequestEvent() {
-        return env("GITHUB_HEAD_REF");
     }
 
     /**
