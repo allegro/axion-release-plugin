@@ -15,7 +15,14 @@ class WithEnvironmentExtension implements IAnnotationDrivenExtension<WithEnviron
         feature.getFeatureMethod().addInterceptor { invocation ->
             List<Pair<String, String>> envVarDefinitions = annotation.value().toList().stream()
                 .map { it.split("=") }
-                .map { Pair.of(it[0], it[1]) }
+                .map { parts ->
+                    switch (parts.length) {
+                        case 2: return Pair.of(parts[0], parts[1])
+                        case 1: return Pair.of(parts[0], "")
+                        default: return null
+                    }
+                }
+                .filter { it != null }
                 .collect(toList())
 
             envVarDefinitions.forEach { setEnvVariable(it.first(), it.second()) }

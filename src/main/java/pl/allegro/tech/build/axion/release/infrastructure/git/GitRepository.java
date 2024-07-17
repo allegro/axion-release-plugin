@@ -343,7 +343,10 @@ public class GitRepository implements ScmRepository {
      */
     private Optional<String> branchNameFromGithubEnvVariable() {
         if (env("GITHUB_ACTIONS").isPresent()) {
-            return env("GITHUB_HEAD_REF");
+            return env("GITHUB_HEAD_REF")
+                // GitHub violates its own documentation and sets this variable always. For pull_request and
+                // pull_request_target it contains actual value, for every other event it's just empty string
+                .filter(it -> !it.isBlank());
         }
         return Optional.empty();
     }

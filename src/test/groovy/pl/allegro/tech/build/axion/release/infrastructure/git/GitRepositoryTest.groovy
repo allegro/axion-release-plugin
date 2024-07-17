@@ -30,7 +30,6 @@ import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilde
 
 class GitRepositoryTest extends Specification {
 
-    public static final String MASTER_BRANCH = "master"
     File repositoryDir
 
     File remoteRepositoryDir
@@ -43,6 +42,8 @@ class GitRepositoryTest extends Specification {
 
     GitRepository repository
 
+    String defaultBranch;
+
     void setup() {
         remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
         Map remoteRepositories = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()
@@ -54,6 +55,9 @@ class GitRepositoryTest extends Specification {
 
         rawRepository = repositories[Grgit]
         repository = repositories[GitRepository]
+
+        assert rawRepository.branch.current().name == remoteRawRepository.branch.current().name
+        defaultBranch = rawRepository.branch.current().name
     }
 
     def "should throw unavailable exception when initializing in unexisitng repository"() {
@@ -592,7 +596,7 @@ class GitRepositoryTest extends Specification {
         git.checkout().setName(secondBranchName).call()
         commitFile('second/aa', 'foo')
         commitFile('b/ba', 'bar')
-        git.checkout().setName(MASTER_BRANCH).call()
+        git.checkout().setName(defaultBranch).call()
         git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
 
         commitFile('after/aa', 'after')
@@ -631,7 +635,6 @@ class GitRepositoryTest extends Specification {
 
     @WithEnvironment([
         'GITHUB_ACTIONS=true',
-        'GITHUB_EVENT_NAME=pull_request',
         'GITHUB_HEAD_REF=pr-source-branch'
     ])
     def "should get branch name on Github Actions if pull_request triggered the workflow"() {
@@ -644,15 +647,14 @@ class GitRepositoryTest extends Specification {
 
     @WithEnvironment([
         'GITHUB_ACTIONS=true',
-        'GITHUB_EVENT_NAME=pull_request_target',
-        'GITHUB_HEAD_REF=pr-source-branch'
+        'GITHUB_HEAD_REF='
     ])
-    def "should get branch name on Github Actions if pull_request_target triggered the workflow"() {
+    def "should ignore GITHUB_HEAD_REF variable if it has empty value"() {
         when:
             ScmPosition position = repository.currentPosition()
 
         then:
-            position.branch == 'pr-source-branch'
+            position.branch == defaultBranch
     }
 
     private void commitFile(String subDir, String fileName) {
