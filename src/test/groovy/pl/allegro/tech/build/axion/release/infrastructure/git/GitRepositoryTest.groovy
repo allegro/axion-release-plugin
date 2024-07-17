@@ -631,7 +631,6 @@ class GitRepositoryTest extends Specification {
 
     @WithEnvironment([
         'GITHUB_ACTIONS=true',
-        'GITHUB_EVENT_NAME=pull_request',
         'GITHUB_HEAD_REF=pr-source-branch'
     ])
     def "should get branch name on Github Actions if pull_request triggered the workflow"() {
@@ -644,15 +643,14 @@ class GitRepositoryTest extends Specification {
 
     @WithEnvironment([
         'GITHUB_ACTIONS=true',
-        'GITHUB_EVENT_NAME=pull_request_target',
-        'GITHUB_HEAD_REF=pr-source-branch'
+        'GITHUB_HEAD_REF='
     ])
     def "should get branch name on Github Actions if pull_request_target triggered the workflow"() {
         when:
             ScmPosition position = repository.currentPosition()
 
         then:
-            position.branch == 'pr-source-branch'
+            position.branch == 'main'
     }
 
     private void commitFile(String subDir, String fileName) {
