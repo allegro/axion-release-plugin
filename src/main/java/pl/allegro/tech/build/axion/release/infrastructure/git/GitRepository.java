@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
 
 public class GitRepository implements ScmRepository {
@@ -51,13 +51,28 @@ public class GitRepository implements ScmRepository {
         }
 
         if (properties.isAttachRemote()) {
-            this.attachRemote(properties.getRemote(), properties.getRemoteUrl());
+            attachRemote(properties.getRemote(), properties.getRemoteUrl());
         }
 
         if (properties.isFetchTags()) {
-            this.fetchTags(properties.getIdentity(), properties.getRemote());
+            fetchTags(properties.getIdentity(), properties.getRemote());
         }
 
+        if (onCI() && properties.isUnshallowRepoOnCI()) {
+            unshallowRepo(properties.getIdentity());
+        }
+    }
+
+    private void unshallowRepo(ScmIdentity identity) {
+        try {
+            logger.lifecycle("Unshallowing repo because the build is being executed on CI");
+            jgitRepository.fetch()
+                .setUnshallow(true)
+                .setTransportConfigCallback(transportConfigFactory.create(identity))
+                .call();
+        } catch (GitAPIException e) {
+            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
+        }
     }
 
     /**
@@ -339,16 +354,24 @@ public class GitRepository implements ScmRepository {
      *
      * <p>If the build is not executed on GitHub Actions, this method will always return Optional.empty.</p>
      *
-     *  @return source branch of the PR which triggered GitHub Actions workflow
+     * @return source branch of the PR which triggered GitHub Actions workflow
      */
     private Optional<String> branchNameFromGithubEnvVariable() {
-        if (env("GITHUB_ACTIONS").isPresent()) {
+        if (onGithubActions()) {
             return env("GITHUB_HEAD_REF")
                 // GitHub violates its own documentation and sets this variable always. For pull_request and
                 // pull_request_target it contains actual value, for every other event it's just empty string
                 .filter(it -> !it.isBlank());
         }
         return Optional.empty();
+    }
+
+    private boolean onGithubActions() {
+        return env("GITHUB_ACTIONS").map(it -> it.equals("true")).orElse(false);
+    }
+
+    private boolean onCI() {
+        return env("CI").map(it -> it.equals("true")).orElse(false);
     }
 
     private Optional<String> env(String name) {
@@ -419,10 +442,13 @@ public class GitRepository implements ScmRepository {
 
             Map<String, List<String>> allTags = tagsMatching(pattern, walk);
 
-            RevCommit currentCommit;
-            List<String> currentTagsList;
-            for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-                currentTagsList = allTags.get(currentCommit.getId().getName());
+            while (true) {
+                RevCommit currentCommit = walk.next();
+                if (currentCommit == null) {
+                    break;
+                }
+
+                List<String> currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
                     TagsOnCommit taggedCommit = new TagsOnCommit(
@@ -438,7 +464,6 @@ public class GitRepository implements ScmRepository {
                 }
 
             }
-
             walk.dispose();
         } catch (IOException | GitAPIException e) {
             throw new ScmException(e);
@@ -571,7 +596,7 @@ public class GitRepository implements ScmRepository {
         try {
             return StreamSupport.stream(jgitRepository.log().setMaxCount(messageCount).call().spliterator(), false)
                 .map(RevCommit::getFullMessage)
-                .collect(Collectors.toList());
+                .collect(toList());
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }

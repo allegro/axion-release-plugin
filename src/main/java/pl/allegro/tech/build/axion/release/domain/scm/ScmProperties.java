@@ -15,6 +15,7 @@ public class ScmProperties {
     private final String overriddenBranchName;
     private final Boolean overriddenIsClean;
     private final ScmIdentity identity;
+    private final Boolean unshallowRepoOnCI;
 
     public ScmProperties(
         String type,
@@ -26,7 +27,8 @@ public class ScmProperties {
         String remoteUrl,
         String overriddenBranchName,
         Boolean overriddenIsClean,
-        ScmIdentity identity
+        ScmIdentity identity,
+        Boolean unshallowRepoOnCI
     ) {
         this.type = type;
         this.directory = directory;
@@ -38,6 +40,7 @@ public class ScmProperties {
         this.overriddenBranchName = overriddenBranchName;
         this.overriddenIsClean = overriddenIsClean;
         this.identity = identity;
+        this.unshallowRepoOnCI = unshallowRepoOnCI;
     }
 
     public ScmPushOptions pushOptions() {
@@ -82,5 +85,9 @@ public class ScmProperties {
 
     public final ScmIdentity getIdentity() {
         return identity;
+    }
+
+    public Boolean isUnshallowRepoOnCI() {
+        return unshallowRepoOnCI;
     }
 }

@@ -9,6 +9,8 @@ class GitProjectBuilder {
 
     private final File repositoryDir
 
+    private File remoteRepositoryDir;
+
     private final Grgit rawRepository
 
     private ScmProperties scmProperties
@@ -26,10 +28,10 @@ class GitProjectBuilder {
         this.rawRepository.repository.jgit.repository.config.baseConfig.clear()
     }
 
-    private GitProjectBuilder(File project, File cloneFrom) {
+    private GitProjectBuilder(File project, File cloneFrom, Integer depth) {
         this.repositoryDir = project
 
-        this.rawRepository = Grgit.clone(dir: repositoryDir, uri: "file://${cloneFrom.canonicalPath}")
+        this.rawRepository = Grgit.clone(dir: repositoryDir, uri: "file://${cloneFrom.canonicalPath}", depth: depth)
         this.scmProperties = ScmPropertiesBuilder.scmProperties(repositoryDir).build()
         this.identity = ScmIdentity.defaultIdentityWithoutAgents()
 
@@ -42,7 +44,11 @@ class GitProjectBuilder {
     }
 
     static GitProjectBuilder gitProject(File project, File cloneFrom) {
-        return new GitProjectBuilder(project, cloneFrom)
+        return new GitProjectBuilder(project, cloneFrom, null)
+    }
+
+    static GitProjectBuilder gitProject(File project, File cloneFrom, int depth) {
+        return new GitProjectBuilder(project, cloneFrom, depth)
     }
 
     GitProjectBuilder withInitialCommit() {

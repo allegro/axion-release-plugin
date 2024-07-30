@@ -21,8 +21,11 @@ class RepositoryBasedTest extends Specification {
 
     ScmRepository repository
 
+    String defaultBranch
+
     void setup() {
         def rawRepository = Grgit.init(dir: temporaryFolder)
+        defaultBranch = rawRepository.branch.current().name
 
         // let's make sure, not to use system wide user settings in tests
         rawRepository.repository.jgit.repository.config.baseConfig.clear()

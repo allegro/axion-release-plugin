@@ -8,7 +8,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
@@ -40,6 +39,7 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
+        getUnshallowRepoOnCI().convention(true)
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
@@ -79,6 +79,9 @@ abstract class VersionConfig extends BaseExtension {
 
     @Internal
     abstract Property<Boolean> getUseHighestVersion();
+
+    @Internal
+    abstract Property<Boolean> getUnshallowRepoOnCI();
 
     @Internal
     abstract MapProperty<String, Object> getBranchVersionIncrementer();
