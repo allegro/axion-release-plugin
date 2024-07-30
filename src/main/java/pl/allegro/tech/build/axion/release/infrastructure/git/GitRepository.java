@@ -428,6 +428,7 @@ public class GitRepository implements ScmRepository {
             RevCommit currentCommit;
             List<String> currentTagsList;
             int depth = 0;
+            boolean alreadyDeepened = false;
 
             logger.lifecycle("Starting rev walk");
 
@@ -435,19 +436,22 @@ public class GitRepository implements ScmRepository {
                 depth++;
 
                 if (currentCommit == null) {
-                    logger.lifecycle("Deepening shallow repo to " + (depth + 1));
-                    jgitRepository.fetch()
-                        .setDepth(depth + 1)
-                        .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
-                        .call();
-                    currentCommit = walk.next();
-                    if (currentCommit == null) {
-                        logger.lifecycle("No more commits fetched after deepening");
-                        break;
+                    if (!alreadyDeepened) {
+                        logger.lifecycle("Deepening shallow repo to " + (depth + 1));
+                        jgitRepository.fetch()
+                            .setDepth(depth + 1)
+                            .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
+                            .call();
+                        walk.reset();
+                        alreadyDeepened = true;
+                        continue;
                     } else {
-                        logger.lifecycle("Fetched commit after deepening");
+                        break;
                     }
                 }
+
+                alreadyDeepened = false;
+
                 logger.lifecycle("Current commit: " + currentCommit.getShortMessage());
 
                 currentTagsList = allTags.get(currentCommit.getId().getName());
@@ -525,19 +529,15 @@ public class GitRepository implements ScmRepository {
     }
 
     private boolean hasCommits() {
-        logger.lifecycle("Executing git log");
         LogCommand log = jgitRepository.log();
         log.setMaxCount(1);
 
         try {
             log.call();
-            logger.lifecycle("Executed git log successfully");
             return true;
         } catch (NoHeadException exception) {
-            logger.lifecycle("Caught NoHeadException");
             return false;
         } catch (GitAPIException e) {
-            logger.lifecycle("Caught GitAPIException");
             throw new ScmException(e);
         }
     }
