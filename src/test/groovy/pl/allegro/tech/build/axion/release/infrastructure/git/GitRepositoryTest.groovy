@@ -651,10 +651,10 @@ class GitRepositoryTest extends Specification {
     ])
     def "should ignore GITHUB_HEAD_REF variable if it has empty value"() {
         when:
-            ScmPosition position = repository.currentPosition()
+        ScmPosition position = repository.currentPosition()
 
         then:
-            position.branch == defaultBranch
+        position.branch == defaultBranch
     }
 
     private void commitFile(String subDir, String fileName) {

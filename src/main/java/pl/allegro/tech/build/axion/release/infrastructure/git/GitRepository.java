@@ -58,6 +58,20 @@ public class GitRepository implements ScmRepository {
             this.fetchTags(properties.getIdentity(), properties.getRemote());
         }
 
+        if (onGithubActions()) {
+            this.unshallowCurrentRef();
+        }
+    }
+
+    private void unshallowCurrentRef() {
+        try {
+            jgitRepository.fetch()
+                .setRefSpecs(env("GITHUB_REF").orElseGet(this::branchName))
+                .setUnshallow(true)
+                .call();
+        } catch (GitAPIException e) {
+            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
+        }
     }
 
     /**
@@ -339,16 +353,20 @@ public class GitRepository implements ScmRepository {
      *
      * <p>If the build is not executed on GitHub Actions, this method will always return Optional.empty.</p>
      *
-     *  @return source branch of the PR which triggered GitHub Actions workflow
+     * @return source branch of the PR which triggered GitHub Actions workflow
      */
     private Optional<String> branchNameFromGithubEnvVariable() {
-        if (env("GITHUB_ACTIONS").isPresent()) {
+        if (onGithubActions()) {
             return env("GITHUB_HEAD_REF")
                 // GitHub violates its own documentation and sets this variable always. For pull_request and
                 // pull_request_target it contains actual value, for every other event it's just empty string
                 .filter(it -> !it.isBlank());
         }
         return Optional.empty();
+    }
+
+    private boolean onGithubActions() {
+        return env("GITHUB_ACTIONS").map(it -> it.equals("true")).orElse(false);
     }
 
     private Optional<String> env(String name) {
@@ -396,12 +414,12 @@ public class GitRepository implements ScmRepository {
     }
 
     private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
-        List<TagsOnCommit> taggedCommits = new ArrayList<>();
-        if (!hasCommits()) {
-            return taggedCommits;
-        }
-
         try {
+            List<TagsOnCommit> taggedCommits = new ArrayList<>();
+            if (!hasCommits()) {
+                return taggedCommits;
+            }
+
             ObjectId headId = jgitRepository.getRepository().resolve(Constants.HEAD);
 
             ObjectId startingCommit;
@@ -438,13 +456,14 @@ public class GitRepository implements ScmRepository {
                 }
 
             }
-
             walk.dispose();
+
+            return taggedCommits;
+
         } catch (IOException | GitAPIException e) {
             throw new ScmException(e);
         }
 
-        return taggedCommits;
     }
 
     private RevWalk walker(ObjectId startingCommit) throws IOException {
@@ -460,7 +479,7 @@ public class GitRepository implements ScmRepository {
     }
 
     private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
-        List<Ref> tags = jgitRepository.tagList().call();
+        Collection<Ref> tags = jgitRepository.lsRemote().setTags(true).call();
 
         return tags.stream()
             .map(tag -> new TagNameAndId(
