@@ -400,8 +400,11 @@ public class GitRepository implements ScmRepository {
 
     private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
         try {
+            logger.lifecycle("Starting taggedCommitsInternal execution");
+
             List<TagsOnCommit> taggedCommits = new ArrayList<>();
             if (!hasCommits()) {
+                logger.lifecycle("No commits found, returning empty list");
                 return taggedCommits;
             }
 
@@ -426,6 +429,8 @@ public class GitRepository implements ScmRepository {
             List<String> currentTagsList;
             int depth = 0;
 
+            logger.lifecycle("Starting rev walk");
+
             for (currentCommit = walk.next(); ; currentCommit = walk.next()) {
                 depth++;
 
@@ -443,10 +448,12 @@ public class GitRepository implements ScmRepository {
                         logger.lifecycle("Fetched commit after deepening");
                     }
                 }
+                logger.lifecycle("Current commit: " + currentCommit.getShortMessage());
 
                 currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
+                    logger.lifecycle("Found tags: " + String.join(", ", currentTagsList));
                     TagsOnCommit taggedCommit = new TagsOnCommit(
                         currentCommit.getId().name(),
                         currentTagsList
@@ -454,6 +461,7 @@ public class GitRepository implements ScmRepository {
                     taggedCommits.add(taggedCommit);
 
                     if (stopOnFirstTag) {
+                        logger.lifecycle("Stopping on first tag");
                         break;
                     }
 
@@ -517,15 +525,19 @@ public class GitRepository implements ScmRepository {
     }
 
     private boolean hasCommits() {
+        logger.lifecycle("Executing git log");
         LogCommand log = jgitRepository.log();
         log.setMaxCount(1);
 
         try {
             log.call();
+            logger.lifecycle("Executed git log successfully");
             return true;
         } catch (NoHeadException exception) {
+            logger.lifecycle("Caught NoHeadException");
             return false;
         } catch (GitAPIException e) {
+            logger.lifecycle("Caught GitAPIException");
             throw new ScmException(e);
         }
     }
