@@ -430,13 +430,17 @@ public class GitRepository implements ScmRepository {
                 depth++;
 
                 if (currentCommit == null) {
+                    logger.lifecycle("Deepening shallow repo to " + (depth + 1));
                     jgitRepository.fetch()
                         .setDepth(depth + 1)
                         .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
                         .call();
                     currentCommit = walk.next();
                     if (currentCommit == null) {
+                        logger.lifecycle("No more commits fetched after deepening");
                         break;
+                    } else {
+                        logger.lifecycle("Fetched commit after deepening");
                     }
                 }
 
