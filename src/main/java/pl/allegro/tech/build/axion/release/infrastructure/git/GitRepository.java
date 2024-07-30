@@ -400,11 +400,8 @@ public class GitRepository implements ScmRepository {
 
     private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
         try {
-            logger.lifecycle("Starting taggedCommitsInternal execution");
-
             List<TagsOnCommit> taggedCommits = new ArrayList<>();
             if (!hasCommits()) {
-                logger.lifecycle("No commits found, returning empty list");
                 return taggedCommits;
             }
 
@@ -430,16 +427,14 @@ public class GitRepository implements ScmRepository {
             int depth = 0;
             boolean alreadyDeepened = false;
 
-            logger.lifecycle("Starting rev walk");
-
             for (currentCommit = walk.next(); ; currentCommit = walk.next()) {
                 depth++;
 
                 if (currentCommit == null) {
                     if (!alreadyDeepened) {
-                        logger.lifecycle("Deepening shallow repo to " + (depth + 1));
+                        logger.lifecycle("Deepening shallow repo to " + (depth + 10));
                         jgitRepository.fetch()
-                            .setDepth(depth + 1)
+                            .setDepth(depth + 10)
                             .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
                             .call();
                         walk.reset();
@@ -452,12 +447,9 @@ public class GitRepository implements ScmRepository {
 
                 alreadyDeepened = false;
 
-                logger.lifecycle("Current commit: " + currentCommit.getShortMessage());
-
                 currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
-                    logger.lifecycle("Found tags: " + String.join(", ", currentTagsList));
                     TagsOnCommit taggedCommit = new TagsOnCommit(
                         currentCommit.getId().name(),
                         currentTagsList
@@ -465,7 +457,6 @@ public class GitRepository implements ScmRepository {
                     taggedCommits.add(taggedCommit);
 
                     if (stopOnFirstTag) {
-                        logger.lifecycle("Stopping on first tag");
                         break;
                     }
 

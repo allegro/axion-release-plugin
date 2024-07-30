@@ -23,9 +23,9 @@ class MemoizedVersionSupplier {
 //            println 'Returning memoized version ' + version.decoratedVersion
 //            return version
 //        }
-        println 'Resolving version'
+//        println 'Resolving version'
         version = versionSupplier.resolve(config, projectDirectory)
-        println 'Returning resolved version ' + version.decoratedVersion
+//        println 'Returning resolved version ' + version.decoratedVersion
         return version
     }
 }
