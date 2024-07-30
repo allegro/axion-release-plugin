@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.Version;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
@@ -27,7 +28,8 @@ class VersionSorter {
         boolean ignoreNextVersionTags,
         boolean forceSnapshot,
         Pattern nextVersionTagPattern,
-        VersionFactory versionFactory
+        VersionFactory versionFactory,
+        ScmRepository repository
     ) {
         Set<Version> versions = new LinkedHashSet<>();
         LinkedHashMap<Version, Boolean> isVersionNextVersion = new LinkedHashMap<>();

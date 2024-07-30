@@ -57,21 +57,6 @@ public class GitRepository implements ScmRepository {
         if (properties.isFetchTags()) {
             this.fetchTags(properties.getIdentity(), properties.getRemote());
         }
-
-        if (onGithubActions()) {
-            this.unshallowCurrentRef();
-        }
-    }
-
-    private void unshallowCurrentRef() {
-        try {
-            jgitRepository.fetch()
-                .setRefSpecs(env("GITHUB_REF").orElseGet(this::branchName))
-                .setUnshallow(true)
-                .call();
-        } catch (GitAPIException e) {
-            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
-        }
     }
 
     /**
@@ -439,7 +424,22 @@ public class GitRepository implements ScmRepository {
 
             RevCommit currentCommit;
             List<String> currentTagsList;
-            for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
+            int depth = 0;
+
+            for (currentCommit = walk.next(); ; currentCommit = walk.next()) {
+                depth++;
+
+                if (currentCommit == null) {
+                    jgitRepository.fetch()
+                        .setDepth(depth + 1)
+                        .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
+                        .call();
+                    currentCommit = walk.next();
+                    if (currentCommit == null) {
+                        break;
+                    }
+                }
+
                 currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
@@ -479,7 +479,7 @@ public class GitRepository implements ScmRepository {
     }
 
     private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
-        Collection<Ref> tags = jgitRepository.lsRemote().setTags(true).call();
+        List<Ref> tags = jgitRepository.tagList().call();
 
         return tags.stream()
             .map(tag -> new TagNameAndId(

@@ -101,9 +101,9 @@ public class VersionResolver {
             // A(last changes in subProj1) -> B -> C(tag 1.3.0) -> D -> E(head)
             // Now if we test for anywhere from C to E we should get 1.3.0
             String tagCommitRevision = currentVersionInfo.commit != null ? currentVersionInfo.commit : "";
-            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
-            for (String dependency: versionProperties.getMonorepoConfig().getDependenciesDirs().get()) {
-                onLatestVersion = onLatestVersion && repository.isIdenticalForPath(dependency, latestChangePosition.getRevision(),tagCommitRevision);
+            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(), tagCommitRevision);
+            for (String dependency : versionProperties.getMonorepoConfig().getDependenciesDirs().get()) {
+                onLatestVersion = onLatestVersion && repository.isIdenticalForPath(dependency, latestChangePosition.getRevision(), tagCommitRevision);
             }
         }
 
@@ -118,7 +118,7 @@ public class VersionResolver {
     }
 
     private VersionSorter.Result versionFromTaggedCommits(TaggedCommits taggedCommits, boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory, boolean forceSnapshot) {
-        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, forceSnapshot, nextVersionTagPattern, versionFactory);
+        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, forceSnapshot, nextVersionTagPattern, versionFactory, repository);
     }
 
     private static final class VersionInfo {
