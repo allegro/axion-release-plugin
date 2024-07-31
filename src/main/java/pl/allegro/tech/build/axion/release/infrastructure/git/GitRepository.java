@@ -414,12 +414,12 @@ public class GitRepository implements ScmRepository {
     }
 
     private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
-        try {
-            List<TagsOnCommit> taggedCommits = new ArrayList<>();
-            if (!hasCommits()) {
-                return taggedCommits;
-            }
+        List<TagsOnCommit> taggedCommits = new ArrayList<>();
+        if (!hasCommits()) {
+            return taggedCommits;
+        }
 
+        try {
             ObjectId headId = jgitRepository.getRepository().resolve(Constants.HEAD);
 
             ObjectId startingCommit;
