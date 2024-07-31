@@ -22,9 +22,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.jgit.revwalk.filter.RevFilter.NO_MERGES;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
 
 public class GitRepository implements ScmRepository {
@@ -422,23 +423,21 @@ public class GitRepository implements ScmRepository {
 
             Map<String, List<String>> allTags = tagsMatching(pattern, walk);
 
-            RevCommit currentCommit;
             List<String> currentTagsList;
-            int depth = 0;
             boolean alreadyDeepened = false;
 
-            for (currentCommit = walk.next(); ; currentCommit = walk.next()) {
-                depth++;
+            while (true) {
+                RevCommit currentCommit = walk.next();
 
                 if (currentCommit == null) {
                     if (!alreadyDeepened) {
-                        logger.lifecycle("Deepening shallow repo to " + (depth + 10));
-                        jgitRepository.fetch()
-                            .setDepth(depth + 10)
-                            .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
-                            .call();
+                        deepenRepositoryBy(100);
                         walk.reset();
                         alreadyDeepened = true;
+
+                        if (!inclusive) {
+                            walk.next();
+                        }
                         continue;
                     } else {
                         break;
@@ -471,6 +470,18 @@ public class GitRepository implements ScmRepository {
             throw new ScmException(e);
         }
 
+    }
+
+    private void deepenRepositoryBy(int depth) throws GitAPIException {
+        Iterable<RevCommit> commits = jgitRepository.log().setRevFilter(NO_MERGES).call();
+        int numberOfCommits = (int) StreamSupport.stream(commits.spliterator(), false).count();
+
+        logger.lifecycle("Deepening shallow repo by " + depth + " to total depth of " + (numberOfCommits + depth));
+
+        jgitRepository.fetch()
+            .setDepth(numberOfCommits + depth)
+            .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
+            .call();
     }
 
     private RevWalk walker(ObjectId startingCommit) throws IOException {
@@ -597,7 +608,7 @@ public class GitRepository implements ScmRepository {
         try {
             return StreamSupport.stream(jgitRepository.log().setMaxCount(messageCount).call().spliterator(), false)
                 .map(RevCommit::getFullMessage)
-                .collect(Collectors.toList());
+                .collect(toList());
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }
