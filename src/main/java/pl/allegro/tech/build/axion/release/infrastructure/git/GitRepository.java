@@ -65,6 +65,7 @@ public class GitRepository implements ScmRepository {
 
     private void unshallowCurrentRef() {
         try {
+            logger.lifecycle("Unshallowing repo");
             jgitRepository.fetch()
                 .setRefSpecs(env("GITHUB_REF").orElseGet(this::branchName))
                 .setUnshallow(true)
