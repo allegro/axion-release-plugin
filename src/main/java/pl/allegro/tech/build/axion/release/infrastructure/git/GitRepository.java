@@ -68,6 +68,7 @@ public class GitRepository implements ScmRepository {
             jgitRepository.fetch()
                 .setRefSpecs(env("GITHUB_REF").orElseGet(this::branchName))
                 .setUnshallow(true)
+                .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
                 .call();
         } catch (GitAPIException e) {
             logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo");
