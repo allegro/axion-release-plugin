@@ -66,13 +66,14 @@ public class GitRepository implements ScmRepository {
     private void unshallowCurrentRef() {
         try {
             logger.lifecycle("Unshallowing repo");
-            jgitRepository.fetch()
-                .setRefSpecs(env("GITHUB_REF").orElseGet(this::branchName))
+            FetchCommand fetch = jgitRepository.fetch();
+            env("GITHUB_REF").ifPresent(fetch::setRefSpecs);
+            fetch
                 .setUnshallow(true)
                 .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
                 .call();
         } catch (GitAPIException e) {
-            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo");
+            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
         }
     }
 
@@ -481,7 +482,7 @@ public class GitRepository implements ScmRepository {
     }
 
     private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
-        Collection<Ref> tags = jgitRepository.lsRemote().setTags(true).call();
+        List<Ref> tags = jgitRepository.tagList().call();
 
         return tags.stream()
             .map(tag -> new TagNameAndId(
