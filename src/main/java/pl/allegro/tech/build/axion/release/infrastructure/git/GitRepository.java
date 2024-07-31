@@ -70,7 +70,7 @@ public class GitRepository implements ScmRepository {
                 .setUnshallow(true)
                 .call();
         } catch (GitAPIException e) {
-            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
+            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo");
         }
     }
 
