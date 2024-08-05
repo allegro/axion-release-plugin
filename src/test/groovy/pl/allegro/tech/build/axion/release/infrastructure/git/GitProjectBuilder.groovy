@@ -9,6 +9,8 @@ class GitProjectBuilder {
 
     private final File repositoryDir
 
+    private File remoteRepositoryDir;
+
     private final Grgit rawRepository
 
     private ScmProperties scmProperties

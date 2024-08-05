@@ -43,7 +43,7 @@ public class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
-        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion());
+        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion(), versionProperties.isAutoDeepenShallowRepo());
 
         ScmState scmState = new ScmState(
             versions.onReleaseTag,
@@ -62,8 +62,7 @@ public class VersionResolver {
         TagProperties tagProperties,
         NextVersionProperties nextVersionProperties,
         VersionProperties versionProperties,
-        ScmPosition latestChangePosition,
-        Boolean useHighestVersions
+        ScmPosition latestChangePosition
     ) {
 
         String releaseTagPatternString = tagProperties.getPrefix();
@@ -74,10 +73,11 @@ public class VersionResolver {
         Pattern releaseTagPattern = Pattern.compile("^" + releaseTagPatternString + ".*");
         Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
+        boolean useHighestVersion = versionProperties.isUseHighestVersion();
 
         TaggedCommits latestTaggedCommit;
         TaggedCommits previousTaggedCommit;
-        if (useHighestVersions) {
+        if (useHighestVersion) {
             TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
             latestTaggedCommit = allTaggedCommits;
             previousTaggedCommit = allTaggedCommits;

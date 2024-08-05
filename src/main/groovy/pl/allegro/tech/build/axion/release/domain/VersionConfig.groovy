@@ -107,6 +107,9 @@ abstract class VersionConfig extends BaseExtension {
     @Internal
     abstract Property<PredefinedReleaseCommitMessageCreator.CommitMessageCreator> getReleaseCommitMessage()
 
+    @Internal
+    abstract Property<Boolean> getAutoDeepenShallowRepo();
+
     Provider<Boolean> ignoreUncommittedChanges() {
         gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
             .orElse(ignoreUncommittedChanges)

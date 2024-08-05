@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.jgit.revwalk.filter.RevFilter.NO_MERGES;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
 
 public class GitRepository implements ScmRepository {
@@ -416,37 +415,20 @@ public class GitRepository implements ScmRepository {
             }
 
 
-            RevWalk walk = walker(startingCommit);
+            RevWalk walk = walker(startingCommit, inclusive);
             if (!inclusive) {
                 walk.next();
             }
 
             Map<String, List<String>> allTags = tagsMatching(pattern, walk);
 
-            List<String> currentTagsList;
-            boolean alreadyDeepened = false;
-
             while (true) {
                 RevCommit currentCommit = walk.next();
-
                 if (currentCommit == null) {
-                    if (!alreadyDeepened) {
-                        deepenRepositoryBy(100);
-                        walk.reset();
-                        alreadyDeepened = true;
-
-                        if (!inclusive) {
-                            walk.next();
-                        }
-                        continue;
-                    } else {
-                        break;
-                    }
+                    break;
                 }
 
-                alreadyDeepened = false;
-
-                currentTagsList = allTags.get(currentCommit.getId().getName());
+                List<String> currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
                     TagsOnCommit taggedCommit = new TagsOnCommit(
@@ -472,20 +454,18 @@ public class GitRepository implements ScmRepository {
 
     }
 
-    private void deepenRepositoryBy(int depth) throws GitAPIException {
-        Iterable<RevCommit> commits = jgitRepository.log().setRevFilter(NO_MERGES).call();
-        int numberOfCommits = (int) StreamSupport.stream(commits.spliterator(), false).count();
+    private RevWalk walker(ObjectId startingCommit, boolean inclusive) throws IOException {
+        RevWalk walk;
 
-        logger.lifecycle("Deepening shallow repo by " + depth + " to total depth of " + (numberOfCommits + depth));
-
-        jgitRepository.fetch()
-            .setDepth(numberOfCommits + depth)
-            .setTransportConfigCallback(transportConfigFactory.create(properties.getIdentity()))
-            .call();
-    }
-
-    private RevWalk walker(ObjectId startingCommit) throws IOException {
-        RevWalk walk = new RevWalk(jgitRepository.getRepository());
+        if (properties.isAutoDeepenShallowRepo()) {
+            walk = new AutoDeepeningRevWalk(
+                jgitRepository,
+                transportConfigFactory.create(properties.getIdentity()),
+                inclusive
+            );
+        } else {
+            walk = new RevWalk(jgitRepository.getRepository());
+        }
 
         // explicitly set to NONE
         // TOPO sorting forces all commits in repo to be read in memory,
