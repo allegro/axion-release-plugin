@@ -7,6 +7,7 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import static java.util.stream.Collectors.toList
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class SimpleIntegrationTest extends BaseIntegrationTest {
@@ -51,7 +52,8 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
-        outputFile.getText().contains('released-version=1.0.0')
+        def definedEnvVariables = outputFile.getText().lines().collect(toList())
+        definedEnvVariables.contains('released-version=1.0.0')
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
