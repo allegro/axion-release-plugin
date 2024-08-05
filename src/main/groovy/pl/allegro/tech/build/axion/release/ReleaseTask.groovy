@@ -28,7 +28,7 @@ abstract class ReleaseTask extends BaseAxionTask {
         if (System.getenv().containsKey('GITHUB_ACTIONS')) {
             Files.write(
                 Paths.get(System.getenv('GITHUB_OUTPUT')),
-                "released-version=${versionConfig.version}\n".getBytes(),
+                "released-version=${versionConfig.uncached.decoratedVersion}\n".getBytes(),
                 StandardOpenOption.APPEND
             )
         }
