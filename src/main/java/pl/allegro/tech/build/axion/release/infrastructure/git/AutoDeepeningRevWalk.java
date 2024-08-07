@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.git;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.gradle.api.logging.Logger;
@@ -17,13 +18,15 @@ public class AutoDeepeningRevWalk extends RevWalk {
 
     private final Git jgitRepository;
     private final TransportConfigCallback transportConfigCallback;
+    private final ObjectId startingCommit;
     private final boolean inclusive;
     private final Logger logger = Logging.getLogger(AutoDeepeningRevWalk.class);
 
-    public AutoDeepeningRevWalk(Git jgitRepository, TransportConfigCallback transportConfigCallback, boolean inclusive) {
+    public AutoDeepeningRevWalk(Git jgitRepository, TransportConfigCallback transportConfigCallback, ObjectId startingCommit, boolean inclusive) {
         super(jgitRepository.getRepository());
         this.jgitRepository = jgitRepository;
         this.transportConfigCallback = transportConfigCallback;
+        this.startingCommit = startingCommit;
         this.inclusive = inclusive;
     }
 
@@ -33,15 +36,16 @@ public class AutoDeepeningRevWalk extends RevWalk {
         if (commit == null) {
             boolean deepened = deepenRepositoryBy(100);
             if (deepened) {
-                resetMaybeExclusive();
+                startFromBeginning();
                 return super.next();
             }
         }
         return commit;
     }
 
-    private void resetMaybeExclusive() throws IOException {
-        reset();
+    private void startFromBeginning() throws IOException {
+        dispose();
+        markStart(parseCommit(startingCommit));
         if (!inclusive) {
             super.next();
         }

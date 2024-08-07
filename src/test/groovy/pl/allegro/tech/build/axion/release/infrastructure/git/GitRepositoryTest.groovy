@@ -9,6 +9,7 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.TagPrefixConf
 import pl.allegro.tech.build.axion.release.util.WithEnvironment
 import pl.allegro.tech.build.axion.release.domain.scm.ScmException
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
@@ -637,7 +638,7 @@ class GitRepositoryTest extends Specification {
         'GITHUB_ACTIONS=true',
         'GITHUB_HEAD_REF=pr-source-branch'
     ])
-    def "should get branch name on Github Actions if pull_request triggered the workflow"() {
+    def 'should get branch name on Github Actions if pull_request triggered the workflow'() {
         when:
         ScmPosition position = repository.currentPosition()
 
@@ -649,12 +650,27 @@ class GitRepositoryTest extends Specification {
         'GITHUB_ACTIONS=true',
         'GITHUB_HEAD_REF='
     ])
-    def "should ignore GITHUB_HEAD_REF variable if it has empty value"() {
+    def 'should ignore GITHUB_HEAD_REF variable if it has empty value'() {
         when:
         ScmPosition position = repository.currentPosition()
 
         then:
         position.branch == defaultBranch
+    }
+
+    def 'should deepen shallow repo'() {
+        given:
+        remoteRepository.tag(fullPrefix() + '1')
+        remoteRepository.commit(['*'], "commit after release")
+        File repoDir = File.createTempDir('axion-release', 'tmp')
+        Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
+        GitRepository repository = repositories[GitRepository]
+
+        when:
+        TagsOnCommit tags = repository.latestTags(compile('^' + defaultPrefix() + '.*'))
+
+        then:
+        tags.tags == [fullPrefix() + '1']
     }
 
     private void commitFile(String subDir, String fileName) {

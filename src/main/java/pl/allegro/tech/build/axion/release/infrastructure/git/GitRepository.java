@@ -461,6 +461,7 @@ public class GitRepository implements ScmRepository {
             walk = new AutoDeepeningRevWalk(
                 jgitRepository,
                 transportConfigFactory.create(properties.getIdentity()),
+                startingCommit,
                 inclusive
             );
         } else {

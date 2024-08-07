@@ -7,6 +7,7 @@ class ScmPropertiesBuilder {
     private String type = 'git'
     private String overriddenBranchName
     private Boolean overriddenIsClean = null
+    private Boolean autoDeepenShallowRepo = true
 
     private ScmPropertiesBuilder(File directory) {
         this.directory = directory
@@ -26,6 +27,11 @@ class ScmPropertiesBuilder {
         return this
     }
 
+    ScmPropertiesBuilder withAutoDeepenShallowRepo(String autoDeepenShallowRepo) {
+        this.autoDeepenShallowRepo = autoDeepenShallowRepo
+        return this
+    }
+
     ScmProperties build() {
         return new ScmProperties(
                 type,
@@ -37,7 +43,8 @@ class ScmPropertiesBuilder {
                 null,
                 overriddenBranchName,
                 overriddenIsClean,
-                ScmIdentity.defaultIdentityWithoutAgents()
+                ScmIdentity.defaultIdentityWithoutAgents(),
+                autoDeepenShallowRepo
         )
     }
 

@@ -43,7 +43,7 @@ public class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
-        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion(), versionProperties.isAutoDeepenShallowRepo());
+        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
 
         ScmState scmState = new ScmState(
             versions.onReleaseTag,
