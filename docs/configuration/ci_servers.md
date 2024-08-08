@@ -12,10 +12,18 @@ check or ahead of remote check).
 
 Many CI servers use shallow clone to optimize repository fetching (for example GitHub actions). However, if only
 1 commit from the top of the branch is fetched, `axion-release` doesn't see the latest tag and is unable to determine
-correct version.
+the correct version.
 
-Because of this issue, `axion-release` will automatically unshallow the repository if executed on CI server (it checks
-for the `CI` environment variable to be set to `true`).
+Because of this issue, `axion-release` can automatically unshallow the repository if executed on CI server.
+To enable it, use:
+
+    scmVersion {
+        unshallowRepoOnCI.set(true)
+    }
+
+This behavior is experimental and has been tested on the following CI servers:
+
+-   GitHub Actions
 
 ## GitHub Actions
 
@@ -45,7 +53,26 @@ avoid the `detached-head` state. In the Git section of the job
 configuration page, add the `Additional Behaviour` called `Check out
 to matching local branch`.
 
+Jenkins pipeline now defaults to clone with a narrow refspec, and
+without tags (as of git plugin 3.4.0). That saves network bandwidth,
+time, and disc space. If you need tags in your Jenkins workspace, add
+the `Additional Behaviour` called `Advanced clone behaviors`. Adding
+that behaviour will enable fetching of tags.
+
 ## Bamboo
+
+### Enable tags fetch
+
+Bamboo fetches bare minimum of information from git. By default, it
+won't even fetch tags. To change this:
+
+-   go to plan configuration
+-   open *Repositories* tab
+-   choose code repository
+-   open *Advanced options*
+-   disable *Use shallow clones* option
+
+### Attach remote on build
 
 Bamboo does not fetch remotes list. Fortunately `axion-release` can
 attach itself to the remote using remote address passed via Bamboo

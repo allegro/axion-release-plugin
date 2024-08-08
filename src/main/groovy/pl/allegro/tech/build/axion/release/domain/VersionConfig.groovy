@@ -39,7 +39,7 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
-        getUnshallowRepoOnCI().convention(true)
+        getUnshallowRepoOnCI().convention(false)
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
