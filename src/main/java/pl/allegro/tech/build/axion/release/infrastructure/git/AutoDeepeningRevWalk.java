@@ -54,6 +54,7 @@ public class AutoDeepeningRevWalk extends RevWalk {
     private boolean deepenRepositoryBy(int depth) {
         try {
             int numberOfCommits = countCommits();
+            logger.lifecycle("Deepening repository by " + depth + " to the total depth of " + (numberOfCommits + depth));
 
             jgitRepository.fetch()
                 .setDepth(numberOfCommits + depth)
@@ -64,7 +65,7 @@ public class AutoDeepeningRevWalk extends RevWalk {
 
             return numberOfCommitsAfterDeepening > numberOfCommits;
 
-        } catch (GitAPIException e) {
+        } catch (Exception e) {
             logger.warn("Unable to auto-deepen repository", e);
             return false;
         }

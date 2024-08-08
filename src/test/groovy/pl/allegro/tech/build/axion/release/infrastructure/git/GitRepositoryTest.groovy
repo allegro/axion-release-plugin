@@ -672,6 +672,22 @@ class GitRepositoryTest extends Specification {
         tags.tags == [fullPrefix() + '1']
     }
 
+    // doesn't work due to JGit bug -> https://bugs.eclipse.org/bugs/show_bug.cgi?id=581228
+    def 'should deepen shallow repo multiple times'() {
+        given:
+            remoteRepository.tag(fullPrefix() + '1')
+            101.times { remoteRepository.commit(['*'], "commit after release") }
+            File repoDir = File.createTempDir('axion-release', 'tmp')
+            Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
+            GitRepository repository = repositories[GitRepository]
+
+        when:
+            TagsOnCommit tags = repository.latestTags(compile('^' + defaultPrefix() + '.*'))
+
+        then:
+            tags.tags == [fullPrefix() + '1']
+    }
+
     private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
