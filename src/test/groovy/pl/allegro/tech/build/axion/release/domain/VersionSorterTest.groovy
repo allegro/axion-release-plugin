@@ -9,7 +9,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import spock.lang.Specification
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 /**
  *  Variant matrix that has to be tested:

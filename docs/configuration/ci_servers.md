@@ -8,6 +8,31 @@ CI servers is treated as *trusted* environment, thus there is no harm in
 disabling checks that need to interact with git (like uncommitted files
 check or ahead of remote check).
 
+## Shallow clones
+
+Many CI servers use shallow clone to optimize repository fetching (for example GitHub actions). However, if only
+1 commit from the top of the branch is fetched, `axion-release` doesn't see the latest tag and is unable to determine
+the correct version.
+
+Because of this issue, `axion-release` can automatically unshallow the repository if executed on CI server.
+To enable it, use:
+
+    scmVersion {
+        unshallowRepoOnCI.set(true)
+    }
+
+This behavior is experimental and has been tested on the following CI servers:
+
+-   GitHub Actions
+
+## GitHub Actions
+
+`axion-release` has dedicated support for GitHub Actions and you don't need any custom configs to make it working.
+
+Here's what Axion does for you under the hood:
+
+-   gets the original branch name for workflows triggered by `pull_request` - see [versionWithBranch](version.md#versionwithbranch-default)
+
 ## Jenkins
 
 Jenkins and `axion-release` cooperate nicely. However, because Jenkins
@@ -21,7 +46,7 @@ verify if current commit is ahead of remote. Setting pushTagsOnly
 ensures that git will not throw an error by attempting to push commits
 while not working on a branch.
 
-To use the [versionWithBranch](version.md#versionwithbranch) version creator from Jenkins,
+To use the [versionWithBranch](version.md#versionwithbranch-default) version creator from Jenkins,
 you need to override the default behavior of the Jenkins git plugin to
 avoid the `detached-head` state. In the Git section of the job
 configuration page, add the `Additional Behaviour` called `Check out
@@ -87,38 +112,6 @@ you need to override branch name with `overriddenBranchName` flag and set it to
         -Prelease.disableChecks \
         -Prelease.pushTagsOnly \
         -Prelease.overriddenBranchName=$(Build.SourceBranch)
-
-## GitHub Actions
-
-Your workflow needs to use `actions/checkout@v3` with configuration to [fetch tags](https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches):
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-When you have a lot of tags/commit you can speed up your build - plugin successfully works using local git shallow repository, but you must run `git fetch --tags --unshallow` before running `./gradlew release` - that will ensure the plugin has all the info it needs to run.
-
-    steps:
-        - uses: actions/checkout@v4
-        - name: Publish using Axion
-          run: |
-              # Fetch a full copy of the repo, as required by release plugin:
-              git fetch --tags --unshallow
-              # Run release:
-              ./gradlew release
-
-In order to push tags into the repository release step must use GitHub actor and token:
-
-      - name: Release
-        id: release
-        run: |
-          ./gradlew release \
-              -Prelease.customUsername=${{ github.actor }} \
-              -Prelease.customPassword=${{ github.token }}
-
-> GitHub token requires write permissions to push tags into the repository.
-> To grant GitHub token write permissions use `Settings -> Actions -> General -> Workflow permissions -> Read and write permissions` option.
 
 ## GitLab CI
 
