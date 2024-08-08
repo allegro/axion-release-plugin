@@ -31,7 +31,6 @@ This behavior is experimental and has been tested on the following CI servers:
 
 Here's what Axion does for you under the hood:
 
--   unshallows the repository - see [shallow clones](#shallow-clones)
 -   gets the original branch name for workflows triggered by `pull_request` - see [versionWithBranch](version.md#versionwithbranch-default)
 
 ## Jenkins
