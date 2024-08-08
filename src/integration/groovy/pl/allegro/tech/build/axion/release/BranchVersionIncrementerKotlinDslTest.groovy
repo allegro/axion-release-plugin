@@ -23,11 +23,14 @@ class BranchVersionIncrementerKotlinDslTest extends Specification {
 
     VersionResolutionContext context
 
+    String defaultBranch
+
     void setup() {
         def rawRepository = Grgit.init(dir: temporaryFolder)
 
         // let's make sure, not to use system wide user settings in tests
         rawRepository.repository.jgit.repository.config.baseConfig.clear()
+        defaultBranch = rawRepository.branch.current().name
 
         ScmProperties scmProperties = scmProperties(temporaryFolder).build()
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
@@ -69,7 +72,7 @@ class BranchVersionIncrementerKotlinDslTest extends Specification {
 
              branchVersionIncrementer.putAll(
                 mapOf<String, Any>(
-                    "master" to VersionProperties.Incrementer { _: VersionIncrementerContext -> Version.valueOf("42.42.42") }
+                    "$defaultBranch" to VersionProperties.Incrementer { _: VersionIncrementerContext -> Version.valueOf("42.42.42") }
                 )
             )
         }

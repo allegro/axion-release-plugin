@@ -24,7 +24,6 @@ class VersionResolverMonoRepoTest extends RepositoryBasedTest {
 
     String subDir = "subProjectMain"
     String secondaryDir = "subProjectSecondary"
-    public static final String MASTER_BRANCH = "master"
 
     def setup() {
         resolver = new VersionResolver(repository, subDir)
@@ -135,13 +134,14 @@ class VersionResolverMonoRepoTest extends RepositoryBasedTest {
         commitNonPrimaryDir('1')
 
         Git git = repository.getJgitRepository();
+        String mainBranchName = git.repository
         String branchName = "feature/important_changes";
         git.branchCreate().setName(branchName).call()
         commitPrimaryDir('4') // Commit to master b4 branch commit
         git.checkout().setName(branchName).call()
         commitPrimaryDir('2')
         commitNonPrimaryDir('3')
-        git.checkout().setName(MASTER_BRANCH).call()
+        git.checkout().setName(defaultBranch).call()
 
         git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
         commitNonPrimaryDir('5')
@@ -169,7 +169,7 @@ class VersionResolverMonoRepoTest extends RepositoryBasedTest {
         git.checkout().setName(branchName).call()
         commitPrimaryDir('2')
         commitNonPrimaryDir('3')
-        git.checkout().setName(MASTER_BRANCH).call()
+        git.checkout().setName(defaultBranch).call()
 
         commitPrimaryDir('4') // Commit to
         git.merge().include(git.repository.resolve(branchName)).setCommit(true).setMessage("important").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()

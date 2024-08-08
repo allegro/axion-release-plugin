@@ -19,13 +19,10 @@ class MemoizedVersionSupplier {
     private final VersionSupplier versionSupplier = new VersionSupplier()
 
     VersionService.DecoratedVersion resolve(VersionConfig config, Directory projectDirectory) {
-//        if(version != null) {
-//            println 'Returning memoized version ' + version.decoratedVersion
-//            return version
-//        }
-//        println 'Resolving version'
+        if(version != null) {
+            return version
+        }
         version = versionSupplier.resolve(config, projectDirectory)
-//        println 'Returning resolved version ' + version.decoratedVersion
         return version
     }
 }

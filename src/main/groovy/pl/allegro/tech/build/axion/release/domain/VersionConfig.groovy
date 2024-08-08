@@ -40,6 +40,7 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
+        getAutoDeepenShallowRepo().convention(true)
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
@@ -81,6 +82,9 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getUseHighestVersion();
 
     @Internal
+    abstract Property<Boolean> getAutoDeepenShallowRepo();
+
+    @Internal
     abstract MapProperty<String, Object> getBranchVersionIncrementer();
 
     @Internal
@@ -106,9 +110,6 @@ abstract class VersionConfig extends BaseExtension {
 
     @Internal
     abstract Property<PredefinedReleaseCommitMessageCreator.CommitMessageCreator> getReleaseCommitMessage()
-
-    @Internal
-    abstract Property<Boolean> getAutoDeepenShallowRepo();
 
     Provider<Boolean> ignoreUncommittedChanges() {
         gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
