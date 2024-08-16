@@ -69,19 +69,19 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    TagsOnCommit latestTags(Pattern pattern) {
+    TagsOnCommit latestTags(List<Pattern> patterns) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return new TagsOnCommit(null, [])
     }
 
     @Override
-    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
+    TagsOnCommit latestTags(List<Pattern> patterns, String sinceCommit) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return new TagsOnCommit(null, [])
     }
 
     @Override
-    List<TagsOnCommit> taggedCommits(Pattern pattern) {
+    List<TagsOnCommit> taggedCommits(List<Pattern> patterns) {
         logger.quiet("Could not resolve current position on uninitialized repository, returning default")
         return [new TagsOnCommit(null, [])]
     }

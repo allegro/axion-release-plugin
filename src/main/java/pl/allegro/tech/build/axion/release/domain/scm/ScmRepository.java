@@ -24,11 +24,11 @@ public interface ScmRepository {
 
     Boolean isIdenticalForPath(String path, String latestChangeRevision, String tagCommitRevision);
 
-    TagsOnCommit latestTags(Pattern pattern);
+    TagsOnCommit latestTags(List<Pattern> patterns);
 
-    TagsOnCommit latestTags(Pattern pattern, String sinceCommit);
+    TagsOnCommit latestTags(List<Pattern> patterns, String sinceCommit);
 
-    List<TagsOnCommit> taggedCommits(Pattern pattern);
+    List<TagsOnCommit> taggedCommits(List<Pattern> patterns);
 
     boolean remoteAttached(String remoteName);
 

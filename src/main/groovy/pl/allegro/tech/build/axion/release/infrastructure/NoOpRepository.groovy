@@ -64,22 +64,22 @@ class NoOpRepository implements ScmRepository {
     }
 
     @Override
-    TagsOnCommit latestTags(Pattern pattern) {
-        TagsOnCommit tags = delegateRepository.latestTags(pattern)
+    TagsOnCommit latestTags(List<Pattern> patterns) {
+        TagsOnCommit tags = delegateRepository.latestTags(patterns)
         log("Latest tags: ${tags.tags}")
         return tags
     }
 
     @Override
-    TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
-        TagsOnCommit tags = delegateRepository.latestTags(pattern, sinceCommit)
+    TagsOnCommit latestTags(List<Pattern> patterns, String sinceCommit) {
+        TagsOnCommit tags = delegateRepository.latestTags(patterns, sinceCommit)
         log("Latest tags: ${tags.tags}")
         return tags
     }
 
     @Override
-    List<TagsOnCommit> taggedCommits(Pattern pattern) {
-        return delegateRepository.taggedCommits(pattern)
+    List<TagsOnCommit> taggedCommits(List<Pattern> patterns) {
+        return delegateRepository.taggedCommits(patterns)
     }
 
     @Override

@@ -8,7 +8,10 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 
+import java.util.List;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Returned structure is:
@@ -65,12 +68,10 @@ public class VersionResolver {
         ScmPosition latestChangePosition
     ) {
 
-        String releaseTagPatternString = tagProperties.getPrefix();
-        if (!releaseTagPatternString.isEmpty()) {
-            releaseTagPatternString += tagProperties.getVersionSeparator();
-        }
-
-        Pattern releaseTagPattern = Pattern.compile("^" + releaseTagPatternString + ".*");
+        List<Pattern> releaseTagPatterns = tagProperties.getAllPrefixes().stream()
+            .map(prefix -> prefix.isEmpty() ? "" : prefix + tagProperties.getVersionSeparator())
+            .map(pattern -> Pattern.compile("^" + pattern + ".*"))
+            .collect(toList());
         Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
         boolean useHighestVersion = versionProperties.isUseHighestVersion();
@@ -78,12 +79,12 @@ public class VersionResolver {
         TaggedCommits latestTaggedCommit;
         TaggedCommits previousTaggedCommit;
         if (useHighestVersion) {
-            TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
+            TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPatterns, latestChangePosition);
             latestTaggedCommit = allTaggedCommits;
             previousTaggedCommit = allTaggedCommits;
         } else {
-            latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition);
-            previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
+            latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPatterns, latestChangePosition);
+            previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPatterns, nextVersionTagPattern, latestChangePosition);
         }
 
         VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern, versionFactory, forceSnapshot);

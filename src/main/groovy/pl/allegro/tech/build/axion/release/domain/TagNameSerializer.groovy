@@ -6,15 +6,19 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 enum TagNameSerializer {
 
     DEFAULT('default',
-            { TagProperties rules, String version ->
-                return rules.prefix ? rules.prefix + rules.versionSeparator + version : version
-            },
-            { TagProperties rules, ScmPosition position, String tagName ->
-                if (rules.prefix.isEmpty()) {
-                    return tagName
-                }
-                return tagName.substring(rules.prefix.length() + rules.versionSeparator.length())
+        { TagProperties rules, String version ->
+            return rules.prefix ? rules.prefix + rules.versionSeparator + version : version
+        },
+        { TagProperties rules, ScmPosition position, String tagName ->
+            if (rules.prefix.isEmpty()) {
+                return tagName
             }
+            for (String prefix : rules.allPrefixes) {
+                if (tagName.matches("^" + prefix + rules.versionSeparator + ".*")) {
+                    return tagName.substring(prefix.length() + rules.versionSeparator.length())
+                }
+            }
+        }
     )
 
     private final String type

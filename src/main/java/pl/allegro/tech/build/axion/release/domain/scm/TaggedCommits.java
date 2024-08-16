@@ -18,20 +18,20 @@ public class TaggedCommits {
         return new TaggedCommits(latestTagPosition, taggedCommits);
     }
 
-    public static TaggedCommits fromLatestCommit(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
-        TagsOnCommit latestTags = repository.latestTags(tagPattern);
+    public static TaggedCommits fromLatestCommit(ScmRepository repository, List<Pattern> relaseTagPatterns, ScmPosition latestTagPosition) {
+        TagsOnCommit latestTags = repository.latestTags(relaseTagPatterns);
         return new TaggedCommits(latestTagPosition, Arrays.asList(latestTags));
     }
 
-    public static TaggedCommits fromAllCommits(ScmRepository repository, Pattern tagPattern, ScmPosition latestTagPosition) {
-        List<TagsOnCommit> taggedCommits = repository.taggedCommits(tagPattern);
+    public static TaggedCommits fromAllCommits(ScmRepository repository, List<Pattern> releaseTagPatterns, ScmPosition latestTagPosition) {
+        List<TagsOnCommit> taggedCommits = repository.taggedCommits(releaseTagPatterns);
         return new TaggedCommits(latestTagPosition, taggedCommits);
     }
 
-    public static TaggedCommits fromLatestCommitBeforeNextVersion(ScmRepository repository, Pattern releaseTagPattern, Pattern nextVersionTagPattern, ScmPosition latestTagPosition) {
-        TagsOnCommit previousTags = repository.latestTags(releaseTagPattern);
+    public static TaggedCommits fromLatestCommitBeforeNextVersion(ScmRepository repository, List<Pattern> releaseTagPatterns, Pattern nextVersionTagPattern, ScmPosition latestTagPosition) {
+        TagsOnCommit previousTags = repository.latestTags(releaseTagPatterns);
         while (previousTags.hasOnlyMatching(nextVersionTagPattern)) {
-            previousTags = repository.latestTags(releaseTagPattern, previousTags.getCommitId());
+            previousTags = repository.latestTags(releaseTagPatterns, previousTags.getCommitId());
         }
         return new TaggedCommits(latestTagPosition, Arrays.asList(previousTags));
     }

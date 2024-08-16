@@ -10,6 +10,7 @@ class TagPropertiesFactory {
     static TagProperties create(TagNameSerializationConfig config, String currentBranch) {
         return new TagProperties(
             findPrefix(config, currentBranch),
+            config.fallbackPrefixes.get(),
             config.versionSeparator.get(),
             config.serialize.get(),
             config.deserialize.get(),

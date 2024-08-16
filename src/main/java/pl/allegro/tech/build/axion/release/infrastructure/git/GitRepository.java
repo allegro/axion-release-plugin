@@ -399,26 +399,26 @@ public class GitRepository implements ScmRepository {
     }
 
     @Override
-    public TagsOnCommit latestTags(Pattern pattern) {
-        return latestTagsInternal(pattern, null, true);
+    public TagsOnCommit latestTags(List<Pattern> patterns) {
+        return latestTagsInternal(patterns, null, true);
     }
 
     @Override
-    public TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
-        return latestTagsInternal(pattern, sinceCommit, false);
+    public TagsOnCommit latestTags(List<Pattern> patterns, String sinceCommit) {
+        return latestTagsInternal(patterns, sinceCommit, false);
     }
 
-    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true);
+    private TagsOnCommit latestTagsInternal(List<Pattern> patterns, String maybeSinceCommit, boolean inclusive) {
+        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(patterns, maybeSinceCommit, inclusive, true);
         return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits.get(0);
     }
 
     @Override
-    public List<TagsOnCommit> taggedCommits(Pattern pattern) {
-        return taggedCommitsInternal(pattern, null, true, false);
+    public List<TagsOnCommit> taggedCommits(List<Pattern> patterns) {
+        return taggedCommitsInternal(patterns, null, true, false);
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+    private List<TagsOnCommit> taggedCommitsInternal(List<Pattern> patterns, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
         List<TagsOnCommit> taggedCommits = new ArrayList<>();
         if (!hasCommits()) {
             return taggedCommits;
@@ -440,7 +440,7 @@ public class GitRepository implements ScmRepository {
                 walk.next();
             }
 
-            Map<String, List<String>> allTags = tagsMatching(pattern, walk);
+            Map<String, List<String>> allTags = tagsMatching(patterns, walk);
 
             while (true) {
                 RevCommit currentCommit = walk.next();
@@ -484,7 +484,7 @@ public class GitRepository implements ScmRepository {
         return walk;
     }
 
-    private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
+    private Map<String, List<String>> tagsMatching(List<Pattern> patterns, RevWalk walk) throws GitAPIException {
         List<Ref> tags = jgitRepository.tagList().call();
 
         return tags.stream()
@@ -492,7 +492,7 @@ public class GitRepository implements ScmRepository {
                 tag.getName().substring(GIT_TAG_PREFIX.length()),
                 parseCommitSafe(walk, tag.getObjectId())
             ))
-            .filter(t -> pattern.matcher(t.name).matches())
+            .filter(t -> patterns.stream().anyMatch(pattern -> pattern.matcher(t.name).matches()))
             .collect(
                 HashMap::new,
                 (m, t) -> m.computeIfAbsent(t.id, (s) -> new ArrayList<>()).add(t.name),
