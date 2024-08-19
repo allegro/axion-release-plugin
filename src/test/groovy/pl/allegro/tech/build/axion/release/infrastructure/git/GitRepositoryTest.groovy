@@ -84,7 +84,7 @@ class GitRepositoryTest extends Specification {
 
         when:
         lightweightTagRepository.tag(fullPrefix() + '2')
-        TagsOnCommit tags = lightweightTagRepository.latestTags(compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = lightweightTagRepository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
@@ -145,7 +145,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after release")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -156,7 +156,7 @@ class GitRepositoryTest extends Specification {
         GitRepository commitlessRepository = GitProjectBuilder.gitProject(File.createTempDir('axion-release', 'tmp')).build()[GitRepository]
 
         when:
-        TagsOnCommit tags = commitlessRepository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = commitlessRepository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == []
@@ -167,7 +167,7 @@ class GitRepositoryTest extends Specification {
         repository.tag(fullPrefix() + '1')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -184,7 +184,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "bugfix after " + fullPrefix() + "1")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile("^" + defaultPrefix() + ".*"))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile("^" + defaultPrefix() + ".*")))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -205,7 +205,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after " + fullPrefix() + "3")
 
         when:
-        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(Pattern.compile('^' + defaultPrefix() + '.*'))
+        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() +'3',fullPrefix() + '4', fullPrefix() + '2', fullPrefix() +'1']
@@ -218,7 +218,7 @@ class GitRepositoryTest extends Specification {
         repository.tag('otherTag')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -230,10 +230,10 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'some commit')
         repository.tag('tag-to-skip')
 
-        String latestCommitId = repository.latestTags(~'^tag.*').commitId
+        String latestCommitId = repository.latestTags(List.of(~'^tag.*')).commitId
 
         when:
-        TagsOnCommit tags = repository.latestTags(~'^tag.*', latestCommitId)
+        TagsOnCommit tags = repository.latestTags(List.of(~'^tag.*'), latestCommitId)
 
         then:
         tags.tags == ['tag-to-find']
@@ -245,7 +245,7 @@ class GitRepositoryTest extends Specification {
         repository.tag(fullPrefix() + '2')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
@@ -451,14 +451,14 @@ class GitRepositoryTest extends Specification {
     def "should remove tag"() {
         given:
         repository.tag(fullPrefix() +"1")
-        int intermediateSize = repository.taggedCommits(~/.*/).size()
+        int intermediateSize = repository.taggedCommits(List.of(~/.*/)).size()
 
         when:
         repository.dropTag(fullPrefix() +"1")
 
         then:
         intermediateSize == 1
-        repository.taggedCommits(~/.*/).isEmpty()
+        repository.taggedCommits(List.of(~/.*/)).isEmpty()
     }
 
     def "should pass ahead of remote check when in sync with remote"() {
@@ -669,7 +669,7 @@ class GitRepositoryTest extends Specification {
         GitRepository repository = repositories[GitRepository]
 
         when:
-        TagsOnCommit tags = repository.latestTags(compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == [fullPrefix() + '1']
@@ -687,7 +687,7 @@ class GitRepositoryTest extends Specification {
             GitRepository repository = repositories[GitRepository]
 
         when:
-            TagsOnCommit tags = repository.latestTags(compile('^' + defaultPrefix() + '.*'))
+            TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
             tags.tags.isEmpty()

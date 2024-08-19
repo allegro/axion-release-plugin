@@ -43,7 +43,7 @@ class NoOpRepositoryTest extends Specification {
         scm.latestTags(_) >> expected
 
         when:
-        TagsOnCommit current = dryRepository.latestTags(~/^release.*/)
+        TagsOnCommit current = dryRepository.latestTags(List.of(~/^release.*/))
 
         then:
         current == expected
