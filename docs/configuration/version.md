@@ -33,6 +33,17 @@ calculating current version. Prefix can be set using
 
 Default prefix is `v`.
 
+In case a tag does not match the main prefix, fallback prefixes will be examined. You can use fallback prefixes to migrate from one prefix to another. For example, if you use prefix `my-service-` but want to migrate to prefix `v`, you can configure it like that:
+
+    scmVersion {
+        tag {
+            prefix.set("v")
+            fallbackPrefixes.set(listOf("my-service-"))
+        }
+    }
+
+Axion will use fallback prefixes to calculate latest version, but the next release tag will be created using the main prefix.
+
 There is also an option to set prefix per-branch (i.e. to use different
 version prefix on `legacy-` branches):
 
