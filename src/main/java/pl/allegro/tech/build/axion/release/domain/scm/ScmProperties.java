@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain.scm;
 
 import java.io.File;
 import java.util.Optional;
+import java.util.Set;
 
 public class ScmProperties {
 
@@ -16,6 +17,8 @@ public class ScmProperties {
     private final Boolean overriddenIsClean;
     private final ScmIdentity identity;
     private final Boolean unshallowRepoOnCI;
+    private final Set<String> releaseBranchNames;
+    private final boolean releaseOnlyOnReleaseBranches;
 
     public ScmProperties(
         String type,
@@ -28,7 +31,9 @@ public class ScmProperties {
         String overriddenBranchName,
         Boolean overriddenIsClean,
         ScmIdentity identity,
-        Boolean unshallowRepoOnCI
+        Boolean unshallowRepoOnCI,
+        Set<String> releaseBranchNames,
+        boolean releaseOnlyOnReleaseBranches
     ) {
         this.type = type;
         this.directory = directory;
@@ -41,6 +46,8 @@ public class ScmProperties {
         this.overriddenIsClean = overriddenIsClean;
         this.identity = identity;
         this.unshallowRepoOnCI = unshallowRepoOnCI;
+        this.releaseBranchNames = releaseBranchNames;
+        this.releaseOnlyOnReleaseBranches = releaseOnlyOnReleaseBranches;
     }
 
     public ScmPushOptions pushOptions() {
@@ -89,5 +96,13 @@ public class ScmProperties {
 
     public Boolean isUnshallowRepoOnCI() {
         return unshallowRepoOnCI;
+    }
+
+    public Set<String> getReleaseBranchNames() {
+        return releaseBranchNames;
+    }
+
+    public boolean isReleaseOnlyOnReleaseBranches() {
+        return releaseOnlyOnReleaseBranches;
     }
 }

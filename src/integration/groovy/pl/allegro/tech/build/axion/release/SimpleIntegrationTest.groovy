@@ -140,4 +140,49 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 0.0.1-SNAPSHOT')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
+
+    def "should skip release when releaseOnlyOnReleaseBranches is true and current branch is not on releaseBranchNames list"() {
+        given:
+        buildFile("""
+            scmVersion {
+                releaseOnlyOnReleaseBranches = true
+                releaseBranchNames = "develop"
+            }
+        """)
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [\'develop\']')
+    }
+
+    def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
+        given:
+        buildFile("")
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [\'develop\']')
+    }
+
+    def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {
+        given:
+        buildFile("""
+            scmVersion {
+                releaseOnlyOnReleaseBranches = true
+            }
+        """)
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
+        releaseResult.output.contains('Creating tag: ' + fullPrefix() + '1.0.0')
+    }
 }

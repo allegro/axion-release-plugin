@@ -1,8 +1,10 @@
 package pl.allegro.tech.build.axion.release
 
+
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
+import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
 import java.nio.file.Files
@@ -15,10 +17,21 @@ abstract class ReleaseTask extends BaseAxionTask {
     void release() {
         VersionResolutionContext context = resolutionContext()
         Releaser releaser = context.releaser()
+        ScmService scmService = context.scmService()
+
+        if (scmService.isReleaseOnlyOnDefaultBranches()) {
+            def releaseBranchNames = scmService.getReleaseBranchNames()
+            def currentBranch = context.repository().currentPosition().getBranch()
+            if (!releaseBranchNames.contains(currentBranch)) {
+                logger.quiet("Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '${currentBranch}' was not in 'releaseBranchNames' list ['${releaseBranchNames.join(', ')}']")
+                return
+            }
+        }
+
         ScmPushResult result = releaser.releaseAndPush(context.rules())
 
         if (!result.success) {
-            def status = result.failureStatus.orElse("Unknown status of push")
+            def status = result.failureStatus
             def message = result.remoteMessage.orElse("Unknown error during push")
             logger.error("remote status: ${status}")
             logger.error("remote message: ${message}")

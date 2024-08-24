@@ -9,6 +9,7 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
+import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.scm.ScmException
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
@@ -45,6 +46,7 @@ class GitRepositoryTest extends Specification {
     String defaultBranch;
 
     void setup() {
+        RepositoryBasedTest.setupLocalGitConfiguration()
         remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
         Map remoteRepositories = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()
         remoteRawRepository = remoteRepositories[Grgit]

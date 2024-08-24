@@ -74,6 +74,9 @@ All `axion-release-plugin` configuration options:
             uncommittedChanges.set(false) // permanently disable uncommitted changes check
             aheadOfRemote.set(false) // permanently disable ahead of remote check
         }
+
+        // doc:
+        releaseOnlyOnReleaseBranches = false
     }
 
 All `axion-release-plugin` configuration flags:

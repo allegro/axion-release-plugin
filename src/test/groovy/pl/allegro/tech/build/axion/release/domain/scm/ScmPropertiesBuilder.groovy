@@ -38,7 +38,9 @@ class ScmPropertiesBuilder {
                 overriddenBranchName,
                 overriddenIsClean,
                 ScmIdentity.defaultIdentityWithoutAgents(),
-                true
+                true,
+                ['main', 'master'] as Set,
+                false
         )
     }
 

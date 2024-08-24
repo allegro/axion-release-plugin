@@ -33,6 +33,8 @@ abstract class VersionConfig extends BaseExtension {
     private static final String DEPRECATED_FORCE_VERSION_PROPERTY = 'release.forceVersion'
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
     private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
+    private static final String RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY = 'release.releaseOnlyOnReleaseBranches'
+    private static final String RELEASE_BRANCH_NAMES_PROPERTY = 'release.releaseBranchNames'
 
     @Inject
     VersionConfig(Directory repositoryDirectory) {
@@ -41,6 +43,8 @@ abstract class VersionConfig extends BaseExtension {
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
         getUnshallowRepoOnCI().convention(false)
+        getReleaseBranchNames().convention(gradleProperty(RELEASE_BRANCH_NAMES_PROPERTY).orElse('master,main'))
+        getReleaseOnlyOnReleaseBranches().convention(gradlePropertyPresent(RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY).orElse(false))
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
@@ -79,7 +83,10 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getIgnoreUncommittedChanges()
 
     @Internal
-    abstract Property<Boolean> getUseHighestVersion();
+    abstract Property<String> getReleaseBranchNames()
+
+    @Internal
+    abstract Property<Boolean> getReleaseOnlyOnReleaseBranches()
 
     @Internal
     @Incubating
@@ -111,6 +118,9 @@ abstract class VersionConfig extends BaseExtension {
 
     @Internal
     abstract Property<PredefinedReleaseCommitMessageCreator.CommitMessageCreator> getReleaseCommitMessage()
+
+    @Internal
+    abstract Property<Boolean> getUseHighestVersion();
 
     Provider<Boolean> ignoreUncommittedChanges() {
         gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
