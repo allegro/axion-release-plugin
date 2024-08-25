@@ -23,7 +23,7 @@ To enable it, use:
 
 This behavior is experimental and has been tested on the following CI servers:
 
--   GitHub Actions
+- GitHub Actions
 
 ## GitHub Actions
 
@@ -31,7 +31,8 @@ This behavior is experimental and has been tested on the following CI servers:
 
 Here's what Axion does for you under the hood:
 
--   gets the original branch name for workflows triggered by `pull_request` - see [versionWithBranch](version.md#versionwithbranch-default)
+- gets the original branch name for workflows triggered by `pull_request` -
+  see [versionWithBranch](version.md#versionwithbranch-default)
 
 ## Jenkins
 
@@ -65,11 +66,11 @@ that behaviour will enable fetching of tags.
 Bamboo fetches bare minimum of information from git. By default, it
 won't even fetch tags. To change this:
 
--   go to plan configuration
--   open *Repositories* tab
--   choose code repository
--   open *Advanced options*
--   disable *Use shallow clones* option
+- go to plan configuration
+- open *Repositories* tab
+- choose code repository
+- open *Advanced options*
+- disable *Use shallow clones* option
 
 ### Attach remote on build
 
@@ -115,10 +116,11 @@ you need to override branch name with `overriddenBranchName` flag and set it to
 
 ## GitLab CI
 
-If you set up a [project token](https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html) you can easily add a non-user dependent tag stage. Add the project token and token user bot name as CI-variables, accessible to the build script.
+If you set up a [project token](https://docs.gitlab.com/ee/user/project/settings/project_access_tokens.html) you can
+easily add a non-user dependent tag stage. Add the project token and token user bot name as CI-variables, accessible to
+the build script.
 
 Example:
-
 
     tagging:
       stage: tag
@@ -127,10 +129,11 @@ Example:
        - git remote set-url origin ${CI_SERVER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}.git
        - ./gradlew release -Prelease.disableChecks -Prelease.pushTagsOnly -Prelease.overriddenBranchName=${CI_COMMIT_REF_SLUG} -Prelease.customUsername=${PROJECT_ACCESS_TOKEN_BOT_NAME} -Prelease.customPassword=${PROJECT_ACCESS_TOKEN}
 
-NOTE: You need to set the git remote url first, as GitLab's default cloned project url will have added the non repo-write permission [gitlab-ci-token](https://docs.gitlab.com/ee/ci/jobs/ci_job_token.html) to the origin url.
-
+NOTE: You need to set the git remote url first, as GitLab's default cloned project url will have added the non
+repo-write permission [gitlab-ci-token](https://docs.gitlab.com/ee/ci/jobs/ci_job_token.html) to the origin url.
 
 Disabling checks is necessary because `axion-release` is not able to verify if current commit is ahead of remote.
-Setting pushTagsOnly ensures that git will not throw an error by attempting to push commits while not working on a branch.
+Setting pushTagsOnly ensures that git will not throw an error by attempting to push commits while not working on a
+branch.
 
 Since Gitlab will do a detached head checkout, the branch name has to be overridden when `versionWithBranch` is used.

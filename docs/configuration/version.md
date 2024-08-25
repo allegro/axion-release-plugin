@@ -293,14 +293,14 @@ This flag can also be set via command line:
 
 And works well in combination with `releaseBranchNames` option
 
-        scmVersion {
-            releaseOnlyOnReleaseBranches = true
-            releaseBranchNames = ['main', 'master']
-        }
+    scmVersion {
+        releaseOnlyOnReleaseBranches = true
+        releaseBranchNames = ['main', 'master']
+    }
 
 or as command line
 
-        ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames=main,release
+    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames=main,release
 
 ## Decorating
 
@@ -391,10 +391,7 @@ Custom version creators can be implemented by creating closure:
     {version, position -> ...}
 
 - version - string version resolved by previous steps
--
-
-position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
-object
+- position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 ### Snapshot
 
@@ -411,10 +408,7 @@ Snapshot creator can be implemented by creating closure:
     {version, position -> ...}
 
 - version - string version resolved by previous steps
--
-
-position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
-object
+- position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 ## Sanitization
 

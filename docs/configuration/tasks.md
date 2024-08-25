@@ -2,12 +2,12 @@
 
 `axion-gradle-plugin` adds 6 new Gradle tasks:
 
--   *verifyRelease*
--   *release*
--   *createRelease*
--   *pushRelease*
--   *currentVersion*
--   *markNextVersion*
+- *verifyRelease*
+- *release*
+- *createRelease*
+- *pushRelease*
+- *currentVersion*
+- *markNextVersion*
 
 ## verifyRelease
 
