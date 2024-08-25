@@ -18,7 +18,7 @@ class ScmPropertiesFactory {
             config.repository.overriddenIsClean().getOrNull(),
             ScmIdentityFactory.create(config.repository, config.repository.disableSshAgent().get()),
             config.getUnshallowRepoOnCI().get(),
-            config.getReleaseBranchNames().get().split(",") as Set,
+            config.getReleaseBranchNames().get(),
             config.getReleaseOnlyOnReleaseBranches().get()
         )
     }

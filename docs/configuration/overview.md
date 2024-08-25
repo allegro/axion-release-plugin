@@ -2,7 +2,6 @@
 
 All `axion-release-plugin` configuration options:
 
-
     scmVersion {
 
         repository {
@@ -75,8 +74,9 @@ All `axion-release-plugin` configuration options:
             aheadOfRemote.set(false) // permanently disable ahead of remote check
         }
 
-        // doc:
+        // doc: Version / releaseOnlyOnReleaseBranches
         releaseOnlyOnReleaseBranches = false
+        releaseBranchNames = ['master', 'main']
     }
 
 All `axion-release-plugin` configuration flags:
@@ -102,11 +102,19 @@ All `axion-release-plugin` configuration flags:
 - release.overriddenIsClean
     - default: not set = determine the `isClean`-state
     - possible values: `true` or `false`
-    - usually the plugin performs a check if the working directory is clean. With this flag, the result of the check can be overridden.
-    - If you have a repository with a lot of files and do not use the isClean-feature, you may set this flag for a speed-up.
+    - usually the plugin performs a check if the working directory is clean. With this flag, the result of the check can
+      be overridden.
+    - If you have a repository with a lot of files and do not use the isClean-feature, you may set this flag for a
+      speed-up.
 - release.disableSshAgent
     - default: false
     - do not use the ssh agent
 - release.fetchTags
     - default: false
     - fetch tags from the remote repository
+- release.releaseOnlyOnReleaseBranches
+    - default: false
+    - only perform a release on branches that match the `releaseBranchNames`
+- release.releaseBranchNames
+    - default: `['master', 'main']`
+    - a list of branch names that are considered release branches

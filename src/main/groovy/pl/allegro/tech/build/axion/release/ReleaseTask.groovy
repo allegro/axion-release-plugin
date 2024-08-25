@@ -23,7 +23,7 @@ abstract class ReleaseTask extends BaseAxionTask {
             def releaseBranchNames = scmService.getReleaseBranchNames()
             def currentBranch = context.repository().currentPosition().getBranch()
             if (!releaseBranchNames.contains(currentBranch)) {
-                logger.quiet("Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '${currentBranch}' was not in 'releaseBranchNames' list ['${releaseBranchNames.join(', ')}']")
+                logger.quiet("Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '${currentBranch}' was not in 'releaseBranchNames' list [${releaseBranchNames.join(', ')}]")
                 return
             }
         }

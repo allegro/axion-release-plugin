@@ -295,7 +295,7 @@ And works well in combination with `releaseBranchNames` option
 
         scmVersion {
             releaseOnlyOnReleaseBranches = true
-            releaseBranchNames = 'main,release'
+            releaseBranchNames = ['main', 'master']
         }
 
 or as command line

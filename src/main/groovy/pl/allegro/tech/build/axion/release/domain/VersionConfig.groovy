@@ -6,6 +6,7 @@ import org.gradle.api.file.Directory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
@@ -43,7 +44,7 @@ abstract class VersionConfig extends BaseExtension {
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
         getUnshallowRepoOnCI().convention(false)
-        getReleaseBranchNames().convention(gradleProperty(RELEASE_BRANCH_NAMES_PROPERTY).orElse('master,main'))
+        getReleaseBranchNames().convention(gradleSetProperty(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
         getReleaseOnlyOnReleaseBranches().convention(gradlePropertyPresent(RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY).orElse(false))
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
@@ -83,7 +84,7 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getIgnoreUncommittedChanges()
 
     @Internal
-    abstract Property<String> getReleaseBranchNames()
+    abstract SetProperty<String> getReleaseBranchNames()
 
     @Internal
     abstract Property<Boolean> getReleaseOnlyOnReleaseBranches()
@@ -142,8 +143,8 @@ abstract class VersionConfig extends BaseExtension {
     Provider<String> forcedVersion() {
         gradleProperty(FORCE_VERSION_PROPERTY)
             .orElse(gradleProperty(DEPRECATED_FORCE_VERSION_PROPERTY))
-        .map({it.trim()})
-        .map({ it.isBlank() ? null : it})
+            .map({ it.trim() })
+            .map({ it.isBlank() ? null : it })
     }
 
     Provider<String> versionIncrementerType() {
@@ -226,12 +227,12 @@ abstract class VersionConfig extends BaseExtension {
 
     Provider<VersionService.DecoratedVersion> versionProvider() {
         def cachedVersionSupplier = this.cachedVersionSupplier
-        providers.provider( { cachedVersionSupplier.resolve(this,layout.projectDirectory)})
+        providers.provider({ cachedVersionSupplier.resolve(this, layout.projectDirectory) })
     }
 
     Provider<VersionService.DecoratedVersion> uncachedVersionProvider() {
         def versionSupplier = this.versionSupplier
-        providers.provider( { versionSupplier.resolve(this, layout.projectDirectory)})
+        providers.provider({ versionSupplier.resolve(this, layout.projectDirectory) })
     }
 
     @Nested
@@ -241,21 +242,21 @@ abstract class VersionConfig extends BaseExtension {
 
     @Input
     String getVersion() {
-        return versionProvider().map({ it.decoratedVersion}).get()
+        return versionProvider().map({ it.decoratedVersion }).get()
     }
 
     @Input
     String getPreviousVersion() {
-        return versionProvider().map({ it.previousVersion}).get()
+        return versionProvider().map({ it.previousVersion }).get()
     }
 
     @Input
     String getUndecoratedVersion() {
-        return versionProvider().map({ it.undecoratedVersion}).get()
+        return versionProvider().map({ it.undecoratedVersion }).get()
     }
 
     @Nested
     ScmPosition getScmPosition() {
-        return versionProvider().map({it.position}).get()
+        return versionProvider().map({ it.position }).get()
     }
 }

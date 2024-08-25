@@ -146,7 +146,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         buildFile("""
             scmVersion {
                 releaseOnlyOnReleaseBranches = true
-                releaseBranchNames = "develop"
+                releaseBranchNames = ['develop', 'release']
             }
         """)
 
@@ -155,7 +155,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [\'develop\']')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop, release]')
     }
 
     def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
@@ -163,11 +163,11 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         buildFile("")
 
         when:
-        def releaseResult = runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        def releaseResult = runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [\'develop\']')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop, release]')
     }
 
     def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {
