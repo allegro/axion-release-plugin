@@ -32,13 +32,13 @@ Supported arguments:
 
 - file - path to file in form of string or `File` instance to update
 - files - array of files, takes precedence over single file definition
-    if not empty
+  if not empty
 - pattern - closure that should return String pattern, arguments are
-    **previous version** and context (described below)
+  **previous version** and context (described below)
 - replacement - closure that should return replacement, arguments are
-    **current version** and context
+  **current version** and context
 - encoding - the name of encoding to use during processing the specified files.
-    By default, it uses default JVM encoding (described below)
+  By default, it uses default JVM encoding (described below)
 
 All patterns have multiline flag switched on by default to match against
 content of whole file.
@@ -101,13 +101,14 @@ any closure that accepts `HookContext` object:
 
 `HookContext` object fields and methods:
 
--   *logger* - instance of Gradle project logger
--   *position* - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
--   *previousVersion* - version before release
--   *currentVersion* - released version
--   *readVersion()* - force reevaluation of version, returns fresh
-    version as if called `./gradlew currentVersion` command
--   *commit(List patterns, String message)* - force commit of given
-    patterns with message
--   *addCommitPattern(String pattern)* - add pattern to commit, you can
-    commit everything at once by adding commit hook to the chain
+- *logger* - instance of Gradle project logger
+-
+*position* - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/master/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
+- *previousVersion* - version before release
+- *currentVersion* - released version
+- *readVersion()* - force reevaluation of version, returns fresh
+  version as if called `./gradlew currentVersion` command
+- *commit(List patterns, String message)* - force commit of given
+  patterns with message
+- *addCommitPattern(String pattern)* - add pattern to commit, you can
+  commit everything at once by adding commit hook to the chain

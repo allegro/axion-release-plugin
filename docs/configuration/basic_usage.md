@@ -83,12 +83,12 @@ Sometimes it might be desirable to release each module (or just some
 modules) of multi-module project separately. If so, please make sure
 that:
 
--   keep in mind, that `scmVersion` must be initialized before
-    `scmVersion.version` is accessed
--   apply plugin on each module that should be released on its own
+- keep in mind, that `scmVersion` must be initialized before
+  `scmVersion.version` is accessed
+- apply plugin on each module that should be released on its own
 
 The plugin ignores tags based on the prefix and version separator
-(i.e. `<prefix><separator>`).  If there is a prefix configured then
+(i.e. `<prefix><separator>`). If there is a prefix configured then
 tags that do not start with the configured `<prefix><separator>` are
 all ignored. If there is no prefix configured then only tags matching
 the version are used for calculating the version (i.e. the version
@@ -98,10 +98,10 @@ This allows for using the name of the module with an appropriate version
 separator as a namespace in a multi-module project, as shown in the table
 below:
 
-| Module name | Version separator | Tags will appear as |
-|-------------|-------------------|---------------------|
-| `module`    | `-`               | `module-<maj>.<min>.<patch>` |
-| `moduleV2`    | `-`               | `moduleV2-<maj>.<min>.<patch>` |
+| Module name | Version separator | Tags will appear as            |
+|-------------|-------------------|--------------------------------|
+| `module`    | `-`               | `module-<maj>.<min>.<patch>`   |
+| `moduleV2`  | `-`               | `moduleV2-<maj>.<min>.<patch>` |
 
 For example, within `module`, tags that do not start `module-` will be
 ignored.
@@ -119,7 +119,7 @@ my-service-client
 
 Use the `exclude()` configuration parameter within a `monorepo` block to identify submodules
 that should be excluded from consideration when calculating whether to increment
-the version of the parent project.  Typically, you would do this in the top level
+the version of the parent project. Typically, you would do this in the top level
 project, assuming that submodules are named after the directory they appear in:
 
 ```
@@ -138,7 +138,6 @@ increment to the version of `A` even if its code did not change, but we only had
 
 Note: these values need to be relative to project root
 
-
 ```
 scmVersion {
         monorepo {
@@ -151,15 +150,16 @@ scmVersion {
 ```
 
 Version calculation rules:
+
 1. Changes to files within a submodule increment that submodule's version only.
 2. Changes to a submodule do not cause a change to the parent project's version if
-the parent is set to ignore that submodule, via `exclude()`.
+   the parent is set to ignore that submodule, via `exclude()`.
 3. Changes to files in the parent project but which are not in a submodule identified via
-`exclude()` will cause the parent project's version to increment but not the
-versions of any submodules.  If this is desired then consider wiring the `createRelease` or
-`release` tasks of the submodules to be dependencies of the tasks of the same name in the parent.
+   `exclude()` will cause the parent project's version to increment but not the
+   versions of any submodules. If this is desired then consider wiring the `createRelease` or
+   `release` tasks of the submodules to be dependencies of the tasks of the same name in the parent.
 4. Changes to directories provided with `include` configuration will also cause an
-incrementation of version (even if the main module did not have any changes)
+   incrementation of version (even if the main module did not have any changes)
 
 ## Releasing
 

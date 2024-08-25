@@ -2,7 +2,6 @@
 
 All `axion-release-plugin` configuration options:
 
-
     scmVersion {
 
         repository {
@@ -99,8 +98,10 @@ All `axion-release-plugin` configuration flags:
 - release.overriddenIsClean
     - default: not set = determine the `isClean`-state
     - possible values: `true` or `false`
-    - usually the plugin performs a check if the working directory is clean. With this flag, the result of the check can be overridden.
-    - If you have a repository with a lot of files and do not use the isClean-feature, you may set this flag for a speed-up.
+    - usually the plugin performs a check if the working directory is clean. With this flag, the result of the check can
+      be overridden.
+    - If you have a repository with a lot of files and do not use the isClean-feature, you may set this flag for a
+      speed-up.
 - release.disableSshAgent
     - default: false
     - do not use the ssh agent
