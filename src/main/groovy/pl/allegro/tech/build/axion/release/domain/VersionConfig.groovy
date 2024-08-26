@@ -44,7 +44,8 @@ abstract class VersionConfig extends BaseExtension {
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
         getUnshallowRepoOnCI().convention(false)
-        getReleaseBranchNames().convention(gradleSetProperty(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
+        getIgnoreGlobalGitConfig().convention(false)
+        getReleaseBranchNames().convention(gradlePropertyAsSet(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
         getReleaseOnlyOnReleaseBranches().convention(gradlePropertyPresent(RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY).orElse(false))
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
@@ -88,6 +89,9 @@ abstract class VersionConfig extends BaseExtension {
 
     @Internal
     abstract Property<Boolean> getReleaseOnlyOnReleaseBranches()
+
+    @Internal
+    abstract Property<Boolean> getIgnoreGlobalGitConfig()
 
     @Internal
     @Incubating

@@ -9,6 +9,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
 
 import java.util.Optional;
+import java.util.Set;
 
 public class Releaser {
 
@@ -23,10 +24,20 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties) {
+    public Optional<String> release(Properties properties,
+                                    boolean isReleaseOnlyOnDefaultBranches,
+                                    String currentBranch,
+                                    Set<String> releaseBranchNames) {
+        if (isReleaseOnlyOnDefaultBranches && !releaseBranchNames.contains(currentBranch)) {
+            String message = String.format("Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]", currentBranch, String.join(",", releaseBranchNames));
+            logger.quiet(message);
+            return Optional.empty();
+        }
+
         VersionContext versionContext = versionService.currentVersion(
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
         );
+
         Version version = versionContext.getVersion();
 
         if (versionContext.isSnapshot()) {
@@ -43,11 +54,17 @@ public class Releaser {
             logger.quiet("Working on released version " + version + ", nothing to release");
             return Optional.empty();
         }
-
     }
 
-    public ScmPushResult releaseAndPush(Properties rules) {
-        Optional<String> releasedTagName = release(rules);
+    public ScmPushResult releaseAndPush(Properties rules,
+                                        boolean isReleaseOnlyOnDefaultBranches,
+                                        String currentBranch,
+                                        Set<String> releaseBranchNames) {
+        Optional<String> releasedTagName = release(rules, isReleaseOnlyOnDefaultBranches, currentBranch, releaseBranchNames);
+
+        if (releasedTagName.isEmpty()) {
+            return new ScmPushResult(true, Optional.empty(), Optional.empty());
+        }
 
         ScmPushResult result = pushRelease();
 

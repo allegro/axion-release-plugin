@@ -28,11 +28,11 @@ abstract class BaseExtension {
         GradleVersion.current()
     }
 
-    protected Provider<Set<String>> gradleSetProperty(String name) {
+    protected Provider<Set<String>> gradlePropertyAsSet(String name) {
         return gradleProperty(name).map({ it.tokenize(',') as Set })
     }
 
-    protected Provider<Boolean> gradlePropertyBoolean(String name) {
+    protected Provider<Boolean> gradlePropertyAsBoolean(String name) {
         return gradleProperty(name).map(Boolean::valueOf)
     }
 

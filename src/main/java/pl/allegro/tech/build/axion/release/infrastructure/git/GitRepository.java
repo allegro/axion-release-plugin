@@ -38,8 +38,7 @@ public class GitRepository implements ScmRepository {
     private final ScmProperties properties;
 
     public GitRepository(ScmProperties properties) {
-        SystemReader.setInstance(new SystemReaderWithoutSystemConfig());
-
+        SystemReader.setInstance(new SystemReaderWithoutSystemConfig(properties.isIgnoreGlobalGitConfig()));
         try {
             this.repositoryDir = properties.getDirectory();
             this.jgitRepository = Git.open(repositoryDir);

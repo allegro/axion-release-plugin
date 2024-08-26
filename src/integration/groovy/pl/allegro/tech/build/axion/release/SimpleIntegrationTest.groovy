@@ -13,7 +13,7 @@ import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 class SimpleIntegrationTest extends BaseIntegrationTest {
 
     @Rule
-    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables();
+    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables()
 
     def "should return default version on calling currentVersion task on vanilla repo"() {
         given:
@@ -155,7 +155,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop, release]')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
     }
 
     def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
@@ -167,7 +167,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop, release]')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
     }
 
     def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {

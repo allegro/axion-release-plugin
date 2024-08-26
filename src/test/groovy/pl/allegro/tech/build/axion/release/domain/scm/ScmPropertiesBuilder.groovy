@@ -40,7 +40,8 @@ class ScmPropertiesBuilder {
                 ScmIdentity.defaultIdentityWithoutAgents(),
                 true,
                 ['main', 'master'] as Set,
-                false
+                false,
+            true
         )
     }
 

@@ -19,7 +19,8 @@ class ScmPropertiesFactory {
             ScmIdentityFactory.create(config.repository, config.repository.disableSshAgent().get()),
             config.getUnshallowRepoOnCI().get(),
             config.getReleaseBranchNames().get(),
-            config.getReleaseOnlyOnReleaseBranches().get()
+            config.getReleaseOnlyOnReleaseBranches().get(),
+            config.getIgnoreGlobalGitConfig().get()
         )
     }
 }
