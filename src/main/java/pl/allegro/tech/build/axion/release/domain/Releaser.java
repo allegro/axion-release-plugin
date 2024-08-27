@@ -28,7 +28,7 @@ public class Releaser {
     public Optional<String> release(Properties properties, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
         if (releaseBranchesConfiguration.shouldRelease()) {
             String message = String.format(
-                "Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
+                "Release step skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
                 releaseBranchesConfiguration.getCurrentBranch(),
                 String.join(",", releaseBranchesConfiguration.getReleaseBranchNames())
             );

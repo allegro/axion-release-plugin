@@ -115,7 +115,7 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.lastLogMessages(1) == ['release version: 3.2.0']
     }
 
-    def "should do release when isReleaseOnlyOnDefaultBranches option is set and current branch is in releaseBranchNames list"() {
+    def "should do release when releaseOnlyOnReleaseBranches option is set and current branch is in releaseBranchNames list"() {
         given:
         repository.tag(fullPrefix() + '1.0.0')
         Properties rules = properties()
