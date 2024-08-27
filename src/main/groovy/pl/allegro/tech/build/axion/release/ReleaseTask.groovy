@@ -3,7 +3,6 @@ package pl.allegro.tech.build.axion.release
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
-import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
 import java.nio.file.Files
@@ -16,11 +15,12 @@ abstract class ReleaseTask extends BaseAxionTask {
     void release() {
         VersionResolutionContext context = resolutionContext()
         Releaser releaser = context.releaser()
-        ScmService scmService = context.scmService()
-        def releaseBranchNames = scmService.getReleaseBranchNames()
-        def currentBranch = context.repository().currentPosition().getBranch()
-        def isReleaseOnlyOnDefaultBranches = scmService.isReleaseOnlyOnDefaultBranches()
-        ScmPushResult result = releaser.releaseAndPush(context.rules(), isReleaseOnlyOnDefaultBranches, currentBranch, releaseBranchNames)
+        ReleaseBranchesConfiguration releaseBranchesConfiguration = new ReleaseBranchesConfiguration(
+            context.scmService().isReleaseOnlyOnReleaseBranches(),
+            context.repository().currentPosition().getBranch(),
+            context.scmService().getReleaseBranchNames()
+        )
+        ScmPushResult result = releaser.releaseAndPush(context.rules(), releaseBranchesConfiguration)
 
         if (!result.success) {
             def status = result.failureStatus
