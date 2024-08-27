@@ -75,7 +75,7 @@ public class ScmService {
         return scmProperties.getReleaseBranchNames();
     }
 
-    public boolean isReleaseOnlyOnDefaultBranches(){
+    public boolean isReleaseOnlyOnReleaseBranches(){
         return scmProperties.isReleaseOnlyOnReleaseBranches();
     }
 }

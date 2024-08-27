@@ -3,13 +3,13 @@ package pl.allegro.tech.build.axion.release.domain;
 import com.github.zafarkhaja.semver.Version;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
 
 import java.util.Optional;
-import java.util.Set;
 
 public class Releaser {
 
@@ -24,12 +24,13 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties,
-                                    boolean isReleaseOnlyOnDefaultBranches,
-                                    String currentBranch,
-                                    Set<String> releaseBranchNames) {
-        if (isReleaseOnlyOnDefaultBranches && !releaseBranchNames.contains(currentBranch)) {
-            String message = String.format("Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]", currentBranch, String.join(",", releaseBranchNames));
+    public Optional<String> release(Properties properties, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
+        if (releaseBranchesConfiguration.shouldRelease()) {
+            String message = String.format(
+                "Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
+                releaseBranchesConfiguration.getCurrentBranch(),
+                String.join(",", releaseBranchesConfiguration.getReleaseBranchNames())
+            );
             logger.quiet(message);
             return Optional.empty();
         }
@@ -56,11 +57,8 @@ public class Releaser {
         }
     }
 
-    public ScmPushResult releaseAndPush(Properties rules,
-                                        boolean isReleaseOnlyOnDefaultBranches,
-                                        String currentBranch,
-                                        Set<String> releaseBranchNames) {
-        Optional<String> releasedTagName = release(rules, isReleaseOnlyOnDefaultBranches, currentBranch, releaseBranchNames);
+    public ScmPushResult releaseAndPush(Properties rules, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
+        Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration);
 
         if (releasedTagName.isEmpty()) {
             return new ScmPushResult(true, Optional.empty(), Optional.empty());
