@@ -11,6 +11,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Shared
@@ -59,7 +60,7 @@ class RemoteRejectionTest extends Specification {
         ScmPushResult result = repository.push(keyIdentity, new ScmPushOptions('origin', false), true)
 
         then:
-        !result.success
+        result.outcome == ScmPushResultOutcome.FAILED
         result.remoteMessage.get().contains("I reject this push!")
     }
 }

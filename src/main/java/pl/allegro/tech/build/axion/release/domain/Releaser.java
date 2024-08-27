@@ -7,6 +7,7 @@ import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
 
 import java.util.Optional;
@@ -61,12 +62,12 @@ public class Releaser {
         Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration);
 
         if (releasedTagName.isEmpty()) {
-            return new ScmPushResult(true, Optional.empty(), Optional.empty());
+            return new ScmPushResult(ScmPushResultOutcome.SKIPPED, Optional.empty(), Optional.empty());
         }
 
         ScmPushResult result = pushRelease();
 
-        if (!result.isSuccess()) {
+        if (result.getOutcome().equals(ScmPushResultOutcome.FAILED)) {
             releasedTagName.ifPresent(this::rollbackRelease);
         }
 

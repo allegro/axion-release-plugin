@@ -185,4 +185,22 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
         releaseResult.output.contains('Creating tag: ' + fullPrefix() + '1.0.0')
     }
+
+    def "should skip release and no GITHUB_OUTPUT should be written"() {
+        given:
+        def outputFile = File.createTempFile("github-outputs", ".tmp")
+        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
+        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
+
+        buildFile('')
+
+        when:
+        runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        outputFile.getText().isEmpty()
+
+        cleanup:
+        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+    }
 }
