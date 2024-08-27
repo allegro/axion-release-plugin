@@ -25,12 +25,12 @@ JDK11+ & Gradle 7+ required.
 
 ## Basic usage
 
-```
+```kotlin
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.18.0'
+    id("pl.allegro.tech.build.axion-release") version "1.18.6"
 }
 
-project.version = scmVersion.version
+version = scmVersion.version
 ```
 
 ```
