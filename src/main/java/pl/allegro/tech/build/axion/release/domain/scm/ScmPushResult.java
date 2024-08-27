@@ -6,20 +6,22 @@ import java.util.Optional;
 
 public class ScmPushResult {
 
-    private final boolean success;
+    private final ScmPushResultOutcome outcome;
 
     private final Optional<RemoteRefUpdate.Status> failureCause;
 
     private final Optional<String> remoteMessage;
 
-    public ScmPushResult(boolean success, Optional<RemoteRefUpdate.Status> failureCause, Optional<String> remoteMessage) {
-        this.success = success;
+    public ScmPushResult(ScmPushResultOutcome outcome,
+                         Optional<RemoteRefUpdate.Status> failureCause,
+                         Optional<String> remoteMessage) {
+        this.outcome = outcome;
         this.failureCause = failureCause;
         this.remoteMessage = remoteMessage;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public ScmPushResultOutcome getOutcome() {
+        return outcome;
     }
 
     public Optional<RemoteRefUpdate.Status> getFailureStatus() {

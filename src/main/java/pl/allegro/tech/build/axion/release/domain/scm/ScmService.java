@@ -38,7 +38,7 @@ public class ScmService {
     public ScmPushResult push() {
         if (localOnlyResolver.localOnly(this.remoteAttached())) {
             logger.quiet("Changes made to local repository only");
-            return new ScmPushResult(true, Optional.of(RemoteRefUpdate.Status.NOT_ATTEMPTED), Optional.empty());
+            return new ScmPushResult(ScmPushResultOutcome.SUCCESS, Optional.of(RemoteRefUpdate.Status.NOT_ATTEMPTED), Optional.empty());
         }
 
         try {

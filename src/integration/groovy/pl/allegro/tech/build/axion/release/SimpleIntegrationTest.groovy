@@ -155,7 +155,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnReleaseBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
     }
 
     def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
@@ -167,7 +167,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnDefaultBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
+        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnReleaseBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
     }
 
     def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {
@@ -184,5 +184,23 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         then:
         releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
         releaseResult.output.contains('Creating tag: ' + fullPrefix() + '1.0.0')
+    }
+
+    def "should skip release and no GITHUB_OUTPUT should be written"() {
+        given:
+        def outputFile = File.createTempFile("github-outputs", ".tmp")
+        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
+        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
+
+        buildFile('')
+
+        when:
+        runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        outputFile.getText().isEmpty()
+
+        cleanup:
+        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
     }
 }

@@ -154,10 +154,9 @@ public class GitRepository implements ScmRepository {
         if (!pushOptions.isPushTagsOnly()) {
             PushCommand command = pushCommand(identity, pushOptions.getRemote(), all);
             ScmPushResult result = verifyPushResults(callPush(command));
-            if (!result.isSuccess()) {
+            if (result.getOutcome().equals(ScmPushResultOutcome.FAILED)) {
                 return result;
             }
-
         }
 
         // and again for tags
@@ -182,12 +181,12 @@ public class GitRepository implements ScmRepository {
                 && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
         ).findFirst();
 
-        boolean isSuccess = !failedRefUpdate.isPresent();
+        boolean isSuccess = failedRefUpdate.isEmpty();
         Optional<RemoteRefUpdate.Status> failureCause = isSuccess ?
             Optional.empty() : Optional.of(failedRefUpdate.get().getStatus());
 
         return new ScmPushResult(
-            isSuccess,
+            isSuccess ? ScmPushResultOutcome.SUCCESS : ScmPushResultOutcome.FAILED,
             failureCause,
             Optional.ofNullable(pushResult.getMessages())
         );
