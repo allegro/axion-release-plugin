@@ -73,6 +73,10 @@ All `axion-release-plugin` configuration options:
             uncommittedChanges.set(false) // permanently disable uncommitted changes check
             aheadOfRemote.set(false) // permanently disable ahead of remote check
         }
+
+        // doc: Version / releaseOnlyOnReleaseBranches
+        releaseOnlyOnReleaseBranches = false
+        releaseBranchNames = ['master', 'main']
     }
 
 All `axion-release-plugin` configuration flags:
@@ -108,3 +112,9 @@ All `axion-release-plugin` configuration flags:
 - release.fetchTags
     - default: false
     - fetch tags from the remote repository
+- release.releaseOnlyOnReleaseBranches
+    - default: false
+    - only perform a release on branches that match the `releaseBranchNames`
+- release.releaseBranchNames
+    - default: `['master', 'main']`
+    - a list of branch names that are considered release branches

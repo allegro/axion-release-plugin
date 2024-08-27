@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.domain;
 import com.github.zafarkhaja.semver.Version;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
@@ -23,10 +24,21 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties) {
+    public Optional<String> release(Properties properties, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
+        if (releaseBranchesConfiguration.shouldRelease()) {
+            String message = String.format(
+                "Release step skipped since 'releaseOnlyOnDefaultBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
+                releaseBranchesConfiguration.getCurrentBranch(),
+                String.join(",", releaseBranchesConfiguration.getReleaseBranchNames())
+            );
+            logger.quiet(message);
+            return Optional.empty();
+        }
+
         VersionContext versionContext = versionService.currentVersion(
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
         );
+
         Version version = versionContext.getVersion();
 
         if (versionContext.isSnapshot()) {
@@ -43,11 +55,14 @@ public class Releaser {
             logger.quiet("Working on released version " + version + ", nothing to release");
             return Optional.empty();
         }
-
     }
 
-    public ScmPushResult releaseAndPush(Properties rules) {
-        Optional<String> releasedTagName = release(rules);
+    public ScmPushResult releaseAndPush(Properties rules, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
+        Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration);
+
+        if (releasedTagName.isEmpty()) {
+            return new ScmPushResult(true, Optional.empty(), Optional.empty());
+        }
 
         ScmPushResult result = pushRelease();
 

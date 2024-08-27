@@ -89,7 +89,7 @@ abstract class RepositoryConfig extends BaseExtension {
     }
 
     Provider<Boolean> overriddenIsClean() {
-        gradlePropertyBoolean(OVERRIDDEN_IS_CLEAN)
+        gradlePropertyAsBoolean(OVERRIDDEN_IS_CLEAN)
     }
 
     Provider<Boolean> disableSshAgent() {
