@@ -29,6 +29,7 @@ abstract class VersionConfig extends BaseExtension {
     private static final String IGNORE_UNCOMMITTED_CHANGES_PROPERTY = 'release.ignoreUncommittedChanges'
     private static final String FORCE_SNAPSHOT_PROPERTY = 'release.forceSnapshot'
     private static final String USE_HIGHEST_VERSION_PROPERTY = 'release.useHighestVersion'
+    private static final String UPDATE_PROJECT_VERSION_AFTER_RELEASE_PROPERTY = 'release.updateProjectVersionAfterRelease'
     private static final String LOCAL_ONLY = "release.localOnly"
     private static final String FORCE_VERSION_PROPERTY = 'release.version'
     private static final String DEPRECATED_FORCE_VERSION_PROPERTY = 'release.forceVersion'
@@ -43,6 +44,7 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
+        getUpdateProjectVersionAfterRelease().convention(false)
         getUnshallowRepoOnCI().convention(false)
         getIgnoreGlobalGitConfig().convention(false)
         getReleaseBranchNames().convention(gradlePropertyAsSet(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
@@ -127,6 +129,9 @@ abstract class VersionConfig extends BaseExtension {
     @Internal
     abstract Property<Boolean> getUseHighestVersion();
 
+    @Internal
+    abstract Property<Boolean> getUpdateProjectVersionAfterRelease();
+
     Provider<Boolean> ignoreUncommittedChanges() {
         gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
             .orElse(ignoreUncommittedChanges)
@@ -138,6 +143,10 @@ abstract class VersionConfig extends BaseExtension {
 
     Provider<Boolean> useHighestVersion() {
         gradlePropertyPresent(USE_HIGHEST_VERSION_PROPERTY).orElse(useHighestVersion)
+    }
+
+    Provider<Boolean> updateProjectVersionAfterRelease() {
+        gradlePropertyPresent(UPDATE_PROJECT_VERSION_AFTER_RELEASE_PROPERTY).orElse(updateProjectVersionAfterRelease)
     }
 
     Provider<Boolean> localOnly() {

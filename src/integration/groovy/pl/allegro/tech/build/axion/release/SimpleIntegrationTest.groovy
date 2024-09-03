@@ -203,4 +203,79 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
     }
+
+    def "should not update project.version after release when updateProjectVersionAfterRelease option is not set"() {
+        given:
+        buildFile("""
+            task assemble {
+              inputs.property("version", project.version)
+              doLast {
+                println("Assembling project: " + version)
+              }
+            }
+        """)
+
+        def result = runGradleWithoutConfigurationCache(
+            ['currentVersion', 'release', 'assemble', '-Prelease.localOnly', '-Prelease.disableChecks']
+        )
+
+        expect:
+        result.output.contains('Project version: 0.1.0-SNAPSHOT')
+        result.output.contains('Creating tag: v0.1.0')
+        result.output.contains('Assembling project: 0.1.0-SNAPSHOT')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+        result.task(":release").outcome == TaskOutcome.SUCCESS
+        result.task(":assemble").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should update project.version after release when updateProjectVersionAfterRelease option is set"() {
+        given:
+        buildFile("""
+            scmVersion {
+                updateProjectVersionAfterRelease = true
+            }
+
+            task assemble {
+              inputs.property("version", project.version)
+              doLast {
+                println("Assembling project: " + version)
+              }
+            }
+        """)
+
+        def result = runGradleWithoutConfigurationCache(
+            ['currentVersion', 'release', 'assemble', '-Prelease.localOnly', '-Prelease.disableChecks']
+        )
+
+        expect:
+        result.output.contains('Project version: 0.1.0-SNAPSHOT')
+        result.output.contains('Creating tag: v0.1.0')
+        result.output.contains('Project version will be updated after release.')
+        result.output.contains('Assembling project: 0.1.0')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+        result.task(":release").outcome == TaskOutcome.SUCCESS
+        result.task(":assemble").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should not fail build when using updateProjectVersionAfterRelease and configuration cache is enabled"() {
+        given:
+        buildFile("""
+            scmVersion {
+                updateProjectVersionAfterRelease = true
+            }
+
+            task assemble {
+              inputs.property("version", project.version)
+              doLast {
+                println("Assembling project: " + version)
+              }
+            }
+        """)
+
+        when:
+        def result = runGradle('release', '--stacktrace', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        result.task(":release").outcome == TaskOutcome.SUCCESS
+    }
 }

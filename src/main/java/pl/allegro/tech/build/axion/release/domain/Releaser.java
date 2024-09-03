@@ -3,6 +3,7 @@ package pl.allegro.tech.build.axion.release.domain;
 import com.github.zafarkhaja.semver.Version;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import pl.allegro.tech.build.axion.release.ConfigurationCacheConfiguration;
 import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
@@ -25,7 +26,11 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
+    public Optional<String> release(
+        Properties properties,
+        ReleaseBranchesConfiguration releaseBranchesConfiguration,
+        ConfigurationCacheConfiguration configurationCacheConfiguration
+    ) {
         if (releaseBranchesConfiguration.shouldRelease()) {
             String message = String.format(
                 "Release step skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
@@ -41,6 +46,14 @@ public class Releaser {
         );
 
         Version version = versionContext.getVersion();
+
+        if (configurationCacheConfiguration.isUpdateProjectVersionAfterRelease()) {
+            if (configurationCacheConfiguration.isConfigurationCacheEnabled()) {
+                throw new IllegalStateException("Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` is set to `true`. " +
+                    "This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` and remember to run release task separately.");
+            }
+            configurationCacheConfiguration.updateProjectVersion.call(version.toString());
+        }
 
         if (versionContext.isSnapshot()) {
             String tagName = properties.getTag().getSerialize().apply(properties.getTag(), version.toString());
@@ -58,8 +71,12 @@ public class Releaser {
         }
     }
 
-    public ScmPushResult releaseAndPush(Properties rules, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
-        Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration);
+    public ScmPushResult releaseAndPush(
+        Properties rules,
+        ReleaseBranchesConfiguration releaseBranchesConfiguration,
+        ConfigurationCacheConfiguration configurationCacheEnabled
+    ) {
+        Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration, configurationCacheEnabled);
 
         if (releasedTagName.isEmpty()) {
             return new ScmPushResult(ScmPushResultOutcome.SKIPPED, Optional.empty(), Optional.empty());

@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import pl.allegro.tech.build.axion.release.ConfigurationCacheConfiguration
 import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
@@ -30,7 +31,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '2.0.0'
@@ -41,7 +46,11 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag(fullPrefix() + '1.0.0')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            context.rules(),
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '1.0.0'
@@ -55,7 +64,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -66,7 +79,11 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag(fullPrefix() + '3.0.0-rc4')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            context.rules(),
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -78,7 +95,11 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.commit(['*'], 'make is snapshot')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            context.rules(),
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '3.0.1'
@@ -92,7 +113,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '3.0.0'
@@ -108,7 +133,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '3.2.0'
@@ -124,7 +153,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(true, 'main', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(true, 'main', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '1.0.1'
@@ -138,7 +171,11 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(true, 'feature/branch', ['main'] as Set))
+        releaser.release(
+            rules,
+            new ReleaseBranchesConfiguration(true, 'feature/branch', ['main'] as Set),
+            new ConfigurationCacheConfiguration(false, { _ -> } as Closure<String>)
+        )
 
         then:
         currentVersion() == '1.0.0'

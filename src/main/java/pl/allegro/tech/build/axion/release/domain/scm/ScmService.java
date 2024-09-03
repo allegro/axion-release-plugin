@@ -78,4 +78,8 @@ public class ScmService {
     public boolean isReleaseOnlyOnReleaseBranches(){
         return scmProperties.isReleaseOnlyOnReleaseBranches();
     }
+
+    public boolean isUpdateProjectVersionAfterRelease() {
+        return scmProperties.isUpdateProjectVersionAfterRelease();
+    }
 }
