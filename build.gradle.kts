@@ -4,8 +4,8 @@ plugins {
     `maven-publish`
     signing
     jacoco
+    idea
     id("pl.allegro.tech.build.axion-release") version "1.18.7"
-    id("com.github.kt3k.coveralls") version "2.12.2"
     id("com.gradle.plugin-publish") version "1.2.2"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
@@ -60,7 +60,7 @@ dependencies {
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")  {
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
         exclude("com.jcraft", "jsch")
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
@@ -112,11 +112,11 @@ tasks {
         reports {
             xml.required.set(true)
         }
+        executionData(
+            file("${layout.buildDirectory.asFile.get()}/jacoco/test.exec"),
+            file("${layout.buildDirectory.asFile.get()}/jacoco/integrationTest.exec"),
+        )
     }
-}
-
-jacoco {
-    toolVersion = "0.8.2"
 }
 
 gradlePlugin {
@@ -192,4 +192,11 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
+}
+
+idea {
+    module {
+        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
+        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+    }
 }
