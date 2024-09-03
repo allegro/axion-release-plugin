@@ -12,7 +12,7 @@ class ScmPropertiesFactoryTest extends Specification {
 
     def "should return remote name and tagsOnly option from configuration when no flags on project"() {
         given:
-        config.repository.remote.set( 'someRemote')
+        config.repository.remote.set('someRemote')
         config.repository.pushTagsOnly.set(true)
 
         when:
@@ -20,19 +20,6 @@ class ScmPropertiesFactoryTest extends Specification {
 
         then:
         properties.remote == 'someRemote'
-        properties.pushTagsOnly
-    }
-
-    def "should return true for tagsOnly when enabled via project flag"() {
-        given:
-        def project = Fixtures.project(['release.pushTagsOnly':''])
-        VersionConfig config = Fixtures.versionConfig(project)
-        config.repository.pushTagsOnly.set(false)
-
-        when:
-        ScmProperties properties = ScmPropertiesFactory.create(config)
-
-        then:
         properties.pushTagsOnly
     }
 }

@@ -45,7 +45,7 @@ public abstract class ChecksConfig extends BaseExtension {
             .orElse(getSnapshotDependencies());
     }
 
-    private Provider<Boolean> enabled(String property) {
+    public Provider<Boolean> enabled(String property) {
         // if either property is present this feature isn't enabled
         return gradlePropertyPresent(DISABLE_CHECKS)
             .orElse(gradlePropertyPresent(property))

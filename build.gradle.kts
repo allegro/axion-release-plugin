@@ -1,12 +1,15 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
     groovy
     `maven-publish`
     signing
     jacoco
+    idea
     id("pl.allegro.tech.build.axion-release") version "1.18.5"
     id("com.github.kt3k.coveralls") version "2.12.2"
-    id("com.gradle.plugin-publish") version "1.2.1"
+    id("com.gradle.plugin-publish") version "1.2.2"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
@@ -42,9 +45,7 @@ repositories {
 sourceSets {
     main {
         java { setSrcDirs(emptyList<String>()) }
-        withConvention(GroovySourceSet::class) {
-            groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }
+        groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
     }
 }
 
@@ -60,7 +61,7 @@ dependencies {
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")  {
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
         exclude("com.jcraft", "jsch")
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
@@ -97,14 +98,14 @@ tasks {
     /**
      * set kotlin to depend on groovy
      */
-    named<AbstractCompile>("compileKotlin") {
-        classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
+    named<KotlinCompile>("compileKotlin") {
+        libraries.from(files(sourceSets.main.get().groovy.classesDirectory))
     }
 
     /**
      * set groovy to not depend on Kotlin
      */
-    named<AbstractCompile>("compileGroovy") {
+    named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
 
@@ -112,11 +113,11 @@ tasks {
         reports {
             xml.required.set(true)
         }
+        executionData(
+            file("${layout.buildDirectory.asFile.get()}/jacoco/test.exec"),
+            file("${layout.buildDirectory.asFile.get()}/jacoco/integrationTest.exec"),
+        )
     }
-}
-
-jacoco {
-    toolVersion = "0.8.2"
 }
 
 gradlePlugin {
@@ -192,4 +193,11 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
+}
+
+idea {
+    module {
+        testSources.from(testSources.from + sourceSets.integration.get().allSource.srcDirs)
+        testResources.from(testResources.from + sourceSets.integration.get().resources.srcDirs)
+    }
 }

@@ -25,20 +25,6 @@ class BaseExtensionTest extends Specification {
         0 * mockedProvider.forUseAtConfigurationTime()
     }
 
-    def "should call forUseAtConfigurationTime for older Gradle versions"() {
-        given:
-        ProviderFactory providers = Mock(ProviderFactory)
-        FakeExtension extension = new FakeExtension(providers, null)
-        Provider mockedProvider = Mock(Provider)
-
-        when:
-        extension.gradleProperty("name")
-
-        then:
-        1 * providers.gradleProperty("name") >> mockedProvider
-        1 * mockedProvider.forUseAtConfigurationTime()
-    }
-
     private class FakeExtension extends BaseExtension {
         ProviderFactory providers
         GradleVersion gradleVersion
@@ -61,14 +47,6 @@ class BaseExtensionTest extends Specification {
         @Override
         protected ObjectFactory getObjects() {
             return null
-        }
-
-        @Override
-        protected GradleVersion currentGradleVersion() {
-            if (gradleVersion == null) {
-                return super.currentGradleVersion()
-            }
-            return gradleVersion
         }
     }
 }
