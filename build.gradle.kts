@@ -5,8 +5,8 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.18.5"
-    id("com.gradle.plugin-publish") version "1.2.1"
+    id("pl.allegro.tech.build.axion-release") version "1.18.7"
+    id("com.gradle.plugin-publish") version "1.2.2"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
