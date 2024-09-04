@@ -1,9 +1,11 @@
 package pl.allegro.tech.build.axion.release
 
+
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
+import pl.allegro.tech.build.axion.release.domain.scm.ScmService
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
 import java.nio.file.Files
@@ -16,13 +18,24 @@ abstract class ReleaseTask extends BaseAxionTask {
     void release() {
         VersionResolutionContext context = resolutionContext()
         Releaser releaser = context.releaser()
+        ScmService service = context.scmService()
+
         ReleaseBranchesConfiguration releaseBranchesConfiguration = new ReleaseBranchesConfiguration(
-            context.scmService().isReleaseOnlyOnReleaseBranches(),
+            service.isReleaseOnlyOnReleaseBranches(),
             context.repository().currentPosition().getBranch(),
-            context.scmService().getReleaseBranchNames()
+            service.getReleaseBranchNames()
         )
 
-        ScmPushResult result = releaser.releaseAndPush(context.rules(), releaseBranchesConfiguration)
+        ConfigurationCacheConfiguration configurationCacheConfiguration = new ConfigurationCacheConfiguration(
+            service.isUpdateProjectVersionAfterRelease(),
+            (version) -> project.setVersion(version)
+        )
+
+        ScmPushResult result = releaser.releaseAndPush(
+            context.rules(),
+            releaseBranchesConfiguration,
+            configurationCacheConfiguration
+        )
 
         if (result.outcome === ScmPushResultOutcome.FAILED) {
             def status = result.failureStatus
