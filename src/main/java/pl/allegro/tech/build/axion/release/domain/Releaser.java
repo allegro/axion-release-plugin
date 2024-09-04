@@ -48,10 +48,6 @@ public class Releaser {
         Version version = versionContext.getVersion();
 
         if (configurationCacheConfiguration.isUpdateProjectVersionAfterRelease()) {
-            if (configurationCacheConfiguration.isConfigurationCacheEnabled()) {
-                throw new IllegalStateException("Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` is set to `true`. " +
-                    "This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` and remember to run release task separately.");
-            }
             configurationCacheConfiguration.updateProjectVersion.call(version.toString());
         }
 

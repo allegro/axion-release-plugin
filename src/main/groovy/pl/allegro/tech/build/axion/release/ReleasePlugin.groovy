@@ -43,14 +43,14 @@ abstract class ReleasePlugin implements Plugin<Project> {
             it.group = 'Release'
             it.description = 'Performs release - creates tag and pushes it to remote.'
             it.dependsOn(VERIFY_RELEASE_TASK)
-            if (GradleVersion.current() >= GradleVersion.version("7.4")) {
-                it.notCompatibleWithConfigurationCache(
-                    "Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` " +
-                        "is set to `true`. This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` " +
-                        "and remember to run release task separately."
-                )
-            }
             if (versionConfig.updateProjectVersionAfterRelease.get() && !project.tasks.matching { it.name == "assemble" }.isEmpty()) {
+                if (GradleVersion.current() >= GradleVersion.version("7.4")) {
+                    it.notCompatibleWithConfigurationCache(
+                        "Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` " +
+                            "is set to `true`. This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` " +
+                            "and remember to run release task separately."
+                    )
+                }
                 it.doLast {
                     logger.quiet("Project version will be updated after release.")
                 }
@@ -62,14 +62,14 @@ abstract class ReleasePlugin implements Plugin<Project> {
             it.group = 'Release'
             it.description = 'Performs first stage of release - creates tag.'
             it.dependsOn(VERIFY_RELEASE_TASK)
-            if (GradleVersion.current() >= GradleVersion.version("7.4")) {
-                it.notCompatibleWithConfigurationCache(
-                    "Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` " +
-                        "is set to `true`. This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` " +
-                        "and remember to run release task separately."
-                )
-            }
             if (versionConfig.updateProjectVersionAfterRelease.get() && !project.tasks.matching { it.name == "assemble" }.isEmpty()) {
+                if (GradleVersion.current() >= GradleVersion.version("7.4")) {
+                    it.notCompatibleWithConfigurationCache(
+                        "Configuration cache is enabled and `scmVersion.updateProjectVersionAfterRelease` " +
+                            "is set to `true`. This is not supported. Set `scmVersion.updateProjectVersionAfterRelease` to `false` " +
+                            "and remember to run release task separately."
+                    )
+                }
                 it.doLast {
                     logger.quiet("Project version will be updated after release.")
                 }
