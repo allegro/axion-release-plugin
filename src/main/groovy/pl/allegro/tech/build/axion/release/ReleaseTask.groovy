@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release
 
+
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskAction
+import org.gradle.tooling.GradleConnector
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
@@ -9,6 +12,8 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionCo
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
+
+import static java.util.stream.Collectors.toList
 
 abstract class ReleaseTask extends BaseAxionTask {
 
@@ -40,6 +45,32 @@ abstract class ReleaseTask extends BaseAxionTask {
                     StandardOpenOption.APPEND
                 )
             }
+            def projectConnection = GradleConnector
+                .newConnector()
+                .forProjectDirectory(layout.projectDirectory.asFile)
+                .connect()
+
+            def tasksExceptCurrentOne = project.gradle.taskGraph.allTasks - this
+
+            tasksExceptCurrentOne.forEach { task ->
+                if (!task.state.executed) {
+                    task.actions.clear()
+                }
+            }
+
+            def taskNames = tasksExceptCurrentOne
+                .stream()
+                .map(Task::getName)
+                .collect(toList())
+
+            def buildLauncher = projectConnection
+                .newBuild()
+                .forTasks(*taskNames)
+                .addArguments('-Prelease.localOnly', '-Prelease.disableChecks')
+                .setStandardInput(System.in)
+                .setStandardOutput(System.out)
+                .setStandardError(System.err)
+            buildLauncher.run()
         }
     }
 }
