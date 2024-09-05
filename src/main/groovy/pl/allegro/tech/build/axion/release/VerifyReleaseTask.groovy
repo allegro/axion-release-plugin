@@ -17,6 +17,22 @@ abstract class VerifyReleaseTask extends BaseAxionTask {
     void verify() {
         VersionResolutionContext context = resolutionContext()
 
+        ReleaseBranchesConfiguration releaseBranchesConfiguration = new ReleaseBranchesConfiguration(
+            context.scmService().isReleaseOnlyOnReleaseBranches(),
+            context.repository().currentPosition().getBranch(),
+            context.scmService().getReleaseBranchNames()
+        )
+
+        if (releaseBranchesConfiguration.shouldSkipRelease()) {
+            String message = String.format(
+                "Release step skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
+                releaseBranchesConfiguration.getCurrentBranch(),
+                String.join(",", releaseBranchesConfiguration.getReleaseBranchNames())
+            )
+            logger.quiet(message)
+            return
+        }
+
         ScmRepository repository = context.repository()
         ScmChangesPrinter changesPrinter = context.changesPrinter()
         LocalOnlyResolver localOnlyResolver = context.localOnlyResolver()

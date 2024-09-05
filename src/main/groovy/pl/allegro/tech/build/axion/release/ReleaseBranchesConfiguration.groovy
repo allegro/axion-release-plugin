@@ -15,7 +15,7 @@ class ReleaseBranchesConfiguration {
         this.releaseBranchNames = releaseBranchNames
     }
 
-    boolean shouldRelease() {
+    boolean shouldSkipRelease() {
         return releaseOnlyOnReleaseBranches && !releaseBranchNames.contains(currentBranch)
     }
 
