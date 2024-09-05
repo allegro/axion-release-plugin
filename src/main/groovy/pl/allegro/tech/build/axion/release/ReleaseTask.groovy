@@ -16,13 +16,8 @@ abstract class ReleaseTask extends BaseAxionTask {
     void release() {
         VersionResolutionContext context = resolutionContext()
         Releaser releaser = context.releaser()
-        ReleaseBranchesConfiguration releaseBranchesConfiguration = new ReleaseBranchesConfiguration(
-            context.scmService().isReleaseOnlyOnReleaseBranches(),
-            context.repository().currentPosition().getBranch(),
-            context.scmService().getReleaseBranchNames()
-        )
 
-        ScmPushResult result = releaser.releaseAndPush(context.rules(), releaseBranchesConfiguration)
+        ScmPushResult result = releaser.releaseAndPush(context.rules())
 
         if (result.outcome === ScmPushResultOutcome.FAILED) {
             def status = result.failureStatus
