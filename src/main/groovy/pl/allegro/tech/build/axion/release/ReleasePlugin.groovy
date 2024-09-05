@@ -68,7 +68,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
         maybeDisableReleaseTasks(project, versionConfig)
     }
 
-    private void maybeDisableReleaseTasks(Project project, VersionConfig versionConfig) {
+    private static void maybeDisableReleaseTasks(Project project, VersionConfig versionConfig) {
         project.afterEvaluate {
             def context = VersionResolutionContext.create(versionConfig, project.layout.projectDirectory)
             def releaseOnlyOnReleaseBranches = context.scmService().isReleaseOnlyOnReleaseBranches()
@@ -83,7 +83,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
         }
     }
 
-    private void disableReleaseTasks(String currentBranch, Set<String> releaseBranchNames, Project project) {
+    private static void disableReleaseTasks(String currentBranch, Set<String> releaseBranchNames, Project project) {
         String message = String.format(
             "Release will be skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
             currentBranch,
