@@ -1,6 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration
+
 import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
@@ -30,7 +30,7 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(rules)
 
         then:
         currentVersion() == '2.0.0'
@@ -41,7 +41,7 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag(fullPrefix() + '1.0.0')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(context.rules())
 
         then:
         currentVersion() == '1.0.0'
@@ -55,7 +55,7 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(rules)
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -66,7 +66,7 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.tag(fullPrefix() + '3.0.0-rc4')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(context.rules())
 
         then:
         currentVersion() == '3.0.0-rc4'
@@ -78,7 +78,7 @@ class ReleaserTest extends RepositoryBasedTest {
         repository.commit(['*'], 'make is snapshot')
 
         when:
-        releaser.release(context.rules(), new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(context.rules())
 
         then:
         currentVersion() == '3.0.1'
@@ -92,7 +92,7 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(rules)
 
         then:
         currentVersion() == '3.0.0'
@@ -108,39 +108,10 @@ class ReleaserTest extends RepositoryBasedTest {
             .build()
 
         when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(false, 'main', ['main'] as Set))
+        releaser.release(rules)
 
         then:
         currentVersion() == '3.2.0'
         repository.lastLogMessages(1) == ['release version: 3.2.0']
-    }
-
-    def "should do release when releaseOnlyOnReleaseBranches option is set and current branch is in releaseBranchNames list"() {
-        given:
-        repository.tag(fullPrefix() + '1.0.0')
-        Properties rules = properties()
-            .withVersionRules(versionProperties().forceVersion('1.0.1').build())
-            .withHooksRules(hooksProperties().withCommitHook().build())
-            .build()
-
-        when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(true, 'main', ['main'] as Set))
-
-        then:
-        currentVersion() == '1.0.1'
-    }
-
-    def "should skip release when current branch is not in releaseBranchNames list"() {
-        given:
-        repository.tag(fullPrefix() + '1.0.0')
-        Properties rules = properties()
-            .withHooksRules(hooksProperties().withCommitHook().build())
-            .build()
-
-        when:
-        releaser.release(rules, new ReleaseBranchesConfiguration(true, 'feature/branch', ['main'] as Set))
-
-        then:
-        currentVersion() == '1.0.0'
     }
 }

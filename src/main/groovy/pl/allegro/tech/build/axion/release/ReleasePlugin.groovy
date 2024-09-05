@@ -4,6 +4,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
 abstract class ReleasePlugin implements Plugin<Project> {
@@ -63,5 +64,36 @@ abstract class ReleasePlugin implements Plugin<Project> {
             group = 'Help'
             description = 'Prints current project version extracted from SCM.'
         }
+
+        maybeDisableReleaseTasks(project, versionConfig)
+    }
+
+    private static void maybeDisableReleaseTasks(Project project, VersionConfig versionConfig) {
+        project.afterEvaluate {
+            def context = VersionResolutionContext.create(versionConfig, project.layout.projectDirectory)
+            def releaseOnlyOnReleaseBranches = context.scmService().isReleaseOnlyOnReleaseBranches()
+            def releaseBranchNames = context.scmService().getReleaseBranchNames()
+            def currentBranch = context.repository().currentPosition().getBranch()
+
+            def shouldSkipRelease = releaseOnlyOnReleaseBranches && !releaseBranchNames.contains(currentBranch)
+
+            if (shouldSkipRelease) {
+                disableReleaseTasks(currentBranch, releaseBranchNames, project)
+            }
+        }
+    }
+
+    private static void disableReleaseTasks(String currentBranch, Set<String> releaseBranchNames, Project project) {
+        String message = String.format(
+            "Release will be skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
+            currentBranch,
+            String.join(",", releaseBranchNames)
+        )
+        project.logger.lifecycle(message);
+
+        List<String> tasksToDisable = [RELEASE_TASK, CREATE_RELEASE_TASK, PUSH_RELEASE_TASK, VERIFY_RELEASE_TASK]
+        project.tasks
+            .matching { it.name in tasksToDisable }
+            .configureEach { it.enabled = false }
     }
 }

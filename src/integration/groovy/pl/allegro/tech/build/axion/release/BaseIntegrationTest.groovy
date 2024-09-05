@@ -37,6 +37,7 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         return GradleRunner.create()
             .withProjectDir(temporaryFolder)
             .withPluginClasspath()
+            .forwardOutput()
     }
 
     BuildResult runGradle(String... arguments) {

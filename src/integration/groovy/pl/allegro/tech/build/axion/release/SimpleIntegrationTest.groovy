@@ -154,8 +154,8 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         def releaseResult = runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
-        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnReleaseBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
+        releaseResult.task(':release').outcome == TaskOutcome.SKIPPED
+        releaseResult.task(':verifyRelease').outcome == TaskOutcome.SKIPPED
     }
 
     def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
@@ -166,8 +166,8 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         def releaseResult = runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
-        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
-        releaseResult.output.contains('Release step skipped since \'releaseOnlyOnReleaseBranches\' option is set, and \'master\' was not in \'releaseBranchNames\' list [develop,release]')
+        releaseResult.task(':release').outcome == TaskOutcome.SKIPPED
+        releaseResult.task(':verifyRelease').outcome == TaskOutcome.SKIPPED
     }
 
     def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {

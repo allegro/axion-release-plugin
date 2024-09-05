@@ -10,11 +10,6 @@ abstract class CreateReleaseTask extends BaseAxionTask {
     void release() {
         VersionResolutionContext context = resolutionContext()
         Releaser releaser = context.releaser()
-        ReleaseBranchesConfiguration releaseBranchesConfiguration = new ReleaseBranchesConfiguration(
-            context.scmService().isReleaseOnlyOnReleaseBranches(),
-            context.repository().currentPosition().getBranch(),
-            context.scmService().getReleaseBranchNames()
-        )
-        releaser.release(context.rules(), releaseBranchesConfiguration)
+        releaser.release(context.rules())
     }
 }

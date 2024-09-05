@@ -3,7 +3,6 @@ package pl.allegro.tech.build.axion.release.domain;
 import com.github.zafarkhaja.semver.Version;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import pl.allegro.tech.build.axion.release.ReleaseBranchesConfiguration;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
@@ -25,16 +24,7 @@ public class Releaser {
         this.hooksRunner = hooksRunner;
     }
 
-    public Optional<String> release(Properties properties, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
-        if (releaseBranchesConfiguration.shouldRelease()) {
-            String message = String.format(
-                "Release step skipped since 'releaseOnlyOnReleaseBranches' option is set, and '%s' was not in 'releaseBranchNames' list [%s]",
-                releaseBranchesConfiguration.getCurrentBranch(),
-                String.join(",", releaseBranchesConfiguration.getReleaseBranchNames())
-            );
-            logger.quiet(message);
-            return Optional.empty();
-        }
+    public Optional<String> release(Properties properties) {
 
         VersionContext versionContext = versionService.currentVersion(
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
@@ -58,8 +48,8 @@ public class Releaser {
         }
     }
 
-    public ScmPushResult releaseAndPush(Properties rules, ReleaseBranchesConfiguration releaseBranchesConfiguration) {
-        Optional<String> releasedTagName = release(rules, releaseBranchesConfiguration);
+    public ScmPushResult releaseAndPush(Properties rules) {
+        Optional<String> releasedTagName = release(rules);
 
         if (releasedTagName.isEmpty()) {
             return new ScmPushResult(ScmPushResultOutcome.SKIPPED, Optional.empty(), Optional.empty());
