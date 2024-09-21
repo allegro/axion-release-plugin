@@ -10,19 +10,18 @@ class SnapshotDependenciesChecker {
     Collection<String> snapshotVersions(Project project) {
         Collection<String> projectVersions = project.getRootProject().getAllprojects()
             .collect { toFullVersion(it) }
-        Collection<String> allDependenciesVersions = []
-        for (final Project proj in project.getRootProject().getAllprojects()) {
-            for (Configuration config : proj.getConfigurations()) {
-                Collection<String> versions = config.getAllDependencies()
-                    .findAll { isSnapshot(it) }
-                    .collect { toFullVersion(it) }
-                +config.getAllDependencyConstraints()
-                    .findAll { isSnapshot(it) }
-                    .collect { toFullVersion(it) }
-                allDependenciesVersions.addAll(versions)
-            }
+        Collection<Configuration> configurations = project.getRootProject().getAllprojects()
+            .collect { it.getConfigurations() }.flatten() as Collection<Configuration>
+        Collection<String> allDependenciesVersions = new HashSet<>()
+        for (Configuration config : configurations) {
+            Collection<String> versions = config.getAllDependencies()
+                .findAll { isSnapshot(it) }
+                .collect { toFullVersion(it) }
+            +config.getAllDependencyConstraints()
+                .findAll { isSnapshot(it) }
+                .collect { toFullVersion(it) }
+            allDependenciesVersions.addAll(versions)
         }
-        allDependenciesVersions = allDependenciesVersions.unique()
         allDependenciesVersions.removeAll(projectVersions)
         return allDependenciesVersions
     }
