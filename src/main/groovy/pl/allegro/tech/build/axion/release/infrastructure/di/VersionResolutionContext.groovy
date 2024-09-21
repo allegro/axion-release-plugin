@@ -38,12 +38,12 @@ class VersionResolutionContext {
             scmProperties.directory.toPath().relativize(projectRoot.toPath()).toString()))
     }
 
-    static VersionResolutionContext create(VersionConfig versionConfig, Directory projectDirectory) {
+    static VersionResolutionContext create(VersionConfig versionConfig, Directory projectDirectory, String nextVersion = null, String versionIncrementerName = null) {
         ScmProperties scmProperties = ScmPropertiesFactory.create(versionConfig)
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
 
         return new VersionResolutionContext(
-            RulesFactory.create(versionConfig, scmRepository),
+            RulesFactory.create(versionConfig, scmRepository, nextVersion, versionIncrementerName),
             scmRepository,
             scmProperties,
             projectDirectory.asFile,
