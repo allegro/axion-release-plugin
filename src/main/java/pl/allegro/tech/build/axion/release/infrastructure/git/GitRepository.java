@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
+import com.github.zafarkhaja.semver.ParseException;
+import com.github.zafarkhaja.semver.Version;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
@@ -491,11 +493,22 @@ public class GitRepository implements ScmRepository {
                 parseCommitSafe(walk, tag.getObjectId())
             ))
             .filter(t -> patterns.stream().anyMatch(pattern -> pattern.matcher(t.name).matches()))
+            .filter(t -> isSemver(t.name))
             .collect(
                 HashMap::new,
                 (m, t) -> m.computeIfAbsent(t.id, (s) -> new ArrayList<>()).add(t.name),
                 HashMap::putAll
             );
+    }
+
+    private boolean isSemver(String tagName) {
+        try {
+            Version.valueOf(tagName);
+            return true;
+        } catch (ParseException e) {
+            logger.info("Found non-semver tag '{}' matching one of the configured prefixes, ignoring it.", tagName);
+            return false;
+        }
     }
 
     private String parseCommitSafe(RevWalk walk, AnyObjectId commitId) {
