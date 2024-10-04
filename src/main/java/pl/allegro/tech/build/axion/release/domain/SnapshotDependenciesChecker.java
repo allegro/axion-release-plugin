@@ -4,6 +4,8 @@ import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencyConstraint;
+import org.gradle.api.artifacts.ProjectDependency;
+import org.gradle.api.internal.artifacts.dependencies.DefaultProjectDependencyConstraint;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,10 +15,6 @@ import java.util.stream.Collectors;
 public class SnapshotDependenciesChecker {
 
     public Collection<String> snapshotVersions(Project project) {
-        Set<String> projectVersions = project.getRootProject().getAllprojects().stream()
-            .map(this::toFullVersion)
-            .collect(Collectors.toSet());
-
         Set<Configuration> configurations = project.getRootProject().getAllprojects().stream()
             .flatMap(p -> p.getConfigurations().stream())
             .collect(Collectors.toSet());
@@ -24,11 +22,13 @@ public class SnapshotDependenciesChecker {
         Set<String> allDependenciesVersions = new HashSet<>();
         for (Configuration config : configurations) {
             Set<String> versions = config.getAllDependencies().stream()
+                .filter(it -> !(it instanceof ProjectDependency))
                 .filter(this::isSnapshot)
                 .map(this::toFullVersion)
                 .collect(Collectors.toSet());
 
             Set<String> constraintVersions = config.getAllDependencyConstraints().stream()
+                .filter(it -> !(it instanceof DefaultProjectDependencyConstraint))
                 .filter(this::isSnapshot)
                 .map(this::toFullVersion)
                 .collect(Collectors.toSet());
@@ -36,7 +36,6 @@ public class SnapshotDependenciesChecker {
             allDependenciesVersions.addAll(versions);
             allDependenciesVersions.addAll(constraintVersions);
         }
-        allDependenciesVersions.removeAll(projectVersions);
         return allDependenciesVersions;
     }
 

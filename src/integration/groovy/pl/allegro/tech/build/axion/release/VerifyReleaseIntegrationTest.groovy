@@ -18,9 +18,9 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
         result.task(":verifyRelease").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should work in multimodule project setup"() {
+    def "should work in multimodule project setup versioning every module separately"() {
         given:
-        initialMultiModuleProjectConfiguration()
+        initialMultiModuleMultiVersionProjectConfiguration()
 
         when:
         def result = runGradle(':verifyRelease')
@@ -29,20 +29,56 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
         result.task(":verifyRelease").outcome == TaskOutcome.SUCCESS
     }
 
-    void initialMultiModuleProjectConfiguration() {
+    def "should work in multimodule project setup with the same version for every module"() {
+        given:
+        initialMultiModuleSingleVersionProjectConfiguration()
+
+        when:
+        def result = runGradle(':verifyRelease')
+
+        then:
+        result.task(":verifyRelease").outcome == TaskOutcome.SUCCESS
+    }
+
+    void initialMultiModuleSingleVersionProjectConfiguration() {
         buildFile('''
-            scmVersion {
-                versionCreator "versionWithBranch"
-            }
+            apply plugin: 'java'
+
             allprojects {
                 version = scmVersion.version
+            }
+
+            dependencies {
+                 implementation(project(":module1"))
             }
         ''')
         generateSettingsFile(temporaryFolder)
         generateGitIgnoreFile(temporaryFolder)
         generateSubmoduleBuildFile("module1")
         repository.commit(['.'], "initial commit of top level project")
-        runGradle(":createRelease", "-Prelease.version=1.0.0", '-Prelease.disableChecks')
+    }
+
+    void initialMultiModuleMultiVersionProjectConfiguration() {
+        buildFile('''
+            apply plugin: 'java'
+
+            allprojects {
+                scmVersion {
+                    tag {
+                        prefix = name
+                    }
+                }
+                version = scmVersion.version
+            }
+
+            dependencies {
+                 implementation(project(":module1"))
+            }
+        ''')
+        generateSettingsFile(temporaryFolder)
+        generateGitIgnoreFile(temporaryFolder)
+        generateSubmoduleBuildFile("module1")
+        repository.commit(['.'], "initial commit of top level project")
     }
 
     void generateSubmoduleBuildFile(String projectName) {
@@ -52,12 +88,6 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
         buildFile << '''
         plugins {
             id 'java-platform'
-        }
-
-        dependencies {
-            constraints {
-                api "multimodule-project:multimodule-project:${version}"
-            }
         }
         '''
     }
