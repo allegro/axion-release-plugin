@@ -9,7 +9,13 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.domain.scm.ScmException
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import pl.allegro.tech.build.axion.release.util.WithEnvironment
 import spock.lang.Specification
 
@@ -71,50 +77,50 @@ class GitRepositoryTest extends Specification {
         File lightweightTagRepositoryDir = File.createTempDir('axion-release', 'tmp')
         Map repositories = GitProjectBuilder.gitProject(lightweightTagRepositoryDir)
             .withInitialCommit()
-            .withLightweightTag(fullPrefix() + '1')
+            .withLightweightTag(fullPrefix() + '1.0.0')
             .build()
 
         GitRepository lightweightTagRepository = repositories[GitRepository] as GitRepository
 
         when:
-        lightweightTagRepository.tag(fullPrefix() + '2')
+        lightweightTagRepository.tag(fullPrefix() + '2.0.0')
         TagsOnCommit tags = lightweightTagRepository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
+        tags.tags == [fullPrefix() + '1.0.0', fullPrefix() + '2.0.0']
     }
 
     def "should create new tag on current commit"() {
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should create tag when on HEAD even if it already exists on the same commit"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should throw an exception when creating new tag that already exists and it's not on HEAD"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after release")
 
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
         ScmException e = thrown(ScmException)
         e.getCause() instanceof RefAlreadyExistsException
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should create commit with given message"() {
@@ -135,14 +141,14 @@ class GitRepositoryTest extends Specification {
 
     def "should return last tag in current position in simple case"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after release")
 
         when:
         TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return no tags when no commit in repository"() {
@@ -158,37 +164,37 @@ class GitRepositoryTest extends Specification {
 
     def "should indicate that position is on tag when latest commit is tagged"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         when:
         TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should track back to older tag when commit was made after checking out older version"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "1")
-        repository.tag(fullPrefix() + '2')
+        repository.tag(fullPrefix() + '2.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "2")
 
-        rawRepository.checkout(branch: fullPrefix() + '1')
+        rawRepository.checkout(branch: fullPrefix() + '1.0.0')
         repository.commit(['*'], "bugfix after " + fullPrefix() + "1")
 
         when:
         TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile("^" + defaultPrefix() + ".*")))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return all tagged commits matching the pattern provided"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "1")
-        repository.tag(fullPrefix() + '2')
+        repository.tag(fullPrefix() + '2.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "2")
         repository.tag('another-tag-1')
         repository.commit(['*'], "commit after another-tag-1")
@@ -202,12 +208,12 @@ class GitRepositoryTest extends Specification {
         List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() + '3', fullPrefix() + '4', fullPrefix() + '2', fullPrefix() + '1']
+        allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() + '3', fullPrefix() + '4', fullPrefix() + '2.0.0', fullPrefix() + '1.0.0']
     }
 
     def "should return only tags that match with prefix"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "1")
         repository.tag('otherTag')
 
@@ -215,7 +221,7 @@ class GitRepositoryTest extends Specification {
         TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return latest tagged commit before the given commit id"() {
@@ -235,14 +241,14 @@ class GitRepositoryTest extends Specification {
 
     def "should return list of tags when multiple matching tags found on same commit"() {
         given:
-        repository.tag(fullPrefix() + '1')
-        repository.tag(fullPrefix() + '2')
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.tag(fullPrefix() + '2.0.0')
 
         when:
         TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
+        tags.tags == [fullPrefix() + '1.0.0', fullPrefix() + '2.0.0']
     }
 
     def "should attach to remote repository"() {
@@ -656,7 +662,7 @@ class GitRepositoryTest extends Specification {
     ])
     def 'should unshallow repo on CI'() {
         given:
-        remoteRepository.tag(fullPrefix() + '1')
+        remoteRepository.tag(fullPrefix() + '1.0.0')
         100.times { remoteRepository.commit(['*'], "commit after release") }
         File repoDir = File.createTempDir('axion-release', 'tmp')
         Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
@@ -666,7 +672,7 @@ class GitRepositoryTest extends Specification {
         TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     @WithEnvironment([
@@ -674,7 +680,7 @@ class GitRepositoryTest extends Specification {
     ])
     def 'should not unshallow repo locally'() {
         given:
-        remoteRepository.tag(fullPrefix() + '1')
+        remoteRepository.tag(fullPrefix() + '1.0.0')
         100.times { remoteRepository.commit(['*'], "commit after release") }
         File repoDir = File.createTempDir('axion-release', 'tmp')
         Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
