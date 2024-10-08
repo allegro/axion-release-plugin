@@ -63,17 +63,22 @@ project.version = scmVersion.version
 For multi project builds the plugin has to be applied only on the root
 project, but version has to be set also in submodules
 
-```
+```kotlin
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version ''
+  id("pl.allegro.tech.build.axion-release") version <VERSION NUMBER>
 }
 
 scmVersion {
-    // ...
+  // ...
 }
 
-allprojects {
-    project.version = scmVersion.version
+version = scmVersion.version
+// ...
+
+allprojects { // or subProjects
+  // ...
+  project.version = rootProject.version
+  // ...
 }
 ```
 
