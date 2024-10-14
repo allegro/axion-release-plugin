@@ -70,9 +70,9 @@ public class VersionResolver {
 
         List<Pattern> releaseTagPatterns = tagProperties.getAllPrefixes().stream()
             .map(prefix -> prefix.isEmpty() ? "" : prefix + tagProperties.getVersionSeparator())
-            .map(pattern -> Pattern.compile("^" + pattern + ".*"))
+            .map(pattern -> Pattern.compile("^" + pattern + "(.+)\\.(.+)\\.(.+)"))
             .collect(toList());
-        Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
+        Pattern nextVersionTagPattern = Pattern.compile("(.+)\\.(.+)\\.(.+)" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
         boolean useHighestVersion = versionProperties.isUseHighestVersion();
 
