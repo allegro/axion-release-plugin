@@ -7,12 +7,13 @@ import org.junit.contrib.java.lang.system.EnvironmentVariables
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import static java.util.stream.Collectors.toList
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class SimpleIntegrationTest extends BaseIntegrationTest {
 
     @Rule
-    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables();
+    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables()
 
     def "should return default version on calling currentVersion task on vanilla repo"() {
         given:
@@ -51,7 +52,8 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
-        outputFile.getText().contains('released-version=1.0.0')
+        def definedEnvVariables = outputFile.getText().lines().collect(toList())
+        definedEnvVariables.contains('released-version=1.0.0')
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
@@ -137,5 +139,68 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         then:
         result.output.contains('Project version: 0.0.1-SNAPSHOT')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def "should skip release when releaseOnlyOnReleaseBranches is true and current branch is not on releaseBranchNames list"() {
+        given:
+        buildFile("""
+            scmVersion {
+                releaseOnlyOnReleaseBranches = true
+                releaseBranchNames = ['develop', 'release']
+            }
+        """)
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SKIPPED
+        releaseResult.task(':verifyRelease').outcome == TaskOutcome.SKIPPED
+    }
+
+    def "should skip release when releaseOnlyOnReleaseBranches is set by gradle task property and current branch is not on releaseBranchNames list"() {
+        given:
+        buildFile("")
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SKIPPED
+        releaseResult.task(':verifyRelease').outcome == TaskOutcome.SKIPPED
+    }
+
+    def "should not skip release when releaseOnlyOnReleaseBranches is true when on master branch (default releaseBranches list)"() {
+        given:
+        buildFile("""
+            scmVersion {
+                releaseOnlyOnReleaseBranches = true
+            }
+        """)
+
+        when:
+        def releaseResult = runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        releaseResult.task(':release').outcome == TaskOutcome.SUCCESS
+        releaseResult.output.contains('Creating tag: ' + fullPrefix() + '1.0.0')
+    }
+
+    def "should skip release and no GITHUB_OUTPUT should be written"() {
+        given:
+        def outputFile = File.createTempFile("github-outputs", ".tmp")
+        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
+        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
+
+        buildFile('')
+
+        when:
+        runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+
+        then:
+        outputFile.getText().isEmpty()
+
+        cleanup:
+        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
     }
 }

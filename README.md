@@ -4,7 +4,6 @@ axion-release-plugin
 *gradle release and version management plugin*
 
 [![Build Status](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/allegro/axion-release-plugin/badge.svg?branch=development)](https://coveralls.io/r/allegro/axion-release-plugin)
 [![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ](http://axion-release-plugin.readthedocs.org/en/latest/)
 ![Maven Central](https://img.shields.io/maven-central/v/pl.allegro.tech.build/axion-release-plugin)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/pl.allegro.tech.build.axion-release?versionPrefix=1.1)](https://plugins.gradle.org/plugin/pl.allegro.tech.build.axion-release)
@@ -25,12 +24,12 @@ JDK11+ & Gradle 7+ required.
 
 ## Basic usage
 
-```
+```kotlin
 plugins {
-    id 'pl.allegro.tech.build.axion-release' version '1.15.1'
+    id("pl.allegro.tech.build.axion-release") version "1.18.7"
 }
 
-project.version = scmVersion.version
+version = scmVersion.version
 ```
 
 ```
@@ -38,7 +37,7 @@ $ git tag
 <empty list>
 
 $ ./gradlew currentVersion
-0.1.0-SNAPSHOT
+0.1.0-branch-SNAPSHOT
 
 $ ./gradlew release
 

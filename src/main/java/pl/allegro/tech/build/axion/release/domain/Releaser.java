@@ -6,6 +6,7 @@ import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
 
 import java.util.Optional;
@@ -24,9 +25,11 @@ public class Releaser {
     }
 
     public Optional<String> release(Properties properties) {
+
         VersionContext versionContext = versionService.currentVersion(
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
         );
+
         Version version = versionContext.getVersion();
 
         if (versionContext.isSnapshot()) {
@@ -43,15 +46,18 @@ public class Releaser {
             logger.quiet("Working on released version " + version + ", nothing to release");
             return Optional.empty();
         }
-
     }
 
     public ScmPushResult releaseAndPush(Properties rules) {
         Optional<String> releasedTagName = release(rules);
 
+        if (releasedTagName.isEmpty()) {
+            return new ScmPushResult(ScmPushResultOutcome.SKIPPED, Optional.empty(), Optional.empty());
+        }
+
         ScmPushResult result = pushRelease();
 
-        if (!result.isSuccess()) {
+        if (result.getOutcome().equals(ScmPushResultOutcome.FAILED)) {
             releasedTagName.ifPresent(this::rollbackRelease);
         }
 

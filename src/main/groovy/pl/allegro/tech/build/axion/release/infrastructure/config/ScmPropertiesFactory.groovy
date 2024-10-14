@@ -16,7 +16,11 @@ class ScmPropertiesFactory {
             config.repository.attachRemote().getOrNull(),
             config.repository.overriddenBranch().getOrNull(),
             config.repository.overriddenIsClean().getOrNull(),
-            ScmIdentityFactory.create(config.repository, config.repository.disableSshAgent().get())
+            ScmIdentityFactory.create(config.repository, config.repository.disableSshAgent().get()),
+            config.getUnshallowRepoOnCI().get(),
+            config.getReleaseBranchNames().get(),
+            config.getReleaseOnlyOnReleaseBranches().get(),
+            config.getIgnoreGlobalGitConfig().get()
         )
     }
 }

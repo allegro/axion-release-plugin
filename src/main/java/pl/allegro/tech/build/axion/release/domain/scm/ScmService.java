@@ -7,6 +7,7 @@ import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public class ScmService {
     private static final Logger logger = Logging.getLogger(ScmService.class);
@@ -37,7 +38,7 @@ public class ScmService {
     public ScmPushResult push() {
         if (localOnlyResolver.localOnly(this.remoteAttached())) {
             logger.quiet("Changes made to local repository only");
-            return new ScmPushResult(true, Optional.of(RemoteRefUpdate.Status.NOT_ATTEMPTED), Optional.empty());
+            return new ScmPushResult(ScmPushResultOutcome.SUCCESS, Optional.of(RemoteRefUpdate.Status.NOT_ATTEMPTED), Optional.empty());
         }
 
         try {
@@ -68,5 +69,13 @@ public class ScmService {
 
     public boolean isLegacyDefTagnameRepo() {
         return repository.isLegacyDefTagnameRepo();
+    }
+
+    public Set<String> getReleaseBranchNames() {
+        return scmProperties.getReleaseBranchNames();
+    }
+
+    public boolean isReleaseOnlyOnReleaseBranches(){
+        return scmProperties.isReleaseOnlyOnReleaseBranches();
     }
 }

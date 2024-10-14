@@ -25,6 +25,7 @@ class BaseIntegrationTest extends RepositoryBasedTest {
             """
 
         project.version = scmVersion.version
+        scmVersion.ignoreGlobalGitConfig = true
         """)
     }
 
@@ -36,6 +37,7 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         return GradleRunner.create()
             .withProjectDir(temporaryFolder)
             .withPluginClasspath()
+            .forwardOutput()
     }
 
     BuildResult runGradle(String... arguments) {
@@ -48,6 +50,7 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         try {
             return gradle().withArguments(args).build()
         }
+
         finally {
             def ccDir = new File(temporaryFolder, "build/reports/configuration-cache")
             if (ccDir.exists() && ccDir.isDirectory()) {

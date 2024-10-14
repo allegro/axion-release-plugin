@@ -37,7 +37,11 @@ class ScmPropertiesBuilder {
                 null,
                 overriddenBranchName,
                 overriddenIsClean,
-                ScmIdentity.defaultIdentityWithoutAgents()
+                ScmIdentity.defaultIdentityWithoutAgents(),
+                true,
+                ['main', 'master'] as Set,
+                false,
+            true
         )
     }
 

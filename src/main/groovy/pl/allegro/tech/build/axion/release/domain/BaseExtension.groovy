@@ -4,6 +4,7 @@ import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.util.GradleVersion
 
 import javax.inject.Inject
 
@@ -18,16 +19,24 @@ abstract class BaseExtension {
     protected abstract ObjectFactory getObjects();
 
     protected Provider<String> gradleProperty(String name) {
-        // forUseAtConfigurationTime() required to make tests happy
-        // TODO: Gradle 7.2+ deprecates forUseAtConfigurationTime(), remove at some future time
-        return providers.gradleProperty(name).forUseAtConfigurationTime()
+        Provider<String> property = providers.gradleProperty(name)
+        // Deprecated and a noop starting in 7.4
+        return currentGradleVersion() < GradleVersion.version("7.4") ? property.forUseAtConfigurationTime() : property
     }
 
-    protected Provider<Boolean> gradlePropertyBoolean(String name) {
+    protected GradleVersion currentGradleVersion() {
+        GradleVersion.current()
+    }
+
+    protected Provider<Set<String>> gradlePropertyAsSet(String name) {
+        return gradleProperty(name).map({ it.tokenize(',') as Set })
+    }
+
+    protected Provider<Boolean> gradlePropertyAsBoolean(String name) {
         return gradleProperty(name).map(Boolean::valueOf)
     }
 
     protected Provider<Boolean> gradlePropertyPresent(String name) {
-        return gradleProperty(name).map({true})
+        return gradleProperty(name).map({ true })
     }
 }

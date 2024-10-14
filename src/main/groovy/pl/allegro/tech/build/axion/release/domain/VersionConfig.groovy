@@ -1,14 +1,15 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Action
+import org.gradle.api.Incubating
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
@@ -33,6 +34,8 @@ abstract class VersionConfig extends BaseExtension {
     private static final String DEPRECATED_FORCE_VERSION_PROPERTY = 'release.forceVersion'
     private static final String VERSION_INCREMENTER_PROPERTY = 'release.versionIncrementer'
     private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
+    private static final String RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY = 'release.releaseOnlyOnReleaseBranches'
+    private static final String RELEASE_BRANCH_NAMES_PROPERTY = 'release.releaseBranchNames'
 
     @Inject
     VersionConfig(Directory repositoryDirectory) {
@@ -40,10 +43,14 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
+        getUnshallowRepoOnCI().convention(false)
+        getIgnoreGlobalGitConfig().convention(false)
+        getReleaseBranchNames().convention(gradlePropertyAsSet(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
+        getReleaseOnlyOnReleaseBranches().convention(gradlePropertyPresent(RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY).orElse(false))
         getReleaseBranchPattern().convention(Pattern.compile('^' + defaultPrefix() + '(/.*)?$'))
         getSanitizeVersion().convention(true)
         getCreateReleaseCommit().convention(false)
-        getVersionCreator().convention(PredefinedVersionCreator.SIMPLE.versionCreator)
+        getVersionCreator().convention(PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator)
         getVersionIncrementer().convention((VersionProperties.Incrementer) { VersionIncrementerContext context -> return context.currentVersion.incrementPatchVersion() })
         getSnapshotCreator().convention(PredefinedSnapshotCreator.SIMPLE.snapshotCreator)
         getReleaseCommitMessage().convention(PredefinedReleaseCommitMessageCreator.DEFAULT.commitMessageCreator)
@@ -78,7 +85,17 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getIgnoreUncommittedChanges()
 
     @Internal
-    abstract Property<Boolean> getUseHighestVersion();
+    abstract SetProperty<String> getReleaseBranchNames()
+
+    @Internal
+    abstract Property<Boolean> getReleaseOnlyOnReleaseBranches()
+
+    @Internal
+    abstract Property<Boolean> getIgnoreGlobalGitConfig()
+
+    @Internal
+    @Incubating
+    abstract Property<Boolean> getUnshallowRepoOnCI();
 
     @Internal
     abstract MapProperty<String, Object> getBranchVersionIncrementer();
@@ -107,6 +124,9 @@ abstract class VersionConfig extends BaseExtension {
     @Internal
     abstract Property<PredefinedReleaseCommitMessageCreator.CommitMessageCreator> getReleaseCommitMessage()
 
+    @Internal
+    abstract Property<Boolean> getUseHighestVersion();
+
     Provider<Boolean> ignoreUncommittedChanges() {
         gradlePropertyPresent(IGNORE_UNCOMMITTED_CHANGES_PROPERTY)
             .orElse(ignoreUncommittedChanges)
@@ -127,8 +147,8 @@ abstract class VersionConfig extends BaseExtension {
     Provider<String> forcedVersion() {
         gradleProperty(FORCE_VERSION_PROPERTY)
             .orElse(gradleProperty(DEPRECATED_FORCE_VERSION_PROPERTY))
-        .map({it.trim()})
-        .map({ it.isBlank() ? null : it})
+            .map({ it.trim() })
+            .map({ it.isBlank() ? null : it })
     }
 
     Provider<String> versionIncrementerType() {
@@ -211,12 +231,12 @@ abstract class VersionConfig extends BaseExtension {
 
     Provider<VersionService.DecoratedVersion> versionProvider() {
         def cachedVersionSupplier = this.cachedVersionSupplier
-        providers.provider( { cachedVersionSupplier.resolve(this,layout.projectDirectory)})
+        providers.provider({ cachedVersionSupplier.resolve(this, layout.projectDirectory) })
     }
 
     Provider<VersionService.DecoratedVersion> uncachedVersionProvider() {
         def versionSupplier = this.versionSupplier
-        providers.provider( { versionSupplier.resolve(this, layout.projectDirectory)})
+        providers.provider({ versionSupplier.resolve(this, layout.projectDirectory) })
     }
 
     @Nested
@@ -231,21 +251,21 @@ abstract class VersionConfig extends BaseExtension {
 
     @Input
     String getVersion() {
-        return versionProvider().map({ it.decoratedVersion}).get()
+        return versionProvider().map({ it.decoratedVersion }).get()
     }
 
     @Input
     String getPreviousVersion() {
-        return versionProvider().map({ it.previousVersion}).get()
+        return versionProvider().map({ it.previousVersion }).get()
     }
 
     @Input
     String getUndecoratedVersion() {
-        return versionProvider().map({ it.undecoratedVersion}).get()
+        return versionProvider().map({ it.undecoratedVersion }).get()
     }
 
     @Nested
     ScmPosition getScmPosition() {
-        return versionProvider().map({it.position}).get()
+        return versionProvider().map({ it.position }).get()
     }
 }

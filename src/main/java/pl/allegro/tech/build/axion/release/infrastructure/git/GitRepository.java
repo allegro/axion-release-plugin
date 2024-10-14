@@ -1,59 +1,30 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
-import org.eclipse.jgit.api.AddCommand;
-import org.eclipse.jgit.api.FetchCommand;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.LogCommand;
-import org.eclipse.jgit.api.PushCommand;
-import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
-import org.eclipse.jgit.lib.AnyObjectId;
-import org.eclipse.jgit.lib.BranchTrackingStatus;
-import org.eclipse.jgit.lib.Config;
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.StoredConfig;
+import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.transport.PushResult;
-import org.eclipse.jgit.transport.RemoteConfig;
-import org.eclipse.jgit.transport.RemoteRefUpdate;
-import org.eclipse.jgit.transport.TagOpt;
-import org.eclipse.jgit.transport.URIish;
+import org.eclipse.jgit.transport.*;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.SystemReader;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmException;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException;
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
+import pl.allegro.tech.build.axion.release.domain.scm.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static java.util.stream.Collectors.toList;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
 
 public class GitRepository implements ScmRepository {
@@ -67,8 +38,7 @@ public class GitRepository implements ScmRepository {
     private final ScmProperties properties;
 
     public GitRepository(ScmProperties properties) {
-        SystemReader.setInstance(new SystemReaderWithoutSystemConfig());
-
+        SystemReader.setInstance(new SystemReaderWithoutSystemConfig(properties.isIgnoreGlobalGitConfig()));
         try {
             this.repositoryDir = properties.getDirectory();
             this.jgitRepository = Git.open(repositoryDir);
@@ -80,13 +50,28 @@ public class GitRepository implements ScmRepository {
         }
 
         if (properties.isAttachRemote()) {
-            this.attachRemote(properties.getRemote(), properties.getRemoteUrl());
+            attachRemote(properties.getRemote(), properties.getRemoteUrl());
         }
 
         if (properties.isFetchTags()) {
-            this.fetchTags(properties.getIdentity(), properties.getRemote());
+            fetchTags(properties.getIdentity(), properties.getRemote());
         }
 
+        if (onCI() && properties.isUnshallowRepoOnCI()) {
+            unshallowRepo(properties.getIdentity());
+        }
+    }
+
+    private void unshallowRepo(ScmIdentity identity) {
+        try {
+            logger.lifecycle("Unshallowing repo because the build is being executed on CI");
+            jgitRepository.fetch()
+                .setUnshallow(true)
+                .setTransportConfigCallback(transportConfigFactory.create(identity))
+                .call();
+        } catch (GitAPIException e) {
+            logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
+        }
     }
 
     /**
@@ -169,10 +154,9 @@ public class GitRepository implements ScmRepository {
         if (!pushOptions.isPushTagsOnly()) {
             PushCommand command = pushCommand(identity, pushOptions.getRemote(), all);
             ScmPushResult result = verifyPushResults(callPush(command));
-            if (!result.isSuccess()) {
+            if (result.getOutcome().equals(ScmPushResultOutcome.FAILED)) {
                 return result;
             }
-
         }
 
         // and again for tags
@@ -197,12 +181,12 @@ public class GitRepository implements ScmRepository {
                 && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
         ).findFirst();
 
-        boolean isSuccess = !failedRefUpdate.isPresent();
+        boolean isSuccess = failedRefUpdate.isEmpty();
         Optional<RemoteRefUpdate.Status> failureCause = isSuccess ?
             Optional.empty() : Optional.of(failedRefUpdate.get().getStatus());
 
         return new ScmPushResult(
-            isSuccess,
+            isSuccess ? ScmPushResultOutcome.SUCCESS : ScmPushResultOutcome.FAILED,
             failureCause,
             Optional.ofNullable(pushResult.getMessages())
         );
@@ -333,60 +317,106 @@ public class GitRepository implements ScmRepository {
     }
 
     public ScmPosition currentPosition() {
+        String revision = getRevision();
+        String branchName = branchName();
+        boolean isClean = !checkUncommittedChanges();
+        return new ScmPosition(revision, branchName, isClean);
+    }
+
+    private String getRevision() {
         try {
             String revision = "";
             if (hasCommits()) {
                 ObjectId head = head();
                 revision = head.name();
             }
-
-            boolean isClean = !checkUncommittedChanges();
-
-            String branchName = branchName();
-            return new ScmPosition(revision, branchName, isClean);
+            return revision;
         } catch (IOException e) {
             throw new ScmException(e);
         }
     }
 
+    private String branchName() {
+        return branchNameFromGithubEnvVariable().orElseGet(this::branchNameFromGit);
+    }
+
+    /**
+     * <p>If executed within workflow on GitHub Actions and that workflow is triggered by pull_request (or pull_request_target)
+     * event, GitHub will not check out the source branch of the PR, but some custom ref: 'refs/pull/<pr_number>/merge'
+     * (they call it a "merge branch"). It effectively means that repository is in detached-HEAD state and axion-release
+     * is not able to get the branch name from HEAD ref.</p>
+     *
+     * <p>For pull_request and pull_request_target events, GitHub sets a special environment variable GITHUB_HEAD_REF.
+     * It contains the head ref of source branch of the PR which triggered the workflow. This variable is not set
+     * for other event types.</p>
+     *
+     * <p>If the build is not executed on GitHub Actions, this method will always return Optional.empty.</p>
+     *
+     * @return source branch of the PR which triggered GitHub Actions workflow
+     */
+    private Optional<String> branchNameFromGithubEnvVariable() {
+        if (onGithubActions()) {
+            return env("GITHUB_HEAD_REF")
+                // GitHub violates its own documentation and sets this variable always. For pull_request and
+                // pull_request_target it contains actual value, for every other event it's just empty string
+                .filter(it -> !it.isBlank());
+        }
+        return Optional.empty();
+    }
+
+    private boolean onGithubActions() {
+        return env("GITHUB_ACTIONS").map(it -> it.equals("true")).orElse(false);
+    }
+
+    private boolean onCI() {
+        return env("CI").map(it -> it.equals("true")).orElse(false);
+    }
+
+    private Optional<String> env(String name) {
+        return Optional.ofNullable(System.getenv(name));
+    }
+
     /**
      * @return branch name or 'HEAD' when in detached state, unless it is overridden by 'overriddenBranchName'
      */
-    private String branchName() throws IOException {
-        // this returns HEAD as branch name when in detached state
-        Optional<Ref> ref = Optional.ofNullable(jgitRepository.getRepository().exactRef(Constants.HEAD));
-        String branchName = ref.map(r -> r.getTarget().getName())
-            .map(Repository::shortenRefName)
-            .orElse(null);
+    private String branchNameFromGit() {
+        try {
+            // this returns HEAD as branch name when in detached state
+            Optional<Ref> ref = Optional.ofNullable(jgitRepository.getRepository().exactRef(Constants.HEAD));
+            String branchName = ref.map(r -> r.getTarget().getName())
+                .map(Repository::shortenRefName)
+                .orElse(null);
 
-        if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
-            branchName = Repository.shortenRefName(properties.getOverriddenBranchName());
+            if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
+                branchName = Repository.shortenRefName(properties.getOverriddenBranchName());
+            }
+            return branchName;
+        } catch (IOException e) {
+            throw new ScmException(e);
         }
-
-        return branchName;
     }
 
     @Override
-    public TagsOnCommit latestTags(Pattern pattern) {
-        return latestTagsInternal(pattern, null, true);
+    public TagsOnCommit latestTags(List<Pattern> patterns) {
+        return latestTagsInternal(patterns, null, true);
     }
 
     @Override
-    public TagsOnCommit latestTags(Pattern pattern, String sinceCommit) {
-        return latestTagsInternal(pattern, sinceCommit, false);
+    public TagsOnCommit latestTags(List<Pattern> patterns, String sinceCommit) {
+        return latestTagsInternal(patterns, sinceCommit, false);
     }
 
-    private TagsOnCommit latestTagsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive) {
-        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(pattern, maybeSinceCommit, inclusive, true);
+    private TagsOnCommit latestTagsInternal(List<Pattern> patterns, String maybeSinceCommit, boolean inclusive) {
+        List<TagsOnCommit> taggedCommits = taggedCommitsInternal(patterns, maybeSinceCommit, inclusive, true);
         return taggedCommits.isEmpty() ? TagsOnCommit.empty() : taggedCommits.get(0);
     }
 
     @Override
-    public List<TagsOnCommit> taggedCommits(Pattern pattern) {
-        return taggedCommitsInternal(pattern, null, true, false);
+    public List<TagsOnCommit> taggedCommits(List<Pattern> patterns) {
+        return taggedCommitsInternal(patterns, null, true, false);
     }
 
-    private List<TagsOnCommit> taggedCommitsInternal(Pattern pattern, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
+    private List<TagsOnCommit> taggedCommitsInternal(List<Pattern> patterns, String maybeSinceCommit, boolean inclusive, boolean stopOnFirstTag) {
         List<TagsOnCommit> taggedCommits = new ArrayList<>();
         if (!hasCommits()) {
             return taggedCommits;
@@ -408,12 +438,15 @@ public class GitRepository implements ScmRepository {
                 walk.next();
             }
 
-            Map<String, List<String>> allTags = tagsMatching(pattern, walk);
+            Map<String, List<String>> allTags = tagsMatching(patterns, walk);
 
-            RevCommit currentCommit;
-            List<String> currentTagsList;
-            for (currentCommit = walk.next(); currentCommit != null; currentCommit = walk.next()) {
-                currentTagsList = allTags.get(currentCommit.getId().getName());
+            while (true) {
+                RevCommit currentCommit = walk.next();
+                if (currentCommit == null) {
+                    break;
+                }
+
+                List<String> currentTagsList = allTags.get(currentCommit.getId().getName());
 
                 if (currentTagsList != null) {
                     TagsOnCommit taggedCommit = new TagsOnCommit(
@@ -429,7 +462,6 @@ public class GitRepository implements ScmRepository {
                 }
 
             }
-
             walk.dispose();
         } catch (IOException | GitAPIException e) {
             throw new ScmException(e);
@@ -450,7 +482,7 @@ public class GitRepository implements ScmRepository {
         return walk;
     }
 
-    private Map<String, List<String>> tagsMatching(Pattern pattern, RevWalk walk) throws GitAPIException {
+    private Map<String, List<String>> tagsMatching(List<Pattern> patterns, RevWalk walk) throws GitAPIException {
         List<Ref> tags = jgitRepository.tagList().call();
 
         return tags.stream()
@@ -458,7 +490,7 @@ public class GitRepository implements ScmRepository {
                 tag.getName().substring(GIT_TAG_PREFIX.length()),
                 parseCommitSafe(walk, tag.getObjectId())
             ))
-            .filter(t -> pattern.matcher(t.name).matches())
+            .filter(t -> patterns.stream().anyMatch(pattern -> pattern.matcher(t.name).matches()))
             .collect(
                 HashMap::new,
                 (m, t) -> m.computeIfAbsent(t.id, (s) -> new ArrayList<>()).add(t.name),
@@ -562,7 +594,7 @@ public class GitRepository implements ScmRepository {
         try {
             return StreamSupport.stream(jgitRepository.log().setMaxCount(messageCount).call().spliterator(), false)
                 .map(RevCommit::getFullMessage)
-                .collect(Collectors.toList());
+                .collect(toList());
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }

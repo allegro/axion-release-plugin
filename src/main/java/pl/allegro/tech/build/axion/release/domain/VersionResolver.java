@@ -8,7 +8,10 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 
+import java.util.List;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Returned structure is:
@@ -43,7 +46,7 @@ public class VersionResolver {
 
         VersionFactory versionFactory = new VersionFactory(versionProperties, tagProperties, nextVersionProperties, latestChangePosition, repository.isLegacyDefTagnameRepo());
 
-        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition, versionProperties.isUseHighestVersion());
+        VersionInfo versions = readVersions(versionFactory, tagProperties, nextVersionProperties, versionProperties, latestChangePosition);
 
         ScmState scmState = new ScmState(
             versions.onReleaseTag,
@@ -62,28 +65,26 @@ public class VersionResolver {
         TagProperties tagProperties,
         NextVersionProperties nextVersionProperties,
         VersionProperties versionProperties,
-        ScmPosition latestChangePosition,
-        Boolean useHighestVersions
+        ScmPosition latestChangePosition
     ) {
 
-        String releaseTagPatternString = tagProperties.getPrefix();
-        if (!releaseTagPatternString.isEmpty()) {
-            releaseTagPatternString += tagProperties.getVersionSeparator();
-        }
-
-        Pattern releaseTagPattern = Pattern.compile("^" + releaseTagPatternString + ".*");
-        Pattern nextVersionTagPattern = Pattern.compile(".*" + nextVersionProperties.getSuffix() + "$");
+        List<Pattern> releaseTagPatterns = tagProperties.getAllPrefixes().stream()
+            .map(prefix -> prefix.isEmpty() ? "" : prefix + tagProperties.getVersionSeparator())
+            .map(pattern -> Pattern.compile("^" + pattern + "(.+)\\.(.+)\\.(.+)"))
+            .collect(toList());
+        Pattern nextVersionTagPattern = Pattern.compile("(.+)\\.(.+)\\.(.+)" + nextVersionProperties.getSuffix() + "$");
         boolean forceSnapshot = versionProperties.isForceSnapshot();
+        boolean useHighestVersion = versionProperties.isUseHighestVersion();
 
         TaggedCommits latestTaggedCommit;
         TaggedCommits previousTaggedCommit;
-        if (useHighestVersions) {
-            TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPattern, latestChangePosition);
+        if (useHighestVersion) {
+            TaggedCommits allTaggedCommits = TaggedCommits.fromAllCommits(repository, releaseTagPatterns, latestChangePosition);
             latestTaggedCommit = allTaggedCommits;
             previousTaggedCommit = allTaggedCommits;
         } else {
-            latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPattern, latestChangePosition);
-            previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPattern, nextVersionTagPattern, latestChangePosition);
+            latestTaggedCommit = TaggedCommits.fromLatestCommit(repository, releaseTagPatterns, latestChangePosition);
+            previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPatterns, nextVersionTagPattern, latestChangePosition);
         }
 
         VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern, versionFactory, forceSnapshot);
@@ -101,9 +102,9 @@ public class VersionResolver {
             // A(last changes in subProj1) -> B -> C(tag 1.3.0) -> D -> E(head)
             // Now if we test for anywhere from C to E we should get 1.3.0
             String tagCommitRevision = currentVersionInfo.commit != null ? currentVersionInfo.commit : "";
-            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(),tagCommitRevision);
-            for (String dependency: versionProperties.getMonorepoConfig().getDependenciesDirs().get()) {
-                onLatestVersion = onLatestVersion && repository.isIdenticalForPath(dependency, latestChangePosition.getRevision(),tagCommitRevision);
+            onLatestVersion = repository.isIdenticalForPath(projectRootRelativePath, latestChangePosition.getRevision(), tagCommitRevision);
+            for (String dependency : versionProperties.getMonorepoConfig().getDependenciesDirs().get()) {
+                onLatestVersion = onLatestVersion && repository.isIdenticalForPath(dependency, latestChangePosition.getRevision(), tagCommitRevision);
             }
         }
 

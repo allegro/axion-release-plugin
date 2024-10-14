@@ -10,7 +10,6 @@ of branches that are ready for testing:
         versionCreator("versionWithBranch")
     }
 
-
 ## Update README version
 
 This replacement pattern will update any `version* x.x.x` occurrences in README.md and create release commit:
@@ -26,7 +25,8 @@ This replacement pattern will update any `version* x.x.x` occurrences in README.
 
 ## Use with Gradle Kotlin DSL
 
-As of v1.13.8, configuration constructs are compatible with Gradle's Kotlin DSL.  As the configuration is richly typed, IDE code completion will be available (for IDEs that provide this for Gradle Kotlin DSL build scripts)
+As of v1.13.8, configuration constructs are compatible with Gradle's Kotlin DSL. As the configuration is richly typed,
+IDE code completion will be available (for IDEs that provide this for Gradle Kotlin DSL build scripts)
 with these key configuration objects available for reference:
 
 * [VersionConfig](https://github.com/allegro/axion-release-plugin/blob/main/src/main/groovy/pl/allegro/tech/build/axion/release/domain/VersionConfig.groovy)
@@ -47,80 +47,80 @@ A full example showing most configurable elements:
 
 ```kotlin
 scmVersion {
-            localOnly.set(true)
-            useHighestVersion.set(true)
-            tag {
-                prefix.set("release")
-                versionSeparator.set("/")
+    localOnly.set(true)
+    useHighestVersion.set(true)
+    tag {
+        prefix.set("release")
+        versionSeparator.set("/")
 
-                // configure via function calls
-                deserializer({ tagProperties,scmPosition,String -> "tag" })
-                serializer( { tagProperties,version -> "tag" })
-            }
-            repository {
-                type.set("git")
-            }
-            checks {
-                aheadOfRemote.set(false)
-                snapshotDependencies.set(true)
-            }
-            nextVersion {
-                // function calls
-                deserializer( { nextVersionProperties,scmPosition,tag -> "version" })
-                serializer( {nextVersionProperties,version -> "version"})
-            }
-            hooks {
-                pre({println("here")})
-                pre("commit") {
-                  println("here")
-                }
-
-                post({println("here")})
-                post("commit") {
-                  println("here")
-                }
-
-                preRelease {
-                    push()
-                    commit { releaseVersion, position -> "New commit message for version $releaseVersion" }
-                    custom { context -> println("$context")}
-                    fileUpdate {
-                        file("README.md") // repeat for additional files
-                        pattern = {previousVersion,context -> "version: $previousVersion"}
-                        replacement = {currentVersion,context -> "version: $currentVersion"}
-                    }
-                }
-
-                postRelease {
-                    push()
-                    commit { releaseVersion, position -> "New commit message for version $releaseVersion" }
-                    custom { context -> println("$context")}
-                    fileUpdate {
-                        file("README.md") // repeat for additional files
-                        pattern = {previousVersion,context -> "version: $previousVersion"}
-                        replacement = {currentVersion,context -> "version: $currentVersion"}
-
-                    }
-                }
-            }
-            monorepo {
-            }
-
-            branchVersionIncrementer.putAll(
-                mapOf<String, Any>(
-                    "master" to VersionProperties.Incrementer { c: VersionIncrementerContext -> c.currentVersion.incrementMajorVersion() }
-                )
-            )
-
-            branchVersionCreator.putAll(
-                mapOf(
-                    "master" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "${s}-${scmPosition.branch}"}
-                )
-            )
-
-            versionCreator({versionFromTag,scmPosition -> "version"})
-            snapshotCreator({versionFromTag,scmPosition -> "version"})
-            versionIncrementer({versionIncrementerContext -> Version})
+        // configure via function calls
+        deserializer({ tagProperties, scmPosition, String -> "tag" })
+        serializer({ tagProperties, version -> "tag" })
+    }
+    repository {
+        type.set("git")
+    }
+    checks {
+        aheadOfRemote.set(false)
+        snapshotDependencies.set(true)
+    }
+    nextVersion {
+        // function calls
+        deserializer({ nextVersionProperties, scmPosition, tag -> "version" })
+        serializer({ nextVersionProperties, version -> "version" })
+    }
+    hooks {
+        pre({ println("here") })
+        pre("commit") {
+            println("here")
         }
+
+        post({ println("here") })
+        post("commit") {
+            println("here")
+        }
+
+        preRelease {
+            push()
+            commit { releaseVersion, position -> "New commit message for version $releaseVersion" }
+            custom { context -> println("$context") }
+            fileUpdate {
+                file("README.md") // repeat for additional files
+                pattern = { previousVersion, context -> "version: $previousVersion" }
+                replacement = { currentVersion, context -> "version: $currentVersion" }
+            }
+        }
+
+        postRelease {
+            push()
+            commit { releaseVersion, position -> "New commit message for version $releaseVersion" }
+            custom { context -> println("$context") }
+            fileUpdate {
+                file("README.md") // repeat for additional files
+                pattern = { previousVersion, context -> "version: $previousVersion" }
+                replacement = { currentVersion, context -> "version: $currentVersion" }
+
+            }
+        }
+    }
+    monorepo {
+    }
+
+    branchVersionIncrementer.putAll(
+        mapOf<String, Any>(
+            "master" to VersionProperties.Incrementer { c: VersionIncrementerContext -> c.currentVersion.incrementMajorVersion() }
+        )
+    )
+
+    branchVersionCreator.putAll(
+        mapOf(
+            "master" to VersionProperties.Creator { s: String, scmPosition: ScmPosition -> "${s}-${scmPosition.branch}" }
+        )
+    )
+
+    versionCreator({ versionFromTag, scmPosition -> "version" })
+    snapshotCreator({ versionFromTag, scmPosition -> "version" })
+    versionIncrementer({ versionIncrementerContext -> Version })
+}
 
 ```

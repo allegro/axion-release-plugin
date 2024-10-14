@@ -9,7 +9,14 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.*
+import pl.allegro.tech.build.axion.release.domain.scm.ScmException
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import pl.allegro.tech.build.axion.release.util.WithEnvironment
 import spock.lang.Specification
 
 import java.nio.file.Files
@@ -17,13 +24,12 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 
 import static java.util.regex.Pattern.compile
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties
 
 class GitRepositoryTest extends Specification {
 
-    public static final String MASTER_BRANCH = "master"
     File repositoryDir
 
     File remoteRepositoryDir
@@ -36,6 +42,8 @@ class GitRepositoryTest extends Specification {
 
     GitRepository repository
 
+    String defaultBranch;
+
     void setup() {
         remoteRepositoryDir = File.createTempDir('axion-release', 'tmp')
         Map remoteRepositories = GitProjectBuilder.gitProject(remoteRepositoryDir).withInitialCommit().build()
@@ -47,6 +55,9 @@ class GitRepositoryTest extends Specification {
 
         rawRepository = repositories[Grgit]
         repository = repositories[GitRepository]
+
+        assert rawRepository.branch.current().name == remoteRawRepository.branch.current().name
+        defaultBranch = rawRepository.branch.current().name
     }
 
     def "should throw unavailable exception when initializing in unexisitng repository"() {
@@ -66,50 +77,50 @@ class GitRepositoryTest extends Specification {
         File lightweightTagRepositoryDir = File.createTempDir('axion-release', 'tmp')
         Map repositories = GitProjectBuilder.gitProject(lightweightTagRepositoryDir)
             .withInitialCommit()
-            .withLightweightTag(fullPrefix() + '1')
+            .withLightweightTag(fullPrefix() + '1.0.0')
             .build()
 
         GitRepository lightweightTagRepository = repositories[GitRepository] as GitRepository
 
         when:
-        lightweightTagRepository.tag(fullPrefix() + '2')
-        TagsOnCommit tags = lightweightTagRepository.latestTags(compile('^' + defaultPrefix() + '.*'))
+        lightweightTagRepository.tag(fullPrefix() + '2.0.0')
+        TagsOnCommit tags = lightweightTagRepository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
+        tags.tags == [fullPrefix() + '1.0.0', fullPrefix() + '2.0.0']
     }
 
     def "should create new tag on current commit"() {
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should create tag when on HEAD even if it already exists on the same commit"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should throw an exception when creating new tag that already exists and it's not on HEAD"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after release")
 
         when:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         then:
         ScmException e = thrown(ScmException)
         e.getCause() instanceof RefAlreadyExistsException
-        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1']
+        rawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + '1.0.0']
     }
 
     def "should create commit with given message"() {
@@ -130,14 +141,14 @@ class GitRepositoryTest extends Specification {
 
     def "should return last tag in current position in simple case"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after release")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return no tags when no commit in repository"() {
@@ -145,7 +156,7 @@ class GitRepositoryTest extends Specification {
         GitRepository commitlessRepository = GitProjectBuilder.gitProject(File.createTempDir('axion-release', 'tmp')).build()[GitRepository]
 
         when:
-        TagsOnCommit tags = commitlessRepository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = commitlessRepository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
         tags.tags == []
@@ -153,38 +164,38 @@ class GitRepositoryTest extends Specification {
 
     def "should indicate that position is on tag when latest commit is tagged"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should track back to older tag when commit was made after checking out older version"() {
         given:
-        repository.tag(fullPrefix() + '1')
+        repository.tag(fullPrefix() + '1.0.0')
         repository.commit(['*'], "commit after " + fullPrefix() + "1")
-        repository.tag(fullPrefix() + '2')
-        repository.commit(['*'], "commit after " + fullPrefix() +"2")
+        repository.tag(fullPrefix() + '2.0.0')
+        repository.commit(['*'], "commit after " + fullPrefix() + "2")
 
-        rawRepository.checkout(branch: fullPrefix() + '1')
+        rawRepository.checkout(branch: fullPrefix() + '1.0.0')
         repository.commit(['*'], "bugfix after " + fullPrefix() + "1")
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile("^" + defaultPrefix() + ".*"))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile("^" + defaultPrefix() + ".*")))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return all tagged commits matching the pattern provided"() {
         given:
-        repository.tag(fullPrefix() + '1')
-        repository.commit(['*'], "commit after " + fullPrefix() +"1")
-        repository.tag(fullPrefix() + '2')
-        repository.commit(['*'], "commit after " + fullPrefix() +"2")
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.commit(['*'], "commit after " + fullPrefix() + "1")
+        repository.tag(fullPrefix() + '2.0.0')
+        repository.commit(['*'], "commit after " + fullPrefix() + "2")
         repository.tag('another-tag-1')
         repository.commit(['*'], "commit after another-tag-1")
         repository.commit(['*'], "commit after another-tag-1-2")
@@ -194,23 +205,23 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], "commit after " + fullPrefix() + "3")
 
         when:
-        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(Pattern.compile('^' + defaultPrefix() + '.*'))
+        List<TagsOnCommit> allTaggedCommits = repository.taggedCommits(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() +'3',fullPrefix() + '4', fullPrefix() + '2', fullPrefix() +'1']
+        allTaggedCommits.collect { c -> c.tags[0] } == [fullPrefix() + '3', fullPrefix() + '4', fullPrefix() + '2.0.0', fullPrefix() + '1.0.0']
     }
 
     def "should return only tags that match with prefix"() {
         given:
-        repository.tag(fullPrefix() + '1')
-        repository.commit(['*'], "commit after " + fullPrefix() +"1")
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.commit(['*'], "commit after " + fullPrefix() + "1")
         repository.tag('otherTag')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(Pattern.compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1']
+        tags.tags == [fullPrefix() + '1.0.0']
     }
 
     def "should return latest tagged commit before the given commit id"() {
@@ -219,10 +230,10 @@ class GitRepositoryTest extends Specification {
         repository.commit(['*'], 'some commit')
         repository.tag('tag-to-skip')
 
-        String latestCommitId = repository.latestTags(~'^tag.*').commitId
+        String latestCommitId = repository.latestTags(List.of(~'^tag.*')).commitId
 
         when:
-        TagsOnCommit tags = repository.latestTags(~'^tag.*', latestCommitId)
+        TagsOnCommit tags = repository.latestTags(List.of(~'^tag.*'), latestCommitId)
 
         then:
         tags.tags == ['tag-to-find']
@@ -230,14 +241,14 @@ class GitRepositoryTest extends Specification {
 
     def "should return list of tags when multiple matching tags found on same commit"() {
         given:
-        repository.tag(fullPrefix() + '1')
-        repository.tag(fullPrefix() + '2')
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.tag(fullPrefix() + '2.0.0')
 
         when:
-        TagsOnCommit tags = repository.latestTags(Pattern.compile('^' + defaultPrefix() + '.*'))
+        TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
 
         then:
-        tags.tags == [fullPrefix() + '1', fullPrefix() + '2']
+        tags.tags == [fullPrefix() + '1.0.0', fullPrefix() + '2.0.0']
     }
 
     def "should attach to remote repository"() {
@@ -327,12 +338,12 @@ class GitRepositoryTest extends Specification {
 
         where:
         expectedIsClean | overridenIsCleanFlag | dirtyRepository
-        false | false | false
-        true | true | false
-        false | false | true
-        true | true | true
-        true | null | false
-        false | null | true
+        false           | false                | false
+        true            | true                 | false
+        false           | false                | true
+        true            | true                 | true
+        true            | null                 | false
+        false           | null                 | true
     }
 
     def "should provide current branch name from overriddenBranchName when in detached state and overriddenBranchName is set"() {
@@ -415,7 +426,7 @@ class GitRepositoryTest extends Specification {
 
         then:
         customRemoteRawRepository.log(maxCommits: 1)*.fullMessage == ['commit after ' + fullPrefix() + 'custom']
-        customRemoteRawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() +'custom']
+        customRemoteRawRepository.tag.list()*.fullName == ['refs/tags/' + fullPrefix() + 'custom']
         remoteRawRepository.log(maxCommits: 1)*.fullMessage == ['InitialCommit']
         remoteRawRepository.tag.list()*.fullName == []
     }
@@ -439,15 +450,15 @@ class GitRepositoryTest extends Specification {
 
     def "should remove tag"() {
         given:
-        repository.tag(fullPrefix() +"1")
-        int intermediateSize = repository.taggedCommits(~/.*/).size()
+        repository.tag(fullPrefix() + "1")
+        int intermediateSize = repository.taggedCommits(List.of(~/.*/)).size()
 
         when:
-        repository.dropTag(fullPrefix() +"1")
+        repository.dropTag(fullPrefix() + "1")
 
         then:
         intermediateSize == 1
-        repository.taggedCommits(~/.*/).isEmpty()
+        repository.taggedCommits(List.of(~/.*/)).isEmpty()
     }
 
     def "should pass ahead of remote check when in sync with remote"() {
@@ -503,7 +514,7 @@ class GitRepositoryTest extends Specification {
         isLegacyNamed
     }
 
-        def "existing legacy default tagname repo should return false on partially matches"() {
+    def "existing legacy default tagname repo should return false on partially matches"() {
         given:
         repository.tag("release-1")
         repository.tag("bla1")
@@ -585,7 +596,7 @@ class GitRepositoryTest extends Specification {
         git.checkout().setName(secondBranchName).call()
         commitFile('second/aa', 'foo')
         commitFile('b/ba', 'bar')
-        git.checkout().setName(MASTER_BRANCH).call()
+        git.checkout().setName(defaultBranch).call()
         git.merge().include(git.repository.resolve(secondBranchName)).setCommit(true).setMessage("unintresting").setFastForward(MergeCommand.FastForwardMode.NO_FF).call()
 
         commitFile('after/aa', 'after')
@@ -622,11 +633,70 @@ class GitRepositoryTest extends Specification {
         position.revision == headSubDirAChanged
     }
 
+    @WithEnvironment([
+        'GITHUB_ACTIONS=true',
+        'GITHUB_HEAD_REF=pr-source-branch'
+    ])
+    def 'should get branch name on Github Actions if pull_request triggered the workflow'() {
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == 'pr-source-branch'
+    }
+
+    @WithEnvironment([
+        'GITHUB_ACTIONS=true',
+        'GITHUB_HEAD_REF='
+    ])
+    def 'should ignore GITHUB_HEAD_REF variable if it has empty value'() {
+        when:
+        ScmPosition position = repository.currentPosition()
+
+        then:
+        position.branch == defaultBranch
+    }
+
+    @WithEnvironment([
+        'CI=true'
+    ])
+    def 'should unshallow repo on CI'() {
+        given:
+        remoteRepository.tag(fullPrefix() + '1.0.0')
+        100.times { remoteRepository.commit(['*'], "commit after release") }
+        File repoDir = File.createTempDir('axion-release', 'tmp')
+        Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
+        GitRepository repository = repositories[GitRepository]
+
+        when:
+        TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
+
+        then:
+        tags.tags == [fullPrefix() + '1.0.0']
+    }
+
+    @WithEnvironment([
+        'CI=false'
+    ])
+    def 'should not unshallow repo locally'() {
+        given:
+        remoteRepository.tag(fullPrefix() + '1.0.0')
+        100.times { remoteRepository.commit(['*'], "commit after release") }
+        File repoDir = File.createTempDir('axion-release', 'tmp')
+        Map repositories = GitProjectBuilder.gitProject(repoDir, remoteRepositoryDir, 1).build()
+        GitRepository repository = repositories[GitRepository]
+
+        when:
+        TagsOnCommit tags = repository.latestTags(List.of(compile('^' + defaultPrefix() + '.*')))
+
+        then:
+        tags.tags.isEmpty()
+    }
+
     private void commitFile(String subDir, String fileName) {
         String fileInA = "${subDir}/${fileName}"
         new File(repositoryDir, subDir).mkdirs()
         new File(repositoryDir, fileInA).createNewFile()
         repository.commit([fileInA], "Add file ${fileName} in ${subDir}")
     }
-
 }

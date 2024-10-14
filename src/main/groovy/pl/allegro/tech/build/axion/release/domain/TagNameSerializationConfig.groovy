@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -15,6 +16,7 @@ abstract class TagNameSerializationConfig extends BaseExtension {
         deserialize.convention(TagNameSerializer.DEFAULT.deserializer)
         initialVersion.convention(defaultInitialVersion())
         prefix.convention(TagPrefixConf.defaultPrefix())
+        fallbackPrefixes.convention(Collections.emptyList())
         versionSeparator.convention(TagPrefixConf.defaultSeparator())
     }
 
@@ -23,6 +25,9 @@ abstract class TagNameSerializationConfig extends BaseExtension {
 
     @Input
     abstract MapProperty<String, String> getBranchPrefix()
+
+    @Input
+    abstract ListProperty<String> getFallbackPrefixes()
 
     @Input
     abstract Property<String> getVersionSeparator()

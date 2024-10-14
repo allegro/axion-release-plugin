@@ -4,15 +4,15 @@
 parsing and decorating. Extracting version information from repository
 can be split in six phases:
 
--   reading - read tags from repository
--   parsing - extracting version from tag (serializing version to tag)
--   incrementing - when not on tag, version patch (least significant)
-    number is incremented
--   decorating - adding additional transformations to create final
-    version
--   appending snapshot - when not on tag, -SNAPSHOT suffix is appended (can be customized)
--   sanitization - making sure there are no unwanted characters in
-    version
+- reading - read tags from repository
+- parsing - extracting version from tag (serializing version to tag)
+- incrementing - when not on tag, version patch (least significant)
+  number is incremented
+- decorating - adding additional transformations to create final
+  version
+- appending snapshot - when not on tag, -SNAPSHOT suffix is appended (can be customized)
+- sanitization - making sure there are no unwanted characters in
+  version
 
 ## Reading
 
@@ -32,6 +32,20 @@ calculating current version. Prefix can be set using
     }
 
 Default prefix is `v`.
+
+In case a tag does not match the main prefix, fallback prefixes will be examined. You can use fallback prefixes to
+migrate from one prefix to another. For example, if you use prefix `my-service-` but want to migrate to prefix `v`, you
+can configure it like that:
+
+    scmVersion {
+        tag {
+            prefix.set("v")
+            fallbackPrefixes.set(listOf("my-service-"))
+        }
+    }
+
+Axion will use fallback prefixes to calculate latest version, but the next release tag will be created using the main
+prefix.
 
 There is also an option to set prefix per-branch (i.e. to use different
 version prefix on `legacy-` branches):
@@ -138,12 +152,12 @@ deserialization config object and position in SCM:
 `config` object is instance of `TagNameSerializationRules` class. Useful
 properties are:
 
--   `prefix`: tag prefix
--   `separator`: separator between prefix and version
+- `prefix`: tag prefix
+- `separator`: separator between prefix and version
 
 `position` object contains:
 
--   `branch` - the name of the current branch
+- `branch` - the name of the current branch
 
 Last but not least, `tagName` contains prepared tag name that should be
 used to extract version. `position.latestTag` might point to next
@@ -189,13 +203,14 @@ Incrementing phase does increment the version in accordance with
 *version incrementer*. By default, version patch (least significant)
 number is incremented. There are other predefined rules:
 
--   *incrementPatch* - increment patch number
--   *incrementMinor* - increment minor (middle) number
--   *incrementMajor* - increment major number
--   *incrementMinorIfNotOnRelease* - increment patch number if on
-    release branch. Increment minor otherwise
--   *incrementPrerelease* - increment pre-release suffix if possible
-    (-rc1 to -rc2). Add `initialPreReleaseIfNotOnPrerelease` to increment patch with pre-release version. Increment patch otherwise
+- *incrementPatch* - increment patch number
+- *incrementMinor* - increment minor (middle) number
+- *incrementMajor* - increment major number
+- *incrementMinorIfNotOnRelease* - increment patch number if on
+  release branch. Increment minor otherwise
+- *incrementPrerelease* - increment pre-release suffix if possible
+  (-rc1 to -rc2). Add `initialPreReleaseIfNotOnPrerelease` to increment patch with pre-release version. Increment patch
+  otherwise
 
 You can set one of predefined rules via `scmVersion.versionIncrementer`
 method:
@@ -224,10 +239,11 @@ would accept a context object and return a `Version` object:
 
 The context object passed to closure contains the following:
 
--   *currentVersion* - current `Version` object that should be used to
-    calculate next version ([Version
-    API](https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java))
--   *position* - widely used position object, for more see [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
+- *currentVersion* - current `Version` object that should be used to
+  calculate next version ([Version
+  API](https://github.com/zafarkhaja/jsemver/blob/1f4996ea3dab06193c378fd66fd4f8fdc8334cc6/src/main/java/com/github/zafarkhaja/semver/Version.java))
+- *position* - widely used position object, for more
+  see [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java)
 
 You can also specify different incrementers per branch. They can be
 either closure, name of predefined incrementer or name and list of
@@ -255,25 +271,49 @@ it's set to `v/.+`):
 
 ### incrementPrerelease
 
-This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease` (by default
-it's empty):
+This rule uses additional parameter `initialPreReleaseIfNotOnPrerelease`
+(by default it's empty):
 
     scmVersion {
         versionIncrementer('incrementPrerelease', [initialPreReleaseIfNotOnPrerelease: 'rc1'])
     }
 
+### releaseOnlyOnReleaseBranches
+
+You can set this flag to true to prevent releasing on branches that are
+not marked as release branches. By default, this flag is set to false.
+
+    scmVersion {
+        releaseOnlyOnReleaseBranches = true
+    }
+
+This flag can also be set via command line:
+
+    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches
+
+And works well in combination with `releaseBranchNames` option
+
+    scmVersion {
+        releaseOnlyOnReleaseBranches = true
+        releaseBranchNames = ['main', 'master']
+    }
+
+or as command line
+
+    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames=main,release
+
 ## Decorating
 
 Decorating phase happens only when version is read (and deserialized).
-During this phase version can be decorated with i.e. branch name.
-Default decorator does nothing. `axion-release-plugin` supports adding
-predefined named version creators (so don't be afraid to post pull
-request if you have something useful!). Decoration phase is conducted by
-*version creators*, you can configure it via `scmVersion.versionCreator`
+During this phase, the version will be decorated with a branch name (default behavior).
+`axion-release-plugin` supports adding predefined named version creators
+(so don't be afraid to post pull request if you have something useful!).
+Decoration phase is conducted by *version creators*,
+you can configure it via `scmVersion.versionCreator`
 method:
 
     scmVersion {
-        versionCreator('versionWithBranch')
+        versionCreator('versionWithCommitHash')
     }
 
 Or via `release.versionCreator` command line argument, which overrides
@@ -295,9 +335,31 @@ Per-branch version creators must be closures, there is no support for
 predefined creators. First match wins, but the order depends on
 collection type used (default for `[:]` is LinkedHashMap).
 
+#### versionWithBranch [default]
+
+This is the default version creator since version 1.18.0 of the plugin.
+
+    scmVersion {
+        versionCreator('versionWithBranch')
+    }
+
+This version creator appends branch name to version unless you are on
+*main*/*master* or *detached HEAD*:
+
+    decorate(version: '0.1.0', branch: 'master') == 0.1.0
+    decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
+
+If your Gradle build is executed within workflow on GitHub Actions and that workflow is triggered by either
+`pull_request` or `pull_request_target` event, GitHub will not check out the source branch of the pull request but
+a custom reference `refs/pull/<pr_number>/merge` (known as "merge branch"). Consequently, the repository will be in
+detached-HEAD state.
+
+In that case, the branch name will be taken from `GITHUB_HEAD_REF` environment variable
+[provided by GitHub](https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables).
+
 #### simple
 
-This is the default version creator that does nothing:
+This version creator is no operation one:
 
     decorate(version: '0.1.0') == 0.1.0
 
@@ -309,18 +371,6 @@ It might be useful when you want some branches to do *nothing*:
             'release/.*': 'simple'
         ])
     }
-
-#### versionWithBranch
-
-    scmVersion {
-        versionCreator('versionWithBranch')
-    }
-
-This version creator appends branch name to version unless you are on
-*main*/*master* or *detached HEAD*:
-
-    decorate(version: '0.1.0', branch: 'master') == 0.1.0
-    decorate(version: '0.1.0', branch: 'my-special-branch') == 0.1.0-my-special-branch
 
 #### versionWithCommitHash
 
@@ -340,8 +390,8 @@ Custom version creators can be implemented by creating closure:
 
     {version, position -> ...}
 
--   version - string version resolved by previous steps
--   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
+- version - string version resolved by previous steps
+- position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 ### Snapshot
 
@@ -357,9 +407,8 @@ Snapshot creator can be implemented by creating closure:
 
     {version, position -> ...}
 
--   version - string version resolved by previous steps
--   position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
-
+- version - string version resolved by previous steps
+- position - [ScmPosition](https://github.com/allegro/axion-release-plugin/blob/main/src/main/java/pl/allegro/tech/build/axion/release/domain/scm/ScmPosition.java) object
 
 ## Sanitization
 

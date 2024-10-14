@@ -1,0 +1,15 @@
+changelog:
+  categories:
+    - title: Dependency updates
+      labels:
+        - dependencies
+    - title: Breaking changes
+      labels:
+        - breaking-change
+    - title: Changed
+      labels:
+        - "*"
+      exclude:
+        labels:
+          - dependencies
+          - breaking-change

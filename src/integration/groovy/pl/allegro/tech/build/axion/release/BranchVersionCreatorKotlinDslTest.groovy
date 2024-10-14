@@ -23,11 +23,14 @@ class BranchVersionCreatorKotlinDslTest extends Specification {
 
     VersionResolutionContext context
 
+    String defaultBranch
+
     void setup() {
         def rawRepository = Grgit.init(dir: temporaryFolder)
 
         // let's make sure, not to use system wide user settings in tests
         rawRepository.repository.jgit.repository.config.baseConfig.clear()
+        defaultBranch = rawRepository.branch.current().name
 
         ScmProperties scmProperties = scmProperties(temporaryFolder).build()
         ScmRepository scmRepository = ScmRepositoryFactory.create(scmProperties)
@@ -70,7 +73,7 @@ class BranchVersionCreatorKotlinDslTest extends Specification {
 
              branchVersionCreator.putAll(
                 mapOf(
-                    "master" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "\${s}-\${scmPosition.branch}"}
+                    "$defaultBranch" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "\${s}-\${scmPosition.branch}"}
                 )
             )
         }
@@ -88,7 +91,7 @@ class BranchVersionCreatorKotlinDslTest extends Specification {
             .build()
 
         then:
-        result.output.contains(" 1.0.1-master-SNAPSHOT")
+        result.output.contains(" 1.0.1-$defaultBranch-SNAPSHOT")
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
 
 

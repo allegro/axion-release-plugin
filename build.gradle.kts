@@ -4,9 +4,9 @@ plugins {
     `maven-publish`
     signing
     jacoco
-    id("pl.allegro.tech.build.axion-release") version "1.17.1"
-    id("com.github.kt3k.coveralls") version "2.12.2"
-    id("com.gradle.plugin-publish") version "1.2.1"
+    idea
+    id("pl.allegro.tech.build.axion-release") version "1.18.12"
+    id("com.gradle.plugin-publish") version "1.3.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
@@ -48,8 +48,8 @@ sourceSets {
     }
 }
 
-val jgitVersion = "6.9.0.202403050737-r"
-val jschVersion = "0.2.17"
+val jgitVersion = "6.10.0.202406032230-r"
+val jschVersion = "0.2.20"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -60,16 +60,16 @@ dependencies {
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
     implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion")  {
+    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
         exclude("com.jcraft", "jsch")
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.14.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.15.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.2.2") {
+    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
@@ -77,9 +77,9 @@ dependencies {
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
     testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
-    testImplementation("org.objenesis:objenesis:3.3")
-    testImplementation("org.apache.sshd:sshd-core:2.12.1")
-    testImplementation("org.apache.sshd:sshd-git:2.12.1")
+    testImplementation("org.objenesis:objenesis:3.4")
+    testImplementation("org.apache.sshd:sshd-core:2.14.0")
+    testImplementation("org.apache.sshd:sshd-git:2.14.0")
     testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
     testImplementation(gradleTestKit())
 }
@@ -112,11 +112,11 @@ tasks {
         reports {
             xml.required.set(true)
         }
+        executionData(
+            file("${layout.buildDirectory.asFile.get()}/jacoco/test.exec"),
+            file("${layout.buildDirectory.asFile.get()}/jacoco/integrationTest.exec"),
+        )
     }
-}
-
-jacoco {
-    toolVersion = "0.8.2"
 }
 
 gradlePlugin {
@@ -192,4 +192,11 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
+}
+
+idea {
+    module {
+        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
+        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+    }
 }
