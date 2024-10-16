@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.Version;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
@@ -21,6 +23,12 @@ import java.util.regex.Pattern;
  * * any highest (stable or alpha)
  */
 class VersionSorter {
+    private static final Logger logger = Logging.getLogger(VersionSorter.class);
+    private final boolean verbose;
+
+    public VersionSorter(boolean verbose) {
+        this.verbose = verbose;
+    }
 
     Result pickTaggedCommit(
         TaggedCommits taggedCommits,
@@ -32,9 +40,11 @@ class VersionSorter {
         Set<Version> versions = new LinkedHashSet<>();
         LinkedHashMap<Version, Boolean> isVersionNextVersion = new LinkedHashMap<>();
         LinkedHashMap<Version, TagsOnCommit> versionToCommit = new LinkedHashMap<>();
+        boolean tagsFound = false;
 
         for (TagsOnCommit tagsEntry : taggedCommits.getCommits()) {
             List<String> tags = tagsEntry.getTags();
+            tagsFound = tagsFound || !tags.isEmpty();
 
             // next version should be ignored when tag is on head
             // and there are other, normal tags on it
@@ -47,10 +57,16 @@ class VersionSorter {
             for (String tag : tags) {
                 boolean isNextVersion = nextVersionTagPattern.matcher(tag).matches();
                 if (isNextVersion && (ignoreNextVersionTags || ignoreNextVersionOnHead)) {
+                    if (verbose) {
+                        logger.info("Ignoring tag: {}, because it's a next version tag and it's not forced", tag);
+                    }
                     continue;
                 }
 
                 Version version = versionFactory.versionFromTag(tag);
+                if (verbose) {
+                    logger.info("Detected version: {} from tag: {}", version, tag);
+                }
                 boolean versionDidNotExist = versions.add(version);
                 boolean isNormalVersion = !isNextVersion;
                 // normal tags have precedence over nextVersion tags with same version
@@ -68,14 +84,13 @@ class VersionSorter {
 
             }
         }
+        if (!tagsFound) {
+            logger.info("No tags were found in git history");
+        }
 
-
-        List<Version> versionList = new ArrayList<>(versions);
-        Collections.sort(versionList, Collections.reverseOrder());
-
-        Version version = (versionList.isEmpty() ? versionFactory.initialVersion() : versionList.get(0));
-        if (version == null) {
-            version = versionFactory.initialVersion();
+        Version version = findBestVersion(versionFactory, versions);
+        if (verbose) {
+            logger.info("Version: {}, was selected from versions: {}", version, versions);
         }
 
         TagsOnCommit versionCommit = versionToCommit.get(version);
@@ -86,6 +101,17 @@ class VersionSorter {
             versions.isEmpty(),
             (versionCommit == null ? null : versionCommit.getCommitId())
         );
+    }
+
+    private static Version findBestVersion(VersionFactory versionFactory, Set<Version> versions) {
+        List<Version> versionList = new ArrayList<>(versions);
+        versionList.sort(Collections.reverseOrder());
+
+        if (versionList.isEmpty()) {
+            return versionFactory.initialVersion();
+        }
+        Version version = versionList.get(0);
+        return version != null ? version : versionFactory.initialVersion();
     }
 
     static class Result {

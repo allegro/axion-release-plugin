@@ -21,7 +21,7 @@ import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
  */
 class VersionSorterTest extends Specification {
 
-    private final VersionSorter sorter = new VersionSorter()
+    private final VersionSorter sorter = new VersionSorter(false)
 
     private final VersionFactory factory = new VersionFactory(
         VersionPropertiesBuilder.versionProperties().build(),
