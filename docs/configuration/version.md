@@ -427,6 +427,6 @@ property:
     }
 
 ## Troubleshooting
-In case of problems use can try to use verbose mode:
+In case of problems you can try to use verbose mode:
 
     #./gradlew release -Prelease.verbose
