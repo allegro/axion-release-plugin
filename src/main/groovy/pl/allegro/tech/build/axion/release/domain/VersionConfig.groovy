@@ -36,12 +36,10 @@ abstract class VersionConfig extends BaseExtension {
     private static final String VERSION_CREATOR_PROPERTY = 'release.versionCreator'
     private static final String RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY = 'release.releaseOnlyOnReleaseBranches'
     private static final String RELEASE_BRANCH_NAMES_PROPERTY = 'release.releaseBranchNames'
-    private static final String RELEASE_VERBOSE = 'release.verbose'
 
     @Inject
     VersionConfig(Directory repositoryDirectory) {
         getDryRun().convention(gradlePropertyPresent(DRY_RUN_FLAG).orElse(false))
-        getVerbose().convention(gradlePropertyPresent(RELEASE_VERBOSE).orElse(false))
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
@@ -82,9 +80,6 @@ abstract class VersionConfig extends BaseExtension {
 
     @Internal
     abstract Property<Boolean> getDryRun()
-
-    @Internal
-    abstract Property<Boolean> getVerbose()
 
     @Internal
     abstract Property<Boolean> getIgnoreUncommittedChanges()

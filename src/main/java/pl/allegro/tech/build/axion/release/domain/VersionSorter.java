@@ -24,11 +24,6 @@ import java.util.regex.Pattern;
  */
 class VersionSorter {
     private static final Logger logger = Logging.getLogger(VersionSorter.class);
-    private final boolean verbose;
-
-    public VersionSorter(boolean verbose) {
-        this.verbose = verbose;
-    }
 
     Result pickTaggedCommit(
         TaggedCommits taggedCommits,
@@ -57,16 +52,13 @@ class VersionSorter {
             for (String tag : tags) {
                 boolean isNextVersion = nextVersionTagPattern.matcher(tag).matches();
                 if (isNextVersion && (ignoreNextVersionTags || ignoreNextVersionOnHead)) {
-                    if (verbose) {
-                        logger.quiet("Ignoring tag: {}, because it's a next version tag and it's not forced", tag);
-                    }
+                    logger.debug("Ignoring tag: {}, because it's a next version tag and it's not forced", tag);
                     continue;
                 }
 
                 Version version = versionFactory.versionFromTag(tag);
-                if (verbose) {
-                    logger.quiet("Detected version: {} from tag: {}", version, tag);
-                }
+                logger.debug("Detected version: {} from tag: {}", version, tag);
+
                 boolean versionDidNotExist = versions.add(version);
                 boolean isNormalVersion = !isNextVersion;
                 // normal tags have precedence over nextVersion tags with same version
@@ -89,9 +81,7 @@ class VersionSorter {
         }
 
         Version version = findBestVersion(versionFactory, versions);
-        if (verbose) {
-            logger.quiet("Version: {}, was selected from versions: {}", version, versions);
-        }
+        logger.debug("Version: {}, was selected from versions: {}", version, versions);
 
         TagsOnCommit versionCommit = versionToCommit.get(version);
 

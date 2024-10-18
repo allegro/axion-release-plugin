@@ -21,7 +21,7 @@ class VersionResolverTest extends RepositoryBasedTest {
     VersionProperties defaultVersionRules = versionProperties().build()
 
     def setup() {
-        resolver = new VersionResolver(repository, "", false)
+        resolver = new VersionResolver(repository, "")
     }
 
     def "should return default previous and current version when no tag in repository"() {

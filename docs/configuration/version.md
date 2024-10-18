@@ -425,8 +425,3 @@ property:
     scmVersion {
         sanitizeVersion.set(false)
     }
-
-## Troubleshooting
-In case of problems you can try to use verbose mode:
-
-    #./gradlew release -Prelease.verbose

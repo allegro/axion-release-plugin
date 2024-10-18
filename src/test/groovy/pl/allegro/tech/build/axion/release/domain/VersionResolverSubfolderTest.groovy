@@ -30,7 +30,7 @@ class VersionResolverSubfolderTest extends RepositoryBasedTest {
 
     def setup() {
         this.projectRootSubfolder = "gradleProjectRoot"
-        resolver = new VersionResolver(repository, projectRootSubfolder, false)
+        resolver = new VersionResolver(repository, projectRootSubfolder)
     }
 
     def "should return default previous and current version when no tag in repository"() {

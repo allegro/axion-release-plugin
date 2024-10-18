@@ -42,7 +42,6 @@ class ScmPropertiesBuilder {
                 ['main', 'master'] as Set,
                 false,
                 true,
-                false
         )
     }
 

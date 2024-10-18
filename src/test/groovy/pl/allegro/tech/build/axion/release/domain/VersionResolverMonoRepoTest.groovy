@@ -26,7 +26,7 @@ class VersionResolverMonoRepoTest extends RepositoryBasedTest {
     String secondaryDir = "subProjectSecondary"
 
     def setup() {
-        resolver = new VersionResolver(repository, subDir, false)
+        resolver = new VersionResolver(repository, subDir)
         commitPrimaryDir("init_file")
     }
 

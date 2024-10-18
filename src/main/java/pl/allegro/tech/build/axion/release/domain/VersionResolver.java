@@ -33,10 +33,10 @@ public class VersionResolver {
      */
     private final String projectRootRelativePath;
 
-    public VersionResolver(ScmRepository repository, String projectRootRelativePath, boolean verbose) {
+    public VersionResolver(ScmRepository repository, String projectRootRelativePath) {
         this.repository = repository;
         this.projectRootRelativePath = projectRootRelativePath;
-        this.sorter = new VersionSorter(verbose);
+        this.sorter = new VersionSorter();
     }
 
     public VersionContext resolveVersion(VersionProperties versionProperties, TagProperties tagProperties, NextVersionProperties nextVersionProperties) {

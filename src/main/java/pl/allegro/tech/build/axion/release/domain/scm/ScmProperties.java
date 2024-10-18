@@ -20,7 +20,6 @@ public class ScmProperties {
     private final Set<String> releaseBranchNames;
     private final boolean releaseOnlyOnReleaseBranches;
     private final boolean ignoreGlobalGitConfig;
-    private final boolean verbose;
 
     public ScmProperties(
         String type,
@@ -36,8 +35,7 @@ public class ScmProperties {
         Boolean unshallowRepoOnCI,
         Set<String> releaseBranchNames,
         boolean releaseOnlyOnReleaseBranches,
-        boolean ignoreGlobalGitConfig,
-        boolean verbose
+        boolean ignoreGlobalGitConfig
     ) {
         this.type = type;
         this.directory = directory;
@@ -53,7 +51,6 @@ public class ScmProperties {
         this.releaseBranchNames = releaseBranchNames;
         this.releaseOnlyOnReleaseBranches = releaseOnlyOnReleaseBranches;
         this.ignoreGlobalGitConfig = ignoreGlobalGitConfig;
-        this.verbose = verbose;
     }
 
     public ScmPushOptions pushOptions() {
@@ -116,7 +113,4 @@ public class ScmProperties {
         return ignoreGlobalGitConfig;
     }
 
-    public boolean isVerbose() {
-        return verbose;
-    }
 }
