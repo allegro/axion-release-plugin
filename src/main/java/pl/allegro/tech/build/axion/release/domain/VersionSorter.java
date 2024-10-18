@@ -80,7 +80,10 @@ class VersionSorter {
             logger.quiet("No tags were found in git history");
         }
 
-        Version version = getLatestVersion(versionFactory, versions);
+        Version version = versions.stream()
+            .filter(Objects::nonNull)
+            .max(Comparator.naturalOrder()) // find latest (max) version
+            .orElseGet(versionFactory::initialVersion);  // if no versions found, use initial version
         logger.debug("Version: {}, was selected from versions: {}", version, versions);
 
         TagsOnCommit versionCommit = versionToCommit.get(version);
@@ -91,13 +94,6 @@ class VersionSorter {
             versions.isEmpty(),
             (versionCommit == null ? null : versionCommit.getCommitId())
         );
-    }
-
-    private static Version getLatestVersion(VersionFactory versionFactory, Set<Version> versions) {
-        return versions.stream()
-            .filter(Objects::nonNull) // filter out nulls
-            .max(Comparator.naturalOrder()) // find latest version
-            .orElseGet(versionFactory::initialVersion); // if no versions found, return initial version
     }
 
     static class Result {
