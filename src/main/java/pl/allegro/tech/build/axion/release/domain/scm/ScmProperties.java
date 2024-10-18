@@ -112,5 +112,4 @@ public class ScmProperties {
     public boolean isIgnoreGlobalGitConfig() {
         return ignoreGlobalGitConfig;
     }
-
 }

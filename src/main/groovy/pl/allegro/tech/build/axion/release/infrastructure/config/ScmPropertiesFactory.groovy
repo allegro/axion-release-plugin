@@ -20,7 +20,7 @@ class ScmPropertiesFactory {
             config.getUnshallowRepoOnCI().get(),
             config.getReleaseBranchNames().get(),
             config.getReleaseOnlyOnReleaseBranches().get(),
-            config.getIgnoreGlobalGitConfig().get(),
+            config.getIgnoreGlobalGitConfig().get()
         )
     }
 }
