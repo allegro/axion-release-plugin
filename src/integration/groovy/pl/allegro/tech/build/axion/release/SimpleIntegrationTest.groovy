@@ -40,23 +40,116 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should define a github output when running release task in github workflow context"() {
+    def "should set released-version github output after release task"(String task, List<String> outputs) {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
         environmentVariablesRule.set("GITHUB_ACTIONS", "true")
         environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
 
-        buildFile('')
+        vanillaSettingsFile("""
+            rootProject.name = 'root-project'
+
+            include 'sub-project'
+            """
+        )
+
+        vanillaBuildFile("""
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+            }
+
+            scmVersion {
+                tag {
+                    prefix = 'root-project-'
+                }
+            }
+            """
+        )
+
+        vanillaSubprojectBuildFile("sub-project", """
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+            }
+
+            scmVersion {
+                tag {
+                    prefix = 'sub-project-'
+                }
+            }
+            """
+        )
+
+        repository.tag('root-project-1.0.0')
+        repository.tag('sub-project-2.0.0')
+        repository.commit(['.'], 'Some commit')
 
         when:
-        runGradle('release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        runGradle(task, '-Prelease.localOnly', '-Prelease.disableChecks')
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables.contains('released-version=1.0.0')
+        definedEnvVariables.size() == outputs.size()
+        definedEnvVariables.containsAll(outputs)
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+
+        where:
+        task                   || outputs
+        'release'              || ['released-version=1.0.1', 'root-project-released-version=1.0.1', 'sub-project-released-version=2.0.1']
+        ':release'             || ['released-version=1.0.1', 'root-project-released-version=1.0.1']
+        ':sub-project:release' || ['released-version=2.0.1', 'sub-project-released-version=2.0.1']
+    }
+
+    def "should set published-version github output after publish task"(String task, List<String> outputs) {
+        given:
+        def outputFile = File.createTempFile("github-outputs", ".tmp")
+        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
+        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
+
+        vanillaSettingsFile("""
+            rootProject.name = 'root-project'
+
+            include 'sub-project'
+            """
+        )
+
+        vanillaBuildFile("""
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+                id 'maven-publish'
+            }
+
+            version = '1.0.0'
+            """
+        )
+
+        vanillaSubprojectBuildFile("sub-project", """
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+                id 'maven-publish'
+            }
+
+            version = '2.0.0'
+            """
+        )
+
+        when:
+        runGradle(task)
+
+        then:
+        def definedEnvVariables = outputFile.getText().lines().collect(toList())
+        definedEnvVariables.size() == outputs.size()
+        definedEnvVariables.containsAll(outputs)
+
+        cleanup:
+        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+
+        where:
+        task                   || outputs
+        'publish'              || ['published-version=1.0.0', 'root-project-published-version=1.0.0', 'sub-project-published-version=2.0.0']
+        ':publish'             || ['published-version=1.0.0', 'root-project-published-version=1.0.0']
+        ':sub-project:publish' || ['published-version=2.0.0', 'sub-project-published-version=2.0.0']
     }
 
     def "should return released version on calling cV on repo with release commit"() {
