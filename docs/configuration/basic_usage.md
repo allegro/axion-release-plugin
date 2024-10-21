@@ -180,18 +180,7 @@ Version calculation rules:
 
 ### GitHub workflow context
 
-If `release` task is executed in GitHub workflow it will generate an output variable `released-version`
-that you can access later on in your workflow steps.
-
-```
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - id: release
-        run: ./gradlew release
-      - run: echo ${{steps.release.outputs.released-version}}
-```
+See [GitHub outputs](ci_servers.md#github-outputs)
 
 ## Accessing previous version
 
