@@ -40,7 +40,10 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
-    def "should set released-version github output after release task"(String task, List<String> outputs) {
+    def "should set released-version github output after release task"(String task,
+                                                                       String rootProjectVersion,
+                                                                       String subprojectVersion,
+                                                                       String output) {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
         environmentVariablesRule.set("GITHUB_ACTIONS", "true")
@@ -79,8 +82,8 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
             """
         )
 
-        repository.tag('root-project-1.0.0')
-        repository.tag('sub-project-2.0.0')
+        repository.tag("root-project-$rootProjectVersion")
+        repository.tag("sub-project-$subprojectVersion")
         repository.commit(['.'], 'Some commit')
 
         when:
@@ -88,20 +91,23 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables.size() == outputs.size()
-        definedEnvVariables.containsAll(outputs)
+        definedEnvVariables.contains(output)
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
 
         where:
-        task                   || outputs
-        'release'              || ['released-version=1.0.1', 'root-project-released-version=1.0.1', 'sub-project-released-version=2.0.1']
-        ':release'             || ['released-version=1.0.1', 'root-project-released-version=1.0.1']
-        ':sub-project:release' || ['released-version=2.0.1', 'sub-project-released-version=2.0.1']
+        task                   | rootProjectVersion | subprojectVersion || output
+        'release'              | "1.0.0"            | "1.0.0"           || 'released-version=1.0.1'
+        'release'              | "1.0.0"            | "2.0.0"           || 'released-version={"root-project":"1.0.1","sub-project":"2.0.1"}'
+        ':release'             | "1.0.0"            | "2.0.0"           || 'released-version=1.0.1'
+        ':sub-project:release' | "1.0.0"            | "2.0.0"           || 'released-version=2.0.1'
     }
 
-    def "should set published-version github output after publish task"(String task, List<String> outputs) {
+    def "should set published-version github output after publish task"(String task,
+                                                                        String rootProjectVersion,
+                                                                        String subprojectVersion,
+                                                                        String output) {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
         environmentVariablesRule.set("GITHUB_ACTIONS", "true")
@@ -120,7 +126,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
                 id 'maven-publish'
             }
 
-            version = '1.0.0'
+            version = '$rootProjectVersion'
             """
         )
 
@@ -130,7 +136,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
                 id 'maven-publish'
             }
 
-            version = '2.0.0'
+            version = '$subprojectVersion'
             """
         )
 
@@ -139,17 +145,17 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables.size() == outputs.size()
-        definedEnvVariables.containsAll(outputs)
+        definedEnvVariables.contains(output)
 
         cleanup:
         environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
 
         where:
-        task                   || outputs
-        'publish'              || ['published-version=1.0.0', 'root-project-published-version=1.0.0', 'sub-project-published-version=2.0.0']
-        ':publish'             || ['published-version=1.0.0', 'root-project-published-version=1.0.0']
-        ':sub-project:publish' || ['published-version=2.0.0', 'sub-project-published-version=2.0.0']
+        task                   | rootProjectVersion | subprojectVersion || output
+        'publish'              | "1.0.0"            | "1.0.0"           || 'published-version=1.0.0'
+        'publish'              | "1.0.0"            | "2.0.0"           || 'published-version={"root-project":"1.0.0","sub-project":"2.0.0"}'
+        ':publish'             | "1.0.0"            | "2.0.0"           || 'published-version=1.0.0'
+        ':sub-project:publish' | "1.0.0"            | "2.0.0"           || 'published-version=2.0.0'
     }
 
     def "should return released version on calling cV on repo with release commit"() {
