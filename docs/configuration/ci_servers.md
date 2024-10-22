@@ -29,10 +29,47 @@ This behavior is experimental and has been tested on the following CI servers:
 
 `axion-release` has dedicated support for GitHub Actions and you don't need any custom configs to make it working.
 
-Here's what Axion does for you under the hood:
+### GitHub outputs
 
-- gets the original branch name for workflows triggered by `pull_request` -
-  see [versionWithBranch](version.md#versionwithbranch-default)
+To make it easier for you to chain jobs in a workflow, `axion-release` will provide some information as GitHub outputs.
+
+| name                | description                                 |
+|---------------------|---------------------------------------------|
+| `released-version`  | Provided after executing the `release` task |
+| `published-version` | Provided after executing the `publish` task |
+
+#### Multi-version builds
+
+If all your Gradle modules use the same version, the output will be a single value, such as:
+```
+1.0.0
+```
+
+However, if each module has its own version, the output will be in JSON format, for example:
+```json
+{"root-project":"1.0.0","sub-project-1":"2.0.0","sub-project-2":"3.0.0"}
+```
+where `root-project`, `sub-project-1` and `sub-project-2` are project names from Gradle.
+
+#### Example
+
+```yaml
+jobs:
+  build:
+    steps:
+      - id: release
+        run: ./gradlew release
+
+      # for single-version builds
+      - run: |
+          echo ${{ steps.release.outputs.released-version }}
+
+      # for multi-version builds
+      - run: |
+          echo ${{ fromJson(steps.release.outputs.released-version).root-project }}
+          echo ${{ fromJson(steps.release.outputs.released-version).sub-project-1 }}
+          echo ${{ fromJson(steps.release.outputs.released-version).sub-project-2 }}
+```
 
 ## Jenkins
 

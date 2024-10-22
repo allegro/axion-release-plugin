@@ -2,9 +2,11 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
 import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
+import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
 abstract class ReleasePlugin implements Plugin<Project> {
@@ -21,7 +23,10 @@ abstract class ReleasePlugin implements Plugin<Project> {
     void apply(Project project) {
         FileLoader.setRoot(project.rootDir)
 
-        def versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
+        Provider<GithubService> githubService = project.gradle.sharedServices
+            .registerIfAbsent("github", GithubService) {}
+
+        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
 
         project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
@@ -42,6 +47,8 @@ abstract class ReleasePlugin implements Plugin<Project> {
             group = 'Release'
             description = 'Performs release - creates tag and pushes it to remote.'
             dependsOn(VERIFY_RELEASE_TASK)
+            it.projectName = project.name
+            it.githubService = githubService
         }
 
         project.tasks.register(CREATE_RELEASE_TASK, CreateReleaseTask) {
@@ -65,7 +72,23 @@ abstract class ReleasePlugin implements Plugin<Project> {
             description = 'Prints current project version extracted from SCM.'
         }
 
+        setGithubOutputsAfterPublishTask(project, githubService)
+
         maybeDisableReleaseTasks(project, versionConfig)
+    }
+
+    private static setGithubOutputsAfterPublishTask(Project project, Provider<GithubService> githubService) {
+        String projectName = project.name
+        Provider<String> projectVersion = project.provider { project.version.toString() }
+
+        project.plugins.withId('maven-publish') {
+            project.tasks.named('publish') { task ->
+                task.usesService(githubService)
+                task.doLast {
+                    githubService.get().setOutput('published-version', projectName, projectVersion.get())
+                }
+            }
+        }
     }
 
     private static void maybeDisableReleaseTasks(Project project, VersionConfig versionConfig) {
