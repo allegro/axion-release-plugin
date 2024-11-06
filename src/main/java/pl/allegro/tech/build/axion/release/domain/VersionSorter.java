@@ -52,12 +52,12 @@ class VersionSorter {
             for (String tag : tags) {
                 boolean isNextVersion = nextVersionTagPattern.matcher(tag).matches();
                 if (isNextVersion && (ignoreNextVersionTags || ignoreNextVersionOnHead)) {
-                    logger.debug("Ignoring tag: {}, because it's a next version tag and it's not forced", tag);
+                    logger.lifecycle("Ignoring tag: {}, because it's a next version tag and it's not forced", tag);
                     continue;
                 }
 
                 Version version = versionFactory.versionFromTag(tag);
-                logger.debug("Detected version: {} from tag: {}", version, tag);
+                logger.lifecycle("Detected version: {} from tag: {}", version, tag);
 
                 boolean versionDidNotExist = versions.add(version);
                 boolean isNormalVersion = !isNextVersion;
@@ -77,14 +77,14 @@ class VersionSorter {
             }
         }
         if (!tagsFound) {
-            logger.quiet("No tags were found in git history");
+            logger.lifecycle("No tags were found in git history");
         }
 
         Version version = versions.stream()
             .filter(Objects::nonNull)
             .max(Comparator.naturalOrder()) // find latest (max) version
             .orElseGet(versionFactory::initialVersion);  // if no versions found, use initial version
-        logger.debug("Version: {}, was selected from versions: {}", version, versions);
+        logger.lifecycle("Version: {}, was selected from versions: {}", version, versions);
 
         TagsOnCommit versionCommit = versionToCommit.get(version);
 
