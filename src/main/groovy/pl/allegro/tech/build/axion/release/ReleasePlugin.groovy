@@ -78,14 +78,16 @@ abstract class ReleasePlugin implements Plugin<Project> {
     }
 
     private static setGithubOutputsAfterPublishTask(Project project, Provider<GithubService> githubService) {
-        String projectName = project.name
-        Provider<String> projectVersion = project.provider { project.version.toString() }
+        project.allprojects { Project p ->
+            String projectName = p.name
+            Provider<String> projectVersion = p.provider { p.version.toString() }
 
-        project.plugins.withId('maven-publish') {
-            project.tasks.named('publish') { task ->
-                task.usesService(githubService)
-                task.doLast {
-                    githubService.get().setOutput('published-version', projectName, projectVersion.get())
+            p.plugins.withId('maven-publish') {
+                p.tasks.named('publish') { task ->
+                    task.usesService(githubService)
+                    task.doLast {
+                        githubService.get().setOutput('published-version', projectName, projectVersion.get())
+                    }
                 }
             }
         }

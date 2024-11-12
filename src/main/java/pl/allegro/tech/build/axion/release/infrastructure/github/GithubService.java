@@ -44,7 +44,7 @@ public abstract class GithubService implements BuildService<BuildServiceParamete
                     writeOutput(name, singleValue);
                 } else {
                     String jsonValue = new JsonBuilder(valuePerProject).toString();
-                    logger.warn("Multiple values provided for the '{}' GitHub output, it will be formatted as JSON: {}", name, jsonValue);
+                    logger.warn("Multiple values provided for the '{}' GitHub output, it will be formatted as JSON", name);
                     writeOutput(name, jsonValue);
                 }
             });
@@ -58,6 +58,7 @@ public abstract class GithubService implements BuildService<BuildServiceParamete
                 String.format("%s=%s\n", name, value).getBytes(),
                 StandardOpenOption.APPEND
             );
+            logger.lifecycle("Written GitHub output: {}={}", name, value);
         } catch (IOException e) {
             logger.warn("Unable to the set '{}' GitHub output, cause: {}", name, e.getMessage());
         }
