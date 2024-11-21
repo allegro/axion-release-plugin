@@ -8,7 +8,7 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version "1.18.15"
     id("com.gradle.plugin-publish") version "1.3.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.coditory.integration-test") version "1.4.5"
+    id("com.coditory.integration-test") version "2.1.0"
     id("com.adarshr.test-logger") version "3.0.0"
 }
 
