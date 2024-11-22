@@ -99,8 +99,9 @@ abstract class ReleasePlugin implements Plugin<Project> {
             def releaseOnlyOnReleaseBranches = context.scmService().isReleaseOnlyOnReleaseBranches()
             def releaseBranchNames = context.scmService().getReleaseBranchNames()
             def currentBranch = context.repository().currentPosition().getBranch()
+            def onReleaseBranch = releaseBranchNames.any { pattern -> currentBranch.matches(pattern) }
 
-            def shouldSkipRelease = releaseOnlyOnReleaseBranches && !releaseBranchNames.contains(currentBranch)
+            def shouldSkipRelease = releaseOnlyOnReleaseBranches && !onReleaseBranch
 
             if (shouldSkipRelease) {
                 disableReleaseTasks(currentBranch, releaseBranchNames, project)

@@ -295,12 +295,12 @@ And works well in combination with `releaseBranchNames` option
 
     scmVersion {
         releaseOnlyOnReleaseBranches = true
-        releaseBranchNames = ['main', 'master']
+        releaseBranchNames = ['main', 'master', 'release/.*']
     }
 
 or as command line
 
-    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames=main,release
+    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames="main,master,release/.*"
 
 ## Decorating
 
