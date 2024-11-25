@@ -13,7 +13,7 @@ plugins {
 }
 
 scmVersion {
-    versionCreator("versionWithBranch")
+    unshallowRepoOnCI.set(true)
 }
 
 group = "pl.allegro.tech.build"

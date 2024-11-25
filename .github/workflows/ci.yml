@@ -1,6 +1,6 @@
 name: Build
 
-on: 
+on:
   pull_request:
   workflow_dispatch:
   push:
@@ -31,3 +31,12 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Publish to staging repository
+        run: ./gradlew publishToSonatype currentVersion
+        env:
+            SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+            SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+            GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+            GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+            GPG_PRIVATE_KEY_PASSWORD: ${{ secrets.GPG_PRIVATE_KEY_PASSWORD }}
