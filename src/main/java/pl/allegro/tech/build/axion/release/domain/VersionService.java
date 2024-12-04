@@ -37,7 +37,7 @@ public class VersionService {
         }
 
         return new DecoratedVersion(versionContext.getVersion().toString(), finalVersion, versionContext.getPosition(),
-            versionContext.getPreviousVersion().toString());
+            versionContext.getPreviousVersion().toString(), versionContext.isSnapshot());
     }
 
     public static class DecoratedVersion {
@@ -45,13 +45,15 @@ public class VersionService {
         private final String decoratedVersion;
         private final ScmPosition position;
         private final String previousVersion;
+        private final boolean snapshot;
 
         public DecoratedVersion(String undecoratedVersion, String decoratedVersion, ScmPosition position,
-                                String previousVersion) {
+                                String previousVersion, boolean snapshot) {
             this.undecoratedVersion = undecoratedVersion;
             this.decoratedVersion = decoratedVersion;
             this.position = position;
             this.previousVersion = previousVersion;
+            this.snapshot = snapshot;
         }
 
         @Input
@@ -72,6 +74,11 @@ public class VersionService {
         @Input
         public final String getPreviousVersion() {
             return previousVersion;
+        }
+
+        @Input
+        public boolean isSnapshot() {
+            return snapshot;
         }
     }
 }
