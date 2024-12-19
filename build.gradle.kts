@@ -188,7 +188,7 @@ signing {
     }
     useInMemoryPgpKeys(
         System.getenv("GPG_KEY_ID"),
-        System.getenv("GPG_PRIVATE_KEY"),
+        System.getenv("GPG_PRIVATE_KEY").replace("\\n", "\n"),
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
