@@ -65,7 +65,7 @@ dependencies {
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.79")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.80")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.15.0")
 
