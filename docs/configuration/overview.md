@@ -76,7 +76,7 @@ All `axion-release-plugin` configuration options:
 
         // doc: Version / releaseOnlyOnReleaseBranches
         releaseOnlyOnReleaseBranches = false
-        releaseBranchNames = ['master', 'main']
+        releaseBranchNames = ['master', 'main', 'release/.*']
     }
 
 All `axion-release-plugin` configuration flags:
@@ -117,4 +117,4 @@ All `axion-release-plugin` configuration flags:
     - only perform a release on branches that match the `releaseBranchNames`
 - release.releaseBranchNames
     - default: `['master', 'main']`
-    - a list of branch names that are considered release branches
+    - a list of regex patterns for release branch names

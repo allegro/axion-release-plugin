@@ -1,16 +1,22 @@
 package pl.allegro.tech.build.axion.release
 
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
-
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
+import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 
 abstract class ReleaseTask extends BaseAxionTask {
+
+    @Input
+    abstract Property<String> getProjectName()
+
+    @Internal
+    abstract Property<GithubService> getGithubService()
 
     @TaskAction
     void release() {
@@ -28,13 +34,8 @@ abstract class ReleaseTask extends BaseAxionTask {
         }
 
         if (result.outcome === ScmPushResultOutcome.SUCCESS) {
-            if (System.getenv().containsKey('GITHUB_ACTIONS')) {
-                Files.write(
-                    Paths.get(System.getenv('GITHUB_OUTPUT')),
-                    "released-version=${versionConfig.uncached.decoratedVersion}\n".getBytes(),
-                    StandardOpenOption.APPEND
-                )
-            }
+            String version = versionConfig.uncached.decoratedVersion
+            githubService.get().setOutput("released-version", projectName.get(), version)
         }
     }
 }
