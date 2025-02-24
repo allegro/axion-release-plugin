@@ -367,7 +367,7 @@ class GitRepositoryTest extends Specification {
         position.branch == 'feature/overridden-branch-name'
     }
 
-    def "should ignore overriddenBranchName when not in detached state"() {
+    def "should not ignore overriddenBranchName when not in detached state"() {
         given:
         File repositoryDir = File.createTempDir('axion-release', 'tmp')
         def scmProperties = scmProperties(repositoryDir)
@@ -384,7 +384,7 @@ class GitRepositoryTest extends Specification {
         ScmPosition position = repository.currentPosition()
 
         then:
-        position.branch == 'some-branch'
+        position.branch == 'feature/overridden-branch-name'
     }
 
     def "should push changes and tag to remote"() {
