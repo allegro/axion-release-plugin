@@ -5,15 +5,15 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.18.12"
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("pl.allegro.tech.build.axion-release") version "1.18.16"
+    id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
 }
 
 scmVersion {
-    versionCreator("versionWithBranch")
+    unshallowRepoOnCI.set(true)
 }
 
 group = "pl.allegro.tech.build"
@@ -49,7 +49,7 @@ sourceSets {
 }
 
 val jgitVersion = "6.10.0.202406032230-r"
-val jschVersion = "0.2.20"
+val jschVersion = "0.2.23"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -65,9 +65,9 @@ dependencies {
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.80")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.15.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.16.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:5.3.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")

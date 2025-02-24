@@ -145,7 +145,7 @@ deserialization config object and position in SCM:
 
     scmVersion {
         tag {
-            deserialize({config, position, tagName -> ...})
+            deserializer({config, position, tagName -> ...})
         }
     }
 
@@ -176,7 +176,7 @@ serialization config object and version:
 
     scmVersion {
         tag {
-            serialize({config, version -> ...})
+            serializer({config, version -> ...})
         }
     }
 
@@ -295,12 +295,12 @@ And works well in combination with `releaseBranchNames` option
 
     scmVersion {
         releaseOnlyOnReleaseBranches = true
-        releaseBranchNames = ['main', 'master']
+        releaseBranchNames = ['main', 'master', 'release/.*']
     }
 
 or as command line
 
-    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames=main,release
+    ./gradlew release -Prelease.releaseOnlyOnReleaseBranches -Prelease.releaseBranchNames="main,master,release/.*"
 
 ## Decorating
 

@@ -16,21 +16,32 @@ class BaseIntegrationTest extends RepositoryBasedTest {
     }
 
     void buildFile(String contents) {
-        new FileTreeBuilder(temporaryFolder).file("build.gradle", """
-        plugins {
-            id 'pl.allegro.tech.build.axion-release'
-        }
-
-        """ + contents +
+        new FileTreeBuilder(temporaryFolder).file("build.gradle",
             """
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+            }
 
-        project.version = scmVersion.version
-        scmVersion.ignoreGlobalGitConfig = true
-        """)
+            $contents
+
+            project.version = scmVersion.version
+            scmVersion.ignoreGlobalGitConfig = true
+            """
+        )
     }
 
     void vanillaBuildFile(String contents) {
         new FileTreeBuilder(temporaryFolder).file("build.gradle", contents)
+    }
+
+    void vanillaSubprojectBuildFile(String subprojectName, String contents) {
+        new FileTreeBuilder(temporaryFolder).dir(subprojectName) {
+            file("build.gradle", contents)
+        }
+    }
+
+    void vanillaSettingsFile(String contents) {
+        new FileTreeBuilder(temporaryFolder).file("settings.gradle", contents)
     }
 
     GradleRunner gradle() {

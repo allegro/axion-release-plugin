@@ -1,6 +1,6 @@
 name: Build
 
-on: 
+on:
   pull_request:
   workflow_dispatch:
   push:
@@ -22,12 +22,12 @@ jobs:
             cache: 'gradle'
 
       - name: Test with Gradle
-        run: ./gradlew --no-daemon --continue check
+        run: ./gradlew build
 
       - name: Jacoco
         run: ./gradlew jacocoTestReport
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
