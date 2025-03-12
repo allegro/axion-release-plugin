@@ -2,12 +2,15 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.Provider
 import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 import pl.allegro.tech.build.axion.release.util.FileLoader
+
+import java.util.stream.Stream
 
 abstract class ReleasePlugin implements Plugin<Project> {
 
@@ -26,7 +29,10 @@ abstract class ReleasePlugin implements Plugin<Project> {
         Provider<GithubService> githubService = project.gradle.sharedServices
             .registerIfAbsent("github", GithubService) {}
 
-        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
+        Gradle rootGradle = project.gradle
+        while(rootGradle.parent != null) { rootGradle = rootGradle.parent }
+
+        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, rootGradle.rootProject.layout.projectDirectory)
 
         project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
