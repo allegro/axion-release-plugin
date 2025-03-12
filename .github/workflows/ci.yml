@@ -8,9 +8,11 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
+    strategy:
+      fail-fast: false
+      matrix:
+        gradle-version: ["7.0", "7.1", "7.2", "7.3", "7.4", "7.5", "7.6", "8.0", "8.3", "8.4", "8.5", "8.6", "8.7", "8.8", "8.9", "8.10", "8.11", "8.12", "8.13"]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,13 +21,17 @@ jobs:
         with:
             distribution: 'temurin'
             java-version: '11'
-            cache: 'gradle'
+     
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "${{ matrix.gradle-version }}"
 
       - name: Test with Gradle
-        run: ./gradlew build
+        run: gradle build
 
       - name: Jacoco
-        run: ./gradlew jacocoTestReport
+        run: gradle jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
