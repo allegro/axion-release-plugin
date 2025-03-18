@@ -13,7 +13,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
             distribution: 'temurin'
-            java-version: '11'
+            java-version: '21'
             cache: 'gradle'
       - name: Publish to gradle
         run: ./gradlew publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}

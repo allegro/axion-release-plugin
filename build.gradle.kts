@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
     groovy
@@ -23,48 +25,25 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "ajoberstar-backup"
-        url = uri("https://ajoberstar.org/bintray-backup/")
-    }
-}
+extra["jgitVersion"] = "6.10.0.202406032230-r"
+extra["jschVersion"] = "0.2.24"
 
-/**
- *  no source dirs for the java compiler
- *  compile everything in src/ with groovy
- */
-sourceSets {
-    main {
-        java { setSrcDirs(emptyList<String>()) }
-        withConvention(GroovySourceSet::class) {
-            groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }
-    }
-}
-
-val jgitVersion = "6.10.0.202406032230-r"
-val jschVersion = "0.2.24"
-val jschAgentVersion = "0.0.9"
+val jgitVersion: String by extra
+val jschVersion: String by extra
 
 dependencies {
     api(localGroovy())
 
+    implementation(project(":lib"))
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:$jgitVersion")
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:$jgitVersion")
     runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
 
-    implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
-        exclude("com.jcraft", "jsch")
-    }
-    implementation("com.github.mwiede:jsch:$jschVersion")
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    testImplementation("com.github.zafarkhaja:java-semver:0.9.0")
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.80")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.16.0")
@@ -94,18 +73,12 @@ tasks {
         dependsOn(named("integrationTest"))
     }
 
-    /**
-     * set kotlin to depend on groovy
-     */
-    named<AbstractCompile>("compileKotlin") {
-        classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
+    test {
+        jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     }
 
-    /**
-     * set groovy to not depend on Kotlin
-     */
-    named<AbstractCompile>("compileGroovy") {
-        classpath = sourceSets.main.get().compileClasspath
+    integrationTest {
+        jvmArgs("--add-opens", "java.base/java.util=ALL-UNNAMED")
     }
 
     jacocoTestReport {
@@ -126,15 +99,12 @@ gradlePlugin {
             id = "pl.allegro.tech.build.axion-release"
             displayName = "axion-release-plugin"
             implementationClass = "pl.allegro.tech.build.axion.release.ReleasePlugin"
+            website = "https://github.com/allegro/axion-release-plugin"
+            vcsUrl = "https://github.com/allegro/axion-release-plugin"
+            description = "Release and version management plugin."
+            tags = listOf("release", "version")
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/allegro/axion-release-plugin"
-    vcsUrl = "https://github.com/allegro/axion-release-plugin"
-    description = "Release and version management plugin."
-    tags = listOf("release", "version")
 }
 
 publishing {
