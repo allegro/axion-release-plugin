@@ -29,24 +29,10 @@ java {
     }
 }
 
-extra["jgitVersion"] = "6.10.0.202406032230-r"
-extra["jschVersion"] = "0.2.24"
-
-val jgitVersion: String by extra
-val jschVersion: String by extra
-
 dependencies {
     api(localGroovy())
 
     implementation(project(":lib"))
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
-
-    testImplementation("com.github.zafarkhaja:java-semver:0.9.0")
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.80")
-    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.16.0")
 
     testImplementation("org.ajoberstar.grgit:grgit-core:5.3.0") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
