@@ -14,7 +14,7 @@ bin/
 .gradle
 
 # project binaries
-/build
+**/build
 /out
 /classes
 
@@ -30,3 +30,5 @@ sonar-project.properties
 
 # Vim
 *.swp
+
+.kotlin
