@@ -19,8 +19,12 @@ jobs:
         with:
             distribution: 'temurin'
             java-version: '11'
-            cache: 'gradle'
-
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch) && 'generate-and-submit' || 'disabled' }}
+      
       - name: Test with Gradle
         run: ./gradlew build
 
