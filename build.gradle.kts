@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
     groovy
@@ -42,9 +44,7 @@ repositories {
 sourceSets {
     main {
         java { setSrcDirs(emptyList<String>()) }
-        withConvention(GroovySourceSet::class) {
-            groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }
+        groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
     }
 }
 
@@ -97,14 +97,14 @@ tasks {
     /**
      * set kotlin to depend on groovy
      */
-    named<AbstractCompile>("compileKotlin") {
-        classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
+    named<KotlinCompile>("compileKotlin") {
+        libraries.from(files(sourceSets.main.get().groovy.classesDirectory))
     }
 
     /**
      * set groovy to not depend on Kotlin
      */
-    named<AbstractCompile>("compileGroovy") {
+    named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
 
@@ -196,7 +196,7 @@ signing {
 
 idea {
     module {
-        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
-        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+        testSources.from(testSources.from + sourceSets.integration.get().allSource.srcDirs)
+        testResources.from(testResources.from + sourceSets.integration.get().resources.srcDirs)
     }
 }
