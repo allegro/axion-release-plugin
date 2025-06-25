@@ -34,7 +34,7 @@ public interface ScmRepository {
 
     boolean checkUncommittedChanges();
 
-    boolean checkAheadOfRemote();
+    int numberOfCommitsAheadOrBehindRemote();
 
     boolean isLegacyDefTagnameRepo();
 
