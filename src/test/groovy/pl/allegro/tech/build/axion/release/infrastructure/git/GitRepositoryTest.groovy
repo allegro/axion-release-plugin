@@ -463,7 +463,7 @@ class GitRepositoryTest extends Specification {
 
     def "should pass ahead of remote check when in sync with remote"() {
         expect:
-        !repository.checkAheadOfRemote()
+        !repository.numberOfCommitsAheadOrBehindRemote()
     }
 
     def "should fail ahead of remote check when repository behind remote"() {
@@ -472,7 +472,7 @@ class GitRepositoryTest extends Specification {
         repository.fetchTags(ScmIdentity.defaultIdentityWithoutAgents(), "origin")
 
         expect:
-        repository.checkAheadOfRemote()
+        repository.numberOfCommitsAheadOrBehindRemote()
     }
 
     def "should fail ahead of remote check when repository has local commits"() {
@@ -480,7 +480,7 @@ class GitRepositoryTest extends Specification {
         repository.commit(["*"], "local commit")
 
         expect:
-        repository.checkAheadOfRemote()
+        repository.numberOfCommitsAheadOrBehindRemote()
     }
 
     def "should fail ahead of remote check when on branch with no remote tracking"() {
@@ -496,7 +496,7 @@ class GitRepositoryTest extends Specification {
         rawRepository.branch.change(name: 'new-branch', startPoint: 'new-branch')
 
         when:
-        noRemoteRepository.checkAheadOfRemote()
+        noRemoteRepository.numberOfCommitsAheadOrBehindRemote()
 
         then:
         thrown(ScmException)
