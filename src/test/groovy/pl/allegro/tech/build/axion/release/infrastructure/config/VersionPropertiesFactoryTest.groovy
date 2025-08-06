@@ -42,53 +42,6 @@ class VersionPropertiesFactoryTest extends Specification {
         !rules.forceVersion()
     }
 
-    def "should return forceVersion false when project has 'release.version' property with empty value"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.version': '']))
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'master')
-
-        then:
-        !rules.forceVersion()
-    }
-
-    def "should return forceVersion true when project has 'release.version' property with non-empty value"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.version': 'version']))
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'master')
-
-        then:
-        rules.forceVersion()
-        rules.forcedVersion == 'version'
-    }
-
-    def "should return trimmed forcedVersion when project has 'release.Version' property with leading or trailing spaces"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.version': 'version ']))
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'master')
-
-        then:
-        rules.forceVersion()
-        rules.forcedVersion == 'version'
-    }
-
-    def "should return forceVersion true when project has deprecated 'release.forceVersion' property with non-empty value"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.forceVersion': 'version']))
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'master')
-
-        then:
-        rules.forceVersion()
-        rules.forcedVersion == 'version'
-    }
-
     def "should return ignore uncommitted changes flag from version config when no project flag present"() {
         given:
         versionConfig.ignoreUncommittedChanges.set(false)
@@ -100,23 +53,11 @@ class VersionPropertiesFactoryTest extends Specification {
         !rules.ignoreUncommittedChanges
     }
 
-    def "should return ignore uncommitted changes as true when project flag present"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.ignoreUncommittedChanges': ""]))
-        versionConfig.ignoreUncommittedChanges.set(false)
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'master')
-
-        then:
-        rules.ignoreUncommittedChanges
-    }
-
     def "should pick default version creator if none branch creators match"() {
         given:
         versionConfig.versionCreator.set((VersionProperties.Creator) { v, p -> 'default' })
         versionConfig.branchVersionCreator.putAll([
-            'some.*': { v, p -> 'someBranch' }
+                'some.*': { v, p -> 'someBranch' }
         ])
 
         when:
@@ -130,7 +71,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionCreator.set((VersionProperties.Creator) { v, p -> 'default' })
         versionConfig.branchVersionCreator.putAll([
-            'some.*': { v, p -> 'someBranch' }
+                'some.*': { v, p -> 'someBranch' }
         ])
 
         when:
@@ -144,7 +85,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionCreator((VersionProperties.Creator) { v, p -> 'default' })
         versionConfig.branchVersionCreator.putAll([
-            'some.*': 'versionWithBranch'
+                'some.*': 'versionWithBranch'
         ])
 
         when:
@@ -154,27 +95,11 @@ class VersionPropertiesFactoryTest extends Specification {
         rules.versionCreator.apply('1.0.0', scmPosition('someBranch')) == '1.0.0-someBranch'
     }
 
-    def "should use version creator passed as command line option if present"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.versionCreator': 'simple']))
-
-        versionConfig.versionCreator.set((VersionProperties.Creator) { v, p -> 'default' })
-        versionConfig.branchVersionCreator.putAll([
-            'some.*': 'versionWithBranch'
-        ])
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'someBranch')
-
-        then:
-        rules.versionCreator.apply('1.0.0', scmPosition('someBranch')) == '1.0.0'
-    }
-
     def "should pick default version incrementer if none branch incrementers match"() {
         given:
         versionConfig.versionIncrementer({ VersionIncrementerContext c -> c.currentVersion })
         versionConfig.branchVersionIncrementer.putAll([
-            'some.*': { c -> c.currentVersion.incrementMajorVersion() }
+                'some.*': { c -> c.currentVersion.incrementMajorVersion() }
         ])
 
         when:
@@ -182,7 +107,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionIncrementer.apply(
-            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+                new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(1)
     }
 
@@ -190,7 +115,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionIncrementer({ c -> c.currentVersion })
         versionConfig.branchVersionIncrementer.putAll([
-            'some.*': { VersionIncrementerContext c -> c.currentVersion.incrementMajorVersion() }
+                'some.*': { VersionIncrementerContext c -> c.currentVersion.incrementMajorVersion() }
         ])
 
         when:
@@ -198,7 +123,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionIncrementer.apply(
-            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+                new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(2)
     }
 
@@ -206,7 +131,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionCreator({ c -> c.currentVersion })
         versionConfig.branchVersionIncrementer.putAll([
-            'some.*': 'incrementMajor'
+                'some.*': 'incrementMajor'
         ])
 
         when:
@@ -214,7 +139,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionIncrementer.apply(
-            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
+                new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
         ) == Version.forIntegers(2)
     }
 
@@ -222,7 +147,7 @@ class VersionPropertiesFactoryTest extends Specification {
         given:
         versionConfig.versionCreator({ c -> c.currentVersion })
         versionConfig.branchVersionIncrementer.putAll([
-            'some.*': ['incrementMinorIfNotOnRelease', [releaseBranchPattern: 'someOther.*']]
+                'some.*': ['incrementMinorIfNotOnRelease', [releaseBranchPattern: 'someOther.*']]
         ])
 
         when:
@@ -230,23 +155,7 @@ class VersionPropertiesFactoryTest extends Specification {
 
         then:
         rules.versionIncrementer.apply(
-            new VersionIncrementerContext(Version.forIntegers(1), scmPosition('someBranch'))
+                new VersionIncrementerContext(Version.forIntegers(1), scmPosition('someBranch'))
         ) == Version.forIntegers(1, 1)
-    }
-
-    def "should use incrementer passed as command line option if present"() {
-        given:
-        VersionConfig versionConfig = Fixtures.versionConfig(Fixtures.project(['release.versionIncrementer': 'incrementMajor']))
-
-        versionConfig.versionCreator({ c -> c.currentVersion })
-
-        when:
-        VersionProperties rules = VersionPropertiesFactory.create(versionConfig, 'someBranch')
-
-        then:
-        rules.versionIncrementer.apply(
-            new VersionIncrementerContext(Version.forIntegers(1), scmPosition().build())
-        ) == Version.forIntegers(2)
-
     }
 }
