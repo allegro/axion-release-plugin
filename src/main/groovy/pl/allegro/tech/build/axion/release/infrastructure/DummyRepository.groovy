@@ -100,9 +100,9 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    boolean checkAheadOfRemote() {
+    int numberOfCommitsAheadOrBehindRemote() {
         log('check ahead of remote')
-        return false
+        return 0
     }
 
     @Override

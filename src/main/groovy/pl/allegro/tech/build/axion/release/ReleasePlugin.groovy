@@ -2,12 +2,15 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.invocation.Gradle
 import org.gradle.api.provider.Provider
 import pl.allegro.tech.build.axion.release.domain.SnapshotDependenciesChecker
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 import pl.allegro.tech.build.axion.release.util.FileLoader
+
+import java.util.stream.Stream
 
 abstract class ReleasePlugin implements Plugin<Project> {
 
@@ -26,7 +29,10 @@ abstract class ReleasePlugin implements Plugin<Project> {
         Provider<GithubService> githubService = project.gradle.sharedServices
             .registerIfAbsent("github", GithubService) {}
 
-        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, project.rootProject.layout.projectDirectory)
+        Gradle rootGradle = project.gradle
+        while(rootGradle.parent != null) { rootGradle = rootGradle.parent }
+
+        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, rootGradle.rootProject.layout.projectDirectory)
 
         project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
@@ -78,14 +84,16 @@ abstract class ReleasePlugin implements Plugin<Project> {
     }
 
     private static setGithubOutputsAfterPublishTask(Project project, Provider<GithubService> githubService) {
-        String projectName = project.name
-        Provider<String> projectVersion = project.provider { project.version.toString() }
+        project.allprojects { Project p ->
+            String projectName = p.name
+            Provider<String> projectVersion = p.provider { p.version.toString() }
 
-        project.plugins.withId('maven-publish') {
-            project.tasks.named('publish') { task ->
-                task.usesService(githubService)
-                task.doLast {
-                    githubService.get().setOutput('published-version', projectName, projectVersion.get())
+            p.plugins.withId('maven-publish') {
+                p.tasks.named('publish') { task ->
+                    task.usesService(githubService)
+                    task.doLast {
+                        githubService.get().setOutput('published-version', projectName, projectVersion.get())
+                    }
                 }
             }
         }
@@ -97,8 +105,9 @@ abstract class ReleasePlugin implements Plugin<Project> {
             def releaseOnlyOnReleaseBranches = context.scmService().isReleaseOnlyOnReleaseBranches()
             def releaseBranchNames = context.scmService().getReleaseBranchNames()
             def currentBranch = context.repository().currentPosition().getBranch()
+            def onReleaseBranch = releaseBranchNames.any { pattern -> currentBranch.matches(pattern) }
 
-            def shouldSkipRelease = releaseOnlyOnReleaseBranches && !releaseBranchNames.contains(currentBranch)
+            def shouldSkipRelease = releaseOnlyOnReleaseBranches && !onReleaseBranch
 
             if (shouldSkipRelease) {
                 disableReleaseTasks(currentBranch, releaseBranchNames, project)

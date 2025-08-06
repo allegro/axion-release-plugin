@@ -1,6 +1,6 @@
 name: Build
 
-on: 
+on:
   pull_request:
   workflow_dispatch:
   push:
@@ -19,15 +19,19 @@ jobs:
         with:
             distribution: 'temurin'
             java-version: '11'
-            cache: 'gradle'
-
+      
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch) && 'generate-and-submit' || 'disabled' }}
+      
       - name: Test with Gradle
-        run: ./gradlew --no-daemon --continue check
+        run: ./gradlew build
 
       - name: Jacoco
         run: ./gradlew jacocoTestReport
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

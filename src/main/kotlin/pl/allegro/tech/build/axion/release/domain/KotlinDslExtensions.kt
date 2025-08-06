@@ -1,6 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Action
+import org.gradle.kotlin.dsl.KotlinClosure1
+import org.gradle.kotlin.dsl.KotlinClosure2
 import pl.allegro.tech.build.axion.release.domain.hooks.HookContext
 import pl.allegro.tech.build.axion.release.domain.hooks.HooksConfig
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHookAction
@@ -42,8 +44,8 @@ class ReleaseHooksBuilder(private val hooksConfig: HooksConfig, private val preR
         fileUpdateConfig.execute(fileUpdateSpec)
         val configMap = mapOf(
             "files" to fileUpdateSpec.filesToUpdate,
-            "pattern" to fileUpdateSpec.pattern,
-            "replacement" to fileUpdateSpec.replacement,
+            "pattern" to KotlinClosure2(fileUpdateSpec.pattern),
+            "replacement" to KotlinClosure2(fileUpdateSpec.replacement),
             "encoding" to fileUpdateSpec.encoding
         )
         if (preRelease) {
@@ -54,7 +56,8 @@ class ReleaseHooksBuilder(private val hooksConfig: HooksConfig, private val preR
     }
 
     fun commit(action: (String, ScmPosition) -> String) {
-        val hook = ReleaseHookAction { c: HookContext -> action(c.releaseVersion, c.position) }
+        val commitMessageCreator = { c: HookContext -> action(c.releaseVersion, c.position) }
+        val hook = KotlinClosure1(commitMessageCreator)
         if (preRelease) {
             hooksConfig.pre("commit", hook)
         } else {

@@ -1,26 +1,56 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
-import org.eclipse.jgit.api.*;
+import org.eclipse.jgit.api.AddCommand;
+import org.eclipse.jgit.api.FetchCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.PushCommand;
+import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
-import org.eclipse.jgit.lib.*;
+import org.eclipse.jgit.lib.AnyObjectId;
+import org.eclipse.jgit.lib.BranchTrackingStatus;
+import org.eclipse.jgit.lib.Config;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RemoteConfig;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
+import org.eclipse.jgit.transport.TagOpt;
+import org.eclipse.jgit.transport.URIish;
 import org.eclipse.jgit.treewalk.filter.PathFilter;
 import org.eclipse.jgit.util.SystemReader;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import pl.allegro.tech.build.axion.release.domain.scm.*;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmException;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException;
+import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
 
@@ -387,7 +417,7 @@ public class GitRepository implements ScmRepository {
                 .map(Repository::shortenRefName)
                 .orElse(null);
 
-            if ("HEAD".equals(branchName) && properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
+            if (properties.getOverriddenBranchName() != null && !properties.getOverriddenBranchName().isEmpty()) {
                 branchName = Repository.shortenRefName(properties.getOverriddenBranchName());
             }
             return branchName;
@@ -554,7 +584,7 @@ public class GitRepository implements ScmRepository {
     }
 
     @Override
-    public boolean checkAheadOfRemote() {
+    public int numberOfCommitsAheadOrBehindRemote() {
         try {
             String branchName = jgitRepository.getRepository().getFullBranch();
             BranchTrackingStatus status = BranchTrackingStatus.of(jgitRepository.getRepository(), branchName);
@@ -563,7 +593,14 @@ public class GitRepository implements ScmRepository {
                 throw new ScmException("Branch " + branchName + " is not set to track another branch");
             }
 
-            return status.getAheadCount() != 0 || status.getBehindCount() != 0;
+            if (status.getAheadCount() > 0) {
+                return status.getAheadCount();
+            }
+            if (status.getBehindCount() > 0) {
+                return -status.getBehindCount();
+            }
+            return 0;
+
         } catch (IOException e) {
             throw new ScmException(e);
         }

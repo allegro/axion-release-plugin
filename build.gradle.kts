@@ -5,15 +5,15 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.18.13"
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("pl.allegro.tech.build.axion-release") version "1.18.18"
+    id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.4.5"
     id("com.adarshr.test-logger") version "3.0.0"
 }
 
 scmVersion {
-    versionCreator("versionWithBranch")
+    unshallowRepoOnCI.set(true)
 }
 
 group = "pl.allegro.tech.build"
@@ -48,8 +48,8 @@ sourceSets {
     }
 }
 
-val jgitVersion = "6.10.0.202406032230-r"
-val jschVersion = "0.2.20"
+val jgitVersion = "6.10.1.202505221210-r"
+val jschVersion = "0.2.24"
 val jschAgentVersion = "0.0.9"
 
 dependencies {
@@ -65,21 +65,21 @@ dependencies {
     }
     implementation("com.github.mwiede:jsch:$jschVersion")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.15.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.0") {
+    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
         exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
-    testImplementation("org.testcontainers:spock:1.17.6")
+    testImplementation("org.testcontainers:spock:1.21.1")
     testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
     testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.14.0")
-    testImplementation("org.apache.sshd:sshd-git:2.14.0")
+    testImplementation("org.apache.sshd:sshd-core:2.15.0")
+    testImplementation("org.apache.sshd:sshd-git:2.15.0")
     testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
     testImplementation(gradleTestKit())
 }
@@ -178,6 +178,8 @@ nexusPublishing {
         sonatype {
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }

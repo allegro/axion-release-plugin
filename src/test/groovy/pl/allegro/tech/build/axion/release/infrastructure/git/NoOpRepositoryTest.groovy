@@ -59,10 +59,18 @@ class NoOpRepositoryTest extends Specification {
 
     def "should check ahead of remote on real scm"() {
         given:
-        scm.checkAheadOfRemote() >> true
+        scm.numberOfCommitsAheadOrBehindRemote() >> 1
 
         expect:
-        dryRepository.checkAheadOfRemote()
+        dryRepository.numberOfCommitsAheadOrBehindRemote() == 1
+    }
+
+    def "should check behind remote on real scm"() {
+        given:
+        scm.numberOfCommitsAheadOrBehindRemote() >> -1
+
+        expect:
+        dryRepository.numberOfCommitsAheadOrBehindRemote() == -1
     }
 
 }
