@@ -53,10 +53,10 @@ class BaseIntegrationTest extends RepositoryBasedTest {
 
     BuildResult runGradle(String... arguments) {
         def args = []
-        args.addAll(arguments)
         args.add("--stacktrace")
         args.add("--configuration-cache")
         args.add("--warning-mode=fail")
+        args.addAll(arguments)
 
         try {
             return gradle().withArguments(args).build()
