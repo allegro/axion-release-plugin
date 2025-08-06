@@ -12,8 +12,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-            distribution: 'temurin'
-            java-version: '11'
+            distribution: temurin
+            java-version: 17
             cache: 'gradle'
       - name: Publish to gradle
         run: ./gradlew publishPlugin -Dgradle.publish.key=${GRADLE_PORTAL_KEY} -Dgradle.publish.secret=${GRADLE_PORTAL_SECRET}
