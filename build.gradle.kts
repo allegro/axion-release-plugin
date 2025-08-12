@@ -10,8 +10,8 @@ plugins {
     id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.coditory.integration-test") version "1.4.5"
-    id("com.adarshr.test-logger") version "3.0.0"
+    id("com.coditory.integration-test") version "1.5.1"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 scmVersion {
@@ -44,36 +44,22 @@ repositories {
 sourceSets {
     main {
         java { setSrcDirs(emptyList<String>()) }
-        withConvention(GroovySourceSet::class) {
-            groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }
+        groovy { setSrcDirs(listOf("src/main/java", "src/main/groovy")) }
     }
 }
 
-val jgitVersion = "7.3.0.202506031305-r"
-val jschVersion = "0.2.24"
-
 dependencies {
     api(localGroovy())
-
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
-
-    implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
-        exclude("com.jcraft", "jsch")
-    }
-    implementation("com.github.mwiede:jsch:$jschVersion")
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    runtimeOnly(libs.bundles.jgit.runtime)
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
-        exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
-        exclude("org.eclipse.jgit", "org.eclipse.jgit")
-    }
+    implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
+    implementation("com.github.mwiede:jsch:0.2.26")
+    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+
+    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
     testImplementation("org.testcontainers:spock:1.21.3")
     testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
@@ -90,16 +76,11 @@ tasks {
         jvmArgs = listOf("--add-opens=java.base/java.util=ALL-UNNAMED")
     }
 
-    named("check") {
-        dependsOn(named("test"))
-        dependsOn(named("integrationTest"))
-    }
-
     /**
      * set kotlin to depend on groovy
      */
     named<KotlinCompile>("compileKotlin") {
-        classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
+        libraries.files += files(sourceSets.main.get().groovy.classesDirectory)
     }
 
     /**
@@ -195,4 +176,11 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
+}
+
+idea {
+    module {
+        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
+        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+    }
 }
