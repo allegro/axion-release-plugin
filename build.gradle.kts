@@ -80,7 +80,7 @@ tasks {
      * set kotlin to depend on groovy
      */
     named<KotlinCompile>("compileKotlin") {
-        libraries.files += files(sourceSets.main.get().groovy.classesDirectory)
+        libraries.from(files(sourceSets.main.get().groovy.classesDirectory))
     }
 
     /**
@@ -102,21 +102,18 @@ tasks {
 }
 
 gradlePlugin {
-    testSourceSets(sourceSets.integration.get())
+    website.set("https://github.com/allegro/axion-release-plugin")
+    vcsUrl.set("https://github.com/allegro/axion-release-plugin")
     plugins {
         create("release") {
             id = "pl.allegro.tech.build.axion-release"
-            displayName = "axion-release-plugin"
             implementationClass = "pl.allegro.tech.build.axion.release.ReleasePlugin"
+            displayName = "axion-release-plugin"
+            description = "Release and version management plugin."
+            tags.set(listOf("git", "release", "version", "semver"))
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/allegro/axion-release-plugin"
-    vcsUrl = "https://github.com/allegro/axion-release-plugin"
-    description = "Release and version management plugin."
-    tags = listOf("release", "version")
+    testSourceSets(sourceSets.integration.get())
 }
 
 publishing {
