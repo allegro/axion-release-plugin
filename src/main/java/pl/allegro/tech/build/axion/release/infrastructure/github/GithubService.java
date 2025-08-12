@@ -37,7 +37,7 @@ public abstract class GithubService implements BuildService<BuildServiceParamete
             outputs.forEach((name, valuePerProject) -> {
                 List<String> distinctValues = valuePerProject.values().stream()
                     .distinct()
-                    .collect(toList());
+                    .toList();
 
                 if (distinctValues.size() == 1) {
                     String singleValue = distinctValues.get(0);

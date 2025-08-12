@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
     groovy
@@ -50,7 +52,6 @@ sourceSets {
 
 val jgitVersion = "7.3.0.202506031305-r"
 val jschVersion = "0.2.24"
-val jschAgentVersion = "0.0.9"
 
 dependencies {
     api(localGroovy())
@@ -74,19 +75,19 @@ dependencies {
         exclude("org.eclipse.jgit", "org.eclipse.jgit")
     }
     testImplementation("org.testcontainers:spock:1.21.3")
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
-    testImplementation("cglib:cglib-nodep:3.3.0")
+    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
+    testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
     testImplementation("org.apache.sshd:sshd-git:2.15.0")
-    testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
 
 tasks {
     withType<Test>().configureEach {
         useJUnitPlatform()
+        jvmArgs = listOf("--add-opens=java.base/java.util=ALL-UNNAMED")
     }
 
     named("check") {
@@ -97,14 +98,14 @@ tasks {
     /**
      * set kotlin to depend on groovy
      */
-    named<AbstractCompile>("compileKotlin") {
+    named<KotlinCompile>("compileKotlin") {
         classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
     }
 
     /**
      * set groovy to not depend on Kotlin
      */
-    named<AbstractCompile>("compileGroovy") {
+    named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
 
@@ -194,11 +195,4 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
-}
-
-idea {
-    module {
-        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
-        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
-    }
 }
