@@ -61,7 +61,7 @@ dependencies {
 
     testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
     testImplementation("org.testcontainers:spock:1.21.3")
-    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
+    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
