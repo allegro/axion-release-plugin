@@ -1,0 +1,13 @@
+[versions]
+jgit = "7.3.0.202506031305-r"
+
+[libraries]
+jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
+jgit-gpg-bc = { module = "org.eclipse.jgit:org.eclipse.jgit.gpg.bc", version.ref = "jgit" }
+jgit-ssh-apache = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.apache", version.ref = "jgit" }
+jgit-ssh-jsch = { module = "org.eclipse.jgit:org.eclipse.jgit.ssh.jsch", version.ref = "jgit" }
+jgit-ui = { module = "org.eclipse.jgit:org.eclipse.jgit.ui", version.ref = "jgit" }
+
+[bundles]
+jgit-runtime = ["jgit-ssh-apache", "jgit-ui", "jgit-gpg-bc"]
+jgit-ssh = ["jgit", "jgit-ssh-jsch"]

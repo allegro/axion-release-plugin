@@ -6,7 +6,6 @@ import org.gradle.api.tasks.Input;
 
 import javax.inject.Inject;
 
-@SuppressWarnings("UnstableApiUsage")
 public abstract class ChecksConfig extends BaseExtension {
 
     private static final String DISABLE_UNCOMMITTED_CHANGES_CHECK = "release.disableUncommittedCheck";
@@ -46,10 +45,9 @@ public abstract class ChecksConfig extends BaseExtension {
     }
 
     private Provider<Boolean> enabled(String property) {
-        // if either property is present this feature isn't enabled
+        // if either property is present, this feature isn't enabled
         return gradlePropertyPresent(DISABLE_CHECKS)
             .orElse(gradlePropertyPresent(property))
             .map(it -> false);
     }
-
 }

@@ -88,7 +88,7 @@ class FileUpdateSpec {
         filesToUpdate.add(file)
     }
 
-    var pattern: (String, HookContext) -> String = { previousVersion, context -> "" }
-    var replacement: (String, HookContext) -> String = { currentVersion, context -> "" }
+    var pattern: (String, HookContext) -> String = { _, _ -> "" }
+    var replacement: (String, HookContext) -> String = { _, _ -> "" }
     var encoding: String? = null
 }
