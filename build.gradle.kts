@@ -48,12 +48,12 @@ dependencies {
     api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
-    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
+    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.10.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
     implementation("com.github.mwiede:jsch:0.2.24")
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
     if (GradleVersion.current().version.startsWith("9.")) {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")

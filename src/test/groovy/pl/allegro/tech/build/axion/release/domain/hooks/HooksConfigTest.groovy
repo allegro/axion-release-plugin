@@ -14,8 +14,9 @@ class HooksConfigTest extends Specification {
             null,
             null,
             new ScmPosition("longrev", "shortrev", "brnach"),
-            new Version.Builder().setNormalVersion("0.1.0").build(),
-            new Version.Builder().setNormalVersion("0.1.1").build())
+            Version.parse("0.1.0"),
+            Version.parse("0.1.1")
+        )
     }
 
     def "should cast a version-and-position closure to a CustomAction instance"() {
