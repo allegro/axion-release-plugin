@@ -49,6 +49,7 @@ sourceSets {
 }
 
 dependencies {
+    api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
@@ -58,6 +59,7 @@ dependencies {
     implementation("com.github.mwiede:jsch:0.2.24")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
+    testImplementation("org.apache.groovy:groovy:4.0.28")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
