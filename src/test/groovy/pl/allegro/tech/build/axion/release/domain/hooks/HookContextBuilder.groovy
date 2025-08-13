@@ -17,8 +17,9 @@ class HookContextBuilder {
 
     HookContext build() {
         return new HookContext(
-                null, null, scmService, position,
-                new Version.Builder().setNormalVersion(previousVersion).build(),
-                new Version.Builder().setNormalVersion(currentVersion).build())
+            null, null, scmService, position,
+            Version.parse(previousVersion),
+            Version.parse(currentVersion)
+        )
     }
 }

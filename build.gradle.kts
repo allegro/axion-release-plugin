@@ -53,7 +53,7 @@ dependencies {
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
     implementation("com.github.mwiede:jsch:0.2.24")
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+    implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
     if (GradleVersion.current().version.startsWith("9.")) {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
@@ -66,7 +66,10 @@ dependencies {
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
-    testImplementation("org.testcontainers:spock:1.21.3")
+    testImplementation("org.testcontainers:spock:1.21.3") {
+        exclude("org.apache.commons", "commons-compress")
+    }
+    testImplementation("org.apache.commons:commons-compress:1.28.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
