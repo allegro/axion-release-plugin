@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
 import org.gradle.testkit.runner.TaskOutcome
 
 import java.nio.charset.StandardCharsets
@@ -87,7 +89,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables == output
+        sortedOutput(definedEnvVariables) == output
 
         where:
         task                   | rootProjectVersion | subprojectVersion || output
@@ -138,7 +140,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables == output
+        sortedOutput(definedEnvVariables) == output
 
         where:
         task                   | rootProjectVersion | subprojectVersion || output
@@ -327,5 +329,19 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
 
         then:
         outputFile.getText().isEmpty()
+    }
+
+    def sortedOutput(List<String> values){
+        values.collect {
+            if(it.contains("={")) {
+                def key = it.split("=")[0]
+                def value = it.split("=")[1]
+                value = new JsonSlurperClassic().parseText(value)
+                value = value.sort()
+                value = JsonOutput.toJson(value)
+                return "${key}=${value}"
+            }
+            return it
+        }
     }
 }

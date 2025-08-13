@@ -8,10 +8,13 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
     def "should return version information"() {
         given:
         buildFile("""
-        task outputDecorated { doLast {
-            println "Version: \${scmVersion.version}"
-            println "Previous: \${scmVersion.previousVersion}" //'previousVersion' property smoke test
-        } }
+            task outputDecorated {
+                def scmVersion = project.scmVersion
+                doLast {
+                    println "Version: \${scmVersion.version}"
+                    println "Previous: \${scmVersion.previousVersion}" //'previousVersion' property smoke test
+                }
+            }
         """)
 
         when:
@@ -26,9 +29,12 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
     def "should return version before any decorations at scmVersion.undecoratedVersion"() {
         given:
         buildFile("""
-        task outputUndecorated { doLast {
-            println "Undecorated: \${scmVersion.undecoratedVersion}"
-        } }
+        task outputUndecorated {
+            def scmVersion = project.scmVersion
+            doLast {
+                println "Undecorated: \${scmVersion.undecoratedVersion}"
+            }
+        }
         """)
 
         when:
@@ -42,11 +48,14 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
     def "should return scm position from which version was read at scmVersion.scmPosition"() {
         given:
         buildFile("""
-        task outputPosition { doLast {
-            println "Revision: \${scmVersion.scmPosition.revision}"
-            println "Short revision: \${scmVersion.scmPosition.shortRevision}"
-            println "Branch: \${scmVersion.scmPosition.branch}"
-        } }
+        task outputPosition {
+            def scmVersion = project.scmVersion
+            doLast {
+                println "Revision: \${scmVersion.scmPosition.revision}"
+                println "Short revision: \${scmVersion.scmPosition.shortRevision}"
+                println "Branch: \${scmVersion.scmPosition.branch}"
+            }
+        }
         """)
 
         ScmPosition position = repository.currentPosition()
@@ -67,13 +76,16 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
         repository.tag("prefix4.5.6")
         repository.tag("another7.8.9")
         buildFile("""
-        task uncachedVersion { doLast {
-            println "Default prefix: \${scmVersion.uncached.decoratedVersion}"
-            scmVersion.tag.prefix = "prefix"
-            println "Custom prefix 1: \${scmVersion.uncached.decoratedVersion}"
-            scmVersion.tag.prefix = "another"
-            println "Custom prefix 2: \${scmVersion.uncached.decoratedVersion}"
-        } }
+        task uncachedVersion {
+            def scmVersion = project.scmVersion
+            doLast {
+                println "Default prefix: \${scmVersion.uncached.decoratedVersion}"
+                scmVersion.tag.prefix = "prefix"
+                println "Custom prefix 1: \${scmVersion.uncached.decoratedVersion}"
+                scmVersion.tag.prefix = "another"
+                println "Custom prefix 2: \${scmVersion.uncached.decoratedVersion}"
+            }
+        }
         """)
 
         when:
@@ -91,13 +103,16 @@ class ScmVersionExposedApiIntegrationTest extends BaseIntegrationTest {
         repository.tag("v1.2.3")
         repository.tag("prefix4.5.6")
         buildFile("""
-        task uncachedVersion { doLast {
-            println "Default prefix: \${scmVersion.version}"
-            scmVersion.tag.prefix = "prefix"
-            println "Custom prefix: \${scmVersion.uncached.decoratedVersion}"
-            scmVersion.tag.prefix = "another"
-            println "Cached version: \${scmVersion.version}"
-        } }
+        task uncachedVersion {
+            def scmVersion = project.scmVersion
+            doLast {
+                println "Default prefix: \${scmVersion.version}"
+                scmVersion.tag.prefix = "prefix"
+                println "Custom prefix: \${scmVersion.uncached.decoratedVersion}"
+                scmVersion.tag.prefix = "another"
+                println "Cached version: \${scmVersion.version}"
+            }
+        }
         """)
 
         when:

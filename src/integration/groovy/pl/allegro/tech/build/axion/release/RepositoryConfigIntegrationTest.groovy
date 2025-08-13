@@ -8,6 +8,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
         given:
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "directory: ${scmVersion.repository.directory.get()}"
                 }
@@ -28,6 +29,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
         given:
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "customKey present: ${scmVersion.repository.customKey.isPresent()}"
                     println "customKeyPassword present: ${scmVersion.repository.customKeyPassword.isPresent()}"
@@ -52,6 +54,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
         given:
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "customKey: ${scmVersion.repository.customKey.orNull}"
                     println "customKeyPassword: ${scmVersion.repository.customKeyPassword.orNull}"
@@ -72,6 +75,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
         given:
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "customUsername: ${scmVersion.repository.customUsername.orNull}"
                     println "customPassword: ${scmVersion.repository.customPassword.orNull}"
@@ -95,6 +99,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
 
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "customKeyFile: ${scmVersion.repository.customKeyFile.asFile.orNull?.name}"
                     println "customKeyPassword: ${scmVersion.repository.customKeyPassword.orNull}"
@@ -118,6 +123,7 @@ class RepositoryConfigIntegrationTest extends BaseIntegrationTest {
 
         buildFile('''
             task verifyRepositoryConfig {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "customKey: ${scmVersion.repository.customKey.orNull}"
                     println "customKeyFile: ${scmVersion.repository.customKeyFile.asFile.orNull?.name}"

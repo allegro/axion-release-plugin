@@ -13,6 +13,7 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyVersionProperties {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "sanitizeVersion: ${scmVersion.sanitizeVersion.get()}"
                     println "ignoreUncommittedChanges: ${scmVersion.ignoreUncommittedChanges.get()}"
@@ -21,7 +22,7 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
         ''')
 
         when:
-        def result = runGradle('verifyVersionProperties', '--no-configuration-cache')
+        def result = runGradle('verifyVersionProperties')
 
         then:
         result.task(":verifyVersionProperties").outcome == TaskOutcome.SUCCESS
@@ -29,12 +30,11 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
         result.output.contains("ignoreUncommittedChanges: false")
     }
 
-    def "should use version from 'release.version' property when present"() {
+    def "should use version from 'release.version' property when present (no configuration-cache)"() {
         given:
         buildFile('''
             task verifyVersionProperties {
                 doLast {
-                    def version = project.version
                     println "version: $version"
                 }
             }
@@ -48,12 +48,11 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
         result.output.contains("version: 1.0.0")
     }
 
-    def "should use version from deprecated 'release.forceVersion' property when present"() {
+    def "should use version from deprecated 'release.forceVersion' property when present  (no configuration-cache)"() {
         given:
         buildFile('''
             task verifyVersionProperties {
                 doLast {
-                    def version = project.version
                     println "version: $version"
                 }
             }
@@ -67,6 +66,25 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
         result.output.contains("version: 1.0.0")
     }
 
+    def "should use version from 'release.version' property when present that is supported by configuration-cache"() {
+        given:
+        buildFile('''
+            task verifyVersionProperties {
+                def scmVersion = project.scmVersion
+                doLast {
+                    println "version: $scmVersion.version"
+                }
+            }
+        ''')
+
+        when:
+        def result = runGradle('verifyVersionProperties', '-Prelease.version=1.0.0')
+
+        then:
+        result.task(":verifyVersionProperties").outcome == TaskOutcome.SUCCESS
+        result.output.contains("version: 1.0.0")
+    }
+
     def "should set ignoreUncommittedChanges directly in configuration"() {
         given:
         buildFile('''
@@ -74,6 +92,7 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
                 ignoreUncommittedChanges = true
             }
 
+            def scmVersion = project.scmVersion
             task verifyVersionProperties {
                 doLast {
                     println "ignoreUncommittedChanges: ${scmVersion.ignoreUncommittedChanges.get()}"
@@ -82,7 +101,7 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
         ''')
 
         when:
-        def result = runGradle('verifyVersionProperties', '--no-configuration-cache')
+        def result = runGradle('verifyVersionProperties')
 
         then:
         result.task(":verifyVersionProperties").outcome == TaskOutcome.SUCCESS
@@ -97,15 +116,15 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyVersionCreator {
+                def version = project.version
                 doLast {
-                    def version = project.version
                     println "version: $version"
                 }
             }
         ''')
 
         when:
-        def result = runGradle('verifyVersionCreator', '--no-configuration-cache')
+        def result = runGradle('verifyVersionCreator')
 
         then:
         result.task(":verifyVersionCreator").outcome == TaskOutcome.SUCCESS
@@ -122,15 +141,15 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyVersionCreator {
+                def version = project.version
                 doLast {
-                    def version = project.version
                     println "version: $version"
                 }
             }
         ''')
 
         when:
-        def result = runGradle('verifyVersionCreator', '--no-configuration-cache')
+        def result = runGradle('verifyVersionCreator')
 
         then:
         result.task(":verifyVersionCreator").outcome == TaskOutcome.SUCCESS
@@ -145,15 +164,15 @@ class VersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyVersionCreator {
+                def version = project.version
                 doLast {
-                    def version = project.version
                     println "version: $version"
                 }
             }
         ''')
 
         when:
-        def result = runGradle('verifyVersionCreator', '-Prelease.versionCreator=simple', '--no-configuration-cache')
+        def result = runGradle('verifyVersionCreator', '-Prelease.versionCreator=simple')
 
         then:
         result.task(":verifyVersionCreator").outcome == TaskOutcome.SUCCESS

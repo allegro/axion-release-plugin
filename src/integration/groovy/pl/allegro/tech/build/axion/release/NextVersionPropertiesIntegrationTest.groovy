@@ -15,6 +15,7 @@ class NextVersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyNextVersion {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "nextVersion: ${scmVersion.nextVersion.nextVersionProperties().nextVersion}"
                     println "suffix: ${scmVersion.nextVersion.nextVersionProperties().suffix}"
@@ -44,6 +45,7 @@ class NextVersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyNextVersion {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "nextVersion: ${scmVersion.nextVersion.nextVersionProperties().nextVersion}"
                     println "suffix: ${scmVersion.nextVersion.nextVersionProperties().suffix}"
@@ -73,6 +75,7 @@ class NextVersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyNextVersion {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "nextVersion: ${scmVersion.nextVersion.nextVersionProperties().nextVersion}"
                     println "suffix: ${scmVersion.nextVersion.nextVersionProperties().suffix}"
@@ -102,6 +105,7 @@ class NextVersionPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyNextVersion {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "nextVersion: ${scmVersion.nextVersion.nextVersionProperties().nextVersion}"
                     println "suffix: ${scmVersion.nextVersion.nextVersionProperties().suffix}"

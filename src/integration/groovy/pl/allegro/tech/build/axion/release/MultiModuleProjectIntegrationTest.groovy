@@ -38,6 +38,12 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
         """
     }
 
+    void generateProjectDirectories(File dir, List<String> submodules) {
+        submodules.forEach {
+            new File(dir, it).mkdir()
+        }
+    }
+
     void generateGitIgnoreFile(File dir) {
         File gitIgnore = new File(dir, ".gitignore")
         gitIgnore << """\
@@ -59,6 +65,8 @@ class MultiModuleProjectIntegrationTest extends BaseIntegrationTest {
         }
         '''
         )
+
+        generateProjectDirectories(temporaryFolder, submodules)
         generateSettingsFile(temporaryFolder, submodules)
         generateGitIgnoreFile(temporaryFolder)
 

@@ -16,6 +16,7 @@ class ScmPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyScmProperties {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "remote: ${scmVersion.repository.remote.get()}"
                     println "pushTagsOnly: ${scmVersion.repository.pushTagsOnly.get()}"
@@ -36,6 +37,7 @@ class ScmPropertiesIntegrationTest extends BaseIntegrationTest {
         given:
         buildFile('''
             task verifyScmProperties {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "remote: ${scmVersion.repository.remote.get()}"
                     println "pushTagsOnly: ${scmVersion.repository.pushTagsOnly.get()}"
@@ -62,6 +64,7 @@ class ScmPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyScmProperties {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "pushTagsOnly: ${scmVersion.repository.pushTagsOnly.get()}"
                 }
@@ -87,6 +90,7 @@ class ScmPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyScmProperties {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "pushTagsOnly: ${scmVersion.repository.pushTagsOnly.get()}"
                 }

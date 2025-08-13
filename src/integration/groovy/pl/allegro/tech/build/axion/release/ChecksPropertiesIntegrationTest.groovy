@@ -16,10 +16,11 @@ class ChecksPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyChecks {
+                def checks = scmVersion.checks
                 doLast {
-                    println "aheadOfRemote: ${scmVersion.checks.checkAheadOfRemote().get()}"
-                    println "uncommittedChanges: ${scmVersion.checks.checkUncommittedChanges().get()}"
-                    println "snapshotDependencies: ${scmVersion.checks.checkSnapshotDependencies().get()}"
+                    println "aheadOfRemote: ${checks.checkAheadOfRemote().get()}"
+                    println "uncommittedChanges: ${checks.checkUncommittedChanges().get()}"
+                    println "snapshotDependencies: ${checks.checkSnapshotDependencies().get()}"
                 }
             }
         ''')
@@ -46,10 +47,11 @@ class ChecksPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyChecks {
+                def checks = scmVersion.checks
                 doLast {
-                    println "aheadOfRemote: ${scmVersion.checks.checkAheadOfRemote().get()}"
-                    println "uncommittedChanges: ${scmVersion.checks.checkUncommittedChanges().get()}"
-                    println "snapshotDependencies: ${scmVersion.checks.checkSnapshotDependencies().get()}"
+                    println "aheadOfRemote: ${checks.checkAheadOfRemote().get()}"
+                    println "uncommittedChanges: ${checks.checkUncommittedChanges().get()}"
+                    println "snapshotDependencies: ${checks.checkSnapshotDependencies().get()}"
                 }
             }
         ''')
@@ -76,10 +78,11 @@ class ChecksPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyChecks {
+                def checks = scmVersion.checks
                 doLast {
-                    println "uncommittedChanges: ${scmVersion.checks.checkUncommittedChanges().get()}"
-                    println "aheadOfRemote: ${scmVersion.checks.checkAheadOfRemote().get()}"
-                    println "snapshotDependencies: ${scmVersion.checks.checkSnapshotDependencies().get()}"
+                    println "uncommittedChanges: ${checks.checkUncommittedChanges().get()}"
+                    println "aheadOfRemote: ${checks.checkAheadOfRemote().get()}"
+                    println "snapshotDependencies: ${checks.checkSnapshotDependencies().get()}"
                 }
             }
         ''')
@@ -106,10 +109,11 @@ class ChecksPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyChecks {
+                def checks = scmVersion.checks
                 doLast {
-                    println "aheadOfRemote: ${scmVersion.checks.checkAheadOfRemote().get()}"
-                    println "uncommittedChanges: ${scmVersion.checks.checkUncommittedChanges().get()}"
-                    println "snapshotDependencies: ${scmVersion.checks.checkSnapshotDependencies().get()}"
+                    println "aheadOfRemote: ${checks.checkAheadOfRemote().get()}"
+                    println "uncommittedChanges: ${checks.checkUncommittedChanges().get()}"
+                    println "snapshotDependencies: ${checks.checkSnapshotDependencies().get()}"
                 }
             }
         ''')
@@ -136,10 +140,11 @@ class ChecksPropertiesIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyChecks {
+                def checks = scmVersion.checks
                 doLast {
-                    println "snapshotDependencies: ${scmVersion.checks.checkSnapshotDependencies().get()}"
-                    println "aheadOfRemote: ${scmVersion.checks.checkAheadOfRemote().get()}"
-                    println "uncommittedChanges: ${scmVersion.checks.checkUncommittedChanges().get()}"
+                    println "snapshotDependencies: ${checks.checkSnapshotDependencies().get()}"
+                    println "aheadOfRemote: ${checks.checkAheadOfRemote().get()}"
+                    println "uncommittedChanges: ${checks.checkUncommittedChanges().get()}"
                 }
             }
         ''')
