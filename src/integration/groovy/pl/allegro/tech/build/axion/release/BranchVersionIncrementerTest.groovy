@@ -6,11 +6,9 @@ import org.gradle.testkit.runner.TaskOutcome
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.properties.PropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.di.ScmRepositoryFactory
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
-import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import spock.lang.Specification
 import spock.lang.TempDir
 

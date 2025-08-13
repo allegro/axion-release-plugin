@@ -1,12 +1,5 @@
 package pl.allegro.tech.build.axion.release.infrastructure.git;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Optional;
-
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
-
 import com.jcraft.jsch.AgentConnector;
 import com.jcraft.jsch.AgentIdentityRepository;
 import com.jcraft.jsch.IdentityRepository;
@@ -14,6 +7,12 @@ import com.jcraft.jsch.JUnixSocketFactory;
 import com.jcraft.jsch.PageantConnector;
 import com.jcraft.jsch.SSHAgentConnector;
 import com.jcraft.jsch.UnixDomainSocketFactory;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Optional;
 
 class SshAgentIdentityRepositoryFactory {
 

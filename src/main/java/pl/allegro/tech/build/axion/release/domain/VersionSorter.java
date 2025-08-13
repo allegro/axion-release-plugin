@@ -4,7 +4,13 @@ import com.github.zafarkhaja.semver.Version;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
