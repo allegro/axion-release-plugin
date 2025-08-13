@@ -2,13 +2,7 @@ package pl.allegro.tech.build.axion.release.infrastructure
 
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import pl.allegro.tech.build.axion.release.domain.scm.*
 
 import java.util.regex.Pattern
 

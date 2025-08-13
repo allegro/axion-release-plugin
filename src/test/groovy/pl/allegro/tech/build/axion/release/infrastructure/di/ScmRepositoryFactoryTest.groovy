@@ -2,7 +2,6 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties

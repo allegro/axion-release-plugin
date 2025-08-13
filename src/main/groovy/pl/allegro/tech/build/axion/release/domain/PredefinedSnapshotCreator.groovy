@@ -3,8 +3,6 @@ package pl.allegro.tech.build.axion.release.domain
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
-import java.util.function.BiFunction
-
 enum PredefinedSnapshotCreator {
 
     SIMPLE('simple', { String version, ScmPosition position ->

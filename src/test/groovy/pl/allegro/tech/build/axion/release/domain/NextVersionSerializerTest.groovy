@@ -3,7 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import spock.lang.Specification
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 

@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
+
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition

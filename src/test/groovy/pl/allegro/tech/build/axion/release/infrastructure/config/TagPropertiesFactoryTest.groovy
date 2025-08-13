@@ -6,8 +6,6 @@ import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import spock.lang.Specification
 
-import static org.gradle.testfixtures.ProjectBuilder.builder
-
 class TagPropertiesFactoryTest extends Specification {
 
     private Project project

@@ -6,7 +6,7 @@ import pl.allegro.tech.build.axion.release.domain.properties.*
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import spock.lang.Shared
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder.scmProperties

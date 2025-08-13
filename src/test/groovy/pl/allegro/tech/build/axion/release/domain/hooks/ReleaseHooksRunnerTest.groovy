@@ -3,8 +3,6 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.VersionContext
 import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition

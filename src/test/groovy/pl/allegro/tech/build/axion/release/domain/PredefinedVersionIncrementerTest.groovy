@@ -3,7 +3,7 @@ package pl.allegro.tech.build.axion.release.domain
 import com.github.zafarkhaja.semver.Version
 import spock.lang.Specification
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
 import static pl.allegro.tech.build.axion.release.domain.PredefinedVersionIncrementer.versionIncrementerFor
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
 
