@@ -31,10 +31,6 @@ java {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "ajoberstar-backup"
-        url = uri("https://ajoberstar.org/bintray-backup/")
-    }
 }
 
 /**
