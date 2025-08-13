@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.file.Directory
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -26,7 +27,7 @@ abstract class RepositoryConfig extends BaseExtension {
 
 
     @Inject
-    RepositoryConfig(Directory repositoryDirectory) {
+    RepositoryConfig(Directory repositoryDirectory, ProjectLayout projectLayout) {
         pushTagsOnly.convention(false)
         type.convention("git")
         remote.convention("origin")
@@ -36,7 +37,7 @@ abstract class RepositoryConfig extends BaseExtension {
         customKeyPassword.convention(gradleProperty(CUSTOM_KEY_PASSWORD_PROPERTY))
         customKey.convention(gradleProperty(CUSTOM_KEY_PROPERTY))
         customKeyFile.convention(gradleProperty(CUSTOM_KEY_FILE_PROPERTY)
-            .map({ layout.projectDirectory.file(it) }))
+            .map({ projectLayout.projectDirectory.file(it) }))
         directory.convention(repositoryDirectory.asFile.absolutePath)
     }
 

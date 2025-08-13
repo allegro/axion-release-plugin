@@ -58,8 +58,16 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         args.add("--warning-mode=fail")
         args.addAll(arguments)
 
+        def gradle = gradle()
         try {
-            return gradle().withArguments(args).build()
+            def gradleRequestedVersion = System.getenv("GRADLE_VERSION_TO_TEST")
+            if (gradleRequestedVersion !== null && !gradleRequestedVersion.isEmpty()) {
+                println("Running test with Gradle version: ${gradleRequestedVersion}")
+                gradle.withGradleVersion(gradleRequestedVersion)
+            } else {
+                println("Running test with default Gradle version")
+            }
+            return gradle.withArguments(args).build()
         }
 
         finally {

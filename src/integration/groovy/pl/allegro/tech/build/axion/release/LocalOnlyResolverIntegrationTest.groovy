@@ -12,6 +12,7 @@ class LocalOnlyResolverIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyLocalOnly {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "localOnly: ${scmVersion.localOnly().get()}"
                 }
@@ -34,6 +35,7 @@ class LocalOnlyResolverIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyLocalOnly {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "localOnly: ${scmVersion.localOnly().get()}"
                 }
@@ -56,6 +58,7 @@ class LocalOnlyResolverIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyLocalOnly {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "localOnly: ${scmVersion.localOnly().get()}"
                 }
@@ -78,6 +81,7 @@ class LocalOnlyResolverIntegrationTest extends BaseIntegrationTest {
             }
 
             task verifyLocalOnly {
+                def scmVersion = project.scmVersion
                 doLast {
                     println "localOnly: ${scmVersion.localOnly().get()}"
                 }

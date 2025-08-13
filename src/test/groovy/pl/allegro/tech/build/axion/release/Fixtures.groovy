@@ -11,15 +11,8 @@ import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 
 final class Fixtures {
-    static project(Map<String,String> properties = [:]) {
-        def project = ProjectBuilder.builder().build()
-        project.file("gradle.properties").withWriter { writer ->
-            properties.each {
-                writer.println("${it.key}=${it.value}")
-            }
-        }
-        (project as ProjectInternal).services.get(GradlePropertiesController.class).loadGradlePropertiesFrom(project.projectDir)
-        return project
+    static project() {
+        return ProjectBuilder.builder().build()
     }
 
     static repositoryConfig(Project project = Fixtures.project()) {
