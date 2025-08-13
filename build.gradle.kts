@@ -6,11 +6,10 @@ plugins {
     `maven-publish`
     signing
     jacoco
-    idea
     id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.coditory.integration-test") version "1.5.1"
+    id("com.coditory.integration-test") version "2.2.5"
     id("com.adarshr.test-logger") version "4.0.0"
 }
 
@@ -59,9 +58,13 @@ dependencies {
     implementation("com.github.mwiede:jsch:0.2.24")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
+        exclude("org.codehaus.groovy", "groovy")
+    }
     testImplementation("org.testcontainers:spock:1.21.3")
-    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
+    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
@@ -88,16 +91,6 @@ tasks {
      */
     named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
-    }
-
-    jacocoTestReport {
-        reports {
-            xml.required.set(true)
-        }
-        executionData(
-            file("${layout.buildDirectory.asFile.get()}/jacoco/test.exec"),
-            file("${layout.buildDirectory.asFile.get()}/jacoco/integrationTest.exec"),
-        )
     }
 }
 
@@ -173,11 +166,4 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
-}
-
-idea {
-    module {
-        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
-        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
-    }
 }
