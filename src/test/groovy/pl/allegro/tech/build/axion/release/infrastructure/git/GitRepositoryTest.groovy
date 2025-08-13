@@ -9,13 +9,7 @@ import org.eclipse.jgit.lib.Constants
 import org.eclipse.jgit.transport.RemoteConfig
 import org.eclipse.jgit.transport.URIish
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmException
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
-import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
+import pl.allegro.tech.build.axion.release.domain.scm.*
 import pl.allegro.tech.build.axion.release.util.WithEnvironment
 import spock.lang.Specification
 

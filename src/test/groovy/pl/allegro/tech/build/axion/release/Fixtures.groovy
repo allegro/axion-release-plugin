@@ -1,14 +1,8 @@
 package pl.allegro.tech.build.axion.release
 
 import org.gradle.api.Project
-import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.initialization.GradlePropertiesController
 import org.gradle.testfixtures.ProjectBuilder
-import pl.allegro.tech.build.axion.release.domain.ChecksConfig
-import pl.allegro.tech.build.axion.release.domain.MonorepoConfig
-import pl.allegro.tech.build.axion.release.domain.NextVersionConfig
-import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
-import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.*
 
 final class Fixtures {
     static project() {

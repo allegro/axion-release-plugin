@@ -5,7 +5,8 @@ import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperti
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 import static pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder.nextVersionProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 import static pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder.versionProperties

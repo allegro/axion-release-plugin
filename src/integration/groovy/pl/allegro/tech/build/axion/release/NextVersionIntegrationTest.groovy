@@ -1,7 +1,5 @@
 package pl.allegro.tech.build.axion.release
 
-import org.gradle.testkit.runner.TaskOutcome
-
 class NextVersionIntegrationTest extends BaseIntegrationTest {
 
     def "should fail when passing empty nextVersion.suffix"() {

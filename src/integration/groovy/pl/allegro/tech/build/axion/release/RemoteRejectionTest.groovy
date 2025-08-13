@@ -7,11 +7,7 @@ import org.eclipse.jgit.transport.Transport
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.images.builder.ImageFromDockerfile
 import org.testcontainers.spock.Testcontainers
-import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPropertiesBuilder
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushOptions
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
+import pl.allegro.tech.build.axion.release.domain.scm.*
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.SshConnector
 import spock.lang.Shared

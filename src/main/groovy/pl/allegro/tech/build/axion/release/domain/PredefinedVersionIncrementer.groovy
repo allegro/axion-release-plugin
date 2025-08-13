@@ -41,10 +41,7 @@ enum PredefinedVersionIncrementer {
                 String nextNumberPadded = format("%0" + matcher.group(2).length() + "d", nextNumber)
                 String nextPreReleaseVersion = matcher.group(1) + nextNumberPadded
 
-                return new Version.Builder()
-                    .setNormalVersion(context.currentVersion.normalVersion)
-                    .setPreReleaseVersion(nextPreReleaseVersion)
-                    .build()
+                return context.currentVersion.nextPreReleaseVersion(nextPreReleaseVersion)
             }
         }
 

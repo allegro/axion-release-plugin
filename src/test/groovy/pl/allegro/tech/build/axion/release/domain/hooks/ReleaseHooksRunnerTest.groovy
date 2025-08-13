@@ -3,8 +3,6 @@ package pl.allegro.tech.build.axion.release.domain.hooks
 import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.VersionContext
 import pl.allegro.tech.build.axion.release.domain.properties.HooksProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
@@ -14,13 +12,13 @@ class ReleaseHooksRunnerTest extends Specification {
     private ReleaseHooksRunner runner = new ReleaseHooksRunner(null, null)
 
     private VersionContext version = new VersionContext(
-            new Version.Builder().setNormalVersion('2.0.0-SNAPSHOT').build(),
-            true,
-            new Version.Builder().setNormalVersion('1.0.0').build(),
-            scmPosition('master')
+        Version.parse('2.0.0-SNAPSHOT'),
+        true,
+        Version.parse('1.0.0'),
+        scmPosition('master')
     )
 
-    private Version releaseVersion = new Version.Builder().setNormalVersion('2.0.0').build()
+    private Version releaseVersion = Version.parse('2.0.0')
 
     def "should run all pre-release jobs"() {
         given:
@@ -28,8 +26,8 @@ class ReleaseHooksRunnerTest extends Specification {
         Map versions = [:]
 
         HooksProperties rules = new HooksProperties([
-                { c -> preReleaseRun++ } as ReleaseHookAction,
-                { c -> preReleaseRun++; versions.previous = c.previousVersion; versions.current = c.releaseVersion }  as ReleaseHookAction
+            { c -> preReleaseRun++ } as ReleaseHookAction,
+            { c -> preReleaseRun++; versions.previous = c.previousVersion; versions.current = c.releaseVersion } as ReleaseHookAction
         ], [])
 
         when:
@@ -45,8 +43,8 @@ class ReleaseHooksRunnerTest extends Specification {
         int postReleaseRun = 0
 
         HooksProperties rules = new HooksProperties([], [
-                {c -> postReleaseRun++ } as ReleaseHookAction,
-                {c -> postReleaseRun++ } as ReleaseHookAction
+            { c -> postReleaseRun++ } as ReleaseHookAction,
+            { c -> postReleaseRun++ } as ReleaseHookAction
         ])
 
         when:

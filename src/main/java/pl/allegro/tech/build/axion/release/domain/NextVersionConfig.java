@@ -2,13 +2,13 @@ package pl.allegro.tech.build.axion.release.domain;
 
 import org.gradle.api.provider.Property;
 import org.gradle.api.provider.Provider;
-import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.Internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties;
-import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties.*;
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties.Deserializer;
+import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties.Serializer;
 
 import javax.inject.Inject;
 

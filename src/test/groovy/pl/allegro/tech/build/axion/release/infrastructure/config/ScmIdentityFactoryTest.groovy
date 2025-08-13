@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.infrastructure.config
 
 import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
 import pl.allegro.tech.build.axion.release.Fixtures
 import pl.allegro.tech.build.axion.release.domain.RepositoryConfig
 import pl.allegro.tech.build.axion.release.domain.scm.ScmIdentity

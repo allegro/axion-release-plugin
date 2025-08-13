@@ -15,8 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.stream.Collectors.toList;
-
 public abstract class GithubService implements BuildService<BuildServiceParameters.None>, AutoCloseable {
 
     private static final Logger logger = Logging.getLogger(GithubService.class);

@@ -2,7 +2,7 @@ package pl.allegro.tech.build.axion.release
 
 import org.gradle.testkit.runner.TaskOutcome
 
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.*
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class HighestVersionIntegrationTest extends BaseIntegrationTest {
 

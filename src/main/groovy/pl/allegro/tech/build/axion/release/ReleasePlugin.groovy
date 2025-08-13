@@ -10,8 +10,6 @@ import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionCo
 import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 import pl.allegro.tech.build.axion.release.util.FileLoader
 
-import java.util.stream.Stream
-
 abstract class ReleasePlugin implements Plugin<Project> {
 
     public static final String VERSION_EXTENSION = 'scmVersion'

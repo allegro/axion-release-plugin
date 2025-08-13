@@ -4,9 +4,9 @@ import org.spockframework.runtime.extension.IAnnotationDrivenExtension
 import org.spockframework.runtime.model.FeatureInfo
 import org.spockframework.util.Pair
 
-import static java.util.stream.Collectors.toList
 import static TestEnvironment.setEnvVariable
 import static TestEnvironment.unsetEnvVariable
+import static java.util.stream.Collectors.toList
 
 class WithEnvironmentExtension implements IAnnotationDrivenExtension<WithEnvironment> {
 

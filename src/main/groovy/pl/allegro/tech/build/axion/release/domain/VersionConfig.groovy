@@ -42,7 +42,7 @@ abstract class VersionConfig extends BaseExtension {
         getLocalOnly().convention(false)
         getIgnoreUncommittedChanges().convention(true)
         getUseHighestVersion().convention(false)
-        getUnshallowRepoOnCI().convention(false)
+        getUnshallowRepoOnCI().convention(true)
         getIgnoreGlobalGitConfig().convention(false)
         getReleaseBranchNames().convention(gradlePropertyAsSet(RELEASE_BRANCH_NAMES_PROPERTY).orElse(['master', 'main'] as Set))
         getReleaseOnlyOnReleaseBranches().convention(gradlePropertyPresent(RELEASE_ONLY_ON_RELEASE_BRANCHES_PROPERTY).orElse(false))
