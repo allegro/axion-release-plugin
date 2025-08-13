@@ -65,7 +65,7 @@ dependencies {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
     testImplementation("org.testcontainers:spock:1.21.3") {
         exclude("org.apache.commons", "commons-compress")
     }
