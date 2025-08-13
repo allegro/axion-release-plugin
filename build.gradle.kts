@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    `kotlin-dsl`
     groovy
     `maven-publish`
     signing
     jacoco
     idea
+    id("org.gradle.kotlin.kotlin-dsl") version "6.2.0"
     id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
@@ -48,7 +48,7 @@ dependencies {
     api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
-    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.10.1")
+    runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
@@ -66,7 +66,10 @@ dependencies {
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
-    testImplementation("org.testcontainers:spock:1.21.3")
+    testImplementation("org.testcontainers:spock:1.21.3") {
+        exclude("org.apache.commons", "commons-compress")
+    }
+    testImplementation("org.apache.commons:commons-compress:1.28.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
