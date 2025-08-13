@@ -60,13 +60,13 @@ dependencies {
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
     if (GradleVersion.current().version.startsWith("9.")) {
-        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
-        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
-    } else {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
         testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
             exclude("org.codehaus.groovy", "groovy")
         }
+    } else {
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
