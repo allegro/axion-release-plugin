@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    `kotlin-dsl`
     groovy
     `maven-publish`
     signing
     jacoco
     idea
-    id("org.gradle.kotlin.kotlin-dsl") version "6.2.0"
     id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
