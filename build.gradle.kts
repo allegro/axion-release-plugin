@@ -6,10 +6,11 @@ plugins {
     `maven-publish`
     signing
     jacoco
+    idea
     id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.coditory.integration-test") version "2.2.5"
+    id("com.coditory.integration-test") version "1.5.1"
     id("com.adarshr.test-logger") version "4.0.0"
 }
 
@@ -92,6 +93,16 @@ tasks {
     named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
+
+    jacocoTestReport {
+        reports {
+            xml.required.set(true)
+        }
+        executionData(
+            file("${layout.buildDirectory.asFile.get()}/jacoco/test.exec"),
+            file("${layout.buildDirectory.asFile.get()}/jacoco/integrationTest.exec"),
+        )
+    }
 }
 
 gradlePlugin {
@@ -166,4 +177,13 @@ signing {
         System.getenv("GPG_PRIVATE_KEY_PASSWORD")
     )
     sign(publishing.publications)
+}
+
+idea {
+    idea {
+        module {
+            testSources.from(sourceSets.integration.get().allSource.srcDirs)
+            testResources.from(sourceSets.integration.get().resources.srcDirs)
+        }
+    }
 }
