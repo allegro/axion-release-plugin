@@ -59,9 +59,18 @@ dependencies {
     implementation("com.github.mwiede:jsch:0.2.24")
     implementation("com.github.zafarkhaja:java-semver:0.9.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+    if (GradleVersion.current().version.startsWith("9.")) {
+        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
+            exclude("org.codehaus.groovy", "groovy")
+        }
+    } else {
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
+    }
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
     testImplementation("org.testcontainers:spock:1.21.3")
-    testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.15.0")
@@ -176,8 +185,10 @@ signing {
 }
 
 idea {
-    module {
-        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
-        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+    idea {
+        module {
+            testSources.from(sourceSets.integration.get().allSource.srcDirs)
+            testResources.from(sourceSets.integration.get().resources.srcDirs)
+        }
     }
 }
