@@ -26,7 +26,7 @@ JDK11+ & Gradle 7+ required.
 
 ```kotlin
 plugins {
-    id("pl.allegro.tech.build.axion-release") version "1.18.7"
+    id("pl.allegro.tech.build.axion-release") version "1.19.1"
 }
 
 version = scmVersion.version

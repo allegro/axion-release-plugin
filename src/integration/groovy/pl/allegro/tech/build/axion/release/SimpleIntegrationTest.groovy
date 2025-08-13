@@ -1,19 +1,17 @@
 package pl.allegro.tech.build.axion.release
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurperClassic
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.Rule
-import org.junit.contrib.java.lang.system.EnvironmentVariables
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
+import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable
 import static java.util.stream.Collectors.toList
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
 
 class SimpleIntegrationTest extends BaseIntegrationTest {
-
-    @Rule
-    EnvironmentVariables environmentVariablesRule = new EnvironmentVariables()
 
     def "should return default version on calling currentVersion task on vanilla repo"() {
         given:
@@ -46,8 +44,6 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
                                                                        List<String> output) {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
-        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
-        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
 
         vanillaSettingsFile("""
             rootProject.name = 'root-project'
@@ -87,14 +83,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         repository.commit(['.'], 'Some commit')
 
         when:
-        runGradle(task, '-Prelease.localOnly', '-Prelease.disableChecks')
+        withEnvironmentVariable("GITHUB_ACTIONS", "true").and("GITHUB_OUTPUT", outputFile.getAbsolutePath()).execute(() -> {
+            runGradle(task, '-Prelease.localOnly', '-Prelease.disableChecks')
+        })
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables == output
-
-        cleanup:
-        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+        sortedOutput(definedEnvVariables) == output
 
         where:
         task                   | rootProjectVersion | subprojectVersion || output
@@ -110,8 +105,6 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
                                                                         List<String> output) {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
-        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
-        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
 
         vanillaSettingsFile("""
             rootProject.name = 'root-project'
@@ -141,14 +134,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         )
 
         when:
-        runGradle(task)
+        withEnvironmentVariable("GITHUB_ACTIONS", "true").and("GITHUB_OUTPUT", outputFile.getAbsolutePath()).execute(() -> {
+            runGradle(task)
+        })
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
-        definedEnvVariables == output
-
-        cleanup:
-        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+        sortedOutput(definedEnvVariables) == output
 
         where:
         task                   | rootProjectVersion | subprojectVersion || output
@@ -161,8 +153,6 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should set published-version github output even if root project does not apply maven-publish"() {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
-        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
-        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
 
         vanillaSettingsFile("""
             rootProject.name = 'root-project'
@@ -190,14 +180,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         )
 
         when:
-        runGradle('publish')
+        withEnvironmentVariable("GITHUB_ACTIONS", "true").and("GITHUB_OUTPUT", outputFile.getAbsolutePath()).execute(() -> {
+            runGradle('publish')
+        })
 
         then:
         def definedEnvVariables = outputFile.getText().lines().collect(toList())
         definedEnvVariables == ['published-version=1.0.0']
-
-        cleanup:
-        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
     }
 
     def "should return released version on calling cV on repo with release commit"() {
@@ -330,18 +319,29 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should skip release and no GITHUB_OUTPUT should be written"() {
         given:
         def outputFile = File.createTempFile("github-outputs", ".tmp")
-        environmentVariablesRule.set("GITHUB_ACTIONS", "true")
-        environmentVariablesRule.set("GITHUB_OUTPUT", outputFile.getAbsolutePath())
 
         buildFile('')
 
         when:
-        runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        withEnvironmentVariable("GITHUB_ACTIONS", "true").and("GITHUB_OUTPUT", outputFile.getAbsolutePath()).execute(() -> {
+            runGradle('release', '-Prelease.releaseOnlyOnReleaseBranches', '-Prelease.releaseBranchNames=develop,release', '-Prelease.version=1.0.0', '-Prelease.localOnly', '-Prelease.disableChecks')
+        })
 
         then:
         outputFile.getText().isEmpty()
+    }
 
-        cleanup:
-        environmentVariablesRule.clear("GITHUB_ACTIONS", "GITHUB_OUTPUT")
+    def sortedOutput(List<String> values){
+        values.collect {
+            if(it.contains("={")) {
+                def key = it.split("=")[0]
+                def value = it.split("=")[1]
+                value = new JsonSlurperClassic().parseText(value)
+                value = value.sort()
+                value = JsonOutput.toJson(value)
+                return "${key}=${value}"
+            }
+            return it
+        }
     }
 }

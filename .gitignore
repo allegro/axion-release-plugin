@@ -30,3 +30,4 @@ sonar-project.properties
 
 # Vim
 *.swp
+.kotlin/

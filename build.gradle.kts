@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `kotlin-dsl`
     groovy
@@ -5,11 +7,11 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.18.16"
+    id("pl.allegro.tech.build.axion-release") version "1.19.1"
     id("com.gradle.plugin-publish") version "1.3.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
-    id("com.coditory.integration-test") version "1.4.5"
-    id("com.adarshr.test-logger") version "3.0.0"
+    id("com.coditory.integration-test") version "1.5.1"
+    id("com.adarshr.test-logger") version "4.0.0"
 }
 
 scmVersion {
@@ -23,7 +25,7 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -42,69 +44,58 @@ repositories {
 sourceSets {
     main {
         java { setSrcDirs(emptyList<String>()) }
-        withConvention(GroovySourceSet::class) {
-            groovy.setSrcDirs(listOf("src/main/java", "src/main/groovy"))
-        }
+        groovy { setSrcDirs(listOf("src/main/java", "src/main/groovy")) }
     }
 }
 
-val jgitVersion = "6.10.0.202406032230-r"
-val jschVersion = "0.2.23"
-val jschAgentVersion = "0.0.9"
-
 dependencies {
     api(localGroovy())
-
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ssh.apache:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.ui:$jgitVersion")
-    runtimeOnly("org.eclipse.jgit:org.eclipse.jgit.gpg.bc:$jgitVersion")
-
-    implementation("org.eclipse.jgit:org.eclipse.jgit:$jgitVersion")
-    implementation("org.eclipse.jgit:org.eclipse.jgit.ssh.jsch:$jgitVersion") {
-        exclude("com.jcraft", "jsch")
-    }
-    implementation("com.github.mwiede:jsch:$jschVersion")
-    implementation("com.github.zafarkhaja:java-semver:0.9.0")
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.80")
+    runtimeOnly(libs.bundles.jgit.runtime)
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.16.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
-    testImplementation("org.ajoberstar.grgit:grgit-core:5.3.0") {
-        exclude("org.eclipse.jgit", "org.eclipse.jgit.ui")
-        exclude("org.eclipse.jgit", "org.eclipse.jgit")
+    implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
+    implementation("com.github.mwiede:jsch:0.2.24")
+    implementation("com.github.zafarkhaja:java-semver:0.9.0")
+
+    if (GradleVersion.current().version.startsWith("9.")) {
+        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
+            exclude("org.codehaus.groovy", "groovy")
+        }
+    } else {
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+        testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
-    testImplementation("org.testcontainers:spock:1.17.6")
-    testImplementation("org.spockframework:spock-core:2.3-groovy-3.0")
-    testImplementation("org.spockframework:spock-junit4:2.3-groovy-3.0")
-    testImplementation("cglib:cglib-nodep:3.3.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
+    testImplementation("org.testcontainers:spock:1.21.3")
+    testImplementation("net.bytebuddy:byte-buddy:1.17.6")
     testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.14.0")
-    testImplementation("org.apache.sshd:sshd-git:2.14.0")
-    testImplementation("com.github.stefanbirkner:system-rules:1.19.0")
+    testImplementation("org.apache.sshd:sshd-core:2.15.0")
+    testImplementation("org.apache.sshd:sshd-git:2.15.0")
+    testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
 
 tasks {
     withType<Test>().configureEach {
         useJUnitPlatform()
-    }
-
-    named("check") {
-        dependsOn(named("test"))
-        dependsOn(named("integrationTest"))
+        jvmArgs = listOf("--add-opens=java.base/java.util=ALL-UNNAMED")
     }
 
     /**
      * set kotlin to depend on groovy
      */
-    named<AbstractCompile>("compileKotlin") {
-        classpath += files(sourceSets.main.get().withConvention(GroovySourceSet::class) { groovy }.classesDirectory)
+    named<KotlinCompile>("compileKotlin") {
+        libraries.from(files(sourceSets.main.get().groovy.classesDirectory))
     }
 
     /**
      * set groovy to not depend on Kotlin
      */
-    named<AbstractCompile>("compileGroovy") {
+    named<GroovyCompile>("compileGroovy") {
         classpath = sourceSets.main.get().compileClasspath
     }
 
@@ -120,21 +111,18 @@ tasks {
 }
 
 gradlePlugin {
-    testSourceSets(sourceSets.integration.get())
+    website.set("https://github.com/allegro/axion-release-plugin")
+    vcsUrl.set("https://github.com/allegro/axion-release-plugin")
     plugins {
         create("release") {
             id = "pl.allegro.tech.build.axion-release"
-            displayName = "axion-release-plugin"
             implementationClass = "pl.allegro.tech.build.axion.release.ReleasePlugin"
+            displayName = "axion-release-plugin"
+            description = "Release and version management plugin."
+            tags.set(listOf("git", "release", "version", "semver"))
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/allegro/axion-release-plugin"
-    vcsUrl = "https://github.com/allegro/axion-release-plugin"
-    description = "Release and version management plugin."
-    tags = listOf("release", "version")
+    testSourceSets(sourceSets.integration.get())
 }
 
 publishing {
@@ -178,6 +166,8 @@ nexusPublishing {
         sonatype {
             username.set(System.getenv("SONATYPE_USERNAME"))
             password.set(System.getenv("SONATYPE_PASSWORD"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }
@@ -195,8 +185,10 @@ signing {
 }
 
 idea {
-    module {
-        testSourceDirs = testSourceDirs + sourceSets.integration.get().allSource.srcDirs
-        testResourceDirs = testResourceDirs + sourceSets.integration.get().resources.srcDirs
+    idea {
+        module {
+            testSources.from(sourceSets.integration.get().allSource.srcDirs)
+            testResources.from(sourceSets.integration.get().resources.srcDirs)
+        }
     }
 }

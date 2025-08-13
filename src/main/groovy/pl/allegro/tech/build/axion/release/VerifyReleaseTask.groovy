@@ -48,10 +48,13 @@ abstract class VerifyReleaseTask extends BaseAxionTask {
         boolean remoteAttached = repository.remoteAttached(versionConfig.repository.remote.get())
         def localOnly = localOnlyResolver.localOnly(remoteAttached)
         if (versionConfig.checks.checkAheadOfRemote().get() && !localOnly) {
-            boolean aheadOfRemote = repository.checkAheadOfRemote()
-            logger.quiet("Checking if branch is ahead of remote.. ${aheadOfRemote ? 'FAILED' : ''}")
-            if (aheadOfRemote && !dryRun) {
-                throw new IllegalStateException("Current branch is ahead of remote counterpart - can't release.")
+            int aheadOrBehindCommits = repository.numberOfCommitsAheadOrBehindRemote()
+
+            if (aheadOrBehindCommits > 0 && !dryRun) {
+                throw new IllegalStateException("Current branch is $aheadOrBehindCommits commits ahead of remote - can't release.")
+            }
+            if (aheadOrBehindCommits < 0 && !dryRun) {
+                throw new IllegalStateException("Current branch is ${-aheadOrBehindCommits} commits behind remote - can't release.")
             }
         } else {
             logger.quiet("Skipping ahead of remote check")

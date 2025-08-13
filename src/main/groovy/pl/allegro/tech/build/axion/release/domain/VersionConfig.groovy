@@ -1,7 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import org.gradle.api.Action
-import org.gradle.api.Incubating
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -94,7 +93,6 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getIgnoreGlobalGitConfig()
 
     @Internal
-    @Incubating
     abstract Property<Boolean> getUnshallowRepoOnCI();
 
     @Internal
