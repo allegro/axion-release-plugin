@@ -20,13 +20,13 @@ a release version. If there were any commits after last tag, project is in SNAPS
 intuitive philosophy, alongside with [Semantic Versioning](http://semver.org/) rules, makes it a lot easier to manage
 project versions along SCM tag versions.
 
-JDK11+ & Gradle 7+ required.
+JDK17+ & Gradle 7.6+ required.
 
 ## Basic usage
 
 ```kotlin
 plugins {
-    id("pl.allegro.tech.build.axion-release") version "1.19.1"
+    id("pl.allegro.tech.build.axion-release") version "1.20.0"
 }
 
 version = scmVersion.version
