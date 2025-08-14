@@ -1,0 +1,31 @@
+name: Axion Release Example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Run currentVersion
+        working-directory: examples/simple-gradle-project
+        run: ../../gradlew currentVersion
+      - name: Run release (localOnly)
+        working-directory: examples/simple-gradle-project
+        run: ../../gradlew release -Prelease.localOnly
+      - name: Run currentVersion (after release)
+        working-directory: examples/simple-gradle-project
+        run: ../../gradlew currentVersion
+      - name: Mark next version (minor incrementor)
+        working-directory: examples/simple-gradle-project
+        run: ../../gradlew markNextVersion -Prelease.versionIncrementer=incrementMinor
+      - name: Run currentVersion (after release)
+        working-directory: examples/simple-gradle-project
+        run: ../../gradlew currentVersion
