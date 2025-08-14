@@ -6,7 +6,7 @@ axion-release-plugin
 [![Build Status](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/allegro/axion-release-plugin/actions/workflows/ci.yml)
 [![readthedocs](https://readthedocs.org/projects/axion-release-plugin/badge/?version=latest) ](http://axion-release-plugin.readthedocs.org/en/latest/)
 ![Maven Central](https://img.shields.io/maven-central/v/pl.allegro.tech.build/axion-release-plugin)
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/pl.allegro.tech.build.axion-release?versionPrefix=1.1)](https://plugins.gradle.org/plugin/pl.allegro.tech.build.axion-release)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/pl.allegro.tech.build.axion-release)](https://plugins.gradle.org/plugin/pl.allegro.tech.build.axion-release)
 
 Releasing versions in Gradle is very different from releasing in Maven. Maven came with
 [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin/) which
