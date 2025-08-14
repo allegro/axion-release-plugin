@@ -14,11 +14,11 @@ Many CI servers use shallow clone to optimize repository fetching (for example G
 1 commit from the top of the branch is fetched, `axion-release` doesn't see the latest tag and is unable to determine
 the correct version.
 
-Because of this issue, `axion-release` can automatically unshallow the repository if executed on CI server.
-To enable it, use:
+Because of this issue, `axion-release` will automatically unshallow the repository if executed on CI server.
+To disable it, use:
 
     scmVersion {
-        unshallowRepoOnCI.set(true)
+        unshallowRepoOnCI.set(false)
     }
 
 This behavior is experimental and has been tested on the following CI servers:
