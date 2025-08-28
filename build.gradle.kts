@@ -52,7 +52,7 @@ dependencies {
     runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
-    implementation("com.github.mwiede:jsch:0.2.24")
+    implementation("com.github.mwiede:jsch:2.27.3")
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
 
     if (GradleVersion.current().version.startsWith("9.")) {
