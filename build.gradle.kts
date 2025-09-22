@@ -47,7 +47,7 @@ sourceSets {
 dependencies {
     api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.82")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
     runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
 
