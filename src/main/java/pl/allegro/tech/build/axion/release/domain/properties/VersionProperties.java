@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.domain.properties;
 
 import com.github.zafarkhaja.semver.Version;
 import pl.allegro.tech.build.axion.release.domain.MonorepoConfig;
+import pl.allegro.tech.build.axion.release.domain.VersionContext;
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
@@ -11,6 +12,10 @@ public class VersionProperties {
         String apply(String versionFromTag, ScmPosition position);
     }
 
+    public interface VersionCreator {
+        String apply(String versionFromTag, ScmPosition position, VersionContext versionContext);
+    }
+
     public interface Incrementer {
         Version apply(VersionIncrementerContext versionIncrementerContext);
     }
@@ -18,7 +23,7 @@ public class VersionProperties {
     private final String forcedVersion;
     private final boolean forceSnapshot;
     private final boolean ignoreUncommittedChanges;
-    private final Creator versionCreator;
+    private final VersionCreator versionCreator;
     private final Creator snapshotCreator;
     private final Incrementer versionIncrementer;
     private final boolean sanitizeVersion;
@@ -29,7 +34,7 @@ public class VersionProperties {
         String forcedVersion,
         boolean forceSnapshot,
         boolean ignoreUncommittedChanges,
-        Creator versionCreator,
+        VersionCreator versionCreator,
         Creator snapshotCreator,
         Incrementer versionIncrementer,
         boolean sanitizeVersion,
@@ -63,7 +68,7 @@ public class VersionProperties {
         return ignoreUncommittedChanges;
     }
 
-    public final Creator getVersionCreator() {
+    public final VersionCreator getVersionCreator() {
         return versionCreator;
     }
 

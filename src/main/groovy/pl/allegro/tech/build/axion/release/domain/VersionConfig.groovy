@@ -108,7 +108,7 @@ abstract class VersionConfig extends BaseExtension {
     abstract Property<Boolean> getCreateReleaseCommit()
 
     @Internal
-    abstract Property<VersionProperties.Creator> getVersionCreator()
+    abstract Property<VersionProperties.VersionCreator> getVersionCreator()
 
     @Internal
     abstract Property<VersionProperties.Creator> getSnapshotCreator()
@@ -195,7 +195,7 @@ abstract class VersionConfig extends BaseExtension {
         this.createReleaseCommit.set(createReleaseCommit)
     }
 
-    void versionCreator(VersionProperties.Creator versionCreator) {
+    void versionCreator(VersionProperties.VersionCreator versionCreator) {
         this.versionCreator.set(versionCreator)
     }
 
