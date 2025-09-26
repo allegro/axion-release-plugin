@@ -9,32 +9,32 @@ class PredefinedVersionCreatorTest extends Specification {
 
     def "default version creator should just return version string"() {
         expect:
-        PredefinedVersionCreator.SIMPLE.versionCreator.apply('version',scmPosition('master')) == 'version'
+        PredefinedVersionCreator.SIMPLE.versionCreator.apply('version',scmPosition('master'), null) == 'version'
     }
 
     def "versionWithBranch version creator should return simple version when on master"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('master')) == 'version'
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('master'), null) == 'version'
     }
 
     def "versionWithBranch version creator should return version with appended branch name when not on master"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('branch')) == 'version-branch'
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('branch'), null) == 'version-branch'
     }
 
     def "versionWithCommitHash version creator should return simple version when on main"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('main')) == 'version'
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('main'), null) == 'version'
     }
 
     def "versionWithCommitHash version creator should return version with appended short SHA-1 hash when not on main"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('branch')) == 'version-c143976'
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('branch'), null) == 'version-c143976'
     }
 
     def "should return version creator of given type"() {
         expect:
-        PredefinedVersionCreator.versionCreatorFor('simple').apply('version', null) == 'version'
+        PredefinedVersionCreator.versionCreatorFor('simple').apply('version', null, null) == 'version'
     }
 
     def "should throw exception when trying to obtain undefined version creator"() {

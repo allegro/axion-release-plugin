@@ -106,7 +106,7 @@ class VersionServiceTest extends Specification {
 
     def "should return version information"() {
         given:
-        VersionProperties properties = versionProperties().withVersionCreator({ v, t -> v }).build()
+        VersionProperties properties = versionProperties().withVersionCreator({ v, t, c -> v }).build()
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
             true,
@@ -125,7 +125,7 @@ class VersionServiceTest extends Specification {
 
     def "should sanitize version if flag is set to true"() {
         given:
-        VersionProperties properties = versionProperties().withVersionCreator({ v, t -> return v + '-feature/hello' }).build()
+        VersionProperties properties = versionProperties().withVersionCreator({ v, t, c -> return v + '-feature/hello' }).build()
 
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
             Version.valueOf("1.0.1"),
@@ -145,7 +145,7 @@ class VersionServiceTest extends Specification {
         given:
         VersionProperties properties = versionProperties()
             .dontSanitizeVersion()
-            .withVersionCreator({ v, t -> return v + '-feature/hello' })
+            .withVersionCreator({ v, t, c -> return v + '-feature/hello' })
             .build()
 
         resolver.resolveVersion(properties, tagProperties, nextVersionProperties) >> new VersionContext(
