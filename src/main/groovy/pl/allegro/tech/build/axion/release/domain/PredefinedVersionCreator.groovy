@@ -17,9 +17,8 @@ enum PredefinedVersionCreator {
     }),
 
     VERSION_WITH_BRANCH_WHEN_SNAPSHOT('versionWithBranchWhenSnapshot', { String versionFromTag, ScmPosition position, VersionContext versionContext ->
-        if ((versionContext.position.branch != 'master' && versionContext.position.branch != 'main') && versionContext.position.branch != 'HEAD' &&
-            versionContext.isSnapshot()) {
-            return "$versionFromTag-$versionContext.position.branch".toString()
+        if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD' && versionContext.isSnapshot()) {
+            return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
     }),

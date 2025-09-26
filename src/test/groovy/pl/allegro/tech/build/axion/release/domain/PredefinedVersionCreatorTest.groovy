@@ -4,6 +4,7 @@ package pl.allegro.tech.build.axion.release.domain
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder.scmPosition
+import static pl.allegro.tech.build.axion.release.domain.VersionContextBuilder.versionContext
 
 class PredefinedVersionCreatorTest extends Specification {
 
@@ -20,6 +21,24 @@ class PredefinedVersionCreatorTest extends Specification {
     def "versionWithBranch version creator should return version with appended branch name when not on master"() {
         expect:
         PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('branch'), null) == 'version-branch'
+    }
+
+    def "versionWithBranchWhenSnapshot version creator should return version when on master"() {
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH_WHEN_SNAPSHOT.versionCreator.apply('version', scmPosition('master'),
+            versionContext(scmPosition('master'), false)) == 'version'
+    }
+
+    def "versionWithBranchWhenSnapshot version creator should return version when on not on master and no snapshot"() {
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH_WHEN_SNAPSHOT.versionCreator.apply('version', scmPosition('branch'),
+            versionContext(scmPosition('branch'), false)) == 'version'
+    }
+
+    def "versionWithBranchWhenSnapshot version creator should return version with appended branch name when on not on master and snapshot"() {
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH_WHEN_SNAPSHOT.versionCreator.apply('version', scmPosition('branch'),
+            versionContext(scmPosition('branch'), true)) == 'version-branch'
     }
 
     def "versionWithCommitHash version creator should return simple version when on main"() {
