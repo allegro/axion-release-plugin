@@ -18,7 +18,7 @@ class VersionPropertiesBuilder {
 
     private MonorepoConfig monorepoConfig = Fixtures.monorepoConfig()
 
-    private VersionProperties.Creator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
+    private VersionProperties.VersionCreator versionCreator = PredefinedVersionCreator.SIMPLE.versionCreator
 
     private VersionProperties.Creator snapshotCreator = PredefinedSnapshotCreator.SIMPLE.snapshotCreator
 

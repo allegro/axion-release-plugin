@@ -43,7 +43,7 @@ class VersionPropertiesFactory {
         )
     }
 
-    private static VersionProperties.Creator findVersionCreator(VersionConfig config, String currentBranch) {
+    private static VersionProperties.VersionCreator findVersionCreator(VersionConfig config, String currentBranch) {
         if (config.versionCreatorType().isPresent()) {
             return PredefinedVersionCreator.versionCreatorFor(config.versionCreatorType().get())
         }
@@ -75,14 +75,15 @@ class VersionPropertiesFactory {
     }
 
     private
-    static VersionProperties.Creator find(String currentBranch, Map<String, Object> collection, VersionProperties.Creator defaultValue, Closure<VersionProperties.Creator> converter) {
+    static VersionProperties.VersionCreator find(String currentBranch, Map<String, Object> collection, VersionProperties.VersionCreator defaultValue,
+                                           Closure<VersionProperties.VersionCreator> converter) {
         Object value = collection?.findResult { pattern, value ->
             Pattern.matches(pattern, currentBranch) ? value : null
         }
 
         if (value == null) {
             return defaultValue
-        } else if ((value instanceof Closure) || (value instanceof VersionProperties.Creator)) {
+        } else if ((value instanceof Closure) || (value instanceof VersionProperties.VersionCreator)) {
             return value
         } else {
             return converter.call(value)
