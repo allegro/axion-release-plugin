@@ -1,5 +1,8 @@
 package pl.allegro.tech.build.axion.release.domain.scm
 
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
+
 class ScmPositionBuilder {
 
     private String branch = 'master'
@@ -9,6 +12,8 @@ class ScmPositionBuilder {
     private String shortRevision = 'c143976'
 
     private boolean isClean = true
+
+    private boolean isReleaseBranch = false
 
     private ScmPositionBuilder() {
     }
@@ -22,7 +27,8 @@ class ScmPositionBuilder {
     }
 
     ScmPosition build() {
-        return new ScmPosition(revision, shortRevision, branch, isClean)
+        def isTagRef = branch.startsWith("refs/tags/" + fullPrefix()) || branch.startsWith("refs/tags/" + fullLegacyPrefix());
+        return new ScmPosition(revision, shortRevision, branch, isClean, isReleaseBranch, isTagRef)
     }
 
     ScmPositionBuilder withBranch(String branch) {
@@ -38,6 +44,11 @@ class ScmPositionBuilder {
 
     ScmPositionBuilder withUnclean() {
         this.isClean = false
+        return this
+    }
+
+    ScmPositionBuilder asReleaseBranch() {
+        this.isReleaseBranch = true
         return this
     }
 }
