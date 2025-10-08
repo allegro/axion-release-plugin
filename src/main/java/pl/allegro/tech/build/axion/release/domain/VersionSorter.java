@@ -57,6 +57,10 @@ class VersionSorter {
                 }
 
                 Version version = versionFactory.versionFromTag(tag);
+                if (version == null) {
+                    continue;
+                }
+
                 boolean versionDidNotExist = versions.add(version);
                 boolean isNormalVersion = !isNextVersion;
                 // normal tags have precedence over nextVersion tags with same version

@@ -421,4 +421,18 @@ class VersionResolverTest extends RepositoryBasedTest {
         versionProperties().build() | defaultPrefix()     | '1.1.0' | false
         versionProperties().build() | 'B'+defaultPrefix() | '1.2.0' | false
     }
+
+    def "should ignore invalid tags matching the prefix"() {
+        given:
+        repository.tag('v1.1.0')
+        repository.tag('validators-2.0.0')
+
+        when:
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagRules, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '1.1.0'
+        version.version.toString() == '1.1.0'
+        !version.snapshot
+    }
 }
