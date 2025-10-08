@@ -1,7 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionPropertiesBuilder
-import pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionPropertiesBuilder
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPositionBuilder
@@ -10,6 +10,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit
 import spock.lang.Specification
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
+import static pl.allegro.tech.build.axion.release.domain.properties.TagPropertiesBuilder.tagProperties
 
 /**
  *  Variant matrix that has to be tested:
@@ -23,9 +24,11 @@ class VersionSorterTest extends Specification {
 
     private final VersionSorter sorter = new VersionSorter()
 
+    private final TagProperties tagProperties = tagProperties().build()
+
     private final VersionFactory factory = new VersionFactory(
         VersionPropertiesBuilder.versionProperties().build(),
-        TagPropertiesBuilder.tagProperties().build(),
+        tagProperties().build(),
         NextVersionPropertiesBuilder.nextVersionProperties().build(),
         ScmPositionBuilder.scmPosition().build()
     )
@@ -38,7 +41,8 @@ class VersionSorterTest extends Specification {
             false,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -53,7 +57,8 @@ class VersionSorterTest extends Specification {
             false,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -69,7 +74,8 @@ class VersionSorterTest extends Specification {
             false,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -84,7 +90,8 @@ class VersionSorterTest extends Specification {
             false,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -99,7 +106,8 @@ class VersionSorterTest extends Specification {
             false,
             true,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -114,7 +122,8 @@ class VersionSorterTest extends Specification {
             true,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:
@@ -129,7 +138,8 @@ class VersionSorterTest extends Specification {
             true,
             false,
             ~/.*-alpha$/,
-            factory
+            factory,
+            tagProperties
         )
 
         then:

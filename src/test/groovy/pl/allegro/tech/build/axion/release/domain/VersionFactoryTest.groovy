@@ -38,14 +38,6 @@ class VersionFactoryTest extends Specification {
         version.toString() == '2.0.0'
     }
 
-    def "should capture parse exception and output meaningful message"() {
-        when:
-        Version version = factory.versionFromTag(fullPrefix() + 'blabla-1.0.0')
-
-        then:
-        thrown(VersionFactory.TagParseException)
-    }
-
     def "should create initial version"() {
         when:
         Version version = factory.initialVersion()

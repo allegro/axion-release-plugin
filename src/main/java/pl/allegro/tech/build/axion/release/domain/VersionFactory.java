@@ -48,9 +48,12 @@ public class VersionFactory {
         }
 
         try {
-            return Version.valueOf(
-                tagProperties.getDeserialize().apply(tagProperties, position, tagWithoutNextVersion)
-            );
+            String version = tagProperties.getDeserialize().apply(tagProperties, position, tagWithoutNextVersion);
+            if (version != null) {
+                return Version.parse(version);
+            } else {
+                return null;
+            }
         } catch (ParseException parseException) {
             throw new TagParseException(tagProperties.getPrefix(), tagWithoutNextVersion, parseException);
         }
