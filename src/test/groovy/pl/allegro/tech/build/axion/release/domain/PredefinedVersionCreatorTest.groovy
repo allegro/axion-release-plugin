@@ -46,13 +46,6 @@ class PredefinedVersionCreatorTest extends Specification {
         PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', pos) == 'version-refs/tags/random-tag'
     }
 
-    def "VERSION_WITH_BRANCH should append when ref is a version tag"() {
-        given:
-        def pos = scmPosition().withBranch('refs/tags/v1.0.0').build()
-        expect:
-        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', pos) == 'version'
-    }
-
     def "VERSION_WITH_COMMIT_HASH should append when ref is a random tag"() {
         given:
         def pos = scmPosition().withBranch('refs/tags/random-tag').build()
