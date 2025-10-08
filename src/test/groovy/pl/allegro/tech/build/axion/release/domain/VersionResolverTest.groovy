@@ -435,4 +435,19 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.version.toString() == '1.1.0'
         !version.snapshot
     }
+
+    def "should handle fallback prefix that is a superset of the main prefix"() {
+        given:
+        repository.tag('v1.1.0')
+        repository.tag('validators-2.0.0')
+
+        when:
+        TagProperties tagProps = tagProperties().withFallbackPrefixes(['validators-']).build()
+        VersionContext version = resolver.resolveVersion(defaultVersionRules, tagProps, nextVersionRules)
+
+        then:
+        version.previousVersion.toString() == '2.0.0'
+        version.version.toString() == '2.0.0'
+        !version.snapshot
+    }
 }

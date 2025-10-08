@@ -48,11 +48,14 @@ public class VersionFactory {
         }
 
         try {
-            return Version.valueOf(
-                tagProperties.getDeserialize().apply(tagProperties, position, tagWithoutNextVersion)
-            );
+            String version = tagProperties.getDeserialize().apply(tagProperties, position, tagWithoutNextVersion);
+            if (version != null) {
+                return Version.parse(version);
+            } else {
+                return null;
+            }
         } catch (ParseException parseException) {
-            return null;
+            throw new TagParseException(tagProperties.getPrefix(), tagWithoutNextVersion, parseException);
         }
 
     }
@@ -92,6 +95,12 @@ public class VersionFactory {
         private FinalVersion(Version version, boolean snapshot) {
             this.version = version;
             this.snapshot = snapshot;
+        }
+    }
+
+    public static class TagParseException extends RuntimeException {
+        public TagParseException(String prefix, String parsedText, final ParseException cause) {
+            super("Failed to parse version: " + parsedText + " that matched configured prefix: " + prefix + ". There can be no tags that match the prefix but contain non-SemVer string after the prefix. Detailed message: " + cause.toString());
         }
     }
 }

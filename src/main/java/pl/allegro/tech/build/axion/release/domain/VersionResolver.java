@@ -87,8 +87,8 @@ public class VersionResolver {
             previousTaggedCommit = TaggedCommits.fromLatestCommitBeforeNextVersion(repository, releaseTagPatterns, nextVersionTagPattern, latestChangePosition);
         }
 
-        VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern, versionFactory, forceSnapshot);
-        VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern, versionFactory, forceSnapshot);
+        VersionSorter.Result currentVersionInfo = versionFromTaggedCommits(latestTaggedCommit, false, nextVersionTagPattern, versionFactory, forceSnapshot, tagProperties);
+        VersionSorter.Result previousVersionInfo = versionFromTaggedCommits(previousTaggedCommit, true, nextVersionTagPattern, versionFactory, forceSnapshot, tagProperties);
 
         Version currentVersion = currentVersionInfo.version;
         Version previousVersion = previousVersionInfo.version;
@@ -118,8 +118,8 @@ public class VersionResolver {
 
     }
 
-    private VersionSorter.Result versionFromTaggedCommits(TaggedCommits taggedCommits, boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory, boolean forceSnapshot) {
-        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, forceSnapshot, nextVersionTagPattern, versionFactory);
+    private VersionSorter.Result versionFromTaggedCommits(TaggedCommits taggedCommits, boolean ignoreNextVersionTags, Pattern nextVersionTagPattern, VersionFactory versionFactory, boolean forceSnapshot, TagProperties tagProperties) {
+        return sorter.pickTaggedCommit(taggedCommits, ignoreNextVersionTags, forceSnapshot, nextVersionTagPattern, versionFactory, tagProperties);
     }
 
     private static final class VersionInfo {

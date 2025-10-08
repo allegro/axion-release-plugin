@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import com.github.zafarkhaja.semver.Version
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
@@ -15,7 +16,10 @@ enum TagNameSerializer {
             }
             for (String prefix : rules.allPrefixes) {
                 if (tagName.matches("^" + prefix + rules.versionSeparator + ".*")) {
-                    return tagName.substring(prefix.length() + rules.versionSeparator.length())
+                    String candidate = tagName.substring(prefix.length() + rules.versionSeparator.length())
+                    if (Version.isValid(candidate)) {
+                        return candidate
+                    }
                 }
             }
         }

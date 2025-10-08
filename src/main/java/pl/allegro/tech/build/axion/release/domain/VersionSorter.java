@@ -1,6 +1,9 @@
 package pl.allegro.tech.build.axion.release.domain;
 
 import com.github.zafarkhaja.semver.Version;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pl.allegro.tech.build.axion.release.domain.properties.TagProperties;
 import pl.allegro.tech.build.axion.release.domain.scm.TaggedCommits;
 import pl.allegro.tech.build.axion.release.domain.scm.TagsOnCommit;
 
@@ -28,12 +31,15 @@ import java.util.regex.Pattern;
  */
 class VersionSorter {
 
+    private static final Logger logger = LoggerFactory.getLogger(VersionSorter.class);
+
     Result pickTaggedCommit(
         TaggedCommits taggedCommits,
         boolean ignoreNextVersionTags,
         boolean forceSnapshot,
         Pattern nextVersionTagPattern,
-        VersionFactory versionFactory
+        VersionFactory versionFactory,
+        TagProperties tagProperties
     ) {
         Set<Version> versions = new LinkedHashSet<>();
         LinkedHashMap<Version, Boolean> isVersionNextVersion = new LinkedHashMap<>();
@@ -58,6 +64,9 @@ class VersionSorter {
 
                 Version version = versionFactory.versionFromTag(tag);
                 if (version == null) {
+                    logger.info("Skipping tag '{}' because a valid version can't be deserialized from it. " +
+                        "Probably it matched one of the following prefixes by accident: {}", tag, tagProperties.getAllPrefixes()
+                    );
                     continue;
                 }
 
