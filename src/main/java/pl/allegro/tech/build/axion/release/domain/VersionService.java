@@ -24,7 +24,7 @@ public class VersionService {
 
     public DecoratedVersion currentDecoratedVersion(VersionProperties versionProperties, TagProperties tagRules, NextVersionProperties nextVersionRules) {
         VersionContext versionContext = versionResolver.resolveVersion(versionProperties, tagRules, nextVersionRules);
-        String version = versionProperties.getVersionCreator().apply(versionContext.getVersion().toString(), versionContext.getPosition());
+        String version = versionProperties.getVersionCreator().apply(versionContext.getVersion().toString(), versionContext.getPosition(), versionContext);
 
         if (versionProperties.isSanitizeVersion()) {
             version = sanitizer.sanitize(version);
