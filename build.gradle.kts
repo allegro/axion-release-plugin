@@ -8,7 +8,7 @@ plugins {
     jacoco
     idea
     id("pl.allegro.tech.build.axion-release") version "1.20.1"
-    id("com.gradle.plugin-publish") version "1.3.1"
+    id("com.gradle.plugin-publish") version "2.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.5.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -47,9 +47,9 @@ sourceSets {
 dependencies {
     api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.81")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.82")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.17.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.18.1")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
     implementation("com.github.mwiede:jsch:0.2.24")
@@ -57,15 +57,15 @@ dependencies {
 
     if (GradleVersion.current().version.startsWith("9.")) {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-4.0")
-        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2") {
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.3") {
             exclude("org.codehaus.groovy", "groovy")
         }
     } else {
-        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.2")
+        testImplementation("org.ajoberstar.grgit:grgit-core:5.3.3")
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
     testImplementation("org.testcontainers:spock:1.21.3") {
         exclude("org.apache.commons", "commons-compress")
     }
