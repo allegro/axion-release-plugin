@@ -356,7 +356,7 @@ public class GitRepository implements ScmRepository {
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
         boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
-        boolean isTagRef = isVersionTagRef(properties.getOverriddenBranchName() != null ? properties.getOverriddenBranchName() : branchName) || isHeadOnVersionTagCommit();
+        boolean isTagRef = isHeadOnVersionTagCommit();
         return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isTagRef);
     }
 
@@ -376,11 +376,6 @@ public class GitRepository implements ScmRepository {
             // ignore, treat as not on tag
         }
         return false;
-    }
-
-    private boolean isVersionTagRef(String branchName) {
-        return branchName.startsWith(GIT_TAG_PREFIX + fullPrefix())
-               || branchName.startsWith(GIT_TAG_PREFIX + fullLegacyPrefix());
     }
 
     private String getRevision() {

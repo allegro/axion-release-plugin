@@ -48,6 +48,10 @@ class RepositoryBasedTest extends Specification {
         rawRepository.checkout([branch: branch, createBranch: true])
     }
 
+    void createTag(String tag) {
+        rawRepository.tag.add(name: tag)
+    }
+
     protected String currentVersion() {
         return context.versionService().currentDecoratedVersion(
             context.rules().version,
