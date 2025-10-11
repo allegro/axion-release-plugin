@@ -331,9 +331,24 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         outputFile.getText().isEmpty()
     }
 
-    def sortedOutput(List<String> values){
+    def "should return tag version when on branch created from tagged commit (HEAD on tag, but on branch)"() {
+        given:
+        buildFile('')
+        repository.commit(['.'], 'init')
+        repository.tag(fullPrefix() + '1.2.3')
+        checkout('feature/test')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('Project version: 1.2.3')
+        result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
+    }
+
+    def sortedOutput(List<String> values) {
         values.collect {
-            if(it.contains("={")) {
+            if (it.contains("={")) {
                 def key = it.split("=")[0]
                 def value = it.split("=")[1]
                 value = new JsonSlurperClassic().parseText(value)

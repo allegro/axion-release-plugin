@@ -60,6 +60,20 @@ class PredefinedVersionCreatorTest extends Specification {
         PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', pos) == 'version'
     }
 
+    def "VERSION_WITH_BRANCH should not append branch name when isTagRef is true (HEAD on tag, but on branch)"() {
+        given:
+        def pos = scmPosition().withBranch('feature/branch').withTagRef().build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', pos) == 'version'
+    }
+
+    def "VERSION_WITH_COMMIT_HASH should not append hash when isTagRef is true (HEAD on tag, but on branch)"() {
+        given:
+        def pos = scmPosition().withBranch('feature/branch').withTagRef().build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', pos) == 'version'
+    }
+
     def "should return version creator of given type"() {
         expect:
         PredefinedVersionCreator.versionCreatorFor('simple').apply('version', null) == 'version'

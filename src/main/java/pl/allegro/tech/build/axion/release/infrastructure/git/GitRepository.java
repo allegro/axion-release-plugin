@@ -52,6 +52,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -354,8 +356,26 @@ public class GitRepository implements ScmRepository {
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
         boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
-        boolean isTagRef = isVersionTagRef(properties.getOverriddenBranchName() != null ? properties.getOverriddenBranchName() : branchName);
+        boolean isTagRef = isVersionTagRef(properties.getOverriddenBranchName() != null ? properties.getOverriddenBranchName() : branchName) || isHeadOnVersionTagCommit();
         return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isTagRef);
+    }
+
+    private boolean isHeadOnVersionTagCommit() {
+        try {
+            ObjectId head = head();
+            List<Ref> versionTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix());
+            List<Ref> legacyVersionTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix());
+            List<Ref> allTags = Stream.concat(versionTags.stream(), legacyVersionTags.stream()).collect(Collectors.toList());
+            allTags.addAll(legacyVersionTags);
+            for (Ref tagRef : allTags) {
+                if (tagRef.getObjectId() != null && tagRef.getObjectId().equals(head)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            // ignore, treat as not on tag
+        }
+        return false;
     }
 
     private boolean isVersionTagRef(String branchName) {
