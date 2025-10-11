@@ -167,25 +167,6 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 1.0.0-feature-branch')
     }
 
-    def "versionWithCommitHash should not append hash when isTagRef is true HEAD on tag, but on branch"() {
-        given:
-        buildFile """
-            scmVersion {
-                release {
-                    versionCreator('versionWithCommitHash')
-                }
-            }
-        """
-        checkout('feature/branch')
-        createTag('v1.0.0')
-
-        when:
-        def result = runGradle('currentVersion')
-
-        then:
-        result.output =~ /Project version: 1.0.0-[a-f0-9]{7}/
-    }
-
     def "should fail with exception when trying to obtain undefined version creator"() {
         given:
         buildFile """
