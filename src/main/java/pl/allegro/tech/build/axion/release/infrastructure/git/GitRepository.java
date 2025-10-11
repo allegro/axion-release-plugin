@@ -56,6 +56,7 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
+import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix;
 
 public class GitRepository implements ScmRepository {
     private static final Logger logger = Logging.getLogger(GitRepository.class);
@@ -208,7 +209,7 @@ public class GitRepository implements ScmRepository {
 
         Optional<RemoteRefUpdate> failedRefUpdate = pushResult.getRemoteUpdates().stream().filter(ref ->
             !ref.getStatus().equals(RemoteRefUpdate.Status.OK)
-                && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
+            && !ref.getStatus().equals(RemoteRefUpdate.Status.UP_TO_DATE)
         ).findFirst();
 
         boolean isSuccess = failedRefUpdate.isEmpty();
@@ -308,7 +309,9 @@ public class GitRepository implements ScmRepository {
         return new ScmPosition(
             lastCommit.getName(),
             currentPosition.getBranch(),
-            currentPosition.getIsClean()
+            currentPosition.getIsClean(),
+            currentPosition.getIsReleaseBranch(),
+            currentPosition.getIsTagRef()
         );
     }
 
@@ -350,7 +353,14 @@ public class GitRepository implements ScmRepository {
         String revision = getRevision();
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
-        return new ScmPosition(revision, branchName, isClean);
+        boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
+        boolean isTagRef = isVersionTagRef(properties.getOverriddenBranchName() != null ? properties.getOverriddenBranchName() : branchName);
+        return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isTagRef);
+    }
+
+    private boolean isVersionTagRef(String branchName) {
+        return branchName.startsWith(GIT_TAG_PREFIX + fullPrefix())
+               || branchName.startsWith(GIT_TAG_PREFIX + fullLegacyPrefix());
     }
 
     private String getRevision() {
@@ -620,7 +630,7 @@ public class GitRepository implements ScmRepository {
             List<Ref> call = jgitRepository.tagList().call();
             if (call.isEmpty()) return false;
 
-            return call.stream().allMatch(ref -> ref.getName().startsWith("refs/tags/" + fullLegacyPrefix()));
+            return call.stream().allMatch(ref -> ref.getName().startsWith(GIT_TAG_PREFIX + fullLegacyPrefix()));
         } catch (GitAPIException e) {
             throw new ScmException(e);
         }

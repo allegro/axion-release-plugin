@@ -12,24 +12,52 @@ class PredefinedVersionCreatorTest extends Specification {
         PredefinedVersionCreator.SIMPLE.versionCreator.apply('version',scmPosition('master')) == 'version'
     }
 
-    def "versionWithBranch version creator should return simple version when on master"() {
+    def "versionWithBranch should not append on release branch"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('master')) == 'version'
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition().withBranch('release').asReleaseBranch().build()) == 'version'
     }
 
-    def "versionWithBranch version creator should return version with appended branch name when not on master"() {
+    def "versionWithBranch should append branch name when not on release branch"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('branch')) == 'version-branch'
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', scmPosition('feature/branch')) == 'version-feature/branch'
     }
 
-    def "versionWithCommitHash version creator should return simple version when on main"() {
+    def "versionWithCommitHash should not append on release branch"() {
         expect:
-        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('main')) == 'version'
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition().withBranch('release').asReleaseBranch().build()) == 'version'
     }
 
-    def "versionWithCommitHash version creator should return version with appended short SHA-1 hash when not on main"() {
+    def "versionWithCommitHash should append short SHA-1 hash when not on release branch"() {
         expect:
         PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', scmPosition('branch')) == 'version-c143976'
+    }
+
+    def "VERSION_WITH_BRANCH should not append when ref is a version tag"() {
+        given:
+        def pos = scmPosition().withBranch('refs/tags/v1.0.0').build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', pos) == 'version'
+    }
+
+    def "VERSION_WITH_BRANCH should not append when ref is a random tag"() {
+        given:
+        def pos = scmPosition().withBranch('refs/tags/random-tag').build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_BRANCH.versionCreator.apply('version', pos) == 'version-refs/tags/random-tag'
+    }
+
+    def "VERSION_WITH_COMMIT_HASH should append when ref is a random tag"() {
+        given:
+        def pos = scmPosition().withBranch('refs/tags/random-tag').build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', pos) == 'version-c143976'
+    }
+
+    def "VERSION_WITH_COMMIT_HASH should not append when ref is a version tag"() {
+        given:
+        def pos = scmPosition().withBranch('refs/tags/v1.0.0').build()
+        expect:
+        PredefinedVersionCreator.VERSION_WITH_COMMIT_HASH.versionCreator.apply('version', pos) == 'version'
     }
 
     def "should return version creator of given type"() {

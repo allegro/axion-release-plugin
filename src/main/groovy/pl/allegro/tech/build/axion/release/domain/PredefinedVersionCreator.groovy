@@ -10,14 +10,14 @@ enum PredefinedVersionCreator {
     }),
 
     VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
-        if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD') {
+        if (!position.isReleaseBranch && position.branch != 'HEAD' && !position.isTagRef) {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
     }),
 
     VERSION_WITH_COMMIT_HASH('versionWithCommitHash', { String versionFromTag, ScmPosition position ->
-    if ((position.branch != 'master' && position.branch != 'main') && position.branch != 'HEAD') {
+    if (!position.isReleaseBranch && position.branch != 'HEAD' && !position.isTagRef) {
         return "$versionFromTag-$position.shortRevision".toString()
     }
     return versionFromTag
