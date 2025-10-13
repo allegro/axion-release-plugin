@@ -1,7 +1,7 @@
 package pl.allegro.tech.build.axion.release
 
 class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
-    def "default version creator should just return version string"() {
+    def "simple version creator should just return version string"() {
         given:
         buildFile("""
             scmVersion {
@@ -15,7 +15,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 0.1.0-SNAPSHOT')
+        result.output.contains('Project version: 0.1.0-SNAPSHOT\n')
     }
 
     def "versionWithBranch should append branch name when not on release branch"() {
@@ -33,7 +33,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 0.1.0-test-branch-SNAPSHOT')
+        result.output.contains('Project version: 0.1.0-test-branch-SNAPSHOT\n')
     }
 
     def "versionWithBranch should not append branch name when on release branch"() {
@@ -51,7 +51,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0')
+        result.output.contains('Project version: 1.0.0\n')
     }
 
     def "versionWithBranch should not append branch name when current ref is a version tag"() {
@@ -70,7 +70,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output =~ /Project version: 1.0.0/
+        result.output.contains('Project version: 1.0.0\n')
     }
 
     def "versionWithCommitHash should append hash when not on release branch"() {
@@ -88,7 +88,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output =~ /Project version: 0.1.0-[a-f0-9]{7}-SNAPSHOT/
+        result.output =~ /Project version: 0.1.0-[a-f0-9]{7}-SNAPSHOT\n/
     }
 
     def "versionWithCommitHash should not append hash on release branch"() {
@@ -106,7 +106,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0')
+        result.output.contains('Project version: 1.0.0\n')
     }
 
     def "versionWithCommitHash should not append hash when current ref is a version tag"() {
@@ -125,7 +125,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output =~ /Project version: 1.0.0/
+        result.output.contains('Project version: 1.0.0\n')
     }
 
     def "versionWithCommitHash should not append when ref is a random tag"() {
@@ -145,7 +145,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output =~ /Project version: 0.1.0-SNAPSHOT/
+        result.output.contains('Project version: 0.1.0-SNAPSHOT\n')
     }
 
     def "versionWithBranch should not append branch name when HEAD on tag, but "() {
@@ -164,7 +164,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0-feature-branch')
+        result.output.contains('Project version: 1.0.0-feature-branch\n')
     }
 
     def "should fail with exception when trying to obtain undefined version creator"() {

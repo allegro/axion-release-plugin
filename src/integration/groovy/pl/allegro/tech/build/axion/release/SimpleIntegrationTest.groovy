@@ -342,7 +342,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.2.3')
+        result.output.contains('Project version: 1.2.3\n')
         result.task(":currentVersion").outcome == TaskOutcome.SUCCESS
     }
 
