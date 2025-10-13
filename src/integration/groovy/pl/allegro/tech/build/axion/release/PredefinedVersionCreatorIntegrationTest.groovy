@@ -36,6 +36,25 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 0.1.0-test-branch-SNAPSHOT\n')
     }
 
+    def "versionWithBranch should append branch name without SNAPSHOT suffix when not on release branch but on tag"() {
+        given:
+        buildFile """
+        scmVersion {
+            release {
+                versionCreator('versionWithBranch')
+            }
+        }
+    """
+
+        when:
+        createTag('v1.0.0')
+        checkout("test-branch")
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('Project version: 1.0.0-test-branch\n')
+    }
+
     def "versionWithBranch should not append branch name when on release branch"() {
         given:
         buildFile """

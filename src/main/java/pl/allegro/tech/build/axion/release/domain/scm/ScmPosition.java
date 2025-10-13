@@ -9,15 +9,15 @@ public class ScmPosition {
     private final String branch;
     private final boolean isClean;
     private final boolean isReleaseBranch;
-    private final boolean isTagRef;
+    private final boolean isHeadOnVersionTagCommit;
 
-    public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch, boolean isTagRef) {
+    public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch, boolean isHeadOnVersionTagCommit) {
         this.revision = revision;
         this.shortRevision = shortRevision;
         this.branch = branch;
         this.isClean = isClean;
         this.isReleaseBranch = isReleaseBranch;
-        this.isTagRef = isTagRef;
+        this.isHeadOnVersionTagCommit = isHeadOnVersionTagCommit;
     }
 
     public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch) {
@@ -32,7 +32,7 @@ public class ScmPosition {
         this(revision, shortRevision, branch, true, false, false);
     }
 
-    public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch, boolean isTagRef) {
+    public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch, boolean isHeadOnVersionTagCommit) {
         this.revision = revision;
         if (revision.length() > 7) {
             this.shortRevision = revision.substring(0, 7);
@@ -42,7 +42,7 @@ public class ScmPosition {
         this.branch = branch;
         this.isClean = isClean;
         this.isReleaseBranch = isReleaseBranch;
-        this.isTagRef = isTagRef;
+        this.isHeadOnVersionTagCommit = isHeadOnVersionTagCommit;
     }
 
     public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch) {
@@ -60,11 +60,11 @@ public class ScmPosition {
     @Override
     public String toString() {
         return "ScmPosition[revision = " + revision
-            + ", shortRevision = " + shortRevision
-            + ", branch = " + branch
-            + ", isClean = " + isClean
-            + ", isReleaseBranch = " + isReleaseBranch
-            + ", isTagRef = " + isTagRef + "]";
+               + ", shortRevision = " + shortRevision
+               + ", branch = " + branch
+               + ", isClean = " + isClean
+               + ", isReleaseBranch = " + isReleaseBranch
+               + ", isHeadOnVersionTagCommit = " + isHeadOnVersionTagCommit + "]";
     }
 
     @Input
@@ -93,7 +93,7 @@ public class ScmPosition {
     }
 
     @Input
-    public boolean getIsTagRef() {
-        return isTagRef;
+    public boolean getIsHeadOnVersionTagCommit() {
+        return isHeadOnVersionTagCommit;
     }
 }

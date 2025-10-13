@@ -313,7 +313,7 @@ public class GitRepository implements ScmRepository {
             currentPosition.getBranch(),
             currentPosition.getIsClean(),
             currentPosition.getIsReleaseBranch(),
-            currentPosition.getIsTagRef()
+            currentPosition.getIsHeadOnVersionTagCommit()
         );
     }
 
@@ -363,15 +363,10 @@ public class GitRepository implements ScmRepository {
     private boolean isHeadOnVersionTagCommit() {
         try {
             ObjectId head = head();
-            List<Ref> versionTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix());
-            List<Ref> legacyVersionTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix());
-            List<Ref> allTags = Stream.concat(versionTags.stream(), legacyVersionTags.stream()).collect(Collectors.toList());
-            allTags.addAll(legacyVersionTags);
-            for (Ref tagRef : allTags) {
-                if (tagRef.getObjectId() != null && tagRef.getObjectId().equals(head)) {
-                    return true;
-                }
-            }
+            return Stream.concat(
+                jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix()).stream(),
+                jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix()).stream()
+            ).anyMatch(tagRef -> tagRef.getObjectId() != null && tagRef.getObjectId().equals(head));
         } catch (Exception e) {
             // ignore, treat as not on tag
         }
