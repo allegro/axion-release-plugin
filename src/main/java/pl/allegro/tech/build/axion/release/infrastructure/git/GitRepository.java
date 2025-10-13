@@ -52,8 +52,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
@@ -363,10 +361,14 @@ public class GitRepository implements ScmRepository {
     private boolean isHeadOnVersionTagCommit() {
         try {
             ObjectId head = head();
-            return Stream.concat(
-                jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix()).stream(),
-                jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix()).stream()
-            ).anyMatch(tagRef -> tagRef.getObjectId() != null && tagRef.getObjectId().equals(head));
+            List<Ref> allTags = new ArrayList<>();
+            allTags.addAll(jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix()));
+            allTags.addAll(jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix()));
+            for (Ref tagRef : allTags) {
+                ObjectId objectId = tagRef.getObjectId();
+                ObjectId peeledObjectId = jgitRepository.getRepository().getRefDatabase().peel(tagRef).getPeeledObjectId();
+                return (objectId != null && objectId.equals(head)) || (peeledObjectId != null && peeledObjectId.equals(head));
+            }
         } catch (Exception e) {
             // ignore, treat as not on tag
         }

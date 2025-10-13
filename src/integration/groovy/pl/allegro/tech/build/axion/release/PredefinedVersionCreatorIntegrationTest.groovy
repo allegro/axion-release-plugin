@@ -36,15 +36,15 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 0.1.0-test-branch-SNAPSHOT\n')
     }
 
-    def "versionWithBranch should append branch name without SNAPSHOT suffix when not on release branch but on tag"() {
+    def "versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag"() {
         given:
         buildFile """
-        scmVersion {
-            release {
-                versionCreator('versionWithBranch')
+            scmVersion {
+                release {
+                    versionCreator('versionWithBranch')
+                }
             }
-        }
-    """
+        """
 
         when:
         createTag('v1.0.0')
@@ -52,7 +52,26 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0-test-branch\n')
+        result.output.contains('Project version: 1.0.0\n')
+    }
+
+    def "versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag when HEAD has version tag"() {
+        given:
+        buildFile """
+            scmVersion {
+                release {
+                    versionCreator('versionWithBranch')
+                }
+            }
+        """
+        checkout('feature/branch')
+        createTag('v1.0.0')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('Project version: 1.0.0\n')
     }
 
     def "versionWithBranch should not append branch name when on release branch"() {
@@ -165,25 +184,6 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
 
         then:
         result.output.contains('Project version: 0.1.0-SNAPSHOT\n')
-    }
-
-    def "versionWithBranch should not append branch name when HEAD on tag, but "() {
-        given:
-        buildFile """
-            scmVersion {
-                release {
-                    versionCreator('versionWithBranch')
-                }
-            }
-        """
-        checkout('feature/branch')
-        createTag('v1.0.0')
-
-        when:
-        def result = runGradle('currentVersion')
-
-        then:
-        result.output.contains('Project version: 1.0.0-feature-branch\n')
     }
 
     def "should fail with exception when trying to obtain undefined version creator"() {
