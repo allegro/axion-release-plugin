@@ -56,7 +56,6 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix;
 
 public class GitRepository implements ScmRepository {
     private static final Logger logger = Logging.getLogger(GitRepository.class);
@@ -354,16 +353,14 @@ public class GitRepository implements ScmRepository {
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
         boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
-        boolean isTagRef = isHeadOnVersionTagCommit();
-        return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isTagRef);
+        boolean isHeadOnVersionTagCommit = isHeadOnVersionTagCommit();
+        return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isHeadOnVersionTagCommit);
     }
 
     private boolean isHeadOnVersionTagCommit() {
         try {
             ObjectId head = head();
-            List<Ref> allTags = new ArrayList<>();
-            allTags.addAll(jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullPrefix()));
-            allTags.addAll(jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + fullLegacyPrefix()));
+            List<Ref> allTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + properties.tagPrefix());
             for (Ref tagRef : allTags) {
                 ObjectId objectId = tagRef.getObjectId();
                 ObjectId peeledObjectId = jgitRepository.getRepository().getRefDatabase().peel(tagRef).getPeeledObjectId();
@@ -598,6 +595,7 @@ public class GitRepository implements ScmRepository {
             // the logic to get the isClean-property is inverted
             return !overriddenIsClean.get();
         }
+        if (properties.isIgnoreUncommittedChanges()) return false;
         try {
             return !jgitRepository.status().call().isClean();
         } catch (GitAPIException e) {

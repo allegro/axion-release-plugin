@@ -41,7 +41,9 @@ class RepositoryBasedTest extends Specification {
         )
 
         repository = context.repository()
-        repository.commit(['*'], 'initial commit')
+        def fileTreeBuilder = new FileTreeBuilder(temporaryFolder)
+        fileTreeBuilder.file(".gitignore", "build.gradle\nbuild/\n.gradle/\n")
+        repository.commit(['.'], 'initial commit')
     }
 
     void checkout(String branch) {

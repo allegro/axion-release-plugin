@@ -111,6 +111,52 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 1.0.0\n')
     }
 
+    def "versionWithBranch should append branch name when on version tag but with uncommitted changes and ignoreUncommittedChanges is set to false"() {
+        given:
+        buildFile """
+            scmVersion {
+                ignoreUncommittedChanges.set(false)
+                release {
+                    versionCreator('versionWithBranch')
+                }
+            }
+        """
+
+        and:
+        createTag('v1.0.0')
+        checkout("test-branch")
+        newFile('dirty.txt')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('Project version: 1.0.1-test-branch-SNAPSHOT\n')
+    }
+
+    def "versionWithBranch should not append branch name when on version tag but with uncommitted changes and ignoreUncommittedChanges is set to true"() {
+        given:
+        buildFile """
+            scmVersion {
+                ignoreUncommittedChanges.set(true)
+                release {
+                    versionCreator('versionWithBranch')
+                }
+            }
+        """
+
+        and:
+        createTag('v1.0.0')
+        checkout("test-branch")
+        newFile('dirty.txt')
+
+        when:
+        def result = runGradle('currentVersion')
+
+        then:
+        result.output.contains('Project version: 1.0.0\n')
+    }
+
     def "versionWithCommitHash should append hash when not on release branch"() {
         given:
         buildFile """

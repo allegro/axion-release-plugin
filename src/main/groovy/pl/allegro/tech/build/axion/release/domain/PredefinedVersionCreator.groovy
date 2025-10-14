@@ -10,17 +10,17 @@ enum PredefinedVersionCreator {
     }),
 
     VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
-        if (!position.isReleaseBranch && position.branch != 'HEAD' && !position.isHeadOnVersionTagCommit) {
+        if (!position.isReleaseBranch && position.branch != 'HEAD' && (!position.isHeadOnVersionTagCommit || !position.isClean)) {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
     }),
 
     VERSION_WITH_COMMIT_HASH('versionWithCommitHash', { String versionFromTag, ScmPosition position ->
-    if (!position.isReleaseBranch && position.branch != 'HEAD' && !position.isHeadOnVersionTagCommit) {
-        return "$versionFromTag-$position.shortRevision".toString()
-    }
-    return versionFromTag
+        if (!position.isReleaseBranch && position.branch != 'HEAD' && (!position.isHeadOnVersionTagCommit || !position.isClean)) {
+            return "$versionFromTag-$position.shortRevision".toString()
+        }
+        return versionFromTag
     })
 
     private final String type
@@ -36,7 +36,7 @@ enum PredefinedVersionCreator {
         PredefinedVersionCreator creator = values().find { it.type == type }
         if (creator == null) {
             throw new IllegalArgumentException("There is no predefined version creator with $type type. " +
-                    "You can choose from: ${values().collect { it.type }}");
+                "You can choose from: ${values().collect { it.type }}");
         }
         return creator.versionCreator
     }
