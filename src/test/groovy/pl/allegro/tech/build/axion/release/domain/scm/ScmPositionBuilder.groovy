@@ -24,7 +24,7 @@ class ScmPositionBuilder {
     }
 
     ScmPosition build() {
-        return new ScmPosition(revision, shortRevision, branch, isClean, isReleaseBranch, false)
+        return new ScmPosition(revision, shortRevision, branch, isClean, isReleaseBranch)
     }
 
     ScmPositionBuilder withBranch(String branch) {

@@ -1,16 +1,15 @@
 package pl.allegro.tech.build.axion.release.domain
 
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 enum PredefinedSnapshotCreator {
 
-    SIMPLE('simple', { String version, ScmPosition position ->
+    SIMPLE('simple', { String version, VersionContext context ->
         return "-SNAPSHOT";
     }),
 
-    UNCLEAN('unclean', { String version, ScmPosition position ->
-        if (!position.isClean) {
+    UNCLEAN('unclean', { String version, VersionContext context ->
+        if (!context.position.isClean) {
             return "-unclean-SNAPSHOT"
         } else {
             return "-SNAPSHOT";

@@ -2,13 +2,13 @@ package pl.allegro.tech.build.axion.release.domain.properties;
 
 import com.github.zafarkhaja.semver.Version;
 import pl.allegro.tech.build.axion.release.domain.MonorepoConfig;
+import pl.allegro.tech.build.axion.release.domain.VersionContext;
 import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext;
-import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 
 public class VersionProperties {
 
     public interface Creator {
-        String apply(String versionFromTag, ScmPosition position);
+        String apply(String versionFromTag, VersionContext context);
     }
 
     public interface Incrementer {

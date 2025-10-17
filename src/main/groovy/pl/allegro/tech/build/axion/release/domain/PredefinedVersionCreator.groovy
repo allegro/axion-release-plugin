@@ -5,19 +5,23 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
 
 enum PredefinedVersionCreator {
 
-    SIMPLE('simple', { String versionFromTag, ScmPosition position ->
+    SIMPLE('simple', { String versionFromTag, VersionContext context ->
         return versionFromTag
     }),
 
-    VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, ScmPosition position ->
-        if (!position.isReleaseBranch && position.branch != 'HEAD' && (!position.isHeadOnVersionTagCommit || !position.isClean)) {
+    VERSION_WITH_BRANCH('versionWithBranch', { String versionFromTag, VersionContext context ->
+        ScmPosition position = context.position
+
+        if (!position.isReleaseBranch && position.branch != 'HEAD' && (context.isSnapshot() || !position.isClean)) {
             return "$versionFromTag-$position.branch".toString()
         }
         return versionFromTag
     }),
 
-    VERSION_WITH_COMMIT_HASH('versionWithCommitHash', { String versionFromTag, ScmPosition position ->
-        if (!position.isReleaseBranch && position.branch != 'HEAD' && (!position.isHeadOnVersionTagCommit || !position.isClean)) {
+    VERSION_WITH_COMMIT_HASH('versionWithCommitHash', { String versionFromTag, VersionContext context ->
+        ScmPosition position = context.position
+
+        if (!position.isReleaseBranch && position.branch != 'HEAD' && (context.isSnapshot() || !position.isClean)) {
             return "$versionFromTag-$position.shortRevision".toString()
         }
         return versionFromTag

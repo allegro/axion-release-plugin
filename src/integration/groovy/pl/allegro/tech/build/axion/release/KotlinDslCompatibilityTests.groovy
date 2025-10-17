@@ -15,7 +15,7 @@ class KotlinDslCompatibilityTests extends Specification {
             """
         import pl.allegro.tech.build.axion.release.domain.*
         import pl.allegro.tech.build.axion.release.domain.properties.*
-        import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+        import pl.allegro.tech.build.axion.release.domain.VersionContext
 
         plugins {
             id("pl.allegro.tech.build.axion-release")
@@ -93,7 +93,7 @@ class KotlinDslCompatibilityTests extends Specification {
 
             branchVersionCreator.putAll(
                 mapOf(
-                    "custom" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "\${s}-\${scmPosition.branch}"}
+                    "custom" to VersionProperties.Creator { s: String, context: VersionContext ->  "\${s}-\${context.position.branch}"}
                 )
             )
 

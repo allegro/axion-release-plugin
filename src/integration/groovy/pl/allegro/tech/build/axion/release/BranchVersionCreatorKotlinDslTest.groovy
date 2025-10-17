@@ -59,7 +59,7 @@ class BranchVersionCreatorKotlinDslTest extends Specification {
         import com.github.zafarkhaja.semver.Version
         import pl.allegro.tech.build.axion.release.domain.VersionIncrementerContext
         import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
-        import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition
+        import pl.allegro.tech.build.axion.release.domain.VersionContext
 
         plugins {
             id ("pl.allegro.tech.build.axion-release")
@@ -73,7 +73,7 @@ class BranchVersionCreatorKotlinDslTest extends Specification {
 
              branchVersionCreator.putAll(
                 mapOf(
-                    "$defaultBranch" to VersionProperties.Creator { s: String, scmPosition: ScmPosition ->  "\${s}-\${scmPosition.branch}"}
+                    "$defaultBranch" to VersionProperties.Creator { s: String, context: VersionContext ->  "\${s}-\${context.position.branch}"}
                 )
             )
         }
