@@ -119,11 +119,14 @@ abstract class ReleasePlugin implements Plugin<Project> {
             currentBranch,
             String.join(",", releaseBranchNames)
         )
-        project.logger.lifecycle(message);
+        project.logger.info(message);
 
         List<String> tasksToDisable = [RELEASE_TASK, CREATE_RELEASE_TASK, PUSH_RELEASE_TASK, VERIFY_RELEASE_TASK]
         project.tasks
             .matching { it.name in tasksToDisable }
-            .configureEach { it.enabled = false }
+            .configureEach {
+                it.enabled = false
+                it.description = "[disabled] ${it.description}"
+            }
     }
 }
