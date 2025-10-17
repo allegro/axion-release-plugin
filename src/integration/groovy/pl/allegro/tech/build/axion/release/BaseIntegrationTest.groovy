@@ -44,6 +44,10 @@ class BaseIntegrationTest extends RepositoryBasedTest {
         new FileTreeBuilder(temporaryFolder).file("settings.gradle", contents)
     }
 
+    void customProjectFile(String path, String contents) {
+        new FileTreeBuilder(temporaryFolder).file(path, contents)
+    }
+
     GradleRunner gradle() {
         return GradleRunner.create()
             .withProjectDir(temporaryFolder)

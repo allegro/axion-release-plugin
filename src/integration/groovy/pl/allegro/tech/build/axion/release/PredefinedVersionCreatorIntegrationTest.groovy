@@ -55,23 +55,59 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 1.0.0\n')
     }
 
-    def "versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag when HEAD has version tag"() {
+    def "[monorepo] versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag"() {
         given:
-        buildFile """
+        vanillaSettingsFile("""
+            rootProject.name = 'root-project'
+
+            include 'sub-project-a'
+            include 'sub-project-b'
+            """
+        )
+
+        vanillaSubprojectBuildFile("sub-project-a", """
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+            }
+
             scmVersion {
-                release {
-                    versionCreator('versionWithBranch')
+                tag {
+                    prefix = 'a-'
                 }
             }
-        """
-        checkout('feature/branch')
-        createTag('v1.0.0')
+            """
+        )
+
+        vanillaSubprojectBuildFile("sub-project-b", """
+            plugins {
+                id 'pl.allegro.tech.build.axion-release'
+            }
+
+            scmVersion {
+                tag {
+                    prefix = 'b-'
+                }
+            }
+            """
+        )
 
         when:
-        def result = runGradle('currentVersion')
+        // initial state
+        repository.commit(['.'], 'Before changes')
+        createTag('a-1.0.2')
+        createTag('b-2.0.3')
+        checkout("test-branch")
+
+        // modify only sub-project-a
+        customProjectFile('sub-project-a/something.txt', 'Some content')
+        repository.commit(['.'], 'Modify sub-project-a')
+
+        def resultA = runGradle(':sub-project-a:currentVersion')
+        def resultB = runGradle(':sub-project-b:currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0\n')
+        resultA.output.contains('Project version: 1.0.3-test-branch-SNAPSHOT\n')
+        resultB.output.contains('Project version: 2.0.3\n')
     }
 
     def "versionWithBranch should not append branch name when on release branch"() {
