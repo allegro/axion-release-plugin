@@ -23,8 +23,10 @@ class RepositoryBasedTest extends Specification {
 
     String defaultBranch
 
+    private Grgit rawRepository
+
     void setup() {
-        def rawRepository = Grgit.init(dir: temporaryFolder)
+        rawRepository = Grgit.init(dir: temporaryFolder)
         defaultBranch = rawRepository.branch.current().name
 
         ScmProperties scmProperties = scmProperties(temporaryFolder).build()
@@ -39,7 +41,15 @@ class RepositoryBasedTest extends Specification {
         )
 
         repository = context.repository()
-        repository.commit(['*'], 'initial commit')
+        repository.commit(['.'], 'initial commit')
+    }
+
+    void checkout(String branch) {
+        rawRepository.checkout([branch: branch, createBranch: true])
+    }
+
+    void createTag(String tag) {
+        rawRepository.tag.add(name: tag)
     }
 
     protected String currentVersion() {

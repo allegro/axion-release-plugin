@@ -56,7 +56,6 @@ import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullLegacyPrefix;
-import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix;
 
 public class GitRepository implements ScmRepository {
     private static final Logger logger = Logging.getLogger(GitRepository.class);
@@ -310,8 +309,7 @@ public class GitRepository implements ScmRepository {
             lastCommit.getName(),
             currentPosition.getBranch(),
             currentPosition.getIsClean(),
-            currentPosition.getIsReleaseBranch(),
-            currentPosition.getIsTagRef()
+            currentPosition.getIsReleaseBranch()
         );
     }
 
@@ -354,13 +352,7 @@ public class GitRepository implements ScmRepository {
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
         boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
-        boolean isTagRef = isVersionTagRef(properties.getOverriddenBranchName() != null ? properties.getOverriddenBranchName() : branchName);
-        return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isTagRef);
-    }
-
-    private boolean isVersionTagRef(String branchName) {
-        return branchName.startsWith(GIT_TAG_PREFIX + fullPrefix())
-               || branchName.startsWith(GIT_TAG_PREFIX + fullLegacyPrefix());
+        return new ScmPosition(revision, branchName, isClean, isReleaseBranch);
     }
 
     private String getRevision() {
@@ -586,6 +578,7 @@ public class GitRepository implements ScmRepository {
             // the logic to get the isClean-property is inverted
             return !overriddenIsClean.get();
         }
+        if (properties.isIgnoreUncommittedChanges()) return false;
         try {
             return !jgitRepository.status().call().isClean();
         } catch (GitAPIException e) {
