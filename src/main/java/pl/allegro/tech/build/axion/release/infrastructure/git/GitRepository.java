@@ -309,8 +309,7 @@ public class GitRepository implements ScmRepository {
             lastCommit.getName(),
             currentPosition.getBranch(),
             currentPosition.getIsClean(),
-            currentPosition.getIsReleaseBranch(),
-            currentPosition.getIsHeadOnVersionTagCommit()
+            currentPosition.getIsReleaseBranch()
         );
     }
 
@@ -353,23 +352,7 @@ public class GitRepository implements ScmRepository {
         String branchName = branchName();
         boolean isClean = !checkUncommittedChanges();
         boolean isReleaseBranch = properties.getReleaseBranchNames() != null && properties.getReleaseBranchNames().contains(branchName);
-        boolean isHeadOnVersionTagCommit = isHeadOnVersionTagCommit();
-        return new ScmPosition(revision, branchName, isClean, isReleaseBranch, isHeadOnVersionTagCommit);
-    }
-
-    private boolean isHeadOnVersionTagCommit() {
-        try {
-            ObjectId head = head();
-            List<Ref> allTags = jgitRepository.getRepository().getRefDatabase().getRefsByPrefix(GIT_TAG_PREFIX + properties.tagPrefix());
-            for (Ref tagRef : allTags) {
-                ObjectId objectId = tagRef.getObjectId();
-                ObjectId peeledObjectId = jgitRepository.getRepository().getRefDatabase().peel(tagRef).getPeeledObjectId();
-                return (objectId != null && objectId.equals(head)) || (peeledObjectId != null && peeledObjectId.equals(head));
-            }
-        } catch (Exception e) {
-            // ignore, treat as not on tag
-        }
-        return false;
+        return new ScmPosition(revision, branchName, isClean, isReleaseBranch);
     }
 
     private String getRevision() {
