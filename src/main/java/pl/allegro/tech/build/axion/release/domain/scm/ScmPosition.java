@@ -9,15 +9,15 @@ public class ScmPosition {
     private final String branch;
     private final boolean isClean;
     private final boolean isReleaseBranch;
-    private final boolean isHeadOnVersionTagCommit;
+    private final Boolean isSnapshot;
 
-    public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch, boolean isHeadOnVersionTagCommit) {
+    public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch, boolean isSnapshot) {
         this.revision = revision;
         this.shortRevision = shortRevision;
         this.branch = branch;
         this.isClean = isClean;
         this.isReleaseBranch = isReleaseBranch;
-        this.isHeadOnVersionTagCommit = isHeadOnVersionTagCommit;
+        this.isSnapshot = isSnapshot;
     }
 
     public ScmPosition(String revision, String shortRevision, String branch, boolean isClean, boolean isReleaseBranch) {
@@ -32,7 +32,7 @@ public class ScmPosition {
         this(revision, shortRevision, branch, true, false, false);
     }
 
-    public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch, boolean isHeadOnVersionTagCommit) {
+    public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch) {
         this.revision = revision;
         if (revision.length() > 7) {
             this.shortRevision = revision.substring(0, 7);
@@ -42,19 +42,15 @@ public class ScmPosition {
         this.branch = branch;
         this.isClean = isClean;
         this.isReleaseBranch = isReleaseBranch;
-        this.isHeadOnVersionTagCommit = isHeadOnVersionTagCommit;
-    }
-
-    public ScmPosition(String revision, String branch, boolean isClean, boolean isReleaseBranch) {
-        this(revision, branch, isClean, isReleaseBranch, false);
+        this.isSnapshot = null;
     }
 
     public ScmPosition(String revision, String branch, boolean isClean) {
-        this(revision, branch, isClean, false, false);
+        this(revision, branch, isClean, false);
     }
 
     public ScmPosition(String revision, String branch) {
-        this(revision, branch, true, false, false);
+        this(revision, branch, true, false);
     }
 
     @Override
@@ -64,7 +60,7 @@ public class ScmPosition {
                + ", branch = " + branch
                + ", isClean = " + isClean
                + ", isReleaseBranch = " + isReleaseBranch
-               + ", isHeadOnVersionTagCommit = " + isHeadOnVersionTagCommit + "]";
+               + ", isSnapshot = " + isSnapshot + "]";
     }
 
     @Input
@@ -93,7 +89,19 @@ public class ScmPosition {
     }
 
     @Input
-    public boolean getIsHeadOnVersionTagCommit() {
-        return isHeadOnVersionTagCommit;
+    public boolean getIsSnapshot() {
+        if (isSnapshot == null) throw new IllegalStateException("isSnapshot is not yet determined");
+        return isSnapshot;
+    }
+
+    public ScmPosition withSnapshotStatus(boolean isSnapshot) {
+        return new ScmPosition(
+            this.revision,
+            this.shortRevision,
+            this.branch,
+            this.isClean,
+            this.isReleaseBranch,
+            isSnapshot
+        );
     }
 }

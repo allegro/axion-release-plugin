@@ -57,7 +57,9 @@ public class VersionResolver {
 
         VersionFactory.FinalVersion finalVersion = versionFactory.createFinalVersion(scmState, versions.current);
 
-        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, latestChangePosition);
+        ScmPosition snapshotAwarePosition = latestChangePosition.withSnapshotStatus(!finalVersion.snapshot);
+
+        return new VersionContext(finalVersion.version, finalVersion.snapshot, versions.previous, snapshotAwarePosition);
     }
 
     private VersionInfo readVersions(
