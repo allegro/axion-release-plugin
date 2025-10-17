@@ -28,20 +28,22 @@ class ScmPropertiesBuilder {
 
     ScmProperties build() {
         return new ScmProperties(
-                type,
-                directory,
-                'origin',
-                false,
-                false,
-                false,
-                null,
-                overriddenBranchName,
-                overriddenIsClean,
-                ScmIdentity.defaultIdentityWithoutAgents(),
-                true,
-                ['main', 'master'] as Set,
-                false,
-            true
+            type,
+            directory,
+            'origin',
+            false,
+            false,
+            false,
+            null,
+            overriddenBranchName,
+            overriddenIsClean,
+            ScmIdentity.defaultIdentityWithoutAgents(),
+            true,
+            ['main', 'master'] as Set,
+            false,
+            true,
+            false,
+            'v'
         )
     }
 
