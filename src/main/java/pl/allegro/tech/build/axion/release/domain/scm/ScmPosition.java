@@ -89,7 +89,7 @@ public class ScmPosition {
     }
 
     @Input
-    public boolean isSnapshot() {
+    public boolean getIsSnapshot() {
         if (isSnapshot == null) throw new IllegalStateException("isSnapshot is not yet determined");
         return isSnapshot;
     }
