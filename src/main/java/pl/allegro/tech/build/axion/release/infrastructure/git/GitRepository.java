@@ -578,7 +578,6 @@ public class GitRepository implements ScmRepository {
             // the logic to get the isClean-property is inverted
             return !overriddenIsClean.get();
         }
-        if (properties.isIgnoreUncommittedChanges()) return false;
         try {
             return !jgitRepository.status().call().isClean();
         } catch (GitAPIException e) {

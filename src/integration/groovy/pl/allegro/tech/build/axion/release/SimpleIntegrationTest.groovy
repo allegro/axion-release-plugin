@@ -334,6 +334,7 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
     def "should return tag version when on branch created from tagged commit (HEAD on tag, but on branch)"() {
         given:
         buildFile('')
+        generateGitIgnoreFile(temporaryFolder)
         repository.commit(['.'], 'init')
         repository.tag(fullPrefix() + '1.2.3')
         checkout('feature/test')
@@ -358,5 +359,13 @@ class SimpleIntegrationTest extends BaseIntegrationTest {
             }
             return it
         }
+    }
+
+    void generateGitIgnoreFile(File dir) {
+        File gitIgnore = new File(dir, ".gitignore")
+        gitIgnore << """\
+        .gradle
+        build/
+        """.stripIndent()
     }
 }

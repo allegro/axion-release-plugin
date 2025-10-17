@@ -6,11 +6,7 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
 
     def "should print changes in Git as seen by axion-release"() {
         given:
-        buildFile('''
-            scmVersion {
-                ignoreUncommittedChanges.set(false)
-            }
-        ''')
+        buildFile('')
         new FileTreeBuilder(temporaryFolder).file('my-uncommitted-file', "hello")
 
         when:
@@ -57,6 +53,7 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
             }
         ''')
         generateSettingsFile(temporaryFolder)
+        generateGitIgnoreFile(temporaryFolder)
         generateSubmoduleBuildFile("module1")
         repository.commit(['.'], "initial commit of top level project")
     }
@@ -79,6 +76,7 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
             }
         ''')
         generateSettingsFile(temporaryFolder)
+        generateGitIgnoreFile(temporaryFolder)
         generateSubmoduleBuildFile("module1")
         repository.commit(['.'], "initial commit of top level project")
     }
@@ -100,5 +98,12 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
         rootProject.name = "multimodule-project"
         include(':module1')
         """
+    }
+
+    void generateGitIgnoreFile(File dir) {
+        File gitIgnore = new File(dir, ".gitignore")
+        gitIgnore << """\
+        .gradle
+        """.stripIndent()
     }
 }
