@@ -1,6 +1,13 @@
 package pl.allegro.tech.build.axion.release
 
+import spock.lang.Tag
+
 class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
+
+    def setup() {
+        generateGitIgnoreFile(temporaryFolder)
+    }
+
     def "simple version creator should just return version string"() {
         given:
         buildFile("""
@@ -28,8 +35,10 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         checkout("test-branch")
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -45,17 +54,21 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
                 }
             }
         """
+        commit(['.'], "feature commit")
 
-        when:
+        and:
         createTag('v1.0.0')
         checkout("test-branch")
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
         result.output.contains('Project version: 1.0.0\n')
     }
 
-    def "[monorepo] versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag"() {
+    @Tag("monorepo")
+    def "versionWithBranch should not append branch name and SNAPSHOT suffix when not on release branch but on version tag"() {
         given:
         vanillaSettingsFile("""
             rootProject.name = 'root-project'
@@ -120,8 +133,10 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         createTag('v1.0.0')
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -138,9 +153,11 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         createTag('v1.0.0')
         checkout('refs/tags/v1.0.0')
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -157,6 +174,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
                 }
             }
         """
+        commit(['.'], "feature commit")
 
         and:
         createTag('v1.0.0')
@@ -170,7 +188,8 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         result.output.contains('Project version: 1.0.1-test-branch-SNAPSHOT\n')
     }
 
-    def "versionWithBranch should not append branch name when on version tag but with uncommitted changes and ignoreUncommittedChanges is set to true"() {
+    @Tag("POSSIBLE-BUG")
+    def "versionWithBranch will append branch name when on version tag but with uncommitted changes and ignoreUncommittedChanges is set to default"() {
         given:
         buildFile """
             scmVersion {
@@ -180,6 +199,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
                 }
             }
         """
+        commit(['.'], "feature commit")
 
         and:
         createTag('v1.0.0')
@@ -190,7 +210,7 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         def result = runGradle('currentVersion')
 
         then:
-        result.output.contains('Project version: 1.0.0\n')
+        result.output.contains('Project version: 1.0.0-test-branch\n')
     }
 
     def "versionWithCommitHash should append hash when not on release branch"() {
@@ -203,8 +223,10 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         checkout("test-branch")
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -221,8 +243,10 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         createTag('v1.0.0')
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -239,9 +263,11 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
             }
         """
 
-        when:
+        and:
         createTag('v1.0.0')
         checkout('refs/tags/v1.0.0')
+
+        when:
         def result = runGradle('currentVersion')
 
         then:
@@ -257,9 +283,12 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
                 }
             }
         """
+        commit(['.'], "feature commit")
+
+        and:
         createTag('random-tag')
         checkout('refs/tags/random-tag')
-        repository.commit(['.'], 'test-commit')
+        commit(['.'], 'test-commit')
 
         when:
         def result = runGradle('currentVersion')
@@ -284,5 +313,13 @@ class PredefinedVersionCreatorIntegrationTest extends BaseIntegrationTest {
         then:
         def e = thrown(Exception)
         e.message.contains("There is no predefined version creator with unknown type.")
+    }
+
+    void generateGitIgnoreFile(File dir) {
+        File gitIgnore = new File(dir, ".gitignore")
+        gitIgnore << """\
+        .gradle
+        build/
+        """.stripIndent()
     }
 }

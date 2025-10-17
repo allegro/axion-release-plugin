@@ -44,6 +44,10 @@ class RepositoryBasedTest extends Specification {
         repository.commit(['.'], 'initial commit')
     }
 
+    void commit(List<String> files, String message) {
+        repository.commit(files, message)
+    }
+
     void checkout(String branch) {
         rawRepository.checkout([branch: branch, createBranch: true])
     }
