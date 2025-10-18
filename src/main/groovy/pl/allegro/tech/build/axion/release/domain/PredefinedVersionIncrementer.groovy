@@ -12,15 +12,15 @@ import static java.lang.String.format
 enum PredefinedVersionIncrementer {
 
     INCREMENT_PATCH('incrementPatch', { VersionIncrementerContext context, Map config ->
-        return context.currentVersion.incrementPatchVersion()
+        return context.currentVersion.nextPatchVersion()
     }),
 
     INCREMENT_MINOR('incrementMinor', { VersionIncrementerContext context, Map config ->
-        return context.currentVersion.incrementMinorVersion()
+        return context.currentVersion.nextMinorVersion()
     }),
 
     INCREMENT_MAJOR('incrementMajor', { VersionIncrementerContext context, Map config ->
-        return context.currentVersion.incrementMajorVersion()
+        return context.currentVersion.nextMajorVersion()
     }),
 
     INCREMENT_MINOR_IF_NOT_ON_RELEASE_BRANCH('incrementMinorIfNotOnRelease', { VersionIncrementerContext context, Map config ->
@@ -28,9 +28,9 @@ enum PredefinedVersionIncrementer {
             config.releaseBranchPattern = context.isLegacyDefTagnameRepo() ? TagPrefixConf.DEFAULT_LEGACY_PREFIX + '/.+' : TagPrefixConf.defaultPrefix() + '/.+'
         }
         if (context.scmPosition.branch ==~ config.releaseBranchPattern) {
-            return context.currentVersion.incrementPatchVersion()
+            return context.currentVersion.nextPatchVersion()
         }
-        return context.currentVersion.incrementMinorVersion()
+        return context.currentVersion.nextMinorVersion()
     }),
 
     INCREMENT_PRERELEASE('incrementPrerelease', { VersionIncrementerContext context, Map config ->
@@ -46,10 +46,10 @@ enum PredefinedVersionIncrementer {
         }
 
         if (config.initialPreReleaseIfNotOnPrerelease != null) {
-            return context.currentVersion.incrementPatchVersion(String.valueOf(config.initialPreReleaseIfNotOnPrerelease))
+            return context.currentVersion.nextPatchVersion(String.valueOf(config.initialPreReleaseIfNotOnPrerelease))
         }
 
-        return context.currentVersion.incrementPatchVersion()
+        return context.currentVersion.nextPatchVersion()
     }),
 
     BRANCH_SPECIFIC('branchSpecific', { VersionIncrementerContext context, Map config ->
@@ -75,5 +75,5 @@ enum PredefinedVersionIncrementer {
         return { VersionIncrementerContext context -> creator.versionIncrementer.apply(context, configuration) }
     }
 
-    interface VersionIncrementer extends BiFunction<VersionIncrementerContext,Map,Version> {}
+    interface VersionIncrementer extends BiFunction<VersionIncrementerContext, Map, Version> {}
 }
