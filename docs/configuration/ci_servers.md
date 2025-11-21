@@ -29,6 +29,12 @@ This behavior is experimental and has been tested on the following CI servers:
 
 `axion-release` has dedicated support for GitHub Actions and you don't need any custom configs to make it working.
 
+### Compatibility with actions/checkout
+
+`axion-release` is fully compatible with all versions of `actions/checkout`, including v6 and later. 
+
+Starting with `actions/checkout@v6`, credentials are stored in a separate config file under `$RUNNER_TEMP` and referenced via `includeIf.gitdir` directives. While JGit doesn't natively support these directives, `axion-release` automatically detects and loads credentials from these files, ensuring seamless authentication for push operations.
+
 ### GitHub outputs
 
 To make it easier for you to chain jobs in a workflow, `axion-release` will provide some information as GitHub outputs.
