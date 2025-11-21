@@ -153,7 +153,7 @@ class GitConfigCredentialsHelper {
                     try {
                         String decoded = new String(Base64.getDecoder().decode(base64Creds));
                         int colonIndex = decoded.indexOf(':');
-                        if (colonIndex > 0) {
+                        if (colonIndex >= 0) {
                             String username = decoded.substring(0, colonIndex);
                             String password = decoded.substring(colonIndex + 1);
                             logger.debug("Found credentials in http.extraheader for subsection: {}", subsection);

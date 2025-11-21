@@ -36,7 +36,6 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should extract credentials from includeIf config file (actions/checkout v6 style)"() {
         given: "a temporary credentials config file with auth token"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        credentialsFile.deleteOnExit()
         
         // Simulate actions/checkout v6 credentials config
         // Base64 encodes "x-access-token:test-token"
@@ -93,7 +92,6 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should handle includeIf with trailing slash in gitdir pattern"() {
         given: "a temporary credentials config file"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        credentialsFile.deleteOnExit()
         
         String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
@@ -122,7 +120,6 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should prioritize includeIf credentials over main config credentials"() {
         given: "credentials in both includeIf file and main config"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        credentialsFile.deleteOnExit()
         
         // includeIf file with higher priority token
         String encodedPriorityCreds = encodeCredentials("x-access-token", "priority-token")
