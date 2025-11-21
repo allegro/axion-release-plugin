@@ -25,14 +25,24 @@ class GitConfigCredentialsHelperTest extends Specification {
         repoDir?.deleteDir()
     }
 
+    /**
+     * Helper method to encode credentials to base64 format used by git config.
+     * Example: encodeCredentials("x-access-token", "test-token") returns "eC1hY2Nlc3MtdG9rZW46dGVzdC10b2tlbg=="
+     */
+    private String encodeCredentials(String username, String password) {
+        return Base64.getEncoder().encodeToString("${username}:${password}".bytes)
+    }
+
     def "should extract credentials from includeIf config file (actions/checkout v6 style)"() {
         given: "a temporary credentials config file with auth token"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
         credentialsFile.deleteOnExit()
         
         // Simulate actions/checkout v6 credentials config
+        // Base64 encodes "x-access-token:test-token"
+        String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
-        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46dGVzdC10b2tlbg==")
+        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         credConfig.save()
         
         and: "git config with includeIf directive pointing to credentials file"
@@ -56,8 +66,9 @@ class GitConfigCredentialsHelperTest extends Specification {
 
     def "should extract credentials from http.extraheader in main config (legacy style)"() {
         given: "git config with extraheader in main config"
+        String encodedCreds = encodeCredentials("x-access-token", "legacy-token")
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
-        config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46bGVnYWN5LXRva2Vu")
+        config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         config.save()
         
         when: "extracting credentials"
@@ -84,8 +95,9 @@ class GitConfigCredentialsHelperTest extends Specification {
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
         credentialsFile.deleteOnExit()
         
+        String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
-        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46dGVzdC10b2tlbg==")
+        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         credConfig.save()
         
         and: "git config with includeIf directive with trailing slash"
@@ -113,15 +125,17 @@ class GitConfigCredentialsHelperTest extends Specification {
         credentialsFile.deleteOnExit()
         
         // includeIf file with higher priority token
+        String encodedPriorityCreds = encodeCredentials("x-access-token", "priority-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
-        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46cHJpb3JpdHktdG9rZW4=")
+        credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedPriorityCreds}")
         credConfig.save()
         
         // Main config with different token
+        String encodedMainCreds = encodeCredentials("x-access-token", "main-token")
         String gitDir = repository.getDirectory().getAbsolutePath().replace('\\', '/')
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("includeIf", "gitdir:" + gitDir, "path", credentialsFile.getAbsolutePath())
-        config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic eC1hY2Nlc3MtdG9rZW46bWFpbi10b2tlbg==")
+        config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedMainCreds}")
         config.save()
         
         when: "extracting credentials"
@@ -154,8 +168,9 @@ class GitConfigCredentialsHelperTest extends Specification {
 
     def "should handle Authorization header with lowercase 'a'"() {
         given: "git config with Authorization header (lowercase)"
+        String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
-        config.setString("http", "https://github.com/", "extraheader", "Authorization: basic eC1hY2Nlc3MtdG9rZW46dGVzdC10b2tlbg==")
+        config.setString("http", "https://github.com/", "extraheader", "Authorization: basic ${encodedCreds}")
         config.save()
         
         when: "extracting credentials"

@@ -23,6 +23,9 @@ import java.util.Set;
  */
 class GitConfigCredentialsHelper {
     private static final Logger logger = Logging.getLogger(GitConfigCredentialsHelper.class);
+    private static final String GITDIR_PREFIX = "gitdir:";
+    private static final String AUTH_HEADER_PREFIX_UPPER = "AUTHORIZATION: basic ";
+    private static final String AUTH_HEADER_PREFIX_LOWER = "Authorization: basic ";
     
     private final Repository repository;
     
@@ -104,8 +107,8 @@ class GitConfigCredentialsHelper {
      * Supports the gitdir: condition format.
      */
     private boolean matchesGitDir(String condition, String gitDir) {
-        if (condition.startsWith("gitdir:")) {
-            String pattern = condition.substring("gitdir:".length()).trim();
+        if (condition.startsWith(GITDIR_PREFIX)) {
+            String pattern = condition.substring(GITDIR_PREFIX.length()).trim();
             
             // Normalize paths - ensure both use forward slashes
             pattern = pattern.replace('\\', '/');
@@ -137,8 +140,16 @@ class GitConfigCredentialsHelper {
         for (String subsection : httpSubsections) {
             String[] extraHeaders = config.getStringList("http", subsection, "extraheader");
             for (String header : extraHeaders) {
-                if (header.startsWith("AUTHORIZATION: basic ") || header.startsWith("Authorization: basic ")) {
-                    String base64Creds = header.substring(header.indexOf("basic ") + 6).trim();
+                String base64Creds = null;
+                
+                // Check for both uppercase and lowercase Authorization headers
+                if (header.startsWith(AUTH_HEADER_PREFIX_UPPER)) {
+                    base64Creds = header.substring(AUTH_HEADER_PREFIX_UPPER.length()).trim();
+                } else if (header.startsWith(AUTH_HEADER_PREFIX_LOWER)) {
+                    base64Creds = header.substring(AUTH_HEADER_PREFIX_LOWER.length()).trim();
+                }
+                
+                if (base64Creds != null) {
                     try {
                         String decoded = new String(Base64.getDecoder().decode(base64Creds));
                         int colonIndex = decoded.indexOf(':');
