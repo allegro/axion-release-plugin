@@ -125,35 +125,46 @@ gradlePlugin {
 }
 
 publishing {
-    afterEvaluate {
-        publications {
-            withType<MavenPublication> {
-                pom {
-                    name.set(project.name)
-                    description.set("Gradle release and version management plugin")
+    publications {
+        withType<MavenPublication> {
+            pom {
+                name.set(project.name)
+                description.set("Gradle release and version management plugin")
+                url.set("https://github.com/allegro/axion-release-plugin")
+                inceptionYear.set("2014")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("adamdubiel")
+                        name.set("Adam Dubiel")
+                    }
+                    developer {
+                        id.set("bgalek")
+                        name.set("Bartosz Gałek")
+                    }
+                }
+                scm {
                     url.set("https://github.com/allegro/axion-release-plugin")
-                    inceptionYear.set("2014")
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("adamdubiel")
-                            name.set("Adam Dubiel")
-                        }
-                        developer {
-                            id.set("bgalek")
-                            name.set("Bartosz Gałek")
-                        }
-                    }
-                    scm {
-                        url.set("https://github.com/allegro/axion-release-plugin")
-                        connection.set("scm:git@github.com:allegro/axion-release-plugin.git")
-                        developerConnection.set("scm:git@github.com:allegro/axion-release-plugin.git")
-                    }
+                    connection.set("scm:git@github.com:allegro/axion-release-plugin.git")
+                    developerConnection.set("scm:git@github.com:allegro/axion-release-plugin.git")
+                }
+            }
+        }
+    }
+
+    repositories {
+        if (version.toString().endsWith("-SNAPSHOT")) {
+            maven {
+                name = "mavenCentralSnapshots"
+                url = uri("https://central.sonatype.com/repository/maven-snapshots")
+                credentials {
+                    username = System.getenv("SONATYPE_USERNAME")
+                    password = System.getenv("SONATYPE_PASSWORD")
                 }
             }
         }
