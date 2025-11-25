@@ -36,29 +36,29 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should extract credentials from includeIf config file (actions/checkout v6 style)"() {
         given: "a temporary credentials config file with auth token"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        
+
         // Simulate actions/checkout v6 credentials config
         // Base64 encodes "x-access-token:test-token"
         String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
         credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         credConfig.save()
-        
+
         and: "git config with includeIf directive pointing to credentials file"
         String gitDir = repository.getDirectory().getAbsolutePath().replace('\\', '/')
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("includeIf", "gitdir:" + gitDir, "path", credentialsFile.getAbsolutePath())
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "credentials should be extracted successfully"
         credentials.isPresent()
         credentials.get().getUsername() == "x-access-token"
         credentials.get().getPassword() == "test-token"
-        
+
         cleanup:
         credentialsFile?.delete()
     }
@@ -69,11 +69,11 @@ class GitConfigCredentialsHelperTest extends Specification {
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "credentials should be extracted successfully"
         credentials.isPresent()
         credentials.get().getUsername() == "x-access-token"
@@ -84,7 +84,7 @@ class GitConfigCredentialsHelperTest extends Specification {
         when: "extracting credentials from empty config"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "no credentials should be found"
         !credentials.isPresent()
     }
@@ -92,27 +92,27 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should handle includeIf with trailing slash in gitdir pattern"() {
         given: "a temporary credentials config file"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        
+
         String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
         credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedCreds}")
         credConfig.save()
-        
+
         and: "git config with includeIf directive with trailing slash"
         String gitDir = repository.getDirectory().getAbsolutePath().replace('\\', '/')
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("includeIf", "gitdir:" + gitDir + "/", "path", credentialsFile.getAbsolutePath())
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "credentials should be extracted successfully"
         credentials.isPresent()
         credentials.get().getUsername() == "x-access-token"
         credentials.get().getPassword() == "test-token"
-        
+
         cleanup:
         credentialsFile?.delete()
     }
@@ -120,13 +120,13 @@ class GitConfigCredentialsHelperTest extends Specification {
     def "should prioritize includeIf credentials over main config credentials"() {
         given: "credentials in both includeIf file and main config"
         File credentialsFile = File.createTempFile("git-credentials-", ".config")
-        
+
         // includeIf file with higher priority token
         String encodedPriorityCreds = encodeCredentials("x-access-token", "priority-token")
         FileBasedConfig credConfig = new FileBasedConfig(credentialsFile, FS.DETECTED)
         credConfig.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedPriorityCreds}")
         credConfig.save()
-        
+
         // Main config with different token
         String encodedMainCreds = encodeCredentials("x-access-token", "main-token")
         String gitDir = repository.getDirectory().getAbsolutePath().replace('\\', '/')
@@ -134,16 +134,16 @@ class GitConfigCredentialsHelperTest extends Specification {
         config.setString("includeIf", "gitdir:" + gitDir, "path", credentialsFile.getAbsolutePath())
         config.setString("http", "https://github.com/", "extraheader", "AUTHORIZATION: basic ${encodedMainCreds}")
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "includeIf credentials should be used"
         credentials.isPresent()
         credentials.get().getUsername() == "x-access-token"
         credentials.get().getPassword() == "priority-token"
-        
+
         cleanup:
         credentialsFile?.delete()
     }
@@ -154,11 +154,11 @@ class GitConfigCredentialsHelperTest extends Specification {
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("includeIf", "gitdir:" + gitDir, "path", "/non/existent/file.config")
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "should return empty without throwing exception"
         !credentials.isPresent()
     }
@@ -169,11 +169,11 @@ class GitConfigCredentialsHelperTest extends Specification {
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
         config.setString("http", "https://github.com/", "extraheader", "Authorization: basic ${encodedCreds}")
         config.save()
-        
+
         when: "extracting credentials"
         GitConfigCredentialsHelper helper = new GitConfigCredentialsHelper(repository)
         Optional<GitConfigCredentialsHelper.UsernamePassword> credentials = helper.extractCredentials()
-        
+
         then: "credentials should be extracted successfully"
         credentials.isPresent()
         credentials.get().getUsername() == "x-access-token"
