@@ -3,6 +3,9 @@ name: Publish snapshot
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish-snapshot:
     runs-on: ubuntu-latest
