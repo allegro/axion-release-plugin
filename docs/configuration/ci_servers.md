@@ -31,9 +31,11 @@ This behavior is experimental and has been tested on the following CI servers:
 
 ### Compatibility with actions/checkout
 
-`axion-release` is fully compatible with all versions of `actions/checkout`, including v6 and later. 
+`axion-release` is fully compatible with all versions of `actions/checkout`, including v6 and later.
 
-Starting with `actions/checkout@v6`, credentials are stored in a separate config file under `$RUNNER_TEMP` and referenced via `includeIf.gitdir` directives. While JGit doesn't natively support these directives, `axion-release` automatically detects and loads credentials from these files, ensuring seamless authentication for push operations.
+Starting with `actions/checkout@v6`, credentials are stored in a separate config file under `$RUNNER_TEMP` and
+referenced via `includeIf.gitdir` directives. While JGit doesn't natively support these directives, `axion-release`
+automatically detects and loads credentials from these files, ensuring seamless authentication for push operations.
 
 ### GitHub outputs
 
@@ -47,34 +49,41 @@ To make it easier for you to chain jobs in a workflow, `axion-release` will prov
 #### Multi-version builds
 
 If all your Gradle modules use the same version, the output will be a single value, such as:
+
 ```
 1.0.0
 ```
 
 However, if each module has its own version, the output will be in JSON format, for example:
+
 ```json
-{"root-project":"1.0.0","sub-project-1":"2.0.0","sub-project-2":"3.0.0"}
+{
+    "root-project": "1.0.0",
+    "sub-project-1": "2.0.0",
+    "sub-project-2": "3.0.0"
+}
 ```
+
 where `root-project`, `sub-project-1` and `sub-project-2` are project names from Gradle.
 
 #### Example
 
 ```yaml
 jobs:
-  build:
-    steps:
-      - id: release
-        run: ./gradlew release
+    build:
+        steps:
+            -   id: release
+                run: ./gradlew release
 
-      # for single-version builds
-      - run: |
-          echo ${{ steps.release.outputs.released-version }}
+            # for single-version builds
+            -   run: |
+                    echo ${{ steps.release.outputs.released-version }}
 
-      # for multi-version builds
-      - run: |
-          echo ${{ fromJson(steps.release.outputs.released-version).root-project }}
-          echo ${{ fromJson(steps.release.outputs.released-version).sub-project-1 }}
-          echo ${{ fromJson(steps.release.outputs.released-version).sub-project-2 }}
+            # for multi-version builds
+            -   run: |
+                    echo ${{ fromJson(steps.release.outputs.released-version).root-project }}
+                    echo ${{ fromJson(steps.release.outputs.released-version).sub-project-1 }}
+                    echo ${{ fromJson(steps.release.outputs.released-version).sub-project-2 }}
 ```
 
 ## Jenkins

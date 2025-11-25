@@ -4,7 +4,6 @@ import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileBasedConfig;
 import org.eclipse.jgit.util.FS;
-import org.eclipse.jgit.util.SystemReader;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -24,65 +23,39 @@ import java.util.Set;
 class GitConfigCredentialsHelper {
     private static final Logger logger = Logging.getLogger(GitConfigCredentialsHelper.class);
     private static final String GITDIR_PREFIX = "gitdir:";
-    private static final String AUTH_HEADER_PREFIX_UPPER = "AUTHORIZATION: basic ";
-    private static final String AUTH_HEADER_PREFIX_LOWER = "Authorization: basic ";
-    
+    private static final String AUTH_HEADER_PREFIX = "Authorization: basic ";
+
     private final Repository repository;
-    
+
     GitConfigCredentialsHelper(Repository repository) {
         this.repository = repository;
     }
-    
-    /**
-     * Attempts to extract credentials from git config, including credentials stored in
-     * separate config files referenced by includeIf directives.
-     * 
-     * @return Optional containing username and password if credentials are found
-     */
+
     Optional<UsernamePassword> extractCredentials() {
         try {
             Config config = repository.getConfig();
-            
-            // First, try to get credentials from includeIf directives
-            Optional<UsernamePassword> credentialsFromInclude = extractCredentialsFromIncludeIf(config);
-            if (credentialsFromInclude.isPresent()) {
-                return credentialsFromInclude;
-            }
-            
-            // Fallback: try to get credentials from the main config (legacy behavior)
-            return extractCredentialsFromConfig(config);
+            // Try to get credentials from includeIf directives or fallback to the main config.
+            return extractCredentialsFromIncludeIf(config).or(() -> extractCredentialsFromConfig(config));
         } catch (Exception e) {
             logger.debug("Failed to extract credentials from git config", e);
             return Optional.empty();
         }
     }
-    
-    /**
-     * Extracts credentials from includeIf directives in the git config.
-     * JGit doesn't support includeIf natively, so we manually parse and load the referenced files.
-     */
+
     private Optional<UsernamePassword> extractCredentialsFromIncludeIf(Config config) {
         try {
             String gitDir = repository.getDirectory().getAbsolutePath().replace('\\', '/');
-            
-            // Get all includeIf subsections
             Set<String> subsections = config.getSubsections("includeIf");
-            
             for (String condition : subsections) {
-                // Check if this includeIf condition matches our git directory
                 if (matchesGitDir(condition, gitDir)) {
                     String path = config.getString("includeIf", condition, "path");
                     if (path != null && !path.isEmpty()) {
                         logger.debug("Found includeIf config path: {}", path);
-                        
-                        // Load the referenced config file
                         File configFile = new File(path);
                         if (configFile.exists() && configFile.canRead()) {
                             FileBasedConfig includedConfig = new FileBasedConfig(configFile, FS.DETECTED);
                             try {
                                 includedConfig.load();
-                                
-                                // Try to extract credentials from the included config
                                 Optional<UsernamePassword> credentials = extractCredentialsFromConfig(includedConfig);
                                 if (credentials.isPresent()) {
                                     logger.debug("Successfully extracted credentials from includeIf config file");
@@ -98,10 +71,9 @@ class GitConfigCredentialsHelper {
         } catch (Exception e) {
             logger.debug("Error processing includeIf directives", e);
         }
-        
         return Optional.empty();
     }
-    
+
     /**
      * Checks if an includeIf condition matches the given git directory.
      * Supports the gitdir: condition format.
@@ -109,46 +81,25 @@ class GitConfigCredentialsHelper {
     private boolean matchesGitDir(String condition, String gitDir) {
         if (condition.startsWith(GITDIR_PREFIX)) {
             String pattern = condition.substring(GITDIR_PREFIX.length()).trim();
-            
-            // Normalize paths - ensure both use forward slashes
             pattern = pattern.replace('\\', '/');
-            
-            // Remove trailing slash from pattern if present
             if (pattern.endsWith("/")) {
                 pattern = pattern.substring(0, pattern.length() - 1);
             }
-            
-            // Check if gitDir matches the pattern
-            // Support both exact match and pattern with trailing /
             return gitDir.equals(pattern) || gitDir.startsWith(pattern + "/");
         }
-        
+
         return false;
     }
-    
-    /**
-     * Extracts credentials from a git config object.
-     * Looks for http.extraheader with Authorization header.
-     */
+
     private Optional<UsernamePassword> extractCredentialsFromConfig(Config config) {
-        // Try to get Authorization header from http.extraheader
-        // actions/checkout sets: http.https://github.com/.extraheader = AUTHORIZATION: basic <base64>
-        
-        // Get all http subsections
         Set<String> httpSubsections = config.getSubsections("http");
-        
         for (String subsection : httpSubsections) {
             String[] extraHeaders = config.getStringList("http", subsection, "extraheader");
             for (String header : extraHeaders) {
                 String base64Creds = null;
-                
-                // Check for both uppercase and lowercase Authorization headers
-                if (header.startsWith(AUTH_HEADER_PREFIX_UPPER)) {
-                    base64Creds = header.substring(AUTH_HEADER_PREFIX_UPPER.length()).trim();
-                } else if (header.startsWith(AUTH_HEADER_PREFIX_LOWER)) {
-                    base64Creds = header.substring(AUTH_HEADER_PREFIX_LOWER.length()).trim();
+                if (header.regionMatches(true, 0, AUTH_HEADER_PREFIX, 0, AUTH_HEADER_PREFIX.length())) {
+                    base64Creds = header.substring(AUTH_HEADER_PREFIX.length()).trim();
                 }
-                
                 if (base64Creds != null) {
                     try {
                         String decoded = new String(Base64.getDecoder().decode(base64Creds));
@@ -165,26 +116,23 @@ class GitConfigCredentialsHelper {
                 }
             }
         }
-        
+
         return Optional.empty();
     }
-    
-    /**
-     * Simple container for username and password.
-     */
+
     static class UsernamePassword {
         private final String username;
         private final String password;
-        
+
         UsernamePassword(String username, String password) {
             this.username = username;
             this.password = password;
         }
-        
+
         String getUsername() {
             return username;
         }
-        
+
         String getPassword() {
             return password;
         }
