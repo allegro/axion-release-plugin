@@ -73,9 +73,7 @@ class GitConfigCredentialsHelper {
     }
 
     private boolean matchesGitDir(String condition, String gitDir) {
-        if (!condition.startsWith(GITDIR_PREFIX)) {
-            return false;
-        }
+        if (!condition.startsWith(GITDIR_PREFIX)) return false;
         String rawPattern = condition.substring(GITDIR_PREFIX.length()).trim();
         String pattern = stripTrailingSlash(normalizePath(rawPattern));
         return gitDir.equals(pattern) || gitDir.startsWith(pattern + "/");
@@ -83,7 +81,6 @@ class GitConfigCredentialsHelper {
 
     private Optional<UsernamePassword> extractCredentialsFromConfig(Config config) {
         Set<String> httpSubsections = config.getSubsections("http");
-
         return httpSubsections.stream()
             .flatMap(subsection -> parseCredentialsFromHeaders(config, subsection))
             .findFirst();
