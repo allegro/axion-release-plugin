@@ -38,15 +38,14 @@ class GitConfigCredentialsHelper {
     Optional<UsernamePassword> extractCredentials() {
         try {
             Config config = repository.getConfig();
-            // Try to get credentials from includeIf directives or fallback to the main config.
-            return extractCredentialsFromIncludeIf(config).or(() -> extractCredentialsFromConfig(config));
+            return extractCredentialsFromIncludeIfSection(config).or(() -> extractCredentialsFromHttpSection(config));
         } catch (Exception e) {
             logger.debug("Failed to extract credentials from git config", e);
             return Optional.empty();
         }
     }
 
-    private Optional<UsernamePassword> extractCredentialsFromIncludeIf(Config config) {
+    private Optional<UsernamePassword> extractCredentialsFromIncludeIfSection(Config config) {
         try {
             String gitDir = normalizePath(repository.getDirectory().getAbsolutePath());
             Set<String> subsections = config.getSubsections("includeIf");
@@ -59,7 +58,7 @@ class GitConfigCredentialsHelper {
                 .filter(this::isReadableFile)
                 .map(this::safeLoadConfig)
                 .flatMap(Optional::stream)
-                .map(this::extractCredentialsFromConfig)
+                .map(this::extractCredentialsFromHttpSection)
                 .flatMap(Optional::stream)
                 .findFirst()
                 .map(creds -> {
@@ -79,14 +78,14 @@ class GitConfigCredentialsHelper {
         return gitDir.equals(pattern) || gitDir.startsWith(pattern + "/");
     }
 
-    private Optional<UsernamePassword> extractCredentialsFromConfig(Config config) {
+    private Optional<UsernamePassword> extractCredentialsFromHttpSection(Config config) {
         Set<String> httpSubsections = config.getSubsections("http");
         return httpSubsections.stream()
-            .flatMap(subsection -> parseCredentialsFromHeaders(config, subsection))
+            .flatMap(subsection -> extractCredentialsFromHttpExtraheaderSubsections(config, subsection))
             .findFirst();
     }
 
-    private Stream<UsernamePassword> parseCredentialsFromHeaders(Config config, String subsection) {
+    private Stream<UsernamePassword> extractCredentialsFromHttpExtraheaderSubsections(Config config, String subsection) {
         String[] extraHeaders = config.getStringList("http", subsection, "extraheader");
         return Arrays.stream(extraHeaders)
             .map(this::parseBasicAuthFromHeader)
