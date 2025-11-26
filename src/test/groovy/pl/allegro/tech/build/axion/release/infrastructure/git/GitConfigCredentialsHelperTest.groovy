@@ -167,7 +167,7 @@ class GitConfigCredentialsHelperTest extends Specification {
         given: "git config with Authorization header (lowercase)"
         String encodedCreds = encodeCredentials("x-access-token", "test-token")
         FileBasedConfig config = repository.getConfig() as FileBasedConfig
-        config.setString("http", "https://github.com/", "extraheader", "Authorization: basic ${encodedCreds}")
+        config.setString("http", "https://github.com/", "extraheader", "authorization: basic ${encodedCreds}")
         config.save()
 
         when: "extracting credentials"
