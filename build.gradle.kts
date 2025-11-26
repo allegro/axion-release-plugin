@@ -156,19 +156,6 @@ publishing {
             }
         }
     }
-
-    repositories {
-        if (version.toString().endsWith("-SNAPSHOT")) {
-            maven {
-                name = "mavenCentralSnapshots"
-                url = uri("https://central.sonatype.com/repository/maven-snapshots")
-                credentials {
-                    username = System.getenv("SONATYPE_USERNAME")
-                    password = System.getenv("SONATYPE_PASSWORD")
-                }
-            }
-        }
-    }
 }
 
 nexusPublishing {
