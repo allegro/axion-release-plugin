@@ -156,17 +156,15 @@ publishing {
             }
         }
     }
+}
 
+nexusPublishing {
     repositories {
-        if (version.toString().endsWith("-SNAPSHOT")) {
-            maven {
-                name = "sonatype"
-                url = uri("https://central.sonatype.com/repository/maven-snapshots")
-                credentials {
-                    username = System.getenv("SONATYPE_USERNAME")
-                    password = System.getenv("SONATYPE_PASSWORD")
-                }
-            }
+        sonatype {
+            username.set(System.getenv("SONATYPE_USERNAME"))
+            password.set(System.getenv("SONATYPE_PASSWORD"))
+            nexusUrl.set(uri("https://ossrh-staging-api.central.sonatype.com/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://central.sonatype.com/repository/maven-snapshots/"))
         }
     }
 }
