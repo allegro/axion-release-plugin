@@ -1,15 +1,18 @@
 package pl.allegro.tech.build.axion.release
 
-
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import pl.allegro.tech.build.axion.release.domain.NextVersionMarker
 import pl.allegro.tech.build.axion.release.domain.properties.Properties
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
 abstract class MarkNextVersionTask extends BaseAxionTask {
+    @Input
+    String versionIncrementerName = null;
+
     @TaskAction
     void release() {
-        VersionResolutionContext context = resolutionContext()
+        VersionResolutionContext context = resolutionContext(null, versionIncrementerName)
         NextVersionMarker marker = new NextVersionMarker(context.scmService())
 
         Properties rules = context.rules()

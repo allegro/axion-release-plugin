@@ -10,7 +10,7 @@ import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 class RulesFactory {
 
-    static Properties create(VersionConfig versionConfig, ScmRepository repository) {
+    static Properties create(VersionConfig versionConfig, ScmRepository repository, String nextVersion = null, String versionIncrementerName = null) {
 
         ScmPosition position = repository.currentPosition()
         setDefaultPrefix(versionConfig.tag, repository)
@@ -20,7 +20,7 @@ class RulesFactory {
             VersionPropertiesFactory.create(versionConfig, position.branch),
             TagPropertiesFactory.create(versionConfig.tag, position.branch),
             versionConfig.checks,
-            versionConfig.nextVersion.nextVersionProperties(),
+            versionConfig.nextVersion.nextVersionProperties(nextVersion, versionIncrementerName),
             HooksPropertiesFactory.create(versionConfig, versionConfig.hooks)
         )
     }

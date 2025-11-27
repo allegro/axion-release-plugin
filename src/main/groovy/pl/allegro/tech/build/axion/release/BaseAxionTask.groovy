@@ -19,7 +19,7 @@ abstract class BaseAxionTask extends DefaultTask {
     @Inject
     protected abstract ProviderFactory getProviders();
 
-    protected VersionResolutionContext resolutionContext() {
-        return VersionResolutionContext.create(versionConfig, layout.projectDirectory)
+    protected VersionResolutionContext resolutionContext(String nextVersion = null, String versionIncrementerName = null) {
+        return VersionResolutionContext.create(versionConfig, layout.projectDirectory, nextVersion, versionIncrementerName)
     }
 }

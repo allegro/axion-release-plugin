@@ -56,20 +56,23 @@ public abstract class NextVersionConfig extends BaseExtension {
         getDeserializer().set(deserializer);
     }
 
-    public NextVersionProperties nextVersionProperties() {
-
+    public NextVersionProperties nextVersionProperties(String nextVersion, String versionIncrementerName) {
         if (getSuffix().get().isEmpty()) {
             String message = "scmVersion.nextVersion.suffix can't be empty! Empty suffix will prevent axion-release from distinguishing nextVersion from regular versions";
             throw new IllegalArgumentException(message);
         }
 
-        return new NextVersionProperties(nextVersion().getOrNull(),
+        return new NextVersionProperties(nextVersion().isPresent() ? versionIncrementerName().getOrNull() : nextVersion,
             getSuffix().get(),
             getSeparator().get(),
-            versionIncrementerName().getOrNull(),
+            versionIncrementerName().isPresent() ? versionIncrementerName().getOrNull() : versionIncrementerName,
             getSerializer().get(),
             getDeserializer().get()
         );
+    }
+
+    public NextVersionProperties nextVersionProperties() {
+        return nextVersionProperties(null, null);
     }
 
     private Provider<String> versionIncrementerName() {
