@@ -38,6 +38,7 @@ All `axion-release-plugin` configuration options:
             serialize({ tag, version -> ... }) // creates tag name from raw version
             deserialize( { tag, position, tagName -> ... }) // reads raw version from tag
             initialVersion({ tag, position -> ... }) // returns initial version if none found, 0.1.0 by default
+            messageCreator({ position, version, previousVersion -> ... }) // returns tag message, empty String (default) means no message
         }
 
         nextVersion { // doc: Next version markers
