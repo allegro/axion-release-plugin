@@ -14,7 +14,8 @@ class TagPropertiesFactory {
             config.versionSeparator.get(),
             config.serialize.get(),
             config.deserialize.get(),
-            config.initialVersion.get()
+            config.initialVersion.get(),
+            config.messageCreator.get()
         )
     }
 
