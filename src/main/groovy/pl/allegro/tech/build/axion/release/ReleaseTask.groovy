@@ -4,12 +4,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 import pl.allegro.tech.build.axion.release.infrastructure.github.GithubService
 
+@DisableCachingByDefault(because = "Creates SCM tag and pushes to remote - side-effectful operation that must always run")
 abstract class ReleaseTask extends BaseAxionTask {
 
     @Input
