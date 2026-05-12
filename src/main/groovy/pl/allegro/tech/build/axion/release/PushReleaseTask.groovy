@@ -2,11 +2,13 @@ package pl.allegro.tech.build.axion.release
 
 
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import pl.allegro.tech.build.axion.release.domain.Releaser
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
+@DisableCachingByDefault(because = "Pushes SCM tag to remote - side-effectful network operation that must always run")
 abstract class PushReleaseTask extends BaseAxionTask {
 
     @TaskAction

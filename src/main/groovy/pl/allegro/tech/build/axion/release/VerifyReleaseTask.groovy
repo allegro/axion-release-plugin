@@ -3,11 +3,13 @@ package pl.allegro.tech.build.axion.release
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import pl.allegro.tech.build.axion.release.domain.LocalOnlyResolver
 import pl.allegro.tech.build.axion.release.domain.scm.ScmChangesPrinter
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
+@DisableCachingByDefault(because = "Verifies live repository state - result must never be cached")
 abstract class VerifyReleaseTask extends BaseAxionTask {
 
     @Input

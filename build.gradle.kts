@@ -7,7 +7,7 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.21.0"
+    id("pl.allegro.tech.build.axion-release") version "1.21.1"
     id("com.gradle.plugin-publish") version "2.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.5.1"
@@ -65,12 +65,12 @@ dependencies {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
     testImplementation("org.testcontainers:spock:1.21.3") {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
-    testImplementation("net.bytebuddy:byte-buddy:1.17.8")
+    testImplementation("net.bytebuddy:byte-buddy:1.18.2")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.16.0")
     testImplementation("org.apache.sshd:sshd-git:2.16.0")
@@ -125,35 +125,33 @@ gradlePlugin {
 }
 
 publishing {
-    afterEvaluate {
-        publications {
-            withType<MavenPublication> {
-                pom {
-                    name.set(project.name)
-                    description.set("Gradle release and version management plugin")
+    publications {
+        withType<MavenPublication> {
+            pom {
+                name.set(project.name)
+                description.set("Gradle release and version management plugin")
+                url.set("https://github.com/allegro/axion-release-plugin")
+                inceptionYear.set("2014")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("adamdubiel")
+                        name.set("Adam Dubiel")
+                    }
+                    developer {
+                        id.set("bgalek")
+                        name.set("Bartosz Gałek")
+                    }
+                }
+                scm {
                     url.set("https://github.com/allegro/axion-release-plugin")
-                    inceptionYear.set("2014")
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("adamdubiel")
-                            name.set("Adam Dubiel")
-                        }
-                        developer {
-                            id.set("bgalek")
-                            name.set("Bartosz Gałek")
-                        }
-                    }
-                    scm {
-                        url.set("https://github.com/allegro/axion-release-plugin")
-                        connection.set("scm:git@github.com:allegro/axion-release-plugin.git")
-                        developerConnection.set("scm:git@github.com:allegro/axion-release-plugin.git")
-                    }
+                    connection.set("scm:git@github.com:allegro/axion-release-plugin.git")
+                    developerConnection.set("scm:git@github.com:allegro/axion-release-plugin.git")
                 }
             }
         }

@@ -97,7 +97,7 @@ public class GitRepository implements ScmRepository {
             logger.lifecycle("Unshallowing repo because the build is being executed on CI");
             jgitRepository.fetch()
                 .setUnshallow(true)
-                .setTransportConfigCallback(transportConfigFactory.create(identity))
+                .setTransportConfigCallback(transportConfigFactory.create(identity, jgitRepository.getRepository()))
                 .call();
         } catch (GitAPIException e) {
             logger.warn("Unable to unshallow repo on GitHub actions, continuing with shallow repo", e);
@@ -117,7 +117,7 @@ public class GitRepository implements ScmRepository {
         FetchCommand fetch = jgitRepository.fetch()
             .setRemote(remoteName)
             .setTagOpt(TagOpt.FETCH_TAGS)
-            .setTransportConfigCallback(transportConfigFactory.create(identity));
+            .setTransportConfigCallback(transportConfigFactory.create(identity, jgitRepository.getRepository()));
         try {
             fetch.call();
         } catch (GitAPIException e) {
@@ -230,7 +230,7 @@ public class GitRepository implements ScmRepository {
             push.setPushAll();
         }
 
-        push.setTransportConfigCallback(transportConfigFactory.create(identity));
+        push.setTransportConfigCallback(transportConfigFactory.create(identity, jgitRepository.getRepository()));
 
         return push;
     }
