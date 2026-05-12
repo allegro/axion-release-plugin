@@ -1,5 +1,5 @@
 [versions]
-jgit = "7.4.0.202509020913-r"
+jgit = "7.6.0.202603022253-r"
 
 [libraries]
 jgit = { module = "org.eclipse.jgit:org.eclipse.jgit", version.ref = "jgit" }
