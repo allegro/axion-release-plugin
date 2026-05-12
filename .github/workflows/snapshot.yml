@@ -17,7 +17,7 @@ jobs:
           java-version: 17
           distribution: temurin
 
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: Publish snapshot to Maven Central
         run: ./gradlew publish
