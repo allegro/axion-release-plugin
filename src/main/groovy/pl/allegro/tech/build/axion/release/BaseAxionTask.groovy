@@ -4,11 +4,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Nested
+import org.gradle.work.DisableCachingByDefault
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
 import pl.allegro.tech.build.axion.release.infrastructure.di.VersionResolutionContext
 
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "SCM release tasks have side effects and must always run")
 abstract class BaseAxionTask extends DefaultTask {
     @Nested
     VersionConfig versionConfig

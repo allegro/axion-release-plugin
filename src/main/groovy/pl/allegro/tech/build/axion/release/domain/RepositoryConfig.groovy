@@ -8,6 +8,8 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 
 import javax.inject.Inject
 
@@ -58,6 +60,7 @@ abstract class RepositoryConfig extends BaseExtension {
     abstract Property<String> getCustomKey()
 
     @InputFile
+    @PathSensitive(PathSensitivity.ABSOLUTE)
     @Optional
     abstract RegularFileProperty getCustomKeyFile()
 
