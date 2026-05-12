@@ -7,7 +7,7 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.21.0"
+    id("pl.allegro.tech.build.axion-release") version "1.21.1"
     id("com.gradle.plugin-publish") version "2.0.0"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.5.1"
@@ -70,10 +70,10 @@ dependencies {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
-    testImplementation("net.bytebuddy:byte-buddy:1.18.1")
+    testImplementation("net.bytebuddy:byte-buddy:1.18.2")
     testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.16.0")
-    testImplementation("org.apache.sshd:sshd-git:2.16.0")
+    testImplementation("org.apache.sshd:sshd-core:2.17.1")
+    testImplementation("org.apache.sshd:sshd-git:2.17.1")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }

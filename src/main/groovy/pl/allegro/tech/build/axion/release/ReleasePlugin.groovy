@@ -30,7 +30,15 @@ abstract class ReleasePlugin implements Plugin<Project> {
         Gradle rootGradle = project.gradle
         while(rootGradle.parent != null) { rootGradle = rootGradle.parent }
 
-        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, rootGradle.rootProject.layout.projectDirectory)
+        def projectDirectory
+        try {
+            projectDirectory = rootGradle.rootProject.layout.projectDirectory
+        } catch (IllegalStateException ignored) {
+            // root project not yet available when applied inside pluginManagement { includeBuild() }
+            projectDirectory = project.rootProject.layout.projectDirectory
+        }
+
+        VersionConfig versionConfig = project.extensions.create(VERSION_EXTENSION, VersionConfig, projectDirectory)
 
         project.tasks.withType(BaseAxionTask).configureEach({
             it.versionConfig = versionConfig
