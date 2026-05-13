@@ -70,7 +70,7 @@ dependencies {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
-    testImplementation("net.bytebuddy:byte-buddy:1.18.2")
+    testImplementation("net.bytebuddy:byte-buddy:1.18.8")
     testImplementation("org.objenesis:objenesis:3.4")
     testImplementation("org.apache.sshd:sshd-core:2.17.1")
     testImplementation("org.apache.sshd:sshd-git:2.17.1")
