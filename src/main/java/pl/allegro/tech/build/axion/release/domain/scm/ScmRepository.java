@@ -8,7 +8,11 @@ public interface ScmRepository {
 
     void fetchTags(ScmIdentity identity, String remoteName);
 
-    void tag(String tagName);
+    default void tag(String tagName) {
+        tag(tagName, "");
+    }
+
+    void tag(String tagName, String tagMessage);
 
     void dropTag(String tagName);
 
