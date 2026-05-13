@@ -66,7 +66,7 @@ dependencies {
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.junit.jupiter:junit-jupiter:6.0.3")
-    testImplementation("org.testcontainers:spock:1.21.3") {
+    testImplementation("org.testcontainers:spock:1.21.4") {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
