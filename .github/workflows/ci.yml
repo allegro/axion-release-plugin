@@ -38,7 +38,7 @@ jobs:
         run: gradle jacocoTestReport
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         if: ${{ matrix.gradle-version == 'current' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
