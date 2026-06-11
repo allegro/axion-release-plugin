@@ -7,8 +7,8 @@ plugins {
     signing
     jacoco
     idea
-    id("pl.allegro.tech.build.axion-release") version "1.21.1"
-    id("com.gradle.plugin-publish") version "2.0.0"
+    id("pl.allegro.tech.build.axion-release") version "1.21.2"
+    id("com.gradle.plugin-publish") version "2.1.1"
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
     id("com.coditory.integration-test") version "1.5.1"
     id("com.adarshr.test-logger") version "4.0.0"
@@ -49,7 +49,7 @@ dependencies {
     runtimeOnly(libs.bundles.jgit.runtime)
     runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.82")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.18.1")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.19.0")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
     implementation("com.github.mwiede:jsch:0.2.24")
@@ -65,15 +65,15 @@ dependencies {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.0.1")
-    testImplementation("org.testcontainers:spock:1.21.3") {
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.0")
+    testImplementation("org.testcontainers:spock:1.21.4") {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
-    testImplementation("net.bytebuddy:byte-buddy:1.18.2")
-    testImplementation("org.objenesis:objenesis:3.4")
-    testImplementation("org.apache.sshd:sshd-core:2.17.1")
-    testImplementation("org.apache.sshd:sshd-git:2.17.1")
+    testImplementation("net.bytebuddy:byte-buddy:1.18.10")
+    testImplementation("org.objenesis:objenesis:3.5")
+    testImplementation("org.apache.sshd:sshd-core:2.18.0")
+    testImplementation("org.apache.sshd:sshd-git:2.18.0")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
