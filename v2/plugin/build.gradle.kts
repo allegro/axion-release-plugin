@@ -24,6 +24,8 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito:mockito-core:5.+")
+    testImplementation(libs.assertj.core)
+    testImplementation(libs.junit.jupiter.params)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

@@ -1,0 +1,68 @@
+name: Test Examples
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test-example:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: [single-module, multi-module, hooks, version-creator]
+
+    name: "${{ matrix.example }}"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Copy example out of repo
+        run: cp -r examples/${{ matrix.example }} /tmp/example
+
+      - name: Fix plugin includeBuild path
+        run: |
+          sed -i 's|includeBuild("\.\./\.\.")|includeBuild("${{ github.workspace }}")|g' \
+            /tmp/example/settings.gradle.kts
+
+      - name: Initialize git repository
+        working-directory: /tmp/example
+        run: |
+          git init -b main
+          git config user.email "github-actions@github.com"
+          git config user.name "GitHub Actions"
+          git add .
+          git commit -m "initial commit"
+
+      - name: Add version tag (single-module / hooks / version-creator)
+        if: matrix.example != 'multi-module'
+        working-directory: /tmp/example
+        run: |
+          git tag v1.0.0
+          git commit --allow-empty -m "next feature"
+
+      - name: Add per-module version tags (multi-module)
+        if: matrix.example == 'multi-module'
+        working-directory: /tmp/example
+        run: |
+          git tag list-v1.0.0
+          git tag utils-v2.0.0
+          git commit --allow-empty -m "next feature"
+
+      - name: Determine release task
+        id: task
+        run: |
+          if [ "${{ matrix.example }}" = "multi-module" ]; then
+            echo "cmd=:list:createRelease :utilities:createRelease" >> "$GITHUB_OUTPUT"
+          else
+            echo "cmd=createRelease" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run dry-run release
+        working-directory: /tmp/example
+        run: ./gradlew ${{ steps.task.outputs.cmd }} -Prelease.dryRun=true
