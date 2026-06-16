@@ -1,6 +1,9 @@
-# Ignore Gradle project-specific cache directory
+# Gradle build outputs and caches
 .gradle
-
-# Ignore Gradle build output directory
-build
+/build
+/plugin/build
 .kotlin
+.DS_Store
+*.iml
+.idea
+local.properties
