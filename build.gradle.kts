@@ -72,8 +72,8 @@ dependencies {
     testImplementation("org.apache.commons:commons-compress:1.28.0")
     testImplementation("net.bytebuddy:byte-buddy:1.18.11")
     testImplementation("org.objenesis:objenesis:3.5")
-    testImplementation("org.apache.sshd:sshd-core:2.18.0")
-    testImplementation("org.apache.sshd:sshd-git:2.18.0")
+    testImplementation("org.apache.sshd:sshd-core:2.19.0")
+    testImplementation("org.apache.sshd:sshd-git:2.19.0")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
