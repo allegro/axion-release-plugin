@@ -23,7 +23,7 @@ class NoOpRepository implements ScmRepository {
     }
 
     @Override
-    void tag(String tagName) {
+    void tag(String tagName, String tagMessage) {
         log("creating tag with name: $tagName")
     }
 

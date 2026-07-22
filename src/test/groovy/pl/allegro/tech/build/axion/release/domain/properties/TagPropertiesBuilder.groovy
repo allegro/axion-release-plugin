@@ -1,6 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.properties
 
 import pl.allegro.tech.build.axion.release.TagPrefixConf
+import pl.allegro.tech.build.axion.release.domain.TagMessageCreator
 import pl.allegro.tech.build.axion.release.domain.TagNameSerializer
 
 class TagPropertiesBuilder {
@@ -8,6 +9,7 @@ class TagPropertiesBuilder {
     private String prefix = TagPrefixConf.defaultPrefix()
     private List<String> fallbackPrefixes = Collections.emptyList()
     private String separator = TagPrefixConf.defaultSeparator()
+    private TagProperties.MessageCreator messageCreator = TagMessageCreator.DEFAULT.messageCreator
 
     private TagPropertiesBuilder() {
     }
@@ -23,7 +25,8 @@ class TagPropertiesBuilder {
             separator,
             TagNameSerializer.DEFAULT.serializer,
             TagNameSerializer.DEFAULT.deserializer,
-            { r, p -> '0.1.0' }
+            { r, p -> '0.1.0' },
+            messageCreator
         )
     }
 
@@ -39,6 +42,11 @@ class TagPropertiesBuilder {
 
     TagPropertiesBuilder withSeparator(String separator) {
         this.separator = separator
+        return this
+    }
+
+    TagPropertiesBuilder withMessageCreator(TagProperties.MessageCreator messageCreator) {
+        this.messageCreator = messageCreator
         return this
     }
 }

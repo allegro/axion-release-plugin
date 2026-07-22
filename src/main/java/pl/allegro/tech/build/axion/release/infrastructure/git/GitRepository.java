@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.Status;
+import org.eclipse.jgit.api.TagCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.diff.DiffFormatter;
@@ -126,7 +127,7 @@ public class GitRepository implements ScmRepository {
     }
 
     @Override
-    public void tag(final String tagName) {
+    public void tag(final String tagName, final String tagMessage) {
         try {
             final String headId = head().name();
             List<Ref> tags = jgitRepository.tagList().call();
@@ -151,7 +152,11 @@ public class GitRepository implements ScmRepository {
             });
 
             if (!isOnExistingTag) {
-                jgitRepository.tag().setName(tagName).call();
+                final TagCommand tagCommand = jgitRepository.tag().setName(tagName);
+                if (tagMessage != null && !tagMessage.isBlank()) {
+                    tagCommand.setMessage(tagMessage);
+                }
+                tagCommand.call();
             } else {
                 logger.debug("The head commit " + headId + " already has the tag " + tagName + ".");
             }

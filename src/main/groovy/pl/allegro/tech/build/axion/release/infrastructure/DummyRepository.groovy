@@ -23,7 +23,7 @@ class DummyRepository implements ScmRepository {
     }
 
     @Override
-    void tag(String tagName) {
+    void tag(String tagName, String tagMessage) {
         log('create tag')
     }
 

@@ -5,6 +5,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import pl.allegro.tech.build.axion.release.domain.hooks.ReleaseHooksRunner;
 import pl.allegro.tech.build.axion.release.domain.properties.Properties;
+import pl.allegro.tech.build.axion.release.domain.scm.ScmPosition;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResult;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmPushResultOutcome;
 import pl.allegro.tech.build.axion.release.domain.scm.ScmService;
@@ -30,15 +31,20 @@ public class Releaser {
             properties.getVersion(), properties.getTag(), properties.getNextVersion()
         );
 
+        ScmPosition position = versionContext.getPosition();
         Version version = versionContext.getVersion();
+        Version previousVersion = versionContext.getPreviousVersion();
 
         if (versionContext.isSnapshot()) {
             String tagName = properties.getTag().getSerialize().apply(properties.getTag(), version.toString());
+            String tagMessage = properties.getTag().getMessageCreator().apply(
+                position, version.toString(), previousVersion.toString()
+            );
 
             hooksRunner.runPreReleaseHooks(properties.getHooks(), properties, versionContext, version);
 
             logger.quiet("Creating tag: " + tagName);
-            repository.tag(tagName);
+            repository.tag(tagName, tagMessage);
 
             hooksRunner.runPostReleaseHooks(properties.getHooks(), properties, versionContext, version);
             return Optional.of(tagName);
