@@ -9,9 +9,37 @@ on:
 jobs:
   build:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        gradle-version: ["7.6", "8.0", "8.3", "8.4", "8.5", "8.6", "8.7", "8.8", "8.9", "8.10", "8.11", "8.12", "8.13", "9.6.0", "current"]
+        # gradle-version capped by which JDKs it can run on:
+        # 7.6/8.0 -> JDK <=19, 8.5/8.13 -> JDK <=21, 9.x -> JDK 17-25(+EA)
+        include:
+          - gradle-version: "7.6"
+            java-version: "17"
+          - gradle-version: "8.0"
+            java-version: "17"
+          - gradle-version: "8.5"
+            java-version: "17"
+          - gradle-version: "8.5"
+            java-version: "21"
+          - gradle-version: "8.13"
+            java-version: "17"
+          - gradle-version: "8.13"
+            java-version: "21"
+          - gradle-version: "9.6.0"
+            java-version: "17"
+          - gradle-version: "9.6.0"
+            java-version: "21"
+          - gradle-version: "9.6.0"
+            java-version: "25"
+          - gradle-version: "current"
+            java-version: "17"
+          - gradle-version: "current"
+            java-version: "21"
+          - gradle-version: "current"
+            java-version: "25"
+          - gradle-version: "current"
+            java-version: "26-ea"
 
     runs-on: ubuntu-latest
 
@@ -22,23 +50,23 @@ jobs:
         uses: actions/setup-java@v5
         with:
             distribution: temurin
-            java-version: 17
+            java-version: ${{ matrix.java-version }}
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
         with:
-          dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch && matrix.gradle-version == 'current') && 'generate-and-submit' || 'disabled' }}
+          dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch && matrix.gradle-version == 'current' && matrix.java-version == '17') && 'generate-and-submit' || 'disabled' }}
           gradle-version: ${{ matrix.gradle-version }}
 
       - name: Test with Gradle
         run: gradle build
 
       - name: Jacoco
-        if: ${{ matrix.gradle-version == 'current' }}
+        if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
         run: gradle jacocoTestReport
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v7
-        if: ${{ matrix.gradle-version == 'current' }}
+        if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
