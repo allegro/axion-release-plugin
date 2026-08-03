@@ -33,7 +33,7 @@ abstract class ReleasePlugin implements Plugin<Project> {
         def projectDirectory
         try {
             projectDirectory = rootGradle.rootProject.layout.projectDirectory
-        } catch (IllegalStateException ignored) {
+        } catch (IllegalStateException | IllegalArgumentException ignored) {
             // root project not yet available when applied inside pluginManagement { includeBuild() }
             projectDirectory = project.rootProject.layout.projectDirectory
         }
