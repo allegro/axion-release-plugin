@@ -16,21 +16,15 @@ jobs:
         include:
           - gradle-version: "7.6"
             java-version: "17"
-          - gradle-version: "8.0"
+          - gradle-version: "8.14.5"
             java-version: "17"
-          - gradle-version: "8.5"
-            java-version: "17"
-          - gradle-version: "8.5"
-            java-version: "21"
-          - gradle-version: "8.13"
-            java-version: "17"
-          - gradle-version: "8.13"
+          - gradle-version: "8.14.5"
             java-version: "21"
           - gradle-version: "9.6.0"
             java-version: "17"
           - gradle-version: "9.6.0"
             java-version: "21"
-          - gradle-version: "9.6.0"
+          - gradle-version: "9.6.1"
             java-version: "25"
           - gradle-version: "current"
             java-version: "17"
@@ -39,7 +33,7 @@ jobs:
           - gradle-version: "current"
             java-version: "25"
           - gradle-version: "current"
-            java-version: "26-ea"
+            java-version: "latest"
 
     runs-on: ubuntu-latest
 
