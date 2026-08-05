@@ -21,12 +21,17 @@ public class TagProperties {
         String apply(TagProperties tagProperties, ScmPosition position);
     }
 
+    public interface MessageCreator {
+        String apply(ScmPosition position, String version, String previousVersion);
+    }
+
     private final String prefix;
     private final List<String> fallbackPrefixes;
     private final String versionSeparator;
     private final Serializer serialize;
     private final Deserializer deserialize;
     private final InitialVersionSupplier initialVersion;
+    private final MessageCreator messageCreator;
 
     public TagProperties(
         String prefix,
@@ -34,7 +39,8 @@ public class TagProperties {
         String versionSeparator,
         Serializer serialize,
         Deserializer deserialize,
-        InitialVersionSupplier initialVersion
+        InitialVersionSupplier initialVersion,
+        MessageCreator messageCreator
     ) {
         this.prefix = prefix;
         this.fallbackPrefixes = fallbackPrefixes;
@@ -42,6 +48,7 @@ public class TagProperties {
         this.serialize = serialize;
         this.deserialize = deserialize;
         this.initialVersion = initialVersion;
+        this.messageCreator = messageCreator;
     }
 
     public final String getPrefix() {
@@ -73,5 +80,9 @@ public class TagProperties {
 
     public final InitialVersionSupplier getInitialVersion() {
         return initialVersion;
+    }
+
+    public final MessageCreator getMessageCreator() {
+        return messageCreator;
     }
 }

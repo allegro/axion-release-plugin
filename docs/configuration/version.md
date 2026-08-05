@@ -197,6 +197,19 @@ that will construct initial version:
 
 Input objects have same structure as deserialization closure inputs.
 
+### Tag message
+
+The default message creator will skip adding a message by returning an empty string.
+
+You can implement your own message creator by setting a closure that would accept
+position in SCM, current version and previous version:
+
+    scmVersion {
+        tag {
+            messageCreator({position, version, previousVersion -> ...})
+        }
+    }
+
 ## Incrementing
 
 Incrementing phase does increment the version in accordance with

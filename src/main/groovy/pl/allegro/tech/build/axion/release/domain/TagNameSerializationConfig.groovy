@@ -18,6 +18,7 @@ abstract class TagNameSerializationConfig extends BaseExtension {
         prefix.convention(TagPrefixConf.defaultPrefix())
         fallbackPrefixes.convention(Collections.emptyList())
         versionSeparator.convention(TagPrefixConf.defaultSeparator())
+        messageCreator.convention(TagMessageCreator.DEFAULT.messageCreator)
     }
 
     @Input
@@ -41,6 +42,9 @@ abstract class TagNameSerializationConfig extends BaseExtension {
     @Internal
     abstract Property<TagProperties.InitialVersionSupplier> getInitialVersion()
 
+    @Internal
+    abstract Property<TagProperties.MessageCreator> getMessageCreator()
+
     @Deprecated
     void setSerializer(TagProperties.Serializer serializer) {
         this.serialize.set(serializer)
@@ -61,6 +65,10 @@ abstract class TagNameSerializationConfig extends BaseExtension {
 
     void initialVersion(TagProperties.InitialVersionSupplier versionSupplier){
         this.initialVersion.set(versionSupplier)
+    }
+
+    void messageCreator(TagProperties.MessageCreator messageCreator) {
+        this.messageCreator.set(messageCreator)
     }
 
     private static TagProperties.InitialVersionSupplier defaultInitialVersion() {

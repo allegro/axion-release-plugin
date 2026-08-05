@@ -22,8 +22,8 @@ public class ScmService {
         this.repository = repository;
     }
 
-    public void tag(String tagName) {
-        repository.tag(tagName);
+    public void tag(String tagName, String tagMessage) {
+        repository.tag(tagName, tagMessage);
     }
 
     public void dropTag(String tagName) {

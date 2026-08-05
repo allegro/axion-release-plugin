@@ -56,6 +56,7 @@ scmVersion {
         // configure via function calls
         deserializer({ tagProperties, scmPosition, String -> "tag" })
         serializer({ tagProperties, version -> "tag" })
+        messageCreator({ scmPosition, version, previousVersion -> "message" })
     }
     repository {
         type.set("git")
