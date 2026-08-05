@@ -45,7 +45,7 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
             apply plugin: 'java'
 
             allprojects {
-                version = scmVersion.version
+                version = rootProject.scmVersion.version
             }
 
             dependencies {
@@ -63,12 +63,12 @@ class VerifyReleaseIntegrationTest extends BaseIntegrationTest {
             apply plugin: 'java'
 
             allprojects {
-                scmVersion {
+                rootProject.scmVersion {
                     tag {
                         prefix = name
                     }
                 }
-                version = scmVersion.version
+                version = rootProject.scmVersion.version
             }
 
             dependencies {

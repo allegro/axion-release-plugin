@@ -47,9 +47,9 @@ sourceSets {
 dependencies {
     api(localGroovy())
     runtimeOnly(libs.bundles.jgit.runtime)
-    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.82")
+    runtimeOnly("org.bouncycastle:bcprov-jdk18on:1.84")
     runtimeOnly("com.kohlschutter.junixsocket:junixsocket-core:2.9.1")
-    runtimeOnly("net.java.dev.jna:jna-platform:5.19.0")
+    runtimeOnly("net.java.dev.jna:jna-platform:5.19.1")
 
     implementation(libs.bundles.jgit.ssh) { exclude("com.jcraft", "jsch") }
     implementation("com.github.mwiede:jsch:0.2.24")
@@ -65,15 +65,15 @@ dependencies {
         testImplementation("org.spockframework:spock-core:2.4-M6-groovy-3.0")
     }
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:6.1.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
     testImplementation("org.testcontainers:spock:1.21.4") {
         exclude("org.apache.commons", "commons-compress")
     }
     testImplementation("org.apache.commons:commons-compress:1.28.0")
-    testImplementation("net.bytebuddy:byte-buddy:1.18.10")
+    testImplementation("net.bytebuddy:byte-buddy:1.18.11")
     testImplementation("org.objenesis:objenesis:3.5")
-    testImplementation("org.apache.sshd:sshd-core:2.18.0")
-    testImplementation("org.apache.sshd:sshd-git:2.18.0")
+    testImplementation("org.apache.sshd:sshd-core:2.19.0")
+    testImplementation("org.apache.sshd:sshd-git:2.19.0")
     testImplementation("com.github.stefanbirkner:system-lambda:1.2.1")
     testImplementation(gradleTestKit())
 }
