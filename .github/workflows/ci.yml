@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Set up JDK
-        uses: actions/setup-java@v5.7.0
+        uses: actions/setup-java@main
         with:
             distribution: temurin
             java-version: ${{ matrix.java-version }}
