@@ -42,7 +42,7 @@ jobs:
         with:
             distribution: temurin
             java-version: ${{ matrix.java-version }}
-      - uses: gradle/actions/setup-gradle@v6.2.0
+      - uses: gradle/actions/setup-gradle@v6.3.0
         with:
           dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch && matrix.gradle-version == 'current' && matrix.java-version == '17') && 'generate-and-submit' || 'disabled' }}
           gradle-version: ${{ matrix.gradle-version }}
