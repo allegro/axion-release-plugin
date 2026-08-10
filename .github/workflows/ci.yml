@@ -46,7 +46,7 @@ jobs:
         with:
           dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch && matrix.gradle-version == 'current' && matrix.java-version == '17') && 'generate-and-submit' || 'disabled' }}
           gradle-version: ${{ matrix.gradle-version }}
-      - run: ./gradlew build
+      - run: gradle build
       - if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
         run: gradle jacocoTestReport
       - uses: codecov/codecov-action@v7
