@@ -1,11 +1,12 @@
 name: Build
-
 on:
   pull_request:
   workflow_dispatch:
   push:
     branches: [main]
-
+permissions:
+  contents: write
+  pull-requests: write
 jobs:
   build:
     strategy:
@@ -34,33 +35,22 @@ jobs:
             java-version: "25"
           - gradle-version: "current"
             java-version: "latest"
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v7
-
-      - name: Set up JDK
-        uses: actions/setup-java@main
+      - uses: actions/setup-java@main
         with:
             distribution: temurin
             java-version: ${{ matrix.java-version }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v6.2.0
+      - uses: gradle/actions/setup-gradle@v6.2.0
         with:
           dependency-graph: ${{(github.event.repository != null && github.ref_name == github.event.repository.default_branch && matrix.gradle-version == 'current' && matrix.java-version == '17') && 'generate-and-submit' || 'disabled' }}
           gradle-version: ${{ matrix.gradle-version }}
-
-      - name: Test with Gradle
-        run: gradle build
-
-      - name: Jacoco
-        if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
+      - run: ./gradlew build
+      - if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
         run: gradle jacocoTestReport
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7
+      - uses: codecov/codecov-action@v7
         if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+      - uses: allegro-actions/dependabot-automerge@v1
