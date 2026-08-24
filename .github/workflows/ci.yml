@@ -54,3 +54,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - uses: allegro-actions/dependabot-automerge@v1
+        if: ${{ matrix.gradle-version == 'current' && matrix.java-version == '17' }}
