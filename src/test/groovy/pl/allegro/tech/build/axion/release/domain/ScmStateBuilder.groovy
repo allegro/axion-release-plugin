@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain
 
+import java.util.function.BooleanSupplier
+
 class ScmStateBuilder {
 
     private boolean onReleaseTag = false
@@ -15,7 +17,7 @@ class ScmStateBuilder {
     }
 
     ScmState build() {
-        return new ScmState(onReleaseTag, onNextVersionTag, noReleaseTagsFound, hasUncommittedChanges)
+        return new ScmState(onReleaseTag, onNextVersionTag, noReleaseTagsFound, { hasUncommittedChanges } as BooleanSupplier)
     }
 
     ScmStateBuilder onReleaseTag() {

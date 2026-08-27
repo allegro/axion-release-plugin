@@ -52,7 +52,7 @@ public class VersionResolver {
             versions.onReleaseTag,
             versions.onNextVersionTag,
             versions.noTagsFound,
-            repository.checkUncommittedChanges()
+            repository::checkUncommittedChanges
         );
 
         VersionFactory.FinalVersion finalVersion = versionFactory.createFinalVersion(scmState, versions.current);
