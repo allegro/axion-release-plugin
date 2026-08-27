@@ -44,16 +44,24 @@ public class NativeGitRepository implements ScmRepository {
 
     private static final String NULL_DEVICE = ProcessBuilder.Redirect.DISCARD.file().getPath();
 
+    private static final int DEFAULT_WALK_CHUNK_SIZE = 2000;
+
     private final File repositoryDir;
     private final ScmProperties properties;
     private final ScmRepository writeDelegate;
     private final ProviderFactory providers;
+    private final int walkChunkSize;
 
     public NativeGitRepository(ScmProperties properties, ScmRepository writeDelegate) {
+        this(properties, writeDelegate, DEFAULT_WALK_CHUNK_SIZE);
+    }
+
+    NativeGitRepository(ScmProperties properties, ScmRepository writeDelegate, int walkChunkSize) {
         this.properties = properties;
         this.repositoryDir = properties.getDirectory();
         this.writeDelegate = writeDelegate;
         this.providers = properties.getProviders();
+        this.walkChunkSize = walkChunkSize;
     }
 
     @Override
@@ -200,17 +208,38 @@ public class NativeGitRepository implements ScmRepository {
 
     /**
      * Commits are emitted in commit date order, which is what JGit's {@code RevSort.NONE} walk does as well.
+     * <p>
+     * The answer is normally a handful of commits away from the start, so a bounded first pass avoids reading
+     * the whole history. Falling back to the full walk keeps the result identical to an unbounded one.
      *
      * @param inclusive when false the starting commit itself is skipped
      * @param visitor   returns false to stop the walk
      */
     private void walkCommits(String startingCommit, boolean inclusive, Predicate<String> visitor) {
-        List<String> commits = lines(git(Arrays.asList("rev-list", startingCommit)));
-        for (int i = inclusive ? 0 : 1; i < commits.size(); i++) {
+        List<String> chunk = revList(startingCommit, walkChunkSize);
+        boolean historyExhausted = chunk.size() < walkChunkSize;
+
+        if (!visit(chunk, inclusive ? 0 : 1, visitor) || historyExhausted) {
+            return;
+        }
+
+        visit(revList(startingCommit, 0), chunk.size(), visitor);
+    }
+
+    private boolean visit(List<String> commits, int fromIndex, Predicate<String> visitor) {
+        for (int i = fromIndex; i < commits.size(); i++) {
             if (!visitor.test(commits.get(i))) {
-                return;
+                return false;
             }
         }
+        return true;
+    }
+
+    private List<String> revList(String startingCommit, int maxCount) {
+        List<String> arguments = maxCount > 0
+            ? Arrays.asList("rev-list", "--max-count=" + maxCount, startingCommit)
+            : Arrays.asList("rev-list", startingCommit);
+        return lines(git(arguments));
     }
 
     @Override

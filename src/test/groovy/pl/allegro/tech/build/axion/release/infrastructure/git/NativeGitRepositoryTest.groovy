@@ -200,6 +200,38 @@ class NativeGitRepositoryTest extends Specification {
         tags.tags == [fullPrefix() + '1.0.0', fullPrefix() + '2.0.0']
     }
 
+    def "should fall back to full history walk when tag is beyond the bounded walk"() {
+        given:
+        repository.tag(fullPrefix() + '1.0.0')
+        5.times { repository.commit(['*'], "commit $it after release") }
+
+        and: 'a repository that only reads two commits per walk'
+        NativeGitRepository chunkedRepository = new NativeGitRepository(
+            scmProperties(repositoryDir).build(), jgitRepository, 2)
+
+        when:
+        TagsOnCommit tags = chunkedRepository.latestTags(ANY_PREFIXED_TAG)
+
+        then:
+        tags.tags == [fullPrefix() + '1.0.0']
+        tags.commitId == repository.latestTags(ANY_PREFIXED_TAG).commitId
+    }
+
+    def "should stop at the nearest tag without walking the whole history"() {
+        given:
+        repository.tag(fullPrefix() + '1.0.0')
+        repository.commit(['*'], 'commit after 1.0.0')
+        repository.tag(fullPrefix() + '2.0.0')
+        repository.commit(['*'], 'commit after 2.0.0')
+
+        and:
+        NativeGitRepository chunkedRepository = new NativeGitRepository(
+            scmProperties(repositoryDir).build(), jgitRepository, 2)
+
+        expect:
+        chunkedRepository.latestTags(ANY_PREFIXED_TAG).tags == [fullPrefix() + '2.0.0']
+    }
+
     def "should provide current branch name and commit id in position"() {
         given:
         rawRepository.checkout(branch: 'some-branch', createBranch: true)
