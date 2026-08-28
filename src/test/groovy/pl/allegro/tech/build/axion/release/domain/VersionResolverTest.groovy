@@ -4,6 +4,7 @@ import pl.allegro.tech.build.axion.release.RepositoryBasedTest
 import pl.allegro.tech.build.axion.release.domain.properties.NextVersionProperties
 import pl.allegro.tech.build.axion.release.domain.properties.TagProperties
 import pl.allegro.tech.build.axion.release.domain.properties.VersionProperties
+import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.defaultPrefix
 import static pl.allegro.tech.build.axion.release.TagPrefixConf.fullPrefix
@@ -449,5 +450,39 @@ class VersionResolverTest extends RepositoryBasedTest {
         version.previousVersion.toString() == '2.0.0'
         version.version.toString() == '2.0.0'
         !version.snapshot
+    }
+
+    def "should not scan working tree for uncommitted changes when they are ignored"() {
+        given:
+        repository.tag(fullPrefix() + '1.1.0')
+        repository.commit(['*'], 'some commit')
+
+        CountingRepository ignoring = new CountingRepository(repository)
+        CountingRepository checking = new CountingRepository(repository)
+
+        when:
+        new VersionResolver(ignoring, "").resolveVersion(versionProperties().build(), tagRules, nextVersionRules)
+        new VersionResolver(checking, "").resolveVersion(versionProperties().dontIgnoreUncommittedChanges().build(), tagRules, nextVersionRules)
+
+        then: 'the only difference is the single check VersionFactory short-circuits away'
+        checking.uncommittedChangesChecks == ignoring.uncommittedChangesChecks + 1
+    }
+
+    static class CountingRepository implements ScmRepository {
+
+        @Delegate
+        private final ScmRepository delegate
+
+        int uncommittedChangesChecks = 0
+
+        CountingRepository(ScmRepository delegate) {
+            this.delegate = delegate
+        }
+
+        @Override
+        boolean checkUncommittedChanges() {
+            uncommittedChangesChecks++
+            return delegate.checkUncommittedChanges()
+        }
     }
 }
