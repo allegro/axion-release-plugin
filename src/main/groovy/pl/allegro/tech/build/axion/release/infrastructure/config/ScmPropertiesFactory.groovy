@@ -2,6 +2,7 @@ package pl.allegro.tech.build.axion.release.infrastructure.config
 
 
 import pl.allegro.tech.build.axion.release.domain.VersionConfig
+import pl.allegro.tech.build.axion.release.domain.scm.ScmBackend
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 
 class ScmPropertiesFactory {
@@ -21,7 +22,9 @@ class ScmPropertiesFactory {
             config.getReleaseBranchNames().get(),
             config.getReleaseOnlyOnReleaseBranches().get(),
             config.getIgnoreGlobalGitConfig().get(),
-            config.tag.prefix.get()
+            config.tag.prefix.get(),
+            ScmBackend.of(config.repository.backend().getOrNull()),
+            config.providerFactory
         )
     }
 }
