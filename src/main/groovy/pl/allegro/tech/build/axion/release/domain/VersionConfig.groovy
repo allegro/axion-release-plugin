@@ -5,6 +5,7 @@ import org.gradle.api.file.Directory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -58,6 +59,14 @@ abstract class VersionConfig extends BaseExtension {
 
     @Nested
     final RepositoryConfig repository
+
+    /**
+     * Needed by scm backends that shell out and therefore have to go through Gradle's exec provider.
+     */
+    @Internal
+    ProviderFactory getProviderFactory() {
+        return providers
+    }
 
     @Nested
     final TagNameSerializationConfig tag = objects.newInstance(TagNameSerializationConfig)
