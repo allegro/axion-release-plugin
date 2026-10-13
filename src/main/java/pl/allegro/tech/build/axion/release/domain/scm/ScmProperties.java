@@ -1,5 +1,7 @@
 package pl.allegro.tech.build.axion.release.domain.scm;
 
+import org.gradle.api.provider.ProviderFactory;
+
 import java.io.File;
 import java.util.Optional;
 import java.util.Set;
@@ -21,6 +23,8 @@ public class ScmProperties {
     private final boolean releaseOnlyOnReleaseBranches;
     private final boolean ignoreGlobalGitConfig;
     private final String tagPrefix;
+    private final ScmBackend backend;
+    private final ProviderFactory providers;
 
     public ScmProperties(
         String type,
@@ -37,7 +41,9 @@ public class ScmProperties {
         Set<String> releaseBranchNames,
         boolean releaseOnlyOnReleaseBranches,
         boolean ignoreGlobalGitConfig,
-        String tagPrefix
+        String tagPrefix,
+        ScmBackend backend,
+        ProviderFactory providers
     ) {
         this.type = type;
         this.directory = directory;
@@ -54,6 +60,8 @@ public class ScmProperties {
         this.releaseOnlyOnReleaseBranches = releaseOnlyOnReleaseBranches;
         this.ignoreGlobalGitConfig = ignoreGlobalGitConfig;
         this.tagPrefix = tagPrefix;
+        this.backend = backend == null ? ScmBackend.JGIT : backend;
+        this.providers = providers;
     }
 
     public ScmPushOptions pushOptions() {
@@ -118,5 +126,16 @@ public class ScmProperties {
 
     public String tagPrefix() {
         return tagPrefix;
+    }
+
+    public ScmBackend getBackend() {
+        return backend;
+    }
+
+    /**
+     * Used by backends that shell out, so that they stay configuration cache compatible.
+     */
+    public ProviderFactory getProviders() {
+        return providers;
     }
 }
