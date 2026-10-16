@@ -1,1 +1,10 @@
-rootProject.name = "axion-release-plugin"
+@file:Suppress("UnstableApiUsage")
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
+rootProject.name = "tagline"
+include("plugin")

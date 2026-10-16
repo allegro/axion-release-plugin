@@ -1,33 +1,9 @@
-# Intellij Idea project files
-.idea
-*.iml
-*.ipr
-*.iws
-
-# Eclipse project files
-.classpath
-.project
-.settings/
-bin/
-
-# gradle config
+# Ignore Gradle project-specific cache directory
 .gradle
 
-# project binaries
-/build
-/out
-/classes
+# Ignore Gradle build output directory
+build
+!plugin/src/main/kotlin/pl/allegro/tech/build
 
-# sonar
-sonar-project.properties
-
-# mac os x
-.DS_Store
-
-# netbeans
-.nb-gradle
-.nb-gradle-properties
-
-# Vim
-*.swp
-.kotlin/
+# Ignore Kotlin plugin data
+.kotlin
