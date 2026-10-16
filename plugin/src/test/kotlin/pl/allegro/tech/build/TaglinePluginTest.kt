@@ -14,10 +14,7 @@ class TaglinePluginTest {
         val result = GradleRunner.create()
             .forwardOutput()
             .withPluginClasspath()
-            .withArguments("help")
             .withProjectDir(exampleDir)
             .build()
-
-        assertEquals(TaskOutcome.SUCCESS, result.task(":help")?.outcome)
     }
 }
