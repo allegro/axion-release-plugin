@@ -9,5 +9,6 @@ class TaglinePlugin : Plugin<Settings> {
 
     override fun apply(settings: Settings) {
         val extension = settings.extensions.create<TaglineExtension>("tagline")
+        val adapter = Adapters.selectAdapter(System.getenv())
     }
 }

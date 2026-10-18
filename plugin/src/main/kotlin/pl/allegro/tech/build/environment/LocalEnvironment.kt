@@ -1,6 +1,5 @@
 package pl.allegro.tech.build.environment
 
-import com.github.zafarkhaja.semver.Version
 import org.eclipse.jgit.api.Git
 import java.io.File
 import java.io.IOException
@@ -42,14 +41,8 @@ class LocalEnvironment : GitEnvironment {
             }
         }
 
-    override val currentVersion: Version
-        get() {
-            try {
-                val latestTag: String =
-                    git.describe().setTags(true).setAbbrev(0).setMatch("v*").call()
-                return Version.parse(latestTag.replaceFirst("v", ""))
-            } catch (e: Exception) {
-                throw RuntimeException(e)
-            }
-        }
+    override fun getTag(prefix: String): String {
+        //TODO: this wont work with useHighestVersion
+        return git.describe().setTags(true).setAbbrev(0).setMatch("$prefix*").call()
+    }
 }

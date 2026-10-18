@@ -7,6 +7,7 @@ plugins {
 dependencies {
     implementation("com.github.zafarkhaja:java-semver:0.10.2")
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r")
+    implementation("com.github.bgalek.github:github-models-dotcom:0.0.59")
     implementation("com.squareup.moshi:moshi:1.15.2")
     implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
 }
