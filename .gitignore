@@ -4,6 +4,7 @@
 # Ignore Gradle build output directory
 build
 !plugin/src/main/kotlin/pl/allegro/tech/build
+!plugin/src/test/kotlin/pl/allegro/tech/build
 
 # Ignore Kotlin plugin data
 .kotlin

@@ -6,9 +6,12 @@ import org.gradle.kotlin.dsl.create
 import pl.allegro.tech.build.extension.TaglineExtension
 
 class TaglinePlugin : Plugin<Settings> {
-
     override fun apply(settings: Settings) {
         val extension = settings.extensions.create<TaglineExtension>("tagline")
-        val adapter = Adapters.selectAdapter(System.getenv())
+        settings.gradle.settingsEvaluated {
+            Adapters.getAdapter(extension, EnvironmentVariables { name ->
+                settings.providers.environmentVariable(name).orNull
+            }, settings.settingsDir)
+        }
     }
 }

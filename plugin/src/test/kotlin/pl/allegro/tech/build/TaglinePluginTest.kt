@@ -1,10 +1,8 @@
 package pl.allegro.tech.build
 
 import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
 import java.io.File
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 class TaglinePluginTest {
     private val exampleDir = File("../examples/single-module").canonicalFile
