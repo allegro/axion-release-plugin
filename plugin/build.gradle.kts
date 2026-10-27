@@ -2,15 +2,13 @@
 
 plugins {
     `kotlin-dsl`
+    `java-library`
 }
 
 dependencies {
-    implementation("com.github.zafarkhaja:java-semver:0.10.2")
+    api("com.github.zafarkhaja:java-semver:0.10.2")
     implementation("org.eclipse.jgit:org.eclipse.jgit:7.8.0.202609011348-r")
     implementation("tools.jackson.core:jackson-databind:3.2.2")
-    implementation("com.github.bgalek.github:github-models-dotcom:0.0.59") {
-        exclude(group = "com.fasterxml.jackson.core", module = "jackson-databind")
-    }
 }
 
 java {
@@ -24,6 +22,15 @@ testing {
 
             dependencies {
                 implementation(project())
+            }
+
+            targets.configureEach {
+                testTask.configure {
+                    inputs.files(fileTree("../examples") {
+                        include("**/*.gradle.kts", "**/gradle.properties")
+                        exclude("**/build/**", "**/.gradle/**")
+                    }).withPropertyName("exampleBuilds").withPathSensitivity(PathSensitivity.RELATIVE)
+                }
             }
         }
     }

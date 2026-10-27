@@ -1,17 +1,16 @@
 ```kotlin
 tagline {
-    backend = [AUTO, GITHUB, GITLAB, GIT, JGIT]
+    backend = [AUTO, GIT, JGIT]
     
     versioning {
         branches {
             all {
                 tagPrefix = "v"
                 increment = [PATCH, MINOR, MAJOR]
-                useHighestVersion = true
+                tagLookup = [NEAREST_REACHABLE, HIGHEST_REACHABLE, HIGHEST_GLOBAL] // HIGHEST_GLOBAL by default
                 sanitize = true
                 snapshot {
                     enabled = true
-                    dirty = true
                     suffix = "-SNAPSHOT"
                 }
                 versionCreator = [
@@ -78,8 +77,8 @@ tasks {
     
     register("generateChangelog") {
         doLast {
-            tagline.currentVersion
-            tagline.nextVersion
+            ...tagline.currentVersion...
+            ...tagline.nextVersion...
         }
     }
 }
@@ -91,7 +90,7 @@ tasks {
 ./gradlew release -Ptagline.git.auth.username -Ptagline.git.auth.password
 ./gradlew release -Ptagline.dryRun
 ./gradlew release -Ptagline.localOnly
-./gradlew release -Ptagline.forceVersion=1.0.0.beta.1
+./gradlew release -Ptagline.forceVersion=1.0.0-beta.1
 ./gradlew release -Ptagline.forceVersion=1.0.0
 ```
 

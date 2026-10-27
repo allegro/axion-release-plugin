@@ -1,9 +1,9 @@
-import pl.allegro.tech.build.extension.Backend.AUTO
-import pl.allegro.tech.build.extension.Increment.MINOR
-import pl.allegro.tech.build.extension.VersionCreatorType.VERSION
-import pl.allegro.tech.build.extension.VersionCreatorType.VERSION_WITH_COMMIT_SHA
+import pl.allegro.tech.build.extension.TagLookup.HIGHEST_GLOBAL
 
 pluginManagement {
+    repositories {
+        mavenCentral()
+    }
     includeBuild("../..")
 }
 
@@ -14,53 +14,18 @@ plugins {
 rootProject.name = "single-module"
 
 tagline {
-    backend = AUTO
-
+    initialVersion = "0.1.0"
+    // AUTO detects CI and falls back to Git, then JGit. To force local tag lookup while keeping CI metadata:
+    // backend = pl.allegro.tech.build.extension.Backend.JGIT
+    // Feature branches use SNAPSHOT. The default branch omits branch and SNAPSHOT suffixes.
     versioning {
         branches {
             all {
-                tagPrefix = "v"
-                increment = MINOR
-                useHighestVersion = true
-                sanitize = true
-                snapshot {
-                    enabled = true
-                    dirty = true
-                    suffix = "-SNAPSHOT"
-                }
-                versionCreator = VERSION_WITH_COMMIT_SHA
+                tagLookup = HIGHEST_GLOBAL
             }
-
-            default {
-                versionCreator = VERSION
-                snapshot {
-                    enabled = false
-                }
-                release = true
-            }
-
-            named("release/*") {
-                tagPrefix = "rv"
-                versionCreator { version, position ->
-                    "$version-rc.${position.shortRevision}"
-                }
+            named("maintenance/*") {
+                tagPrefix = "maintenance-v"
             }
         }
-    }
-
-    releasing {
-        annotation {
-            message { position, version, previousVersion ->
-                "Released version $version (previous: ${previousVersion ?: "none"})"
-            }
-        }
-    }
-
-    git {
-        username = "ci-bot"
-        email = "ci-bot@example.com"
-        password = providers.environmentVariable("GIT_PASSWORD")
-        signing = false
-        requireAheadOfRemote = true
     }
 }
