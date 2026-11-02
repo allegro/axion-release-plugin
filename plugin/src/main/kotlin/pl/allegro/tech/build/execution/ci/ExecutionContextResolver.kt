@@ -13,6 +13,5 @@ internal interface ExecutionContextResolver {
     fun resolve(
         environment: EnvironmentVariables,
         fallback: ExecutionContext.Local,
-        readFile: (String) -> String,
     ): ExecutionContext.Ci
 }

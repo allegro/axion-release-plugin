@@ -11,14 +11,11 @@ import pl.allegro.tech.build.repository.RepositoryMetadataSource.Parameters
 
 internal abstract class RepositoryMetadataSource : ValueSource<RepositoryMetadata, Parameters> {
     override fun obtain(): RepositoryMetadata {
-        val executionContext = ExecutionContexts.resolve(parameters.environment.get()) { path ->
-            parameters.directory.get().asFile.resolve(path).readText()
-        }
+        val executionContext = ExecutionContexts.resolve(parameters.environment.get())
         return Adapters.metadataReader(
             parameters.backend.get(),
             executionContext,
-            parameters.directory.get().
-            asFile,
+            parameters.directory.get().asFile,
         ).readMetadata()
     }
 

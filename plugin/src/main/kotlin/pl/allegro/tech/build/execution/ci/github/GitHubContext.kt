@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.execution.ci.github
 
+import java.io.File
 import java.io.IOException
 import java.net.URI
 import pl.allegro.tech.build.execution.ApiAccess
@@ -67,13 +68,8 @@ internal data class GitHubContext(
         override fun resolve(
             environment: EnvironmentVariables,
             fallback: ExecutionContext.Local,
-            readFile: (String) -> String,
         ): GitHubContext {
-            val payload = try {
-                environment.maybeGet(EnvironmentField.EVENT_PAYLOAD)?.let(readFile)
-            } catch (failure: IOException) {
-                throw ProviderUnavailableException("GitHub event payload could not be read", failure)
-            }
+            val payload = environment.maybeGet(EnvironmentField.EVENT_PAYLOAD)?.let(::readPayload)
             val events = GitHubEvents(
                 environment.maybeGet(EnvironmentField.EVENT_NAME), environment.maybeGet(EnvironmentField.REF_TYPE),
                 environment.maybeGet(EnvironmentField.REF_NAME), payload,
@@ -95,6 +91,12 @@ internal data class GitHubContext(
                 apiUrl = environment.maybeGet(EnvironmentField.API_URL) ?: "https://api.github.com",
                 credential = environment.maybeGet(EnvironmentField.TOKEN)?.let { HeaderCredential("Authorization", "Bearer $it") },
             )
+        }
+
+        private fun readPayload(path: String): String = try {
+            File(path).readText()
+        } catch (failure: IOException) {
+            throw ProviderUnavailableException("GitHub event payload could not be read", failure)
         }
     }
 }

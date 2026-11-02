@@ -1,5 +1,6 @@
 package pl.allegro.tech.build.execution
 
+import java.io.File
 import java.io.IOException
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -7,7 +8,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertSame
 import pl.allegro.tech.build.execution.ci.EventTrigger
 import pl.allegro.tech.build.execution.ci.github.GitHubContext
 import pl.allegro.tech.build.execution.ci.gitlab.GitLabContext
@@ -19,7 +19,7 @@ class EnvironmentVariablesTest {
     fun `provider bindings normalize metadata endpoints and ordered token aliases`() {
         val githubValues = mapOf(
             "GITHUB_ACTIONS" to "true", "GITHUB_EVENT_NAME" to "push", "GITHUB_REF_TYPE" to "branch",
-            "GITHUB_REF_NAME" to "main", "GITHUB_SHA" to "revision", "GITHUB_EVENT_PATH" to "event.json",
+            "GITHUB_REF_NAME" to "main", "GITHUB_SHA" to "revision", "GITHUB_EVENT_PATH" to payload(),
             "GITHUB_REPOSITORY" to "example/library", "GITHUB_API_URL" to "https://github.example/api/v3/",
             "GH_TOKEN" to "preferred", "GITHUB_TOKEN" to "fallback",
         )
@@ -69,33 +69,48 @@ class EnvironmentVariablesTest {
 
     @Test
     fun `unavailable CI metadata falls back locally and inactive providers do not require metadata`() {
-        val values = mapOf("CI" to "true", "PATH" to "/usr/bin", "GITHUB_ACTIONS" to "true", "GITHUB_EVENT_PATH" to "missing.json")
-        val failure = ProviderUnavailableException("Missing CI payload")
-        val local = assertIs<ExecutionContext.Local>(read(values) { throw failure })
+        val values = mapOf(
+            "CI" to "true", "PATH" to "/usr/bin", "GITHUB_ACTIONS" to "true", "GITHUB_EVENT_PATH" to missingPayload(),
+        )
+        val local = assertIs<ExecutionContext.Local>(read(values))
         assertEquals("/usr/bin", local.executablePath)
-        assertSame(failure, local.fallbackFailure)
+        assertEquals("GitHub event payload could not be read", local.fallbackFailure?.message)
+        assertNotNull(local.fallbackFailure?.cause)
 
         assertIs<ExecutionContext.Local>(read(mapOf("GITHUB_ACTIONS" to "false", "GITLAB_CI" to "false")))
     }
 
     @Test
     fun `GitHub normalizes malformed and unreadable event payloads before context fallback`() {
-        val values = mapOf("GITHUB_ACTIONS" to "true", "GITHUB_EVENT_PATH" to "event.json")
-        val malformed = assertIs<ExecutionContext.Local>(read(values) { "{" })
+        val malformed = assertIs<ExecutionContext.Local>(read(mapOf(
+            "GITHUB_ACTIONS" to "true", "GITHUB_EVENT_PATH" to payload("{"),
+        )))
         assertEquals("GitHub event payload could not be parsed", malformed.fallbackFailure?.message)
         assertNotNull(malformed.fallbackFailure?.cause)
 
-        val unreadable = IOException("Fixture read failure")
-        val missing = assertIs<ExecutionContext.Local>(read(values) { throw unreadable })
-        assertEquals("GitHub event payload could not be read", missing.fallbackFailure?.message)
-        assertSame(unreadable, missing.fallbackFailure?.cause)
-
-        val bug = IllegalArgumentException("Unexpected provider failure")
-        assertSame(bug, assertFailsWith<IllegalArgumentException> { read(values) { throw bug } })
+        val unreadable = assertIs<ExecutionContext.Local>(read(mapOf(
+            "GITHUB_ACTIONS" to "true", "GITHUB_EVENT_PATH" to directoryPayload(),
+        )))
+        assertEquals("GitHub event payload could not be read", unreadable.fallbackFailure?.message)
+        assertIs<IOException>(unreadable.fallbackFailure?.cause)
     }
 
-    private fun read(
-        values: Map<String, String>,
-        readFile: (String) -> String = { """{"repository":{"default_branch":"main"}}""" },
-    ): ExecutionContext = ExecutionContexts.resolve(values, readFile)
+    private fun read(values: Map<String, String>): ExecutionContext = ExecutionContexts.resolve(values)
+
+    private fun payload(content: String = """{"repository":{"default_branch":"main"}}"""): String =
+        File.createTempFile("tagline-event", ".json").apply {
+            deleteOnExit()
+            writeText(content)
+        }.absolutePath
+
+    private fun missingPayload(): String = File.createTempFile("tagline-missing", ".json").apply {
+        deleteOnExit()
+        delete()
+    }.absolutePath
+
+    private fun directoryPayload(): String = File.createTempFile("tagline-directory", "").apply {
+        deleteOnExit()
+        delete()
+        mkdirs()
+    }.absolutePath
 }

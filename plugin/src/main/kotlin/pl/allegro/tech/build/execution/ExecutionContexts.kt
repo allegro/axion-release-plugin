@@ -11,7 +11,6 @@ internal object ExecutionContexts {
 
     fun resolve(
         environment: Map<String, String>,
-        readFile: (String) -> String,
     ): ExecutionContext {
         fun values(provider: ExecutionContextResolver): EnvironmentVariables =
             EnvironmentVariables(provider.variables, environment::get)
@@ -20,7 +19,7 @@ internal object ExecutionContexts {
         val selected = providers.firstOrNull { it.isActive(values(it)) }
         if (selected == null) return local
         return try {
-            selected.resolve(values(selected), local, readFile)
+            selected.resolve(values(selected), local)
         } catch (failure: ProviderUnavailableException) {
             local.copy(fallbackFailure = failure)
         }

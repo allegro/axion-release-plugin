@@ -32,7 +32,6 @@ internal data class GitLabContext(
         override fun resolve(
             environment: EnvironmentVariables,
             fallback: ExecutionContext.Local,
-            readFile: (String) -> String,
         ): GitLabContext {
             val event = GitLabEvents.detect(
                 environment.maybeGet(EnvironmentField.COMMIT_TAG), environment.maybeGet(EnvironmentField.EVENT_NAME),
