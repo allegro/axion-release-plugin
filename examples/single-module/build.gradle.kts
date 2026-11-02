@@ -1,14 +1,24 @@
-import pl.allegro.tech.build.extension.ProjectTaglineExtension
-
 plugins {
     `java-library`
     `maven-publish`
 }
 
 group = "example"
-val tagline = extensions.getByType<ProjectTaglineExtension>()
 
-// Capture values as task inputs during configuration; execution needs no Project access.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+publishing {
+    publications {
+        register<MavenPublication>("library") {
+            from(components["java"])
+        }
+    }
+}
+
 tasks.register<WriteProperties>("versionDetails") {
     destinationFile = layout.buildDirectory.file("version.properties")
     property("currentVersion", tagline.currentVersion)
@@ -21,10 +31,3 @@ tasks.register<WriteProperties>("versionDetails") {
     property("projectVersion", project.version.toString())
 }
 
-publishing {
-    publications {
-        register<MavenPublication>("library") {
-            from(components["java"])
-        }
-    }
-}

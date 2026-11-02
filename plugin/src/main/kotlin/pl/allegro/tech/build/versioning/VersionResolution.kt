@@ -25,5 +25,6 @@ internal class VersionResolution(
         }
     }
 
-    fun resolve(tags: TagSelection): VersionInfo = VersionResolver.resolve(metadata, tags, config, initialVersion)
+    fun resolve(tags: TagSelection): VersionInfo =
+        VersionResolver.resolve(metadata, tags, config, initialVersion)
 }

@@ -10,13 +10,13 @@ internal object ExecutionContexts {
     val variables: Set<String> = setOf("PATH") + providers.flatMap { it.variables.values.flatten() }
 
     fun read(
-        collected: Map<String, String>,
+        environment: Map<String, String>,
         readFile: (String) -> String,
     ): ExecutionContext {
         fun values(provider: CiProvider): EnvironmentVariables =
-            EnvironmentVariables(provider.variables, collected::get)
+            EnvironmentVariables(provider.variables, environment::get)
 
-        val local = ExecutionContext.Local(collected["PATH"]?.takeIf(String::isNotBlank))
+        val local = ExecutionContext.Local(environment["PATH"]?.takeIf(String::isNotBlank))
         val selected = providers.firstOrNull { it.isActive(values(it)) }
         if (selected == null) return local
         return try {
