@@ -13,7 +13,7 @@ import pl.allegro.tech.build.repository.RepositoryTagsSource.Parameters
 internal abstract class RepositoryTagsSource : ValueSource<TagSelection, Parameters> {
 
     override fun obtain(): TagSelection {
-        val executionContext = ExecutionContexts.read(parameters.environment.get()) { path ->
+        val executionContext = ExecutionContexts.resolve(parameters.environment.get()) { path ->
             parameters.directory.get().asFile.resolve(path).readText()
         }
         val repository = Adapters.tagReader(

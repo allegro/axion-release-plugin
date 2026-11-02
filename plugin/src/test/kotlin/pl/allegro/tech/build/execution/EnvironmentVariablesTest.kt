@@ -9,8 +9,8 @@ import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import pl.allegro.tech.build.execution.ci.EventTrigger
-import pl.allegro.tech.build.execution.ci.github.GitHubProvider
-import pl.allegro.tech.build.execution.ci.gitlab.GitLabProvider
+import pl.allegro.tech.build.execution.ci.github.GitHubContext
+import pl.allegro.tech.build.execution.ci.gitlab.GitLabContext
 import pl.allegro.tech.build.extension.TagLookup
 import pl.allegro.tech.build.repository.RepositoryMetadata
 
@@ -23,8 +23,8 @@ class EnvironmentVariablesTest {
             "GITHUB_REPOSITORY" to "example/library", "GITHUB_API_URL" to "https://github.example/api/v3/",
             "GH_TOKEN" to "preferred", "GITHUB_TOKEN" to "fallback",
         )
-        val github = assertIs<GitHubProvider.Context>(read(githubValues))
-        val gitlab = assertIs<GitLabProvider.Context>(read(mapOf(
+        val github = assertIs<GitHubContext>(read(githubValues))
+        val gitlab = assertIs<GitLabContext>(read(mapOf(
             "GITLAB_CI" to "true", "CI_PIPELINE_SOURCE" to "push", "CI_COMMIT_REF_NAME" to "main",
             "CI_COMMIT_SHA" to "revision", "CI_DEFAULT_BRANCH" to "main",
         )))
@@ -56,9 +56,9 @@ class EnvironmentVariablesTest {
         assertEquals("Authorization", githubApi.credential.name)
         assertEquals("Bearer preferred", githubApi.credential.value)
         assertFalse(github.toString().contains("preferred"), "Context diagnostics must redact credentials")
-        val fallback = assertIs<GitHubProvider.Context>(read(githubValues + ("GH_TOKEN" to "")))
+        val fallback = assertIs<GitHubContext>(read(githubValues + ("GH_TOKEN" to "")))
         assertEquals("Bearer fallback", fallback.apiAccess().credential.value)
-        val withoutToken = assertIs<GitHubProvider.Context>(read(githubValues - "GH_TOKEN" - "GITHUB_TOKEN"))
+        val withoutToken = assertIs<GitHubContext>(read(githubValues - "GH_TOKEN" - "GITHUB_TOKEN"))
         assertEquals(
             "GitHub API lookup requires GH_TOKEN or GITHUB_TOKEN with contents: read",
             assertFailsWith<ProviderUnavailableException> {
@@ -97,5 +97,5 @@ class EnvironmentVariablesTest {
     private fun read(
         values: Map<String, String>,
         readFile: (String) -> String = { """{"repository":{"default_branch":"main"}}""" },
-    ): ExecutionContext = ExecutionContexts.read(values, readFile)
+    ): ExecutionContext = ExecutionContexts.resolve(values, readFile)
 }
