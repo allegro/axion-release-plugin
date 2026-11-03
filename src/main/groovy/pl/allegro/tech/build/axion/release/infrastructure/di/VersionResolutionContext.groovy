@@ -14,6 +14,7 @@ import pl.allegro.tech.build.axion.release.infrastructure.config.RulesFactory
 import pl.allegro.tech.build.axion.release.infrastructure.config.ScmPropertiesFactory
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitChangesPrinter
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
+import pl.allegro.tech.build.axion.release.infrastructure.git.NativeGitRepository
 
 class VersionResolutionContext {
 
@@ -80,6 +81,12 @@ class VersionResolutionContext {
     }
 
     ScmChangesPrinter changesPrinter() {
-        return new GitChangesPrinter(scmRepository as GitRepository)
+        return new GitChangesPrinter(jgitRepository())
+    }
+
+    private GitRepository jgitRepository() {
+        return (scmRepository instanceof NativeGitRepository
+            ? ((NativeGitRepository) scmRepository).writeDelegate
+            : scmRepository) as GitRepository
     }
 }

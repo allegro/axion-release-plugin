@@ -44,4 +44,27 @@ you do not want to set this in your build script:
 The command line flag **will** override the build script even if the
 script has explicitly set the `pushTagsOnly` flag to false.
 
+## Repository backend
+
+By default `axion-release` reads the repository with **JGit**. On very
+large repositories the tag walk and the working tree status scan
+performed during configuration can take seconds. In that case you can
+switch reads to the native `git` executable:
+
+    scmVersion {
+        repository {
+            backend.set("nativeGit")
+        }
+    }
+
+A command line flag, `release.scmBackend`, is also available:
+
+    ./gradlew currentVersion -Prelease.scmBackend=nativeGit
+
+Only reads use the `git` executable. Tagging, committing, fetching and
+pushing still go through JGit, so authorization keeps working exactly
+the same way - see [authorization](authorization.md).
+
+The native backend requires `git` to be available on `PATH`.
+
 See [authorization](authorization.md) for authorization options.
