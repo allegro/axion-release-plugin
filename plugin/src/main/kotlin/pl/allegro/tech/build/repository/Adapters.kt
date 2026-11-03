@@ -21,7 +21,7 @@ internal object Adapters {
     fun tagReader(backend: Backend, context: ExecutionContext, directory: File, offline: Boolean): TagReader = when (context) {
         is ExecutionContext.Ci -> if (backend == Backend.AUTO) {
             FallbackTagReader(
-                TagReader { prefix, tagLookup -> context.resolveTags(prefix, tagLookup, offline) },
+                TagReader { prefix, tagLookup -> context.selectTags(prefix, tagLookup, offline) },
                 { localRepository(context.fallback.executablePath, directory) },
             )
         } else {

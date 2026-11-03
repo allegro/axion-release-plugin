@@ -16,6 +16,6 @@ internal sealed interface ExecutionContext {
         val event: EventTrigger
         val fallback: Local
 
-        fun resolveTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection
+        fun selectTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection
     }
 }

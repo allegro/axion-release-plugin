@@ -35,19 +35,19 @@ class EnvironmentVariablesTest {
         assertEquals(
             "GitHub NEAREST_REACHABLE lookup is not supported yet",
             assertFailsWith<ProviderUnavailableException> {
-                github.resolveTags("v", TagLookup.NEAREST_REACHABLE, offline = false)
+                github.selectTags("v", TagLookup.NEAREST_REACHABLE, offline = false)
             }.message,
         )
         assertEquals(
             "GitLab provider tag resolution is not supported yet",
             assertFailsWith<ProviderUnavailableException> {
-                gitlab.resolveTags("v", TagLookup.HIGHEST_GLOBAL, offline = false)
+                gitlab.selectTags("v", TagLookup.HIGHEST_GLOBAL, offline = false)
             }.message,
         )
         assertEquals(
             "Offline mode prevents CI tag API lookup",
             assertFailsWith<ProviderUnavailableException> {
-                github.resolveTags("v", TagLookup.HIGHEST_GLOBAL, offline = true)
+                github.selectTags("v", TagLookup.HIGHEST_GLOBAL, offline = true)
             }.message,
         )
 
@@ -62,7 +62,7 @@ class EnvironmentVariablesTest {
         assertEquals(
             "GitHub API lookup requires GH_TOKEN or GITHUB_TOKEN with contents: read",
             assertFailsWith<ProviderUnavailableException> {
-                withoutToken.resolveTags("v", TagLookup.HIGHEST_GLOBAL, offline = false)
+                withoutToken.selectTags("v", TagLookup.HIGHEST_GLOBAL, offline = false)
             }.message,
         )
     }

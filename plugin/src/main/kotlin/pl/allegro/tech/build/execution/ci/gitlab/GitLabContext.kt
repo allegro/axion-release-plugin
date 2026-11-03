@@ -16,7 +16,7 @@ internal data class GitLabContext(
     override val fallback: ExecutionContext.Local,
 ) : ExecutionContext.Ci {
 
-    override fun resolveTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection =
+    override fun selectTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection =
         throw ProviderUnavailableException("GitLab provider tag resolution is not supported yet")
 
     companion object : ExecutionContextResolver {

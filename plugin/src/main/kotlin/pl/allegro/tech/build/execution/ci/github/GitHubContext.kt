@@ -26,7 +26,7 @@ internal data class GitHubContext(
     val credential: HeaderCredential?,
 ) : ExecutionContext.Ci {
 
-    override fun resolveTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection {
+    override fun selectTags(prefix: String, tagLookup: TagLookup, offline: Boolean): TagSelection {
         val eventTag = event.currentTag
         if (eventTag != null) {
             requireNotNull(versionTag(eventTag, prefix)) {
