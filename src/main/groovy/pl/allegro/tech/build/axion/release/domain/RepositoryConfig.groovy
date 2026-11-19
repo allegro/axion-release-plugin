@@ -10,6 +10,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import pl.allegro.tech.build.axion.release.domain.scm.ScmBackend
 
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ abstract class RepositoryConfig extends BaseExtension {
     private static final String OVERRIDDEN_IS_CLEAN = 'release.overriddenIsClean'
     private static final String DISABLE_SSH_AGENT = 'release.disableSshAgent'
     private static final String FETCH_TAGS_PROPERTY = 'release.fetchTags'
+    private static final String SCM_BACKEND_PROPERTY = 'release.scmBackend'
 
 
     @Inject
@@ -33,6 +35,7 @@ abstract class RepositoryConfig extends BaseExtension {
         pushTagsOnly.convention(false)
         type.convention("git")
         remote.convention("origin")
+        backend.convention(ScmBackend.JGIT.id)
 
         customUsername.convention(gradleProperty(USERNAME_PROPERTY))
         customPassword.convention(gradleProperty(PASSWORD_PROPERTY))
@@ -79,6 +82,17 @@ abstract class RepositoryConfig extends BaseExtension {
     @Input
     @Optional
     abstract Property<Boolean> getPushTagsOnly()
+
+    /**
+     * Implementation used to read from the repository: 'jgit' (default) or 'nativeGit'.
+     */
+    @Input
+    @Optional
+    abstract Property<String> getBackend()
+
+    Provider<String> backend() {
+        gradleProperty(SCM_BACKEND_PROPERTY).orElse(backend)
+    }
 
     Provider<Boolean> pushTagsOnly() {
         gradlePropertyPresent(RELEASE_PUSH_TAGS_ONLY_PROPERTY).orElse(pushTagsOnly)

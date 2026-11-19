@@ -79,7 +79,9 @@ class GitProjectBuilder {
     Map build() {
         Map map = [:]
         map[Grgit] = rawRepository
-        map[GitRepository] = new GitRepository(scmProperties)
+        GitRepository gitRepository = new GitRepository(scmProperties)
+        map[GitRepository] = gitRepository
+        map[NativeGitRepository] = new NativeGitRepository(scmProperties, gitRepository)
 
         return map
     }

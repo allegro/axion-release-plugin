@@ -1,12 +1,19 @@
 package pl.allegro.tech.build.axion.release.domain.scm
 
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.testfixtures.ProjectBuilder
+
 class ScmPropertiesBuilder {
+
+    // ProviderFactory is only obtainable from a Gradle project, one throwaway project per JVM is enough
+    private static final ProviderFactory PROVIDERS = ProjectBuilder.builder().build().providers
 
     private final File directory
 
     private String type = 'git'
     private String overriddenBranchName
     private Boolean overriddenIsClean = null
+    private ScmBackend backend = ScmBackend.JGIT
 
     private ScmPropertiesBuilder(File directory) {
         this.directory = directory
@@ -26,6 +33,11 @@ class ScmPropertiesBuilder {
         return this
     }
 
+    ScmPropertiesBuilder withBackend(ScmBackend backend) {
+        this.backend = backend
+        return this
+    }
+
     ScmProperties build() {
         return new ScmProperties(
             type,
@@ -42,7 +54,9 @@ class ScmPropertiesBuilder {
             ['main', 'master'] as Set,
             false,
             true,
-            'v'
+            'v',
+            backend,
+            PROVIDERS
         )
     }
 

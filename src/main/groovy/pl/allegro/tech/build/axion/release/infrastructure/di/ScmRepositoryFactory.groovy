@@ -2,11 +2,13 @@ package pl.allegro.tech.build.axion.release.infrastructure.di
 
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import pl.allegro.tech.build.axion.release.domain.scm.ScmBackend
 import pl.allegro.tech.build.axion.release.domain.scm.ScmProperties
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepository
 import pl.allegro.tech.build.axion.release.domain.scm.ScmRepositoryUnavailableException
 import pl.allegro.tech.build.axion.release.infrastructure.DummyRepository
 import pl.allegro.tech.build.axion.release.infrastructure.git.GitRepository
+import pl.allegro.tech.build.axion.release.infrastructure.git.NativeGitRepository
 
 class ScmRepositoryFactory {
     private static final Logger logger = Logging.getLogger(ScmRepositoryFactory.class);
@@ -20,7 +22,11 @@ class ScmRepositoryFactory {
 
         ScmRepository repository
         try {
-            repository = new GitRepository(properties)
+            GitRepository jgitRepository = new GitRepository(properties)
+            // the native backend only takes over reads, writes stay on JGit to keep transport auth unchanged
+            repository = properties.backend == ScmBackend.NATIVE
+                ? new NativeGitRepository(properties, jgitRepository)
+                : jgitRepository
         } catch (ScmRepositoryUnavailableException exception) {
             logger.warn("Failed to open repository, trying to work without it $exception.message")
             repository = new DummyRepository()
